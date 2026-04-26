@@ -1,1 +1,444 @@
+name: 🧪 CI Pipeline
 
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  # Backend Tests
+  test-backend:
+    runs-on: ubuntu-latest
+    
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: test_tiktok_panel
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+      
+      redis:
+        image: redis:7-alpine
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 6379:6379
+    
+    steps:
+    - name: 📥 Checkout
+      uses: actions/checkout@v4
+    
+    - name: 🐍 Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+        cache: 'pip'
+    
+    - name: 📦 Install dependencies
+      run: |
+        cd backend
+        pip install -r requirements.txt
+        pip install pytest pytest-asyncio pytest-cov
+    
+    - name: 🔧 Set environment variables
+      run: |
+        cd backend
+        echo "DATABASE_URL=postgresql://postgres:postgres@localhost:5432/test_tiktok_panel" >> .env
+        echo "REDIS_URL=redis://localhost:6379" >> .env
+        echo "SECRET_KEY=test-secret-key-for-ci" >> .env
+        echo "DEBUG=true" >> .env
+    
+    - name: 🧪 Run tests
+      run: |
+        cd backend
+        pytest --cov=app --cov-report=xml --cov-report=term-missing tests/
+    
+    - name: 📊 Upload coverage
+      uses: codecov/codecov-action@v3
+      with:
+        file: ./backend/coverage.xml
+        flags: backend
+        name: backend-coverage
+    
+    - name: 🔍 Lint code
+      run: |
+        cd backend
+        pip install flake8 black mypy
+        flake8 app/ --count --select=E9,F63,F7,F82 --show-source --statistics
+        black --check app/
+        mypy app/
+
+  # Frontend Tests
+  test-frontend:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: 📥 Checkout
+      uses: actions/checkout@v4
+    
+    - name: 📦 Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+        cache-dependency-path: frontend/package-lock.json
+    
+    - name: 📦 Install dependencies
+      run: |
+        cd frontend
+        npm ci
+    
+    - name: 🔍 Lint code
+      run: |
+        cd frontend
+        npm run lint
+    
+    - name: 🧪 Run tests
+      run: |
+        cd frontend
+        npm run test
+    
+    - name: 🏗️ Build frontend
+      run: |
+        cd frontend
+        npm run build
+    
+    - name: 📊 Upload coverage
+      uses: codecov/codecov-action@v3
+      with:
+        file: ./frontend/coverage/lcov.info
+        flags: frontend
+        name: frontend-coverage
+
+  # Security Scan
+  security-scan:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: 📥 Checkout
+      uses: actions/checkout@v4
+    
+    - name: 🔒 Run Trivy vulnerability scanner
+      uses: aquasecurity/trivy-action@master
+      with:
+        scan-type: 'fs'
+        scan-ref: '.'
+        format: 'sarif'
+        output: 'trivy-results.sarif'
+    
+    - name: 📊 Upload Trivy scan results
+      uses: github/codeql-action/upload-sarif@v2
+      with:
+        sarif_file: 'trivy-results.sarif'
+    
+    - name: 🔍 Run CodeQL Analysis
+      uses: github/codeql-action/analyze@v2
+      with:
+        languages: python, javascript
+
+  # Docker Build Test
+  test-docker:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: 📥 Checkout
+      uses: actions/checkout@v4
+    
+    - name: 🐳 Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
+    
+    - name: 🏗️ Build backend image
+      uses: docker/build-push-action@v5
+      with:
+        context: ./backend
+        push: false
+        tags: tiktok-panel/backend:test
+        cache-from: type=gha
+        cache-to: type=gha,mode=max
+    
+    - name: 🏗️ Build frontend image
+      uses: docker/build-push-action@v5
+      with:
+        context: ./frontend
+        push: false
+        tags: tiktok-panel/frontend:test
+        cache-from: type=gha
+        cache-to: type=gha,mode=max
+    
+    - name: 🧪 Test Docker Compose
+      run: |
+        docker-compose -f docker-compose.yml up -d
+        sleep 30
+        
+        # Health checks
+        curl -f http://localhost:8000/api/health || exit 1
+        curl -f http://localhost:3000 || exit 1
+        
+        docker-compose down
+
+  # Integration Tests
+  integration-tests:
+    runs-on: ubuntu-latest
+    needs: [test-backend, test-frontend]
+    
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: test_tiktok_panel
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+      
+      redis:
+        image: redis:7-alpine
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 6379:6379
+    
+    steps:
+    - name: 📥 Checkout
+      uses: actions/checkout@v4
+    
+    - name: 🐍 Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+        cache: 'pip'
+    
+    - name: 📦 Install dependencies
+      run: |
+        cd backend
+        pip install -r requirements.txt
+        pip install pytest pytest-asyncio httpx
+    
+    - name: 🔧 Set environment
+      run: |
+        cd backend
+        echo "DATABASE_URL=postgresql://postgres:postgres@localhost:5432/test_tiktok_panel" >> .env
+        echo "REDIS_URL=redis://localhost:6379" >> .env
+        echo "SECRET_KEY=test-secret-key-for-ci" >> .env
+        echo "DEBUG=true" >> .env
+    
+    - name: 🚀 Start backend
+      run: |
+        cd backend
+        uvicorn app.main:app --host 0.0.0.0 --port 8000 &
+        sleep 10
+    
+    - name: 🧪 Run integration tests
+      run: |
+        cd backend
+        pytest tests/integration/ -v
+    
+    - name: 🔍 API Tests
+      run: |
+        # Test health endpoint
+        curl -f http://localhost:8000/api/health
+        
+        # Test main endpoint
+        curl -f http://localhost:8000/
+        
+        # Test WebSocket
+        python -c "
+        import asyncio
+        import websockets
+        import json
+        
+        async def test_websocket():
+            try:
+                async with websockets.connect('ws://localhost:8000/ws/test-user') as websocket:
+                    await websocket.send(json.dumps({'type': 'ping'}))
+                    response = await websocket.recv()
+                    print('WebSocket test passed:', response)
+                    return True
+            except Exception as e:
+                print('WebSocket test failed:', e)
+                return False
+        
+        result = asyncio.run(test_websocket())
+        exit(0 if result else 1)
+        "
+
+  # Performance Tests
+  performance-tests:
+    runs-on: ubuntu-latest
+    needs: [test-backend, test-frontend]
+    if: github.event_name == 'pull_request'
+    
+    steps:
+    - name: 📥 Checkout
+      uses: actions/checkout@v4
+    
+    - name: 🐍 Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+    
+    - name: 📦 Install dependencies
+      run: |
+        cd backend
+        pip install -r requirements.txt
+        pip install locust
+    
+    - name: 🚀 Start backend
+      run: |
+        cd backend
+        echo "DATABASE_URL=sqlite:///./test.db" >> .env
+        echo "REDIS_URL=redis://localhost:6379" >> .env
+        echo "SECRET_KEY=test-secret-key" >> .env
+        uvicorn app.main:app --host 0.0.0.0 --port 8000 &
+        sleep 10
+    
+    - name: 🧪 Load tests
+      run: |
+        cd backend
+        # Create locustfile
+        cat > locustfile.py << 'EOF'
+        from locust import HttpUser, task, between
+        import json
+        
+        class ApiUser(HttpUser):
+            wait_time = between(1, 3)
+            
+            @task
+            def health_check(self):
+                self.client.get("/api/health")
+            
+            @task
+            def main_page(self):
+                self.client.get("/")
+            
+            @task
+            def websocket_test(self):
+                # WebSocket test would need special handling
+                pass
+        
+        class WebsiteUser(HttpUser):
+            wait_time = between(1, 5)
+            
+            @task
+            def index_page(self):
+                self.client.get("/")
+        EOF
+        
+        # Run load test
+        locust --headless --users 10 --spawn-rate 2 --run-time 30s --host http://localhost:8000 locustfile.py
+    
+    - name: 📊 Performance Report
+      run: |
+        echo "Performance tests completed"
+        echo "Load test: 10 users for 30 seconds"
+        echo "Check logs for detailed metrics"
+
+  # Documentation Build
+  build-docs:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: 📥 Checkout
+      uses: actions/checkout@v4
+    
+    - name: 📦 Setup Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+    
+    - name: 📦 Install dependencies
+      run: |
+        pip install mkdocs mkdocs-material mkdocs-mermaid2-plugin
+    
+    - name: 📚 Build documentation
+      run: |
+        # Create docs if they don't exist
+        mkdir -p docs
+        
+        # Create mkdocs.yml
+        cat > mkdocs.yml << 'EOF'
+        site_name: TikTok Panel
+        site_description: TikTok jeton yönetim paneli
+        
+        theme:
+          name: material
+          palette:
+            - scheme: slate
+              primary: purple
+              accent: pink
+              toggle:
+                icon: material/brightness-4
+                name: Dark mode
+            - scheme: default
+              primary: purple
+              accent: pink
+              toggle:
+                icon: material/brightness-7
+                name: Light mode
+        
+        plugins:
+          - search
+          - mermaid2
+        
+        nav:
+          - Home: index.md
+          - Installation: installation.md
+          - API Reference: api.md
+          - Development: development.md
+          - Deployment: deployment.md
+        
+        markdown_extensions:
+          - codehilite
+          - admonition
+          - toc:
+            permalink: true
+        EOF
+        
+        # Create documentation files
+        cat > docs/index.md << 'EOF'
+        # TikTok Panel
+        
+        TikTok jeton yönetim paneli - Canlı yayın takibi, otomatik sandık yakalama ve gelişmiş analitik.
+        
+        ## Features
+        
+        - 🔴 Canlı yayın takibi
+        - 💎 Otomatik sandık yakalama
+        - 📊 Real-time analitik
+        - 🎨 Modern koyu tema
+        - 🔐 Güvenli ve hızlı
+        
+        ## Quick Start
+        
+        ```bash
+        docker-compose up -d
+        # Open http://localhost:8000
+        ```
+        EOF
+        
+        # Build docs
+        mkdocs build
+    
+    - name: 📊 Upload docs artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: documentation
+        path: site/
