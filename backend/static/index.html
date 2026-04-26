@@ -1,0 +1,962 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TikTok Panel - Jeton Yönetim Sistemi</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <!-- Custom Styles -->
+    <style>
+        :root {
+            --background: 15 15 35;
+            --surface: 26 26 46;
+            --surface-light: 37 37 66;
+            --primary: 124 58 237;
+            --primary-light: 167 139 250;
+            --secondary: 236 72 153;
+            --secondary-light: 244 114 182;
+            --accent: 6 182 212;
+            --accent-light: 34 211 238;
+            --success: 16 185 129;
+            --warning: 245 158 11;
+            --error: 239 68 68;
+            --text-primary: 226 232 240;
+            --text-secondary: 148 163 184;
+            --text-muted: 100 116 139;
+        }
+        
+        * {
+            box-sizing: border-box;
+            padding: 0;
+            margin: 0;
+        }
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            color: rgb(var(--text-primary));
+            background: linear-gradient(135deg, #0f0f23 0%, #1a1a2e 50%, #0f0f23 100%);
+            min-height: 100vh;
+        }
+        
+        .glass {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .glass-dark {
+            background: rgba(0, 0, 0, 0.2);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .gradient-border {
+            background: linear-gradient(135deg, rgb(var(--primary)), rgb(var(--secondary)));
+            padding: 1px;
+        }
+        
+        .gradient-border-inner {
+            background: rgb(var(--background));
+            padding: 1rem;
+        }
+        
+        .text-gradient {
+            background: linear-gradient(135deg, rgb(var(--primary)), rgb(var(--secondary)));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .hover-glow {
+            transition: all 0.3s ease;
+        }
+        
+        .hover-glow:hover {
+            box-shadow: 0 0 30px rgba(124, 58, 237, 0.6);
+            transform: translateY(-2px);
+        }
+        
+        .animate-float {
+            animation: float 3s ease-in-out infinite;
+        }
+        
+        .animate-glow {
+            animation: glow 2s ease-in-out infinite alternate;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+        
+        @keyframes glow {
+            0% { box-shadow: 0 0 20px rgba(124, 58, 237, 0.5); }
+            100% { box-shadow: 0 0 30px rgba(124, 58, 237, 0.8); }
+        }
+        
+        .loading-spinner {
+            border: 2px solid rgba(124, 58, 237, 0.3);
+            border-top: 2px solid rgb(124, 58, 237);
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .stat-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 1rem;
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+        }
+        
+        .stat-card:hover {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: rgba(124, 58, 237, 0.3);
+            transform: translateY(-2px);
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, rgb(124, 58, 237), rgb(236, 72, 153));
+            color: white;
+            font-weight: 600;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary:hover {
+            box-shadow: 0 10px 25px rgba(124, 58, 237, 0.3);
+            transform: translateY(-2px);
+        }
+        
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            color: white;
+            font-weight: 600;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
+        }
+        
+        .badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+        
+        .badge-success {
+            background: rgba(16, 185, 129, 0.2);
+            color: rgb(16, 185, 129);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+        }
+        
+        .badge-warning {
+            background: rgba(245, 158, 11, 0.2);
+            color: rgb(245, 158, 11);
+            border: 1px solid rgba(245, 158, 11, 0.3);
+        }
+        
+        .badge-error {
+            background: rgba(239, 68, 68, 0.2);
+            color: rgb(239, 68, 68);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+        }
+        
+        .notification {
+            position: fixed;
+            top: 1rem;
+            right: 1rem;
+            z-index: 1000;
+            max-width: 400px;
+        }
+        
+        .notification-item {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 0.5rem;
+            padding: 1rem;
+            margin-bottom: 0.5rem;
+            animation: slideIn 0.3s ease-out;
+        }
+        
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        
+        .scrollbar-custom {
+            scrollbar-width: thin;
+            scrollbar-color: rgba(124, 58, 237, 0.5) rgba(255, 255, 255, 0.1);
+        }
+        
+        .scrollbar-custom::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        .scrollbar-custom::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 4px;
+        }
+        
+        .scrollbar-custom::-webkit-scrollbar-thumb {
+            background: rgba(124, 58, 237, 0.5);
+            border-radius: 4px;
+        }
+        
+        .scrollbar-custom::-webkit-scrollbar-thumb:hover {
+            background: rgba(124, 58, 237, 0.7);
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="glass border-b border-white/10">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex items-center space-x-3">
+                    <div class="w-10 h-10 bg-gradient-to-r from-purple-500 to-pink-500 rounded-lg flex items-center justify-center">
+                        <i data-lucide="sparkles" class="w-6 h-6 text-white"></i>
+                    </div>
+                    <h1 class="text-2xl font-bold text-white">TikTok Panel</h1>
+                </div>
+                
+                <div class="flex items-center space-x-4">
+                    <div id="connectionStatus" class="flex items-center space-x-2 px-3 py-1 rounded-full bg-red-500/20 text-red-400">
+                        <div id="statusDot" class="w-2 h-2 rounded-full bg-red-400"></div>
+                        <span id="statusText" class="text-sm font-medium">Bağlantı Yok</span>
+                    </div>
+                    <button onclick="toggleSettings()" class="btn-secondary">
+                        <i data-lucide="settings" class="w-5 h-5"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <!-- Quick Stats -->
+        <section class="mb-8">
+            <h2 class="text-3xl font-bold text-white mb-6">Genel Bakış</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <div class="stat-card">
+                    <div class="flex items-center justify-between mb-2">
+                        <div class="w-12 h-12 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-lg flex items-center justify-center">
+                            <i data-lucide="play-circle" class="w-6 h-6 text-white"></i>
+                        </div>
+                        <span class="badge badge-success">Aktif</span>
+                    </div>
+                    <h3 class="text-2xl font-bold text-white mb-1" id="activeStreams">0</h3>
+                    <p class="text-gray-400 text-sm">Canlı Yayın</p>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="flex items-center justify-between mb-2">
+                        <div class="w-12 h-12 bg-gradient-to-r from-purple-500 to-pink-500 rounded-lg flex items-center justify-center">
+                            <i data-lucide="gift" class="w-6 h-6 text-white"></i>
+                        </div>
+                        <span class="badge badge-warning">+12%</span>
+                    </div>
+                    <h3 class="text-2xl font-bold text-white mb-1" id="totalGifts">0</h3>
+                    <p class="text-gray-400 text-sm">Toplam Hediye</p>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="flex items-center justify-between mb-2">
+                        <div class="w-12 h-12 bg-gradient-to-r from-green-500 to-emerald-500 rounded-lg flex items-center justify-center">
+                            <i data-lucide="package" class="w-6 h-6 text-white"></i>
+                        </div>
+                        <span class="badge badge-success">+8%</span>
+                    </div>
+                    <h3 class="text-2xl font-bold text-white mb-1" id="totalChests">0</h3>
+                    <p class="text-gray-400 text-sm">Toplam Sandık</p>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="flex items-center justify-between mb-2">
+                        <div class="w-12 h-12 bg-gradient-to-r from-orange-500 to-red-500 rounded-lg flex items-center justify-center">
+                            <i data-lucide="trending-up" class="w-6 h-6 text-white"></i>
+                        </div>
+                        <span class="badge badge-success">+25%</span>
+                    </div>
+                    <h3 class="text-2xl font-bold text-white mb-1" id="totalValue">0</h3>
+                    <p class="text-gray-400 text-sm">Toplam Değer</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Control Panel -->
+        <section class="mb-8">
+            <h2 class="text-3xl font-bold text-white mb-6">Kontrol Paneli</h2>
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <!-- Live Stream Controls -->
+                <div class="glass rounded-2xl p-6">
+                    <h3 class="text-xl font-semibold text-white mb-4">Canlı Yayın Kontrolü</h3>
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-gray-400 text-sm mb-2">TikTok Kullanıcı Adı</label>
+                            <input type="text" id="tiktokUsername" placeholder="@username" 
+                                   class="w-full bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg px-4 py-3 text-white placeholder-gray-400 focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 transition-all duration-200">
+                        </div>
+                        <div class="flex space-x-4">
+                            <button onclick="startLiveStream()" class="btn-primary">
+                                <i data-lucide="play" class="w-5 h-5 inline-block mr-2"></i>
+                                Yayını Başlat
+                            </button>
+                            <button onclick="stopLiveStream()" class="btn-secondary">
+                                <i data-lucide="stop-circle" class="w-5 h-5 inline-block mr-2"></i>
+                                Durdur
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Chest Detection -->
+                <div class="glass rounded-2xl p-6">
+                    <h3 class="text-xl font-semibold text-white mb-4">Sandık Tespiti</h3>
+                    <div class="space-y-4">
+                        <div class="flex items-center justify-between">
+                            <span class="text-gray-400">Otomatik Sandık Yakalama</span>
+                            <label class="relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" id="chestDetection" class="sr-only peer">
+                                <div class="w-11 h-6 bg-gray-600 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-purple-500"></div>
+                            </label>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <span class="text-gray-400">Otomatik Hediye Gönderme</span>
+                            <label class="relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" id="autoGift" class="sr-only peer">
+                                <div class="w-11 h-6 bg-gray-600 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-purple-500"></div>
+                            </label>
+                        </div>
+                        <div>
+                            <label class="block text-gray-400 text-sm mb-2">Hediye Miktarı</label>
+                            <select id="giftAmount" class="w-full bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg px-4 py-3 text-white focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 transition-all duration-200">
+                                <option value="1">1x</option>
+                                <option value="5">5x</option>
+                                <option value="10">10x</option>
+                                <option value="50">50x</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Live Activity -->
+        <section class="mb-8">
+            <h2 class="text-3xl font-bold text-white mb-6">Canlı Aktivite</h2>
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <!-- Recent Gifts -->
+                <div class="glass rounded-2xl p-6">
+                    <h3 class="text-xl font-semibold text-white mb-4">Son Hediyeler</h3>
+                    <div id="giftsList" class="space-y-3 max-h-96 overflow-y-auto scrollbar-custom">
+                        <!-- Gifts will be added here dynamically -->
+                        <div class="text-gray-400 text-center py-8">Henüz hediye alınmadı</div>
+                    </div>
+                </div>
+                
+                <!-- Recent Chests -->
+                <div class="glass rounded-2xl p-6">
+                    <h3 class="text-xl font-semibold text-white mb-4">Sandıklar</h3>
+                    <div id="chestsList" class="space-y-3 max-h-96 overflow-y-auto scrollbar-custom">
+                        <!-- Chests will be added here dynamically -->
+                        <div class="text-gray-400 text-center py-8">Henüz sandık tespit edilmedi</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Analytics -->
+        <section class="mb-8">
+            <h2 class="text-3xl font-bold text-white mb-6">Analitik</h2>
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <!-- Gift Chart -->
+                <div class="glass rounded-2xl p-6">
+                    <h3 class="text-xl font-semibold text-white mb-4">Hediye Grafiği</h3>
+                    <canvas id="giftChart" width="400" height="200"></canvas>
+                </div>
+                
+                <!-- Chest Chart -->
+                <div class="glass rounded-2xl p-6">
+                    <h3 class="text-xl font-semibold text-white mb-4">Sandık Grafiği</h3>
+                    <canvas id="chestChart" width="400" height="200"></canvas>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Notifications -->
+    <div id="notifications" class="notification"></div>
+
+    <!-- Settings Modal -->
+    <div id="settingsModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 hidden">
+        <div class="flex items-center justify-center min-h-screen p-4">
+            <div class="glass rounded-2xl p-6 max-w-md w-full">
+                <h3 class="text-xl font-semibold text-white mb-4">Ayarlar</h3>
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-gray-400 text-sm mb-2">Backend URL</label>
+                        <input type="text" id="backendUrl" value="http://localhost:8000" 
+                               class="w-full bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg px-4 py-3 text-white focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 transition-all duration-200">
+                    </div>
+                    <div>
+                        <label class="block text-gray-400 text-sm mb-2">WebSocket URL</label>
+                        <input type="text" id="websocketUrl" value="ws://localhost:8000" 
+                               class="w-full bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg px-4 py-3 text-white focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 transition-all duration-200">
+                    </div>
+                    <div>
+                        <label class="block text-gray-400 text-sm mb-2">Kullanıcı ID</label>
+                        <input type="text" id="userId" value="demo-user" 
+                               class="w-full bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg px-4 py-3 text-white focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 transition-all duration-200">
+                    </div>
+                </div>
+                <div class="flex space-x-4 mt-6">
+                    <button onclick="saveSettings()" class="btn-primary">Kaydet</button>
+                    <button onclick="toggleSettings()" class="btn-secondary">İptal</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript -->
+    <script>
+        // Global variables
+        let ws = null;
+        let isConnected = false;
+        let stats = {
+            activeStreams: 0,
+            totalGifts: 0,
+            totalChests: 0,
+            totalValue: 0
+        };
+        let giftChart = null;
+        let chestChart = null;
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            lucide.createIcons();
+            initializeCharts();
+            connectWebSocket();
+            loadSettings();
+        });
+
+        // WebSocket connection
+        function connectWebSocket() {
+            const websocketUrl = document.getElementById('websocketUrl').value;
+            const userId = document.getElementById('userId').value;
+            
+            try {
+                ws = new WebSocket(`${websocketUrl}/ws/${userId}`);
+                
+                ws.onopen = function() {
+                    isConnected = true;
+                    updateConnectionStatus(true);
+                    showNotification('Bağlantı kuruldu', 'success');
+                    console.log('WebSocket connected');
+                };
+                
+                ws.onmessage = function(event) {
+                    const data = JSON.parse(event.data);
+                    handleWebSocketMessage(data);
+                };
+                
+                ws.onclose = function() {
+                    isConnected = false;
+                    updateConnectionStatus(false);
+                    showNotification('Bağlantı koptu', 'error');
+                    console.log('WebSocket disconnected');
+                    
+                    // Try to reconnect after 3 seconds
+                    setTimeout(connectWebSocket, 3000);
+                };
+                
+                ws.onerror = function(error) {
+                    console.error('WebSocket error:', error);
+                    showNotification('Bağlantı hatası', 'error');
+                };
+                
+            } catch (error) {
+                console.error('WebSocket connection error:', error);
+                showNotification('WebSocket bağlantısı kurulamadı', 'error');
+            }
+        }
+
+        // Handle WebSocket messages
+        function handleWebSocketMessage(data) {
+            switch(data.type) {
+                case 'live_connected':
+                    handleLiveConnected(data);
+                    break;
+                case 'gift_received':
+                    handleGiftReceived(data);
+                    break;
+                case 'chest_detected':
+                    handleChestDetected(data);
+                    break;
+                case 'comment_received':
+                    handleCommentReceived(data);
+                    break;
+                case 'notification':
+                    showNotification(data.data.title, data.data.type, data.data.message);
+                    break;
+                default:
+                    console.log('Unknown message type:', data);
+            }
+        }
+
+        // Handle live stream connection
+        function handleLiveConnected(data) {
+            stats.activeStreams++;
+            updateStats();
+            showNotification('Yayına bağlandı', 'success', `${data.data.username} yayınına bağlandı`);
+        }
+
+        // Handle gift received
+        function handleGiftReceived(data) {
+            const gift = data.data;
+            stats.totalGifts++;
+            stats.totalValue += gift.gift_cost || 0;
+            updateStats();
+            addGiftToList(gift);
+            updateGiftChart();
+            showNotification('Hediye alındı', 'success', `${gift.gift_name} - ${gift.gift_cost} jeton`);
+        }
+
+        // Handle chest detected
+        function handleChestDetected(data) {
+            const chest = data.data;
+            stats.totalChests++;
+            stats.totalValue += chest.chest_value || 0;
+            updateStats();
+            addChestToList(chest);
+            updateChestChart();
+            showNotification('Sandık tespit edildi', 'warning', `${chest.chest_type} - ${chest.chest_value} jeton`);
+        }
+
+        // Handle comment received
+        function handleCommentReceived(data) {
+            const comment = data.data;
+            console.log('Comment:', comment);
+        }
+
+        // Update connection status
+        function updateConnectionStatus(connected) {
+            const statusDot = document.getElementById('statusDot');
+            const statusText = document.getElementById('statusText');
+            const statusContainer = document.getElementById('connectionStatus');
+            
+            if (connected) {
+                statusDot.className = 'w-2 h-2 rounded-full bg-green-400 animate-pulse';
+                statusText.textContent = 'Bağlı';
+                statusContainer.className = 'flex items-center space-x-2 px-3 py-1 rounded-full bg-green-500/20 text-green-400';
+            } else {
+                statusDot.className = 'w-2 h-2 rounded-full bg-red-400';
+                statusText.textContent = 'Bağlantı Yok';
+                statusContainer.className = 'flex items-center space-x-2 px-3 py-1 rounded-full bg-red-500/20 text-red-400';
+            }
+        }
+
+        // Update stats
+        function updateStats() {
+            document.getElementById('activeStreams').textContent = stats.activeStreams;
+            document.getElementById('totalGifts').textContent = stats.totalGifts;
+            document.getElementById('totalChests').textContent = stats.totalChests;
+            document.getElementById('totalValue').textContent = stats.totalValue;
+        }
+
+        // Add gift to list
+        function addGiftToList(gift) {
+            const giftsList = document.getElementById('giftsList');
+            
+            // Remove empty message if exists
+            const emptyMessage = giftsList.querySelector('.text-gray-400');
+            if (emptyMessage) {
+                emptyMessage.remove();
+            }
+            
+            const giftElement = document.createElement('div');
+            giftElement.className = 'glass rounded-lg p-3 hover:bg-white/15 transition-all duration-200';
+            giftElement.innerHTML = `
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-white font-medium">${gift.gift_name}</p>
+                        <p class="text-gray-400 text-sm">${gift.user || 'Bilinmeyen'} - ${new Date().toLocaleTimeString()}</p>
+                    </div>
+                    <div class="text-right">
+                        <p class="text-purple-400 font-bold">${gift.gift_cost || 0}</p>
+                        <p class="text-gray-400 text-sm">jeton</p>
+                    </div>
+                </div>
+            `;
+            
+            giftsList.insertBefore(giftElement, giftsList.firstChild);
+            
+            // Keep only last 10 gifts
+            while (giftsList.children.length > 10) {
+                giftsList.removeChild(giftsList.lastChild);
+            }
+        }
+
+        // Add chest to list
+        function addChestToList(chest) {
+            const chestsList = document.getElementById('chestsList');
+            
+            // Remove empty message if exists
+            const emptyMessage = chestsList.querySelector('.text-gray-400');
+            if (emptyMessage) {
+                emptyMessage.remove();
+            }
+            
+            const chestElement = document.createElement('div');
+            chestElement.className = 'glass rounded-lg p-3 hover:bg-white/15 transition-all duration-200';
+            chestElement.innerHTML = `
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-white font-medium">${chest.chest_type}</p>
+                        <p class="text-gray-400 text-sm">${new Date().toLocaleTimeString()}</p>
+                    </div>
+                    <div class="text-right">
+                        <p class="text-green-400 font-bold">${chest.chest_value || 0}</p>
+                        <p class="text-gray-400 text-sm">jeton</p>
+                    </div>
+                </div>
+            `;
+            
+            chestsList.insertBefore(chestElement, chestsList.firstChild);
+            
+            // Keep only last 10 chests
+            while (chestsList.children.length > 10) {
+                chestsList.removeChild(chestsList.lastChild);
+            }
+        }
+
+        // Initialize charts
+        function initializeCharts() {
+            // Gift chart
+            const giftCtx = document.getElementById('giftChart').getContext('2d');
+            giftChart = new Chart(giftCtx, {
+                type: 'line',
+                data: {
+                    labels: ['00:00', '04:00', '08:00', '12:00', '16:00', '20:00', '24:00'],
+                    datasets: [{
+                        label: 'Hediyeler',
+                        data: [0, 0, 0, 0, 0, 0, 0],
+                        borderColor: 'rgb(124, 58, 237)',
+                        backgroundColor: 'rgba(124, 58, 237, 0.1)',
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            labels: {
+                                color: 'rgb(226, 232, 240)'
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            grid: {
+                                color: 'rgba(255, 255, 255, 0.1)'
+                            },
+                            ticks: {
+                                color: 'rgb(148, 163, 184)'
+                            }
+                        },
+                        y: {
+                            grid: {
+                                color: 'rgba(255, 255, 255, 0.1)'
+                            },
+                            ticks: {
+                                color: 'rgb(148, 163, 184)'
+                            }
+                        }
+                    }
+                }
+            });
+
+            // Chest chart
+            const chestCtx = document.getElementById('chestChart').getContext('2d');
+            chestChart = new Chart(chestCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['Pazartesi', 'Salı', 'Çarşamba', 'Perşembe', 'Cuma', 'Cumartesi', 'Pazar'],
+                    datasets: [{
+                        label: 'Sandıklar',
+                        data: [0, 0, 0, 0, 0, 0, 0],
+                        backgroundColor: 'rgba(16, 185, 129, 0.5)',
+                        borderColor: 'rgb(16, 185, 129)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            labels: {
+                                color: 'rgb(226, 232, 240)'
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            grid: {
+                                color: 'rgba(255, 255, 255, 0.1)'
+                            },
+                            ticks: {
+                                color: 'rgb(148, 163, 184)'
+                            }
+                        },
+                        y: {
+                            grid: {
+                                color: 'rgba(255, 255, 255, 0.1)'
+                            },
+                            ticks: {
+                                color: 'rgb(148, 163, 184)'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Update gift chart
+        function updateGiftChart() {
+            if (giftChart) {
+                const currentHour = new Date().getHours();
+                const hourIndex = Math.floor(currentHour / 4);
+                giftChart.data.datasets[0].data[hourIndex]++;
+                giftChart.update();
+            }
+        }
+
+        // Update chest chart
+        function updateChestChart() {
+            if (chestChart) {
+                const currentDay = new Date().getDay();
+                const dayIndex = currentDay === 0 ? 6 : currentDay - 1;
+                chestChart.data.datasets[0].data[dayIndex]++;
+                chestChart.update();
+            }
+        }
+
+        // Start live stream
+        function startLiveStream() {
+            const username = document.getElementById('tiktokUsername').value;
+            if (!username) {
+                showNotification('Kullanıcı adı girin', 'error');
+                return;
+            }
+            
+            if (!isConnected) {
+                showNotification('WebSocket bağlantısı yok', 'error');
+                return;
+            }
+            
+            const message = {
+                type: 'command',
+                data: {
+                    action: 'subscribe_live',
+                    live_id: username
+                }
+            };
+            
+            ws.send(JSON.stringify(message));
+            showNotification('Yayın aboneliği başlatıldı', 'success', `${username} yayınına bağlanılıyor`);
+        }
+
+        // Stop live stream
+        function stopLiveStream() {
+            if (!isConnected) {
+                showNotification('WebSocket bağlantısı yok', 'error');
+                return;
+            }
+            
+            const message = {
+                type: 'command',
+                data: {
+                    action: 'unsubscribe_live',
+                    live_id: document.getElementById('tiktokUsername').value
+                }
+            };
+            
+            ws.send(JSON.stringify(message));
+            showNotification('Yayın aboneliği durduruldu', 'warning');
+        }
+
+        // Toggle chest detection
+        document.getElementById('chestDetection').addEventListener('change', function() {
+            if (!isConnected) {
+                showNotification('WebSocket bağlantısı yok', 'error');
+                this.checked = false;
+                return;
+            }
+            
+            const message = {
+                type: 'command',
+                data: {
+                    action: 'start_chest_detection'
+                }
+            };
+            
+            if (this.checked) {
+                ws.send(JSON.stringify(message));
+                showNotification('Sandık tespiti başlatıldı', 'success');
+            } else {
+                showNotification('Sandık tespiti durduruldu', 'warning');
+            }
+        });
+
+        // Show notification
+        function showNotification(title, type = 'info', message = '') {
+            const notifications = document.getElementById('notifications');
+            
+            const notification = document.createElement('div');
+            notification.className = 'notification-item';
+            
+            const typeColors = {
+                success: 'bg-green-500/20 text-green-400 border-green-500/30',
+                error: 'bg-red-500/20 text-red-400 border-red-500/30',
+                warning: 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30',
+                info: 'bg-blue-500/20 text-blue-400 border-blue-500/30'
+            };
+            
+            notification.innerHTML = `
+                <div class="flex items-start space-x-3">
+                    <div class="flex-shrink-0">
+                        <i data-lucide="${type === 'success' ? 'check-circle' : type === 'error' ? 'x-circle' : type === 'warning' ? 'alert-triangle' : 'info'}" class="w-5 h-5"></i>
+                    </div>
+                    <div class="flex-1">
+                        <p class="font-medium">${title}</p>
+                        ${message ? `<p class="text-sm opacity-75">${message}</p>` : ''}
+                    </div>
+                    <button onclick="this.parentElement.parentElement.remove()" class="flex-shrink-0">
+                        <i data-lucide="x" class="w-4 h-4"></i>
+                    </button>
+                </div>
+            `;
+            
+            notification.classList.add(...typeColors[type].split(' '));
+            
+            notifications.appendChild(notification);
+            lucide.createIcons();
+            
+            // Auto remove after 5 seconds
+            setTimeout(() => {
+                notification.remove();
+            }, 5000);
+        }
+
+        // Toggle settings modal
+        function toggleSettings() {
+            const modal = document.getElementById('settingsModal');
+            modal.classList.toggle('hidden');
+        }
+
+        // Save settings
+        function saveSettings() {
+            const settings = {
+                backendUrl: document.getElementById('backendUrl').value,
+                websocketUrl: document.getElementById('websocketUrl').value,
+                userId: document.getElementById('userId').value
+            };
+            
+            localStorage.setItem('tiktokPanelSettings', JSON.stringify(settings));
+            showNotification('Ayarlar kaydedildi', 'success');
+            toggleSettings();
+            
+            // Reconnect with new settings
+            if (ws) {
+                ws.close();
+            }
+            connectWebSocket();
+        }
+
+        // Load settings
+        function loadSettings() {
+            const savedSettings = localStorage.getItem('tiktokPanelSettings');
+            if (savedSettings) {
+                const settings = JSON.parse(savedSettings);
+                document.getElementById('backendUrl').value = settings.backendUrl || 'http://localhost:8000';
+                document.getElementById('websocketUrl').value = settings.websocketUrl || 'ws://localhost:8000';
+                document.getElementById('userId').value = settings.userId || 'demo-user';
+            }
+        }
+
+        // Auto gift functionality
+        document.getElementById('autoGift').addEventListener('change', function() {
+            if (this.checked) {
+                showNotification('Otomatik hediye gönderme aktif', 'success');
+            } else {
+                showNotification('Otomatik hediye gönderme pasif', 'warning');
+            }
+        });
+
+        // Simulate some data for demo
+        function simulateData() {
+            // Simulate random gifts
+            setInterval(() => {
+                if (Math.random() > 0.7 && isConnected) {
+                    const giftData = {
+                        type: 'gift_received',
+                        data: {
+                            gift_name: ['Rose', 'Heart', 'TikTok', 'Cap', 'Coffee'][Math.floor(Math.random() * 5)],
+                            gift_cost: Math.floor(Math.random() * 10) + 1,
+                            user: 'User' + Math.floor(Math.random() * 100)
+                        }
+                    };
+                    handleGiftReceived(giftData);
+                }
+            }, 5000);
+            
+            // Simulate random chests
+            setInterval(() => {
+                if (Math.random() > 0.8 && isConnected) {
+                    const chestData = {
+                        type: 'chest_detected',
+                        data: {
+                            chest_type: ['Bronze', 'Silver', 'Gold'][Math.floor(Math.random() * 3)],
+                            chest_value: Math.floor(Math.random() * 50) + 10
+                        }
+                    };
+                    handleChestDetected(chestData);
+                }
+            }, 8000);
+        }
+
+        // Start simulation after 2 seconds
+        setTimeout(simulateData, 2000);
+    </script>
+</body>
+</html>
