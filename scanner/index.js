@@ -127,7 +127,7 @@ async function fetchLiveStatus(uniqueId) {
     if (!response.ok) return { live: false, reason: 'http ' + response.status };
     const payload = await response.json();
     const room = payload && payload.data && payload.data.liveRoom;
-    if (!room) return { live: false, reason: 'oda yok' };
+    if (!room) return { live: false, reason: (payload && payload.message) || 'oda yok' };
     const live = Number(room.status) === 2;
     return {
       live,
@@ -250,6 +250,7 @@ async function startWatching(username) {
     record.startTime = Number(roomInfo && (roomInfo.startTime || roomInfo.createTime)) || record.startTime || 0;
     record.title = (roomInfo && roomInfo.title) || record.title || '';
     record.viewers = Number(roomInfo && roomInfo.stats && roomInfo.stats.totalUser) || record.viewers || 0;
+    record.country = (roomInfo && roomInfo.user && roomInfo.user.region) || record.country || '';
     record.lastSeenLiveAt = Date.now();
     state.streamers.set(username, record);
     log('dinleniyor', username, '(' + (record.title || '').slice(0, 40) + ')');
@@ -290,6 +291,7 @@ async function pollTargets() {
     };
 
     record.checkedAt = Date.now();
+    record.reason = status.live ? '' : (status.reason || '');
     if (status.live) {
       liveCount += 1;
       record.live = true;
@@ -320,7 +322,9 @@ async function pollTargets() {
 
 function snapshot() {
   const streamers = Array.from(state.streamers.values())
-    .filter((record) => record.live || record.startTime || record.coins)
+    // Havuzdaki her adres yazılır: panel "taranmış ama yayında değil" ile
+    // "hiç taranmamış" durumunu ayırabilsin, eski Canlı durumu takılı kalmasın.
+    .filter((record) => record.checkedAt || record.live || record.startTime || record.coins)
     .sort((a, b) => {
       if (a.live !== b.live) return a.live ? -1 : 1;
       return (b.coins || 0) - (a.coins || 0);
@@ -337,6 +341,7 @@ function snapshot() {
       lastGiftAt: record.lastGiftAt || 0,
       lastGiftName: record.lastGiftName || '',
       lastSeenLiveAt: record.lastSeenLiveAt || 0,
+      reason: record.reason || '',
       checkedAt: record.checkedAt || 0
     }));
 

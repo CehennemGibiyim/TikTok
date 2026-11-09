@@ -173,6 +173,7 @@
       if (existing) {
         var copy = Object.assign({}, existing, {
           scanLive: Boolean(item.live),
+          scanReason: item.reason || '',
           scanCheckedAt: Number(item.checkedAt) || Date.now()
         });
         if (item.title) copy.liveTitle = item.title;
@@ -198,7 +199,7 @@
         return;
       }
 
-      if (!item.live && !(Number(item.coins) > 0)) return;
+      if (!item.live) return;
 
       var created = {
         id: uid('st'),
@@ -217,6 +218,34 @@
       streamers.push(created);
       changed = true;
     });
+
+    // Tarama tek doğru kaynaktır: havuzdaki bir yayıncı taramada canlı değilse
+    // panelde de canlı değildir. Böylece eski/elle işaretlenmiş "Canlı" durumu
+    // ve ondan sayılan yanlış süre kendiliğinden kapanır.
+    var scanned = {};
+    (data.streamers || []).forEach(function (item) {
+      if (item && item.username) scanned[cleanUsername(item.username)] = Boolean(item.live);
+    });
+
+    var scannedAt = data.scannedAt ? new Date(data.scannedAt).getTime() : 0;
+    var fresh = scannedAt > 0 && (Date.now() - scannedAt) < 60 * 60 * 1000;
+
+    if (fresh) {
+      streamers = streamers.map(function (streamer) {
+        var name = cleanUsername(streamer.username);
+        var inPool = name in scanned;
+        if (inPool && scanned[name]) return streamer;
+        if (!streamer.startedAt && !streamer.scanLive) return streamer;
+        changed = true;
+        return Object.assign({}, streamer, {
+          accumulatedMs: (Number(streamer.accumulatedMs) || 0) +
+            Math.max(0, Date.now() - new Date(streamer.startedAt || Date.now()).getTime()),
+          startedAt: null,
+          scanLive: false,
+          scanCheckedAt: inPool ? Date.now() : (streamer.scanCheckedAt || 0)
+        });
+      });
+    }
 
     var events = state.events.slice();
     var known = {};
@@ -404,9 +433,15 @@
 
     rows.innerHTML = list.map(function (streamer) {
       var metrics = streamerMetrics(streamer);
+      var scannedOff = streamer.scanCheckedAt && !streamer.scanLive && !metrics.live;
+      var missing = scannedOff && /not_found/i.test(streamer.scanReason || '');
       var liveChip = metrics.live
         ? '<button class="chip chip-green" data-toggle-live="' + streamer.id + '" title="' + esc(streamer.liveTitle || '') + '">● Canlı' + (streamer.scanLive ? ' · tarama' : '') + '</button>'
-        : '<button class="chip" data-toggle-live="' + streamer.id + '">Canlı yap</button>';
+        : missing
+          ? '<span class="chip chip-danger" title="TikTok bu kullanıcı adını bulamadı; adresi düzelt">⚠ Hesap yok</span>'
+          : scannedOff
+            ? '<span class="chip" title="Tarama bu hesabı canlı bulmadı">○ Yayında değil</span>'
+            : '<button class="chip" data-toggle-live="' + streamer.id + '">Canlı yap</button>';
       var liveNote = streamer.scanLive
         ? '<div class="text-[10px] text-yellow-50/40 truncate max-w-[180px]">' + esc(streamer.liveTitle || 'yayında') + (streamer.viewers ? ' · ' + fmt(streamer.viewers) + ' kişi' : '') + '</div>'
         : '';
@@ -415,7 +450,7 @@
         '<tr>',
         '  <td class="min-w-[170px]">',
         '    <a href="' + liveUrl(streamer.username) + '" target="_blank" rel="noopener" class="font-bold text-yellow-100 hover:text-yellow-300">@' + esc(streamer.username) + '</a>',
-        '    <div class="text-[10px] text-yellow-50/40">' + flag(streamer.country) + ' ' + esc(countryName(streamer.country)) + '</div>',
+        '    <div class="text-[10px] text-yellow-50/40">' + (streamer.country ? flag(streamer.country) + ' ' + esc(countryName(streamer.country)) : '') + '</div>',
         '    ' + liveNote,
         '  </td>',
         '  <td>' + liveChip + '</td>',
