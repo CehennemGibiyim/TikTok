@@ -25,20 +25,27 @@ ister ve tarayıcıya CORS izni vermez. Bunu otomatik yapmanın tek yolu bir sun
 
 | Sekme | Ne yapar |
 |---|---|
-| **Av** | Yayıncı ekle, süreyi başlat/durdur, + Sandık / + Zarf / + Portal ile jeton ve süre gir, fırsatları topla, QR aç |
+| **Av** | Yayıncı ekle (tek tek veya 500 satıra kadar toplu), **Canlı** ile süreyi başlat/durdur, sütun başlığına tıklayarak sırala, + Sandık / + Zarf / + Portal ile jeton, süre ve paylaşım sayısını gir, QR aç |
+| **Fırsatlar** | Yalnızca jeton paylaşan yayınlar; jetona veya yaklaşan süreye göre sırala, canlı geri sayım, Topladım / Kaçtı |
 | **Envanter** | Hesap listesi (kullanıcı adı, ajans, durum, jeton), CSV dışa/içe aktarma |
 | **Ajanslar** | Ajans tanımı, komisyon, bağlı hesap ve jeton toplamları |
 | **Gelir** | Jeton → TikTok kesintisi → ajans kesintisi → USD/TRY hesabı |
-| **Ayarlar** | Zarf süresi, bildirim, JSON yedek, tüm veriyi silme |
+| **Ayarlar** | Zarf süresi, 7 gün kuralı, bildirim, JSON yedek, tüm veriyi silme |
 
 ## Akış
 
-1. **Av** sekmesinde yayıncı adını (ör. `@kullanici` veya tam link) gir, ülkesini seç, **Yayın ekle**.
-2. Yayın başlayınca satırdaki **Başlat** ile süreyi çalıştır.
-3. Yayında sandık düştüğünde **+ Sandık**: jeton miktarı ve açılış süresini gir.
-4. Zarf/mektup düştüğünde **+ Zarf**: jeton ve geçerlilik süresini gir.
-5. **Fırsatlar** bölümünde geri sayımları gör; yetişince **Topladım**, kaçırınca **Kaçtı**.
-6. Telefonla okutmak için **QR** düğmesi yayının canlı adresini gösterir.
+1. **Av** sekmesinde yayıncı adını (ör. `@kullanici` veya tam link) gir, ülkesini seç, **Yayıncı ekle**. Tek eklemede hesap TikTok oEmbed ile doğrulanır; `@tiktok` gibi gerçek hesaplar için "✓ doğrulandı" yazar.
+2. 200+ adresi tek seferde eklemek için **Toplu ekle**'yi aç, satır satır yapıştır (link veya `@ad`), ülke seç, **Hepsini ekle**.
+3. Yayın başlayınca satırdaki **Canlı yap** ile süreyi çalıştır; durdurmak için tekrar bas.
+4. Yayında sandık düştüğünde **+ Sandık**: jeton miktarı, açılış süresi ve kaç kişiye paylaşıldığını gir.
+5. Zarf/mektup düştüğünde **+ Zarf**: jeton ve geçerlilik süresini gir.
+6. **Fırsatlar** sekmesinde geri sayımları gör; yetişince **Topladım**, kaçırınca **Kaçtı**. Sıralamayı jeton / yaklaşan süre / yeni / yayıncı olarak değiştir.
+7. Telefonla okutmak için **QR** düğmesi yayının canlı adresini gösterir.
+
+### 7 gün kuralı
+
+Bir yayıncı **Ayarlar**'daki gün sayısı (varsayılan 7) boyunca canlı görülmezse panel onu ve olaylarını listeden düşürür.
+Her `+ Sandık`/`+ Zarf`/`+ Portal` girdisi ve Canlı düğmesi "son görülme" zamanını günceller.
 
 ### Tür kuralları
 

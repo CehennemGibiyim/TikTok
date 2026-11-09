@@ -1,12 +1,8 @@
 /*
  * app.js — Sunucusuz TikTok jeton paneli.
  *
- * Ağ isteği yoktur. Veri Store (IndexedDB) üzerinde tutulur.
- * Akış:
- *   - Yayıncı ekle, süreyi başlat/durdur
- *   - Sandık / zarf / portal olayını jeton ve süresiyle kaydet
- *   - Fırsatlar: sandık süresi dolsa da bekler; zarf süresi dolunca düşer
- *   - QR ile telefonundan yayına git
+ * Ağ isteği yoktur (yalnızca kullanıcı adı doğrulamak için TikTok oEmbed).
+ * Veri Store (IndexedDB) üzerinde tutulur.
  */
 (function () {
   'use strict';
@@ -36,11 +32,14 @@
   };
 
   var state = null;
-  var sortMode = 'alpha';
+  var sortKey = 'name';
+  var sortDir = 1;
+  var oppSort = 'coins';
   var searchTerm = '';
   var eventTarget = { streamerId: null, kind: 'chest' };
   var notified = {};
   var audioCtx = null;
+  var verified = {};
 
   function $(id) { return document.getElementById(id); }
 
@@ -75,6 +74,18 @@
     return (h > 0 ? pad(h) + ':' : '') + pad(m) + ':' + pad(s);
   }
 
+  function ago(ms) {
+    if (!ms) return '—';
+    var diff = Date.now() - Number(ms);
+    if (diff < 60000) return 'şimdi';
+    var minutes = Math.floor(diff / 60000);
+    if (minutes < 60) return minutes + ' dk önce';
+    var hours = Math.floor(minutes / 60);
+    if (hours < 24) return hours + ' sa önce';
+    var days = Math.floor(hours / 24);
+    return days + ' gün önce';
+  }
+
   function liveUrl(username) {
     return 'https://www.tiktok.com/@' + encodeURIComponent(username) + '/live';
   }
@@ -88,9 +99,11 @@
       .trim()
       .replace(/^https?:\/\/(www\.)?tiktok\.com\/@?/i, '')
       .replace(/^@/, '')
-      .split(/[/?#]/)[0]
+      .split(/[/?#\s]/)[0]
       .toLowerCase();
   }
+
+  function daysMs(days) { return Math.max(1, Number(days) || 7) * 86400000; }
 
   // ---------- Sekmeler ----------
 
@@ -104,7 +117,7 @@
     if (window.lucide) lucide.createIcons();
   }
 
-  // ---------- Av ----------
+  // ---------- Av verileri ----------
 
   function streamerDuration(streamer) {
     var total = Number(streamer.accumulatedMs) || 0;
@@ -114,6 +127,24 @@
 
   function eventsOf(streamerId) {
     return state.events.filter(function (event) { return event.streamerId === streamerId; });
+  }
+
+  function streamerMetrics(streamer) {
+    var events = eventsOf(streamer.id);
+    var metrics = {
+      chest: 0, letter: 0, portal: 0, coins: 0, collected: 0, collectedCount: 0,
+      shared: 0, lastSeen: Number(streamer.lastLiveAt) || 0, live: Boolean(streamer.startedAt)
+    };
+    events.forEach(function (event) {
+      if (metrics[event.kind] !== undefined) metrics[event.kind] += 1;
+      metrics.coins += Number(event.coins) || 0;
+      if (event.status === 'collected') {
+        metrics.collected += Number(event.coins) || 0;
+        metrics.collectedCount += 1;
+      }
+      metrics.shared += Number(event.shared) || 0;
+    });
+    return metrics;
   }
 
   function isExpired(event) {
@@ -128,88 +159,116 @@
 
   function sortEvents(list) {
     return list.slice().sort(function (a, b) {
+      if (oppSort === 'new') return b.createdAt - a.createdAt;
+      if (oppSort === 'streamer') return a.username.localeCompare(b.username, 'tr');
+      if (oppSort === 'expiry') {
+        var now = Date.now();
+        var deadline = function (event) {
+          if (event.kind === 'letter') return event.expiresAt || now;
+          return event.availableAt > now ? event.availableAt : Number.MAX_SAFE_INTEGER;
+        };
+        return deadline(a) - deadline(b);
+      }
       var aLetter = a.kind === 'letter';
       var bLetter = b.kind === 'letter';
       if (aLetter !== bLetter) return aLetter ? -1 : 1;
-      if (aLetter) return (a.expiresAt || 0) - (b.expiresAt || 0);
       return (Number(b.coins) || 0) - (Number(a.coins) || 0);
     });
   }
 
+  // ---------- İstatistikler ----------
+
   function renderStats() {
     var pending = pendingEvents();
     var collected = state.events.filter(function (event) { return event.status === 'collected'; });
+    var recentLive = state.streamers.filter(function (streamer) {
+      return Date.now() - (Number(streamer.lastLiveAt) || 0) < daysMs(state.settings.inactiveDays);
+    });
+
     $('statStreams').textContent = state.streamers.length;
-    $('statPending').textContent = pending.length;
+    $('statLive').textContent = recentLive.length;
     $('statPendingCoins').textContent = fmt(pending.reduce(function (sum, event) { return sum + Number(event.coins); }, 0));
     $('statCollected').textContent = fmt(collected.reduce(function (sum, event) { return sum + Number(event.coins); }, 0));
+    $('navOppCount').textContent = pending.length;
     $('opportunityCount').textContent = pending.length;
     $('pendingCoinsBig').textContent = fmt(pending.reduce(function (sum, event) { return sum + Number(event.coins); }, 0)) + ' jeton';
+    $('streamerCount').textContent = state.streamers.length;
+  }
+
+  // ---------- Yayın tablosu ----------
+
+  function sortValue(streamer) {
+    var metrics = streamerMetrics(streamer);
+    switch (sortKey) {
+      case 'live': return metrics.live ? 1 : 0;
+      case 'duration': return streamerDuration(streamer);
+      case 'chest': return metrics.chest;
+      case 'letter': return metrics.letter;
+      case 'portal': return metrics.portal;
+      case 'coins': return metrics.coins;
+      case 'collected': return metrics.collected;
+      case 'lastSeen': return metrics.lastSeen;
+      default: return streamer.username;
+    }
   }
 
   function renderStreamers() {
-    var container = $('streamerList');
-    if (!container) return;
+    var rows = $('streamerRows');
+    $('streamerEmpty').classList.toggle('hidden', state.streamers.length > 0);
 
-    if (state.streamers.length === 0) {
-      container.innerHTML = '<div class="empty-state">Henüz yayın eklenmedi. Yukarıdan bir kullanıcı adı ekle; yayına girince süreyi başlat.</div>';
-      if (window.lucide) lucide.createIcons();
-      return;
-    }
-
-    var list = state.streamers.slice();
-    list.sort(function (a, b) {
-      if (sortMode === 'coins') {
-        var ca = eventsOf(a.id).reduce(function (s, e) { return s + Number(e.coins || 0); }, 0);
-        var cb = eventsOf(b.id).reduce(function (s, e) { return s + Number(e.coins || 0); }, 0);
-        return cb - ca;
-      }
-      if (sortMode === 'duration') return streamerDuration(b) - streamerDuration(a);
-      if (sortMode === 'country') {
-        var x = a.country || 'ZZ', y = b.country || 'ZZ';
-        if (x !== y) return x.localeCompare(y);
-      }
-      return a.username.localeCompare(b.username, 'tr');
+    var list = state.streamers.slice().sort(function (a, b) {
+      var va = sortValue(a);
+      var vb = sortValue(b);
+      if (typeof va === 'string') return va.localeCompare(vb, 'tr') * sortDir;
+      return (va - vb) * sortDir;
     });
 
-    var rows = list.map(function (streamer) {
-      var events = eventsOf(streamer.id);
-      var chests = events.filter(function (e) { return e.kind === 'chest'; }).length;
-      var letters = events.filter(function (e) { return e.kind === 'letter'; }).length;
-      var coins = events.reduce(function (s, e) { return s + Number(e.coins || 0); }, 0);
-      var running = Boolean(streamer.startedAt);
+    document.querySelectorAll('th[data-sort]').forEach(function (th) {
+      var active = th.getAttribute('data-sort') === sortKey;
+      th.classList.toggle('sorted', active);
+      th.setAttribute('data-dir', active ? (sortDir > 0 ? 'asc' : 'desc') : '');
+    });
+
+    rows.innerHTML = list.map(function (streamer) {
+      var metrics = streamerMetrics(streamer);
+      var liveChip = metrics.live
+        ? '<button class="chip chip-green" data-toggle-live="' + streamer.id + '">● Canlı</button>'
+        : '<button class="chip" data-toggle-live="' + streamer.id + '">Canlı yap</button>';
 
       return [
-        '<div class="row">',
-        '  <div class="min-w-0 flex-1">',
+        '<tr>',
+        '  <td class="min-w-[170px]">',
         '    <a href="' + liveUrl(streamer.username) + '" target="_blank" rel="noopener" class="font-bold text-yellow-100 hover:text-yellow-300">@' + esc(streamer.username) + '</a>',
-        '    <div class="text-[11px] text-yellow-50/40">' + flag(streamer.country) + ' ' + esc(countryName(streamer.country)) + '</div>',
-        '  </div>',
-        '  <div class="text-center"><div class="text-[10px] text-yellow-50/40">SÜRE</div><div class="font-mono text-xs" data-streamer-timer="' + streamer.id + '">' + clock(streamerDuration(streamer)) + '</div></div>',
-        '  <div class="text-center"><div class="text-[10px] text-yellow-50/40">SANDIK</div><div class="text-xs text-amber-300">' + chests + '</div></div>',
-        '  <div class="text-center"><div class="text-[10px] text-yellow-50/40">ZARF</div><div class="text-xs text-pink-300">' + letters + '</div></div>',
-        '  <div class="text-center"><div class="text-[10px] text-yellow-50/40">JETON</div><div class="text-xs font-bold text-amber-400">' + fmt(coins) + '</div></div>',
-        '  <div class="flex flex-wrap items-center gap-1 justify-end">',
-        '    <button class="chip ' + (running ? 'chip-danger' : 'chip-green') + '" data-toggle-timer="' + streamer.id + '">' + (running ? 'Durdur' : 'Başlat') + '</button>',
+        '    <div class="text-[10px] text-yellow-50/40">' + flag(streamer.country) + ' ' + esc(countryName(streamer.country)) + '</div>',
+        '  </td>',
+        '  <td>' + liveChip + '</td>',
+        '  <td class="font-mono text-xs" data-streamer-timer="' + streamer.id + '">' + clock(streamerDuration(streamer)) + '</td>',
+        '  <td class="text-amber-300">' + metrics.chest + '</td>',
+        '  <td class="text-pink-300">' + metrics.letter + '</td>',
+        '  <td class="text-purple-300">' + metrics.portal + '</td>',
+        '  <td class="font-bold text-amber-400">' + fmt(metrics.coins) + '</td>',
+        '  <td><span class="text-green-300 font-bold">' + fmt(metrics.collected) + '</span> <span class="text-[10px] text-yellow-50/40">(' + metrics.collectedCount + ')</span></td>',
+        '  <td class="text-[11px] text-yellow-50/50 whitespace-nowrap">' + ago(metrics.lastSeen) + '</td>',
+        '  <td><div class="flex flex-wrap gap-1 justify-end">',
         '    <button class="chip chip-amber" data-add-event="' + streamer.id + '" data-kind="chest">+ Sandık</button>',
         '    <button class="chip chip-pink" data-add-event="' + streamer.id + '" data-kind="letter">+ Zarf</button>',
         '    <button class="chip chip-purple" data-add-event="' + streamer.id + '" data-kind="portal">+ Portal</button>',
         '    <button class="chip" data-qr="' + esc(streamer.username) + '">QR</button>',
         '    <button class="chip chip-danger" data-remove-streamer="' + streamer.id + '">×</button>',
-        '  </div>',
-        '</div>'
+        '  </div></td>',
+        '</tr>'
       ].join('');
     }).join('');
 
-    container.innerHTML = rows;
     if (window.lucide) lucide.createIcons();
   }
 
+  // ---------- Fırsatlar ----------
+
   function renderOpportunities() {
     var container = $('opportunityList');
-    if (!container) return;
-
     var pending = sortEvents(pendingEvents());
+
     if (pending.length === 0) {
       container.innerHTML = '<div class="empty-state md:col-span-2 xl:col-span-3">Bekleyen jeton yok. Yayında sandık veya zarf düştüğünde burada belirir.</div>';
       return;
@@ -224,16 +283,14 @@
         var remaining = Math.max(0, Math.round(((event.expiresAt || Date.now()) - Date.now()) / 1000));
         urgent = remaining <= 60;
         timeText = 'jeton geri dönüyor: ' + clock(remaining);
-      } else {
+      } else if (Number(event.durationSec) > 0) {
         var toOpen = Math.max(0, Math.round(((event.availableAt || Date.now()) - Date.now()) / 1000));
-        if (toOpen > 0) {
-          timeText = 'açılışa ' + clock(toOpen);
-        } else if (Number(event.durationSec) > 0) {
-          timeText = 'açıldı · süre doldu, kaybolmaz';
-        } else {
-          timeText = 'hemen açıldı · kaybolmaz';
-        }
+        timeText = toOpen > 0 ? 'açılışa ' + clock(toOpen) : 'açıldı · süre doldu, kaybolmaz';
+      } else {
+        timeText = 'hemen açıldı · kaybolmaz';
       }
+
+      var shared = Number(event.shared) || 0;
 
       return [
         '<div class="opp-card ' + (urgent ? 'opp-urgent' : '') + '">',
@@ -242,7 +299,7 @@
         '    <span class="font-black text-amber-400">' + fmt(event.coins) + ' <span class="text-[10px] font-normal text-yellow-50/40">jeton</span></span>',
         '  </div>',
         '  <a href="' + liveUrl(event.username) + '" target="_blank" rel="noopener" class="font-semibold text-yellow-100 hover:text-yellow-300 truncate block">@' + esc(event.username) + '</a>',
-        '  <div class="text-[10px] text-yellow-50/40">' + flag(event.country) + ' ' + esc(countryName(event.country)) + ' · ' + new Date(event.createdAt).toLocaleTimeString('tr-TR') + '</div>',
+        '  <div class="text-[10px] text-yellow-50/40">' + flag(event.country) + ' ' + esc(countryName(event.country)) + ' · ' + new Date(event.createdAt).toLocaleTimeString('tr-TR') + (shared > 1 ? ' · ' + shared + ' kişiye' : '') + '</div>',
         '  <div class="text-[11px] mt-1 ' + (urgent ? 'text-red-300 font-bold' : 'text-yellow-50/60') + '" data-countdown="' + (event.kind === 'letter' ? event.expiresAt : event.availableAt) + '" data-kind="' + event.kind + '" data-duration="' + (Number(event.durationSec) || 0) + '">' + timeText + '</div>',
         '  <div class="flex gap-2 mt-3">',
         '    <button class="chip chip-amber" data-qr="' + esc(event.username) + '">QR / Yayına git</button>',
@@ -254,42 +311,89 @@
     }).join('');
   }
 
-  function addStreamer() {
-    var raw = $('streamerName').value;
-    var username = cleanUsername(raw);
-    if (!username) {
-      $('streamerName').focus();
-      return;
+  // ---------- Yayıncı işlemleri ----------
+
+  function bulkAddUsers(raw, countryCode) {
+    var seen = {};
+    state.streamers.forEach(function (streamer) { seen[streamer.username] = true; });
+
+    var lines = String(raw || '').split(/\r?\n/);
+    var added = [];
+    var skipped = 0;
+
+    lines.forEach(function (line) {
+      var username = cleanUsername(line);
+      if (!username || username.length > 40) return;
+      if (seen[username]) { skipped += 1; return; }
+      seen[username] = true;
+      added.push({
+        id: uid('st'),
+        username: username,
+        country: countryCode || '',
+        startedAt: null,
+        accumulatedMs: 0,
+        createdAt: Date.now(),
+        lastLiveAt: null
+      });
+    });
+
+    if (added.length === 0) return { added: 0, skipped: skipped };
+    Store.set({ streamers: added.concat(state.streamers) });
+    state = Store.get();
+    renderAll();
+    return { added: added.length, skipped: skipped };
+  }
+
+  async function verifyAccount(username) {
+    if (verified[username]) return verified[username];
+    try {
+      var controller = new AbortController();
+      var timer = setTimeout(function () { controller.abort(); }, 6000);
+      var response = await fetch('https://www.tiktok.com/oembed?url=' +
+        encodeURIComponent('https://www.tiktok.com/@' + username), { signal: controller.signal });
+      clearTimeout(timer);
+      if (!response.ok) {
+        verified[username] = { ok: false, note: 'TikTok bu adı doğrulamadı (yine de eklendi).' };
+      } else {
+        var data = await response.json();
+        verified[username] = { ok: true, note: '✓ ' + (data.author_name || '@' + username) + ' doğrulandı.' };
+      }
+    } catch (error) {
+      verified[username] = { ok: false, note: 'Doğrulama yapılamadı (çevrimdışı olabilir); kayıt eklendi.' };
     }
+    return verified[username];
+  }
+
+  async function addStreamer() {
+    var username = cleanUsername($('streamerName').value);
+    if (!username) { $('streamerName').focus(); return; }
     if (state.streamers.some(function (s) { return s.username === username; })) {
+      $('addStatus').textContent = '@' + username + ' zaten listede.';
       $('streamerName').value = '';
       return;
     }
 
-    var streamers = state.streamers.concat([{
-      id: uid('st'),
-      username: username,
-      country: $('streamerCountry').value || '',
-      startedAt: null,
-      accumulatedMs: 0,
-      createdAt: Date.now()
-    }]);
-
-    Store.set({ streamers: streamers });
-    state = Store.get();
+    var result = bulkAddUsers(username, $('streamerCountry').value);
     $('streamerName').value = '';
-    renderAll();
+    $('addStatus').textContent = result.added ? 'Eklendi: @' + username + ' · doğrulanıyor…' : '@' + username + ' eklenemedi.';
+
+    if (result.added) {
+      var check = await verifyAccount(username);
+      $('addStatus').textContent = check.note;
+    }
   }
 
-  function toggleTimer(id) {
+  function toggleLive(id) {
     var streamers = state.streamers.map(function (streamer) {
       if (streamer.id !== id) return streamer;
       var copy = Object.assign({}, streamer);
       if (copy.startedAt) {
         copy.accumulatedMs = (Number(copy.accumulatedMs) || 0) + (Date.now() - new Date(copy.startedAt).getTime());
         copy.startedAt = null;
+        copy.lastLiveAt = Date.now();
       } else {
         copy.startedAt = new Date().toISOString();
+        copy.lastLiveAt = Date.now();
       }
       return copy;
     });
@@ -301,7 +405,7 @@
   function removeStreamer(id) {
     var streamer = state.streamers.find(function (s) { return s.id === id; });
     if (!streamer) return;
-    if (!confirm('@' + streamer.username + ' listeden ve olaylarından kaldırılsın mı?')) return;
+    if (!confirm('@' + streamer.username + ' ve olayları listeden kaldırılsın mı?')) return;
 
     Store.set({
       streamers: state.streamers.filter(function (s) { return s.id !== id; }),
@@ -316,7 +420,8 @@
     var streamer = state.streamers.find(function (s) { return s.id === streamerId; });
     $('eventTitle').textContent = '@' + (streamer ? streamer.username : '') + ' · ' + (KINDS[eventTarget.kind] || KINDS.chest).label;
     $('eventCoins').value = '';
-    $('eventDuration').value = eventTarget.kind === 'letter' ? (state.settings.letterTtlSec || 180) : 60;
+    $('eventDuration').value = eventTarget.kind === 'letter' ? (state.settings.letterTtlSec || 180) : 0;
+    $('eventShared').value = '';
     renderEventTypes();
     openModal('eventModal');
     setTimeout(function () { $('eventCoins').focus(); }, 50);
@@ -328,6 +433,7 @@
       var active = eventTarget.kind === kind;
       return '<button class="chip ' + (active ? 'chip-amber' : '') + '" data-event-kind="' + kind + '">' + meta.icon + ' ' + meta.label + '</button>';
     }).join('');
+    $('eventSharedWrap').classList.toggle('hidden', eventTarget.kind === 'letter');
   }
 
   function saveEvent() {
@@ -350,6 +456,7 @@
       country: streamer.country || '',
       kind: kind,
       coins: coins,
+      shared: Math.max(1, Number($('eventShared').value) || 1),
       durationSec: seconds,
       createdAt: now,
       availableAt: now + seconds * 1000,
@@ -358,7 +465,12 @@
       collectedAt: null
     };
 
-    Store.set({ events: [event].concat(state.events).slice(0, 2000) });
+    Store.set({
+      events: [event].concat(state.events).slice(0, 3000),
+      streamers: state.streamers.map(function (item) {
+        return item.id === streamer.id ? Object.assign({}, item, { lastLiveAt: now }) : item;
+      })
+    });
     state = Store.get();
     closeModal('eventModal');
     renderAll();
@@ -383,8 +495,7 @@
     var container = $('accountList');
     var accounts = state.accounts.filter(function (account) {
       if (!searchTerm) return true;
-      var haystack = (account.username + ' ' + (account.label || '')).toLowerCase();
-      return haystack.indexOf(searchTerm) >= 0;
+      return (account.username + ' ' + (account.label || '')).toLowerCase().indexOf(searchTerm) >= 0;
     });
 
     $('accCount').textContent = state.accounts.length;
@@ -401,7 +512,7 @@
       return;
     }
 
-    var rows = accounts.map(function (account) {
+    container.innerHTML = accounts.map(function (account) {
       var agency = state.agencies.find(function (a) { return a.id === account.agencyId; });
       var statusMeta = {
         active: ['Aktif', 'chip-green'],
@@ -425,8 +536,6 @@
         '</div>'
       ].join('');
     }).join('');
-
-    container.innerHTML = rows;
   }
 
   function addAccount() {
@@ -458,8 +567,7 @@
     var order = ['active', 'paused', 'banned'];
     var accounts = state.accounts.map(function (account) {
       if (account.id !== id) return account;
-      var next = order[(order.indexOf(account.status) + 1) % order.length];
-      return Object.assign({}, account, { status: next });
+      return Object.assign({}, account, { status: order[(order.indexOf(account.status) + 1) % order.length] });
     });
     Store.set({ accounts: accounts });
     state = Store.get();
@@ -529,11 +637,7 @@
 
   function renderAgencies() {
     var container = $('agencyList');
-    $('agCountry').innerHTML = '<option value="">Ülke seç</option>' + Object.keys(COUNTRIES).sort(function (a, b) {
-      return countryName(a).localeCompare(countryName(b), 'tr');
-    }).map(function (code) {
-      return '<option value="' + code + '">' + flag(code) + ' ' + countryName(code) + '</option>';
-    }).join('');
+    $('agCountry').innerHTML = optionsHtml(true);
 
     if (state.agencies.length === 0) {
       container.innerHTML = '<div class="empty-state">Henüz ajans yok. Ajans ekleyince hesapları bu ajansa bağlayabilirsin.</div>';
@@ -643,11 +747,12 @@
 
   function renderSettings() {
     $('letterTtl').value = state.settings.letterTtlSec;
+    $('inactiveDays').value = state.settings.inactiveDays;
     $('notifyToggle').checked = Boolean(state.settings.notify);
 
     var info = Store.storageInfo();
     $('storageInfo').textContent = info.engine + ' · ' + (info.bytes / 1024).toFixed(1) + ' KB · ' +
-      info.streamers + ' yayın, ' + info.events + ' olay, ' + info.accounts + ' hesap, ' + info.agencies + ' ajans' +
+      info.streamers + ' yayıncı, ' + info.events + ' olay, ' + info.accounts + ' hesap, ' + info.agencies + ' ajans' +
       (info.updatedAt ? ' · son kayıt ' + new Date(info.updatedAt).toLocaleString('tr-TR') : '');
   }
 
@@ -655,11 +760,13 @@
     Store.set({
       settings: Object.assign({}, state.settings, {
         letterTtlSec: Math.max(10, Number($('letterTtl').value) || 180),
+        inactiveDays: Math.max(1, Number($('inactiveDays').value) || 7),
         notify: $('notifyToggle').checked
       })
     });
     state = Store.get();
     renderSettings();
+    renderAll();
   }
 
   function download(filename, content, mime) {
@@ -741,6 +848,33 @@
     });
   }
 
+  // ---------- 7 gün kuralı ----------
+
+  function pruneInactive() {
+    var limit = daysMs(state.settings.inactiveDays);
+    var now = Date.now();
+    var removed = state.streamers.filter(function (streamer) {
+      if (streamer.startedAt) return false;
+      var last = Number(streamer.lastLiveAt) || Number(streamer.createdAt);
+      return last && now - last > limit;
+    });
+
+    if (removed.length === 0) return;
+
+    var ids = {};
+    removed.forEach(function (streamer) { ids[streamer.id] = true; });
+
+    Store.set({
+      streamers: state.streamers.filter(function (streamer) { return !ids[streamer.id]; }),
+      events: state.events.filter(function (event) { return !ids[event.streamerId]; })
+    });
+    state = Store.get();
+
+    $('addStatus').textContent = removed.length + ' yayıncı ' + state.settings.inactiveDays +
+      ' gündür canlı görülmediği için listeden düşürüldü.';
+    renderAll();
+  }
+
   // ---------- Döngü ----------
 
   function tick() {
@@ -752,8 +886,8 @@
     document.querySelectorAll('[data-countdown]').forEach(function (element) {
       var target = Number(element.getAttribute('data-countdown'));
       var kind = element.getAttribute('data-kind');
-      var remaining = Math.max(0, Math.round((target - Date.now()) / 1000));
       var duration = Number(element.getAttribute('data-duration')) || 0;
+      var remaining = Math.max(0, Math.round((target - Date.now()) / 1000));
       if (kind === 'letter') {
         element.textContent = remaining > 0 ? 'jeton geri dönüyor: ' + clock(remaining) : 'süre doldu · jeton yayıncıya döndü';
       } else if (remaining > 0) {
@@ -763,7 +897,6 @@
       }
     });
 
-    // Süresi dolan zarfları listeden düşür.
     if (state.events.some(function (event) { return event.status === 'pending' && isExpired(event); })) {
       var events = state.events.map(function (event) {
         if (event.status === 'pending' && isExpired(event)) {
@@ -780,7 +913,16 @@
     checkNotifications();
   }
 
-  // ---------- Bağlama ----------
+  // ---------- Yardımcılar ----------
+
+  function optionsHtml(includeEmpty) {
+    var keys = Object.keys(COUNTRIES).sort(function (a, b) {
+      return countryName(a).localeCompare(countryName(b), 'tr');
+    });
+    return (includeEmpty ? '<option value="">Ülke (opsiyonel)</option>' : '') + keys.map(function (code) {
+      return '<option value="' + code + '">' + flag(code) + ' ' + countryName(code) + '</option>';
+    }).join('');
+  }
 
   function renderAll() {
     renderStats();
@@ -792,6 +934,8 @@
     renderSettings();
     if (window.lucide) lucide.createIcons();
   }
+
+  // ---------- Bağlama ----------
 
   function bind() {
     document.querySelectorAll('.tab-btn').forEach(function (button) {
@@ -810,16 +954,41 @@
 
     $('addStreamer').addEventListener('click', addStreamer);
     $('streamerName').addEventListener('keydown', function (event) { if (event.key === 'Enter') addStreamer(); });
-    $('sortStreamers').addEventListener('change', function () { sortMode = $('sortStreamers').value; renderStreamers(); });
 
-    $('streamerList').addEventListener('click', function (event) {
+    $('bulkBtn').addEventListener('click', function () {
+      $('bulkResult').textContent = '';
+      $('bulkCountry').innerHTML = optionsHtml(true);
+      openModal('bulkModal');
+      setTimeout(function () { $('bulkText').focus(); }, 50);
+    });
+    $('bulkSubmit').addEventListener('click', function () {
+      var result = bulkAddUsers($('bulkText').value, $('bulkCountry').value);
+      $('bulkResult').textContent = result.added + ' yayıncı eklendi' + (result.skipped ? ' · ' + result.skipped + ' zaten listedeydi' : '') + '.';
+      $('bulkText').value = '';
+      $('addStatus').textContent = result.added ? result.added + ' yayıncı toplu eklendi.' : 'Yeni yayıncı bulunamadı.';
+    });
+
+    document.querySelectorAll('th[data-sort]').forEach(function (th) {
+      th.addEventListener('click', function () {
+        var key = th.getAttribute('data-sort');
+        if (sortKey === key) sortDir *= -1; else { sortKey = key; sortDir = 1; }
+        renderStreamers();
+      });
+    });
+
+    $('streamerRows').addEventListener('click', function (event) {
       var target = event.target.closest('button');
       if (!target) return;
 
-      if (target.dataset.toggleTimer) return toggleTimer(target.dataset.toggleTimer);
+      if (target.dataset.toggleLive) return toggleLive(target.dataset.toggleLive);
       if (target.dataset.addEvent) return openEventModal(target.dataset.addEvent, target.dataset.kind);
       if (target.dataset.qr) return openQr(target.dataset.qr);
       if (target.dataset.removeStreamer) return removeStreamer(target.dataset.removeStreamer);
+    });
+
+    $('oppSort').addEventListener('change', function () {
+      oppSort = $('oppSort').value;
+      renderOpportunities();
     });
 
     $('opportunityList').addEventListener('click', function (event) {
@@ -843,7 +1012,7 @@
       var button = event.target.closest('button');
       if (!button) return;
       eventTarget.kind = button.getAttribute('data-event-kind');
-      $('eventDuration').value = eventTarget.kind === 'letter' ? (state.settings.letterTtlSec || 180) : Number($('eventDuration').value) || 60;
+      $('eventDuration').value = eventTarget.kind === 'letter' ? (state.settings.letterTtlSec || 180) : Number($('eventDuration').value) || 0;
       renderEventTypes();
     });
     $('eventSave').addEventListener('click', saveEvent);
@@ -907,31 +1076,21 @@
       state = Store.get();
       renderAll();
     });
-
-  }
-
-  function fillCountries() {
-    var options = '<option value="">Ülke (opsiyonel)</option>' + Object.keys(COUNTRIES).sort(function (a, b) {
-      return countryName(a).localeCompare(countryName(b), 'tr');
-    }).map(function (code) {
-      return '<option value="' + code + '">' + flag(code) + ' ' + countryName(code) + '</option>';
-    }).join('');
-    $('streamerCountry').innerHTML = options;
   }
 
   async function boot() {
     await Store.ready();
     state = Store.get();
 
-    Store.subscribe(function (next) {
-      state = next;
-    });
+    Store.subscribe(function (next) { state = next; });
 
-    fillCountries();
+    $('streamerCountry').innerHTML = optionsHtml(true);
     bind();
     renderAll();
     switchTab('hunt');
+    pruneInactive();
     setInterval(tick, 1000);
+    setInterval(pruneInactive, 600000);
   }
 
   if (document.readyState === 'loading') {

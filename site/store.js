@@ -26,6 +26,7 @@
       events: [],
       settings: {
         letterTtlSec: 180,
+        inactiveDays: 7,
         notify: true,
         tiktokCutPct: 50,
         agencyCutPct: 10,
