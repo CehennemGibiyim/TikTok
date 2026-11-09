@@ -40,6 +40,9 @@
   var notified = {};
   var audioCtx = null;
   var verified = {};
+  var scanInfo = null;
+  var scanUrl = 'data/live.json';
+  var poolUrl = 'data/targets.json';
 
   function $(id) { return document.getElementById(id); }
 
@@ -147,6 +150,176 @@
     return metrics;
   }
 
+  // ---------- Canlı tarayıcı köprüsü ----------
+  // Tarayıcı (scanner/index.js) gerçek TikTok verisini data/live.json'a yazar.
+  // Panel bu dosyayı okuyup canlı yayınları, gerçek sürelerini ve jeton
+  // olaylarını kendiliğinden gösterir.
+
+  function applyScan(data) {
+    if (!data || !Array.isArray(data.streamers)) return false;
+
+    var byName = {};
+    state.streamers.forEach(function (streamer) { byName[streamer.username] = streamer; });
+
+    var streamers = state.streamers.slice();
+    var changed = false;
+
+    data.streamers.forEach(function (item) {
+      var username = cleanUsername(item.username);
+      if (!username) return;
+      var startIso = item.startTime ? new Date(Number(item.startTime) * 1000).toISOString() : null;
+      var existing = byName[username];
+
+      if (existing) {
+        var copy = Object.assign({}, existing, {
+          scanLive: Boolean(item.live),
+          scanCheckedAt: Number(item.checkedAt) || Date.now()
+        });
+        if (item.title) copy.liveTitle = item.title;
+        if (item.viewers) copy.viewers = item.viewers;
+
+        if (item.live && startIso && existing.startedAt !== startIso) {
+          // TikTok'un gerçek başlangıç saati: süre sıfırdan ve doğru sayılır.
+          copy.startedAt = startIso;
+          copy.accumulatedMs = 0;
+          copy.lastLiveAt = Number(item.lastSeenLiveAt) || Date.now();
+        } else if (!item.live && existing.startedAt) {
+          copy.accumulatedMs = (Number(existing.accumulatedMs) || 0) +
+            Math.max(0, Date.now() - new Date(existing.startedAt).getTime());
+          copy.startedAt = null;
+          copy.lastLiveAt = Number(item.lastSeenLiveAt) || Date.now();
+        }
+
+        byName[username] = copy;
+        streamers = streamers.map(function (streamer) {
+          return streamer.id === existing.id ? copy : streamer;
+        });
+        changed = true;
+        return;
+      }
+
+      if (!item.live && !(Number(item.coins) > 0)) return;
+
+      var created = {
+        id: uid('st'),
+        username: username,
+        country: item.country || '',
+        startedAt: item.live && startIso ? startIso : null,
+        accumulatedMs: 0,
+        createdAt: Date.now(),
+        lastLiveAt: Number(item.lastSeenLiveAt) || (item.live ? Date.now() : 0),
+        scanLive: Boolean(item.live),
+        liveTitle: item.title || '',
+        viewers: Number(item.viewers) || 0,
+        source: 'scan'
+      };
+      byName[username] = created;
+      streamers.push(created);
+      changed = true;
+    });
+
+    var events = state.events.slice();
+    var known = {};
+    events.forEach(function (event) { if (event.scanId) known[event.scanId] = true; });
+
+    (data.events || []).forEach(function (item) {
+      if (!item || !item.id || known[item.id]) return;
+      var owner = byName[cleanUsername(item.username)];
+      if (!owner) return;
+      known[item.id] = true;
+      events.unshift({
+        id: uid('ev'),
+        streamerId: owner.id,
+        username: owner.username,
+        country: owner.country || '',
+        kind: item.kind === 'letter' ? 'letter' : 'chest',
+        coins: Number(item.coins) || 0,
+        durationSec: 0,
+        availableAt: Number(item.t) || Date.now(),
+        expiresAt: 0,
+        shared: 0,
+        status: 'pending',
+        createdAt: Number(item.t) || Date.now(),
+        scanId: item.id,
+        auto: true,
+        giftName: item.giftName || '',
+        sender: item.sender || ''
+      });
+      changed = true;
+    });
+
+    if (changed) {
+      Store.set({ streamers: streamers, events: events });
+      state = Store.get();
+    }
+    return changed;
+  }
+
+  function renderScanStatus(error) {
+    var el = $('scanStatus');
+    if (!el) return;
+    if (!scanInfo) {
+      el.innerHTML = error
+        ? 'Tarama verisi okunamadı (' + esc(error) + ').'
+        : 'Tarama verisi yok — arka plan tarayıcısı henüz çalışmadı.';
+      return;
+    }
+    var live = Number(scanInfo.liveCount) || 0;
+    var parts = [
+      'Tarama: ' + ago(new Date(scanInfo.scannedAt || Date.now()).getTime()),
+      live + ' canlı',
+      (Number(scanInfo.targetCount) || 0) + ' adres',
+      (Number(scanInfo.watching) || 0) + ' oda dinleniyor'
+    ];
+    el.innerHTML = '<span class="chip chip-green">● ' + esc(parts.join(' · ')) + '</span>';
+  }
+
+  async function refreshScan() {
+    try {
+      var response = await fetch(scanUrl + '?t=' + Date.now(), { cache: 'no-store' });
+      if (!response.ok) throw new Error('HTTP ' + response.status);
+      var data = await response.json();
+      scanInfo = Object.assign({ scannedAt: data.scannedAt }, data.scanner || {});
+      if (applyScan(data)) renderAll();
+      renderScanStatus();
+    } catch (error) {
+      renderScanStatus(error.message);
+    }
+  }
+
+  function downloadTargets() {
+    var payload = {
+      note: 'Taranacak adresler. GitHub\'ta site/firsat/data/targets.json olarak yükle.',
+      updatedAt: new Date().toISOString(),
+      targets: state.streamers.map(function (streamer) { return streamer.username; })
+    };
+    var blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+    var link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = 'targets.json';
+    document.body.appendChild(link);
+    link.click();
+    setTimeout(function () { URL.revokeObjectURL(link.href); link.remove(); }, 1000);
+  }
+
+  async function importPool() {
+    try {
+      var response = await fetch(poolUrl + '?t=' + Date.now(), { cache: 'no-store' });
+      if (!response.ok) throw new Error('HTTP ' + response.status);
+      var data = await response.json();
+      var list = Array.isArray(data) ? data : data.targets || [];
+      var raw = list.map(function (item) {
+        return typeof item === 'string' ? item : (item && item.username) || '';
+      }).join('\n');
+      var result = bulkAddUsers(raw, '');
+      $('addStatus').textContent = result.added
+        ? 'Taranan havuzdan ' + result.added + ' yayıncı eklendi.'
+        : 'Havuzdaki herkes zaten listede (' + result.skipped + ').';
+    } catch (error) {
+      $('addStatus').textContent = 'Havuz okunamadı: ' + error.message;
+    }
+  }
+
   function isExpired(event) {
     return event.kind === 'letter' && event.expiresAt && event.expiresAt <= Date.now();
   }
@@ -232,14 +405,18 @@
     rows.innerHTML = list.map(function (streamer) {
       var metrics = streamerMetrics(streamer);
       var liveChip = metrics.live
-        ? '<button class="chip chip-green" data-toggle-live="' + streamer.id + '">● Canlı</button>'
+        ? '<button class="chip chip-green" data-toggle-live="' + streamer.id + '" title="' + esc(streamer.liveTitle || '') + '">● Canlı' + (streamer.scanLive ? ' · tarama' : '') + '</button>'
         : '<button class="chip" data-toggle-live="' + streamer.id + '">Canlı yap</button>';
+      var liveNote = streamer.scanLive
+        ? '<div class="text-[10px] text-yellow-50/40 truncate max-w-[180px]">' + esc(streamer.liveTitle || 'yayında') + (streamer.viewers ? ' · ' + fmt(streamer.viewers) + ' kişi' : '') + '</div>'
+        : '';
 
       return [
         '<tr>',
         '  <td class="min-w-[170px]">',
         '    <a href="' + liveUrl(streamer.username) + '" target="_blank" rel="noopener" class="font-bold text-yellow-100 hover:text-yellow-300">@' + esc(streamer.username) + '</a>',
         '    <div class="text-[10px] text-yellow-50/40">' + flag(streamer.country) + ' ' + esc(countryName(streamer.country)) + '</div>',
+        '    ' + liveNote,
         '  </td>',
         '  <td>' + liveChip + '</td>',
         '  <td class="font-mono text-xs" data-streamer-timer="' + streamer.id + '">' + clock(streamerDuration(streamer)) + '</td>',
@@ -279,10 +456,12 @@
       var urgent = false;
       var timeText = '';
 
-      if (event.kind === 'letter') {
-        var remaining = Math.max(0, Math.round(((event.expiresAt || Date.now()) - Date.now()) / 1000));
+      if (event.kind === 'letter' && Number(event.expiresAt) > 0) {
+        var remaining = Math.max(0, Math.round((Number(event.expiresAt) - Date.now()) / 1000));
         urgent = remaining <= 60;
         timeText = 'jeton geri dönüyor: ' + clock(remaining);
+      } else if (event.kind === 'letter') {
+        timeText = event.auto ? 'tarayıcı yakaladı · jeton dağıtıldı' : 'hemen açıldı · kaybolmaz';
       } else if (Number(event.durationSec) > 0) {
         var toOpen = Math.max(0, Math.round(((event.availableAt || Date.now()) - Date.now()) / 1000));
         timeText = toOpen > 0 ? 'açılışa ' + clock(toOpen) : 'açıldı · süre doldu, kaybolmaz';
@@ -295,7 +474,7 @@
       return [
         '<div class="opp-card ' + (urgent ? 'opp-urgent' : '') + '">',
         '  <div class="flex items-center justify-between mb-2">',
-        '    <span class="kind-badge ' + meta.cls + '">' + meta.icon + ' ' + meta.label + '</span>',
+        '    <span class="flex items-center gap-1"><span class="kind-badge ' + meta.cls + '">' + meta.icon + ' ' + meta.label + '</span>' + (event.auto ? '<span class="kind-badge kind-live">CANLI</span>' : '') + '</span>',
         '    <span class="font-black text-amber-400">' + fmt(event.coins) + ' <span class="text-[10px] font-normal text-yellow-50/40">jeton</span></span>',
         '  </div>',
         '  <a href="' + liveUrl(event.username) + '" target="_blank" rel="noopener" class="font-semibold text-yellow-100 hover:text-yellow-300 truncate block">@' + esc(event.username) + '</a>',
@@ -955,6 +1134,9 @@
     $('addStreamer').addEventListener('click', addStreamer);
     $('streamerName').addEventListener('keydown', function (event) { if (event.key === 'Enter') addStreamer(); });
 
+    if ($('poolDownload')) $('poolDownload').addEventListener('click', downloadTargets);
+    if ($('poolImport')) $('poolImport').addEventListener('click', importPool);
+
     $('bulkBtn').addEventListener('click', function () {
       $('bulkResult').textContent = '';
       $('bulkCountry').innerHTML = optionsHtml(true);
@@ -1089,7 +1271,9 @@
     renderAll();
     switchTab('hunt');
     pruneInactive();
+    refreshScan();
     setInterval(tick, 1000);
+    setInterval(refreshScan, 30000);
     setInterval(pruneInactive, 600000);
   }
 

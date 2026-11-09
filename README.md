@@ -33,11 +33,41 @@ Panel verisi tarayıcıda (localStorage) tutulur; şifreler cihazdan dışarı �
 
 Verisi IndexedDB'de tutulur.
 
-## Neden otomatik tarama yok?
+## Arka plan tarayıcısı (gerçek süre + otomatik dinleme)
 
-TikTok canlı soketi imza ister ve tarayıcıya CORS izni vermez; ücretsiz aynalar (tikwm vb.)
-Cloudflare ile kapatılmış, oEmbed yalnızca profil doğrulaması veriyor. Bu yüzden canlı olayı
-panel kendisi okuyamaz; olayları tek dokunuşla sen işaretlersin, panel süre ve toplamları yönetir.
+Tarayıcı sayfası TikTok canlı soketine bağlanamaz (imza + CORS). Bu yüzden dinleme işini
+`scanner/` klasöründeki Node aracı yapar ve GitHub Actions'ta **3 saatte bir, ~2,5 saat boyunca** çalışır:
+
+1. **Keşif** — `site/firsat/data/targets.json` havuzundaki her adresi TikTok'a sorar:
+   canlı mı, yayın **ne zaman başladı**, başlık, izleyici sayısı.
+2. **Dinleme** — canlı odalara bağlanır, jeton olaylarını (hediye, zarf) zamana damgalar.
+3. **Yayın** — sonucu `site/firsat/data/live.json`'a yazar, commit eder; panel bu dosyayı
+   30 saniyede bir okur.
+
+Sonuç: yayıncı canlıysa panel kendiliğinden **Canlı · tarama** yazar, süreyi TikTok'un gerçek
+başlangıç saatinden sayar (sen sıfırlamazsın) ve yayında paylaşılan jetonlar **(CANLI)** etiketiyle
+Fırsatlar'a düşer.
+
+### Havuzu doldurmak
+
+Panelde **Tarama listesi indir** → inen `targets.json` dosyasını depoya
+`site/firsat/data/targets.json` olarak yükle. Panelin listesi havuzun kaynağıdır.
+**Havuzu içe al** ise tersini yapar: repodaki havuzu panele ekler.
+
+### Yerelde dinleme
+
+```bash
+cd scanner && npm install
+node index.js --minutes=120      # 2 saat tara + dinle
+node index.js --once             # tek tur (deneme)
+```
+
+### Sınırlar
+
+- TikTok serbest bir "tüm canlı yayınlar" dizini vermiyor; keşif senin havuzunla sınırlı.
+- GitHub cron 3 saatte bir tur açar; iki tur arası ≈15 dakika boşluk olabilir. O arada başlayan
+  yayın, bir sonraki turda (en geç 3 saat sonra) yakalanır; süresi yine gerçek başlangıçtan sayılır.
+- GitHub'ın 6 saatlik iş sınırı nedeniyle tur 165 dakika tutulur.
 
 ## Yerelde çalıştırma
 

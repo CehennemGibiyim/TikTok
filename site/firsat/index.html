@@ -51,8 +51,13 @@
         <button id="bulkBtn" class="btn-ghost"><i data-lucide="list-plus" class="w-4 h-4"></i> Toplu ekle</button>
       </div>
       <div class="flex flex-wrap items-center gap-3 mt-2">
-        <p class="hint">Yayıncı ekle, yayına girince <b>Canlı</b> ile işaretle; süre otomatik başlar. Sandık/zarf düştüğünde satırdaki düğmelerle jeton ve süresini gir.</p>
+        <p class="hint">Yayıncı ekle; arka plan tarayıcısı kim canlıysa <b>Canlı</b> yapar, süreyi TikTok'un gerçek başlangıç saatinden sayar ve jeton olaylarını Fırsatlar'a düşürür.</p>
         <span id="addStatus" class="text-[11px] text-yellow-300"></span>
+      </div>
+      <div class="flex flex-wrap items-center gap-2 mt-3 pt-3 border-t border-white/5">
+        <span id="scanStatus" class="text-[11px] text-yellow-50/60">Tarama verisi yok — arka plan tarayıcısı henüz çalışmadı.</span>
+        <button id="poolDownload" class="chip" title="Havuzu GitHub'a yükle: site/firsat/data/targets.json">Tarama listesi indir</button>
+        <button id="poolImport" class="chip">Havuzu içe al</button>
       </div>
     </div>
 

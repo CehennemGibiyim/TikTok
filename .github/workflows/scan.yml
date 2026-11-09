@@ -1,0 +1,43 @@
+name: 📡 Canlı Tarayıcı
+
+# Havuzdaki adresleri tarar, canlı olanlara bağlanır, jeton olaylarını toplar.
+# Sonucu site/firsat/data/live.json'a yazar; Pages paneli onu okur.
+
+on:
+  schedule:
+    # Her 3 saatte bir uzun tur (github cron en erken 5 dk, biz 3 saat seçtik)
+    - cron: '0 */3 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: live-scanner
+  cancel-in-progress: false
+
+jobs:
+  scan:
+    runs-on: ubuntu-latest
+    timeout-minutes: 350
+    steps:
+      - name: 📥 Checkout
+        uses: actions/checkout@v4
+
+      - name: 🟢 Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: npm
+          cache-dependency-path: scanner/package-lock.json
+
+      - name: 📦 Bağımlılıklar
+        run: npm ci --prefix scanner --no-audit --no-fund
+
+      - name: ⚙️ Git kimliği
+        run: |
+          git config user.name "canli-tarayici"
+          git config user.email "actions@users.noreply.github.com"
+
+      - name: 🔍 Tara ve dinle
+        run: node scanner/index.js --minutes=165 --commit=600
