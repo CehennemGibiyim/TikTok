@@ -1,0 +1,54 @@
+:root {
+  --text-primary: 254 252 232; /* yellow-50 */
+}
+
+* { box-sizing: border-box; padding: 0; margin: 0; }
+
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  color: rgb(var(--text-primary));
+  background: #050505; /* Kapkaranlık siyah arka plan */
+  min-height: 100vh;
+}
+
+.glass {
+  background: rgba(255, 255, 255, 0.02);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(250, 204, 21, 0.15); /* Hafif altın rengi sınır */
+  box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5);
+}
+
+.scrollbar-custom::-webkit-scrollbar { width: 6px; }
+.scrollbar-custom::-webkit-scrollbar-track { background: rgba(255,255,255,0.02); }
+.scrollbar-custom::-webkit-scrollbar-thumb { background: rgba(250,204,21,0.3); border-radius: 3px; }
+.scrollbar-custom::-webkit-scrollbar-thumb:hover { background: rgba(250,204,21,0.6); }
+
+.loading-spinner {
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+@keyframes spin { 100% { transform: rotate(360deg); } }
+
+input[type=range] {
+  -webkit-appearance: none;
+  background: rgba(255,255,255,0.1);
+  border-radius: 5px;
+  height: 6px;
+}
+input[type=range]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  height: 16px;
+  width: 16px;
+  border-radius: 50%;
+  background: #facc15;
+  cursor: pointer;
+}
+
+/* Sweet fade-in animation for new chests */
+@keyframes slideIn {
+  from { opacity: 0; transform: translateX(-20px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+.chest-anim {
+  animation: slideIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
