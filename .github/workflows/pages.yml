@@ -29,10 +29,11 @@ jobs:
 
       - name: 📦 Paneli hazırla
         run: |
-          mkdir -p _site
-          cp site/index.html site/app.js site/store.js site/styles.css _site/
+          mkdir -p _site/firsat
+          cp site/index.html site/main.js site/styles.css site/config.js site/web-shim.js site/hunt.js site/store-client.js _site/
+          cp site/firsat/index.html site/firsat/app.js site/firsat/store.js site/firsat/styles.css _site/firsat/
           echo "Panel dosyaları:"
-          ls -la _site
+          ls -la _site _site/firsat
 
       - name: ⚙️ Pages ayarları
         uses: actions/configure-pages@v5

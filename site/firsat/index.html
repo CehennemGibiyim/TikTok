@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TikTok Jeton Paneli · Sunucusuz</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://unpkg.com/lucide@latest"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body class="min-h-screen text-yellow-50">
+
+<header class="sticky top-0 z-40 border-b border-white/10 bg-black/70 backdrop-blur">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 py-3 flex flex-col lg:flex-row lg:items-center gap-3">
+    <div class="flex items-center gap-3">
+      <div class="w-10 h-10 rounded-xl bg-yellow-500 text-black flex items-center justify-center font-black text-lg shadow-[0_0_18px_rgba(250,204,21,0.45)]">₺</div>
+      <div>
+        <div class="font-black text-lg leading-tight">Jeton Paneli <span class="text-[10px] align-top bg-yellow-500/20 text-yellow-300 border border-yellow-500/30 rounded px-1.5 py-0.5 ml-1">SUNUCUSUZ</span></div>
+        <div class="text-[11px] text-yellow-50/50">Tüm veriler bu cihazda · internet gerekmez</div>
+      </div>
+    </div>
+
+    <nav class="flex flex-wrap gap-1 lg:ml-auto bg-white/5 p-1 rounded-xl border border-white/10">
+      <button data-tab="hunt" class="tab-btn">Av</button>
+      <button data-tab="opportunities" class="tab-btn relative">Fırsatlar <span id="navOppCount" class="nav-count">0</span></button>
+      <button data-tab="inventory" class="tab-btn">Envanter</button>
+      <button data-tab="agencies" class="tab-btn">Ajanslar</button>
+      <button data-tab="calc" class="tab-btn">Gelir</button>
+      <button data-tab="settings" class="tab-btn">Ayarlar</button>
+    </nav>
+  </div>
+</header>
+
+<main class="max-w-7xl mx-auto px-4 sm:px-6 py-6">
+
+  <!-- ========== AV ========== -->
+  <section id="view-hunt" class="view">
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-5">
+      <div class="card p-4"><div class="stat-label">Kayıtlı yayıncı</div><div id="statStreams" class="stat-value text-yellow-300">0</div></div>
+      <div class="card p-4"><div class="stat-label">Son 1 hafta canlı</div><div id="statLive" class="stat-value text-green-400">0</div></div>
+      <div class="card p-4"><div class="stat-label">Bekleyen jeton</div><div id="statPendingCoins" class="stat-value text-amber-400">0</div></div>
+      <div class="card p-4"><div class="stat-label">Toplanan jeton</div><div id="statCollected" class="stat-value text-white">0</div></div>
+    </div>
+
+    <div class="card p-5 mb-5">
+      <div class="flex flex-col lg:flex-row gap-3">
+        <input id="streamerName" class="input flex-1" placeholder="@yayinci veya tiktok.com/@yayinci">
+        <select id="streamerCountry" class="input w-full lg:w-52"></select>
+        <button id="addStreamer" class="btn-primary">Yayıncı ekle</button>
+        <button id="bulkBtn" class="btn-ghost"><i data-lucide="list-plus" class="w-4 h-4"></i> Toplu ekle</button>
+      </div>
+      <div class="flex flex-wrap items-center gap-3 mt-2">
+        <p class="hint">Yayıncı ekle, yayına girince <b>Canlı</b> ile işaretle; süre otomatik başlar. Sandık/zarf düştüğünde satırdaki düğmelerle jeton ve süresini gir.</p>
+        <span id="addStatus" class="text-[11px] text-yellow-300"></span>
+      </div>
+    </div>
+
+    <div class="card p-5">
+      <div class="flex items-center justify-between gap-3 mb-3 flex-wrap">
+        <h2 class="section-title"><i data-lucide="radio" class="w-5 h-5 text-yellow-400"></i> Yayınlar <span id="streamerCount" class="badge ml-2">0</span></h2>
+        <div class="text-[11px] text-yellow-50/40">Sütun başlığına tıkla → o sütuna göre sırala</div>
+      </div>
+      <div class="overflow-x-auto">
+        <table class="stream-table">
+          <thead>
+            <tr>
+              <th data-sort="name">Yayıncı</th>
+              <th data-sort="live">Durum</th>
+              <th data-sort="duration">Süre</th>
+              <th data-sort="chest">Sandık</th>
+              <th data-sort="letter">Zarf</th>
+              <th data-sort="portal">Portal</th>
+              <th data-sort="coins">Jeton</th>
+              <th data-sort="collected">Toplanan</th>
+              <th data-sort="lastSeen">Son görülme</th>
+              <th>İşlem</th>
+            </tr>
+          </thead>
+          <tbody id="streamerRows"></tbody>
+        </table>
+      </div>
+      <div id="streamerEmpty" class="empty-state mt-3">Henüz yayıncı yok. Yukarıdan ekle veya <b>Toplu ekle</b> ile 200 adresi tek seferde yapıştır.</div>
+    </div>
+  </section>
+
+  <!-- ========== FIRSATLAR ========== -->
+  <section id="view-opportunities" class="view hidden">
+    <div class="card p-5">
+      <div class="flex items-start justify-between gap-3 mb-4 flex-wrap">
+        <div>
+          <h2 class="section-title"><i data-lucide="gift" class="w-5 h-5 text-amber-400"></i> Fırsatlar <span id="opportunityCount" class="badge ml-2">0</span></h2>
+          <p class="hint mt-1">Yalnızca jeton paylaşan yayınlar. Sandık süresi dolsa da bekler; zarf/mektup süresi dolunca jeton yayıncıya döner ve düşer.</p>
+        </div>
+        <div class="flex items-center gap-3">
+          <select id="oppSort" class="input !py-1.5 !text-xs w-auto">
+            <option value="coins">Jeton (çok → az)</option>
+            <option value="expiry">Yaklaşan süre</option>
+            <option value="new">Yeni eklenen</option>
+            <option value="streamer">Yayıncı (A-Z)</option>
+          </select>
+          <div class="text-right">
+            <div id="pendingCoinsBig" class="text-xl font-black text-amber-400">0 jeton</div>
+            <button id="clearOpportunities" class="text-[11px] text-yellow-50/40 hover:text-red-300 mt-1">Kaçanları temizle</button>
+          </div>
+        </div>
+      </div>
+      <div id="opportunityList" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3"></div>
+    </div>
+  </section>
+
+  <!-- ========== ENVANTER ========== -->
+  <section id="view-inventory" class="view hidden">
+    <div class="card p-5 mb-5">
+      <h2 class="section-title mb-3"><i data-lucide="users" class="w-5 h-5 text-yellow-400"></i> Hesap envanteri <span id="accCount" class="badge ml-2">0</span></h2>
+      <div class="grid grid-cols-1 md:grid-cols-6 gap-3">
+        <input id="accUser" class="input md:col-span-2" placeholder="Kullanıcı adı / etiket">
+        <select id="accAgency" class="input md:col-span-2"></select>
+        <select id="accStatus" class="input">
+          <option value="active">Aktif</option>
+          <option value="paused">Duraklatıldı</option>
+          <option value="banned">Banlı</option>
+        </select>
+        <input id="accCoins" type="number" min="0" class="input" placeholder="Jeton">
+      </div>
+      <div class="flex flex-wrap gap-2 mt-3">
+        <button id="addAccount" class="btn-primary">Hesap ekle</button>
+        <input type="file" id="accImport" accept=".csv,.json" class="hidden">
+        <button id="accImportBtn" class="btn-ghost"><i data-lucide="upload" class="w-4 h-4"></i> İçe aktar</button>
+        <button id="accExport" class="btn-ghost"><i data-lucide="download" class="w-4 h-4"></i> CSV indir</button>
+        <input id="accSearch" class="input !py-1.5 !text-xs w-full sm:w-56 ml-auto" placeholder="Ara…">
+      </div>
+      <p class="hint mt-2">Envanter boş başlar. Şifre saklanmaz; yalnızca kullanıcı adı, durum, ajans ve jeton bilgisi tutulur.</p>
+    </div>
+    <div class="card p-5"><div id="accountList"></div></div>
+  </section>
+
+  <!-- ========== AJANSLAR ========== -->
+  <section id="view-agencies" class="view hidden">
+    <div class="card p-5 mb-5">
+      <h2 class="section-title mb-3"><i data-lucide="building-2" class="w-5 h-5 text-yellow-400"></i> Ajanslar</h2>
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-3">
+        <input id="agName" class="input" placeholder="Ajans adı">
+        <select id="agCountry" class="input"></select>
+        <input id="agCommission" type="number" min="0" max="100" class="input" placeholder="Komisyon %">
+        <button id="addAgency" class="btn-primary">Ajans ekle</button>
+      </div>
+    </div>
+    <div class="card p-5"><div id="agencyList"></div></div>
+  </section>
+
+  <!-- ========== GELIR ========== -->
+  <section id="view-calc" class="view hidden">
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-5">
+      <div class="card p-5">
+        <h2 class="section-title mb-4"><i data-lucide="calculator" class="w-5 h-5 text-yellow-400"></i> Gelir hesaplayıcı</h2>
+        <label class="label">Toplanan jeton</label>
+        <input id="calcCoins" type="number" min="0" class="input mb-3" placeholder="0">
+        <div class="grid grid-cols-2 gap-3">
+          <div><label class="label">TikTok kesintisi %</label><input id="calcTiktok" type="number" min="0" max="100" class="input"></div>
+          <div><label class="label">Ajans kesintisi %</label><input id="calcAgency" type="number" min="0" max="100" class="input"></div>
+          <div><label class="label">1 jeton = $</label><input id="calcCoinUsd" type="number" step="0.0001" class="input"></div>
+          <div><label class="label">USD/TRY</label><input id="calcRate" type="number" step="0.01" class="input"></div>
+        </div>
+        <button id="saveCalc" class="btn-ghost mt-4">Varsayılan olarak kaydet</button>
+      </div>
+      <div class="card p-5">
+        <h2 class="section-title mb-4"><i data-lucide="trending-up" class="w-5 h-5 text-green-400"></i> Sonuç</h2>
+        <div class="space-y-3 text-sm">
+          <div class="flex justify-between"><span class="text-yellow-50/60">Brüt değer</span><span id="calcGross" class="font-bold">$0.00</span></div>
+          <div class="flex justify-between"><span class="text-yellow-50/60">TikTok sonrası</span><span id="calcAfterTiktok" class="font-bold">$0.00</span></div>
+          <div class="flex justify-between"><span class="text-yellow-50/60">Ajans sonrası (net)</span><span id="calcAfterAgency" class="font-bold text-green-400">$0.00</span></div>
+          <div class="flex justify-between border-t border-white/10 pt-3"><span class="text-yellow-50/60">TL karşılığı</span><span id="calcTry" class="font-black text-amber-400">₺0.00</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== AYARLAR ========== -->
+  <section id="view-settings" class="view hidden">
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-5">
+      <div class="card p-5">
+        <h2 class="section-title mb-4"><i data-lucide="clock" class="w-5 h-5 text-yellow-400"></i> Av ayarları</h2>
+        <label class="label">Zarf/mektup geçerlilik süresi (saniye)</label>
+        <input id="letterTtl" type="number" min="10" class="input mb-3">
+        <label class="label">Yayında görülmeyen kayıt kaç günde düşsün?</label>
+        <input id="inactiveDays" type="number" min="1" class="input mb-3">
+        <label class="flex items-center gap-2 text-sm text-yellow-50/70 mb-3">
+          <input id="notifyToggle" type="checkbox" class="w-4 h-4 accent-yellow-500">
+          Zarfın süresi dolmadan tarayıcı bildirimi göster
+        </label>
+        <button id="saveSettings" class="btn-primary">Kaydet</button>
+      </div>
+
+      <div class="card p-5">
+        <h2 class="section-title mb-4"><i data-lucide="database" class="w-5 h-5 text-yellow-400"></i> Veri</h2>
+        <p class="hint mb-3">Tüm kayıtlar bu tarayıcının IndexedDB deposunda. Tarayıcı verisi silinirse kaybolur; düzenli yedek al.</p>
+        <div class="flex flex-wrap gap-2">
+          <button id="exportBackup" class="btn-primary">JSON yedek indir</button>
+          <input type="file" id="importBackup" accept=".json" class="hidden">
+          <button id="importBackupBtn" class="btn-ghost">Yedekten yükle</button>
+          <button id="clearAll" class="btn-danger">Tüm veriyi sil</button>
+        </div>
+        <div id="storageInfo" class="text-[11px] text-yellow-50/40 mt-4"></div>
+        <div class="note-box mt-4">
+          <b>Otomatik tarama hakkında:</b> TikTok canlı olaylarını tarayıcı okuyamaz (imzalı soket + CORS).
+          Bu yüzden canlı durumu, sandık/zarf düşüşünü tek dokunuşla sen işaretliyorsun; panel süre ve toplamları kendisi yönetiyor.
+        </div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<!-- Toplu ekleme -->
+<div id="bulkModal" class="modal hidden">
+  <div class="card p-5 w-full max-w-lg border-t-4 border-t-yellow-500">
+    <div class="flex items-center justify-between mb-3">
+      <h3 class="font-bold text-lg">Toplu yayıncı ekle</h3>
+      <button data-close-modal="bulkModal" class="text-yellow-50/50 hover:text-yellow-300"><i data-lucide="x" class="w-5 h-5"></i></button>
+    </div>
+    <p class="hint mb-2">Her satıra bir kullanıcı adı veya profil linki. En fazla 500 satır işlenir.</p>
+    <textarea id="bulkText" rows="8" class="input font-mono !text-xs mb-2" placeholder="@yayinci1&#10;https://www.tiktok.com/@yayinci2&#10;yayinci3"></textarea>
+    <div class="flex flex-col sm:flex-row gap-2 mb-3">
+      <select id="bulkCountry" class="input"></select>
+      <button id="bulkSubmit" class="btn-primary sm:ml-auto">Hepsini ekle</button>
+    </div>
+    <div id="bulkResult" class="text-[11px] text-yellow-300"></div>
+  </div>
+</div>
+
+<!-- Jeton olayı ekleme -->
+<div id="eventModal" class="modal hidden">
+  <div class="card p-5 w-full max-w-sm border-t-4 border-t-yellow-500">
+    <div class="flex items-center justify-between mb-3">
+      <h3 id="eventTitle" class="font-bold text-lg">Sandık ekle</h3>
+      <button data-close-modal="eventModal" class="text-yellow-50/50 hover:text-yellow-300"><i data-lucide="x" class="w-5 h-5"></i></button>
+    </div>
+    <div id="eventTypes" class="flex gap-2 mb-4"></div>
+    <label class="label">Jeton miktarı</label>
+    <input id="eventCoins" type="number" min="1" class="input mb-3" placeholder="örn. 500">
+    <label class="label">Süre (saniye)</label>
+    <input id="eventDuration" type="number" min="0" class="input mb-3" placeholder="örn. 60">
+    <div id="eventSharedWrap" class="hidden mb-4">
+      <label class="label">Kaç kişiye paylaşıldı</label>
+      <input id="eventShared" type="number" min="1" class="input" placeholder="örn. 1">
+    </div>
+    <button id="eventSave" class="btn-primary w-full">Ekle</button>
+  </div>
+</div>
+
+<!-- QR -->
+<div id="qrModal" class="modal hidden">
+  <div class="card p-5 w-full max-w-xs border-t-4 border-t-yellow-500">
+    <div class="flex items-center justify-between mb-3">
+      <h3 id="qrTitle" class="font-bold">Yayına git</h3>
+      <button data-close-modal="qrModal" class="text-yellow-50/50 hover:text-yellow-300"><i data-lucide="x" class="w-5 h-5"></i></button>
+    </div>
+    <div id="qrBox" class="bg-white rounded-xl p-3 min-h-[220px] flex items-center justify-center"></div>
+    <a id="qrLink" href="#" target="_blank" rel="noopener" class="block mt-3 text-center text-xs text-yellow-300 underline break-all"></a>
+    <p class="hint text-center mt-2">Telefonla okut, canlı yayın açılır.</p>
+  </div>
+</div>
+
+<script src="store.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

@@ -1,89 +1,53 @@
-# 🎯 TikTok Jeton Paneli — Sunucusuz
+# 🎯 TikTok Sandık Radarı PRO
 
-Tarayıcıda çalışan, **sunucu ve API anahtarı gerektirmeyen** jeton takip paneli.
-Canlı: **https://cehennemgibiyim.github.io/TikTok/**
+Panel: **https://cehennemgibiyim.github.io/TikTok/**
+Fırsatlar (sunucusuz av aracı): **https://cehennemgibiyim.github.io/TikTok/firsat/**
 
-Tüm veri (yayınlar, sandık/zarf olayları, hesap envanteri, ajanslar, ayarlar) yalnızca
-kullandığın cihazın tarayıcısında tutulur. Hiçbir ağ isteği yapılmaz, hiçbir yere
-veri gönderilmez.
+Sunucu, Docker, API anahtarı gerekmez. GitHub Pages üzerinde statik çalışır.
 
-## Neden manuel giriş?
-
-TikTok canlı yayın olayları tarayıcıdan okunamaz: TikTok'un canlı WebSocket'i imza
-ister ve tarayıcıya CORS izni vermez. Bunu otomatik yapmanın tek yolu bir sunucu ya da
-ücretli bir API anahtarıdır. Bu panel ikisini de kullanmaz; bu yüzden olayları
-(sandık/zarf düştüğünde) **tek dokunuşla sen girersin**, panel gerisini yapar:
-
-- gerçek süre sayacı (yayın süresi, sandık açılışı, zarf geçerliliği)
-- fırsat listesi ve bekleyen jeton toplamı
-- zarf süresi dolunca otomatik düşme, sandık süresi dolsa da kalma
-- QR ile telefonundan yayına gitme
-- envanter, ajans ve gelir hesapları
-- JSON yedek / geri yükleme
-
-## Sekmeler
+## Panel sekmeleri
 
 | Sekme | Ne yapar |
 |---|---|
-| **Av** | Yayıncı ekle (tek tek veya 500 satıra kadar toplu), **Canlı** ile süreyi başlat/durdur, sütun başlığına tıklayarak sırala, + Sandık / + Zarf / + Portal ile jeton, süre ve paylaşım sayısını gir, QR aç |
-| **Fırsatlar** | Yalnızca jeton paylaşan yayınlar; jetona veya yaklaşan süreye göre sırala, canlı geri sayım, Topladım / Kaçtı |
-| **Envanter** | Hesap listesi (kullanıcı adı, ajans, durum, jeton), CSV dışa/içe aktarma |
-| **Ajanslar** | Ajans tanımı, komisyon, bağlı hesap ve jeton toplamları |
-| **Gelir** | Jeton → TikTok kesintisi → ajans kesintisi → USD/TRY hesabı |
-| **Ayarlar** | Zarf süresi, 7 gün kuralı, bildirim, JSON yedek, tüm veriyi silme |
+| **Radar** | Dinlenecek yayıncı listesi, canlı olay akışı (sunucu bağlanırsa) |
+| **Gelir** | Jeton → TikTok kesintisi → ajans komisyonu → yayıncı net kazancı, TL karşılığı ve pasta dağılımı |
+| **AI** | Yayın metni/sohbet analizi (sağlayıcı anahtarı verilirse) |
+| **Araçlar** | Yardımcı araçlar |
+| **Hesaplar** | Hesap envanteri (kullanıcı adı, şifre, ajans, jeton), arama ve dışa aktarma. **Envanteri sıfırla** düğmesi cihazdaki tüm kayıtları temizler |
+| **Ajanslar** | Ajans tanımı, komisyon, bağlı hesaplar ve liderlik tablosu |
+| **Jeton Avı** | Yayınlardaki sandık/zarf/portal olayları, fırsatlar, ülke özeti, QR |
 
-## Akış
+Panel verisi tarayıcıda (localStorage) tutulur; şifreler cihazdan dışarı çıkmaz.
 
-1. **Av** sekmesinde yayıncı adını (ör. `@kullanici` veya tam link) gir, ülkesini seç, **Yayıncı ekle**. Tek eklemede hesap TikTok oEmbed ile doğrulanır; `@tiktok` gibi gerçek hesaplar için "✓ doğrulandı" yazar.
-2. 200+ adresi tek seferde eklemek için **Toplu ekle**'yi aç, satır satır yapıştır (link veya `@ad`), ülke seç, **Hepsini ekle**.
-3. Yayın başlayınca satırdaki **Canlı yap** ile süreyi çalıştır; durdurmak için tekrar bas.
-4. Yayında sandık düştüğünde **+ Sandık**: jeton miktarı, açılış süresi ve kaç kişiye paylaşıldığını gir.
-5. Zarf/mektup düştüğünde **+ Zarf**: jeton ve geçerlilik süresini gir.
-6. **Fırsatlar** sekmesinde geri sayımları gör; yetişince **Topladım**, kaçırınca **Kaçtı**. Sıralamayı jeton / yaklaşan süre / yeni / yayıncı olarak değiştir.
-7. Telefonla okutmak için **QR** düğmesi yayının canlı adresini gösterir.
+## Fırsatlar sayfası (sunucusuz av)
 
-### 7 gün kuralı
+`/firsat/` altındaki ayrı araç, sunucu olmadan çalışan jeton takibi:
 
-Bir yayıncı **Ayarlar**'daki gün sayısı (varsayılan 7) boyunca canlı görülmezse panel onu ve olaylarını listeden düşürür.
-Her `+ Sandık`/`+ Zarf`/`+ Portal` girdisi ve Canlı düğmesi "son görülme" zamanını günceller.
+- Yayıncı ekle (tek tek veya 500 satıra kadar **toplu**), tek eklemede TikTok oEmbed doğrulaması
+- **Canlı** düğmesiyle gerçek süre sayacı, sütun başlığına tıklayarak sıralama
+- **+ Sandık / + Zarf / + Portal**: jeton, gerçek süre ve kaç kişiye paylaşıldığı
+- **Fırsatlar** sekmesi: jetona veya yaklaşan süreye göre sıralı, canlı geri sayım, QR, Topladım/Kaçtı
+- Sandık süresi dolsa da bekler; zarf süresi dolunca jeton yayıncıya döner
+- 7 gün canlı görülmeyen yayıncı otomatik düşer (Ayarlar'dan değiştirilir)
+- JSON yedek / geri yükleme
 
-### Tür kuralları
+Verisi IndexedDB'de tutulur.
 
-- **Sandık:** süresi dolsa bile listede bekler; jeton kaybolmaz.
-- **Zarf / mektup:** süresi dolunca jeton yayıncıya döner ve listeden düşer (süre dolmadan 60 sn kala bildirim).
-- **Portal:** sandık gibi davranır, ayrı etiketle gösterilir.
-- Tür belirtilmemişse sandık kabul edilir.
+## Neden otomatik tarama yok?
 
-## Veri ve yedek
+TikTok canlı soketi imza ister ve tarayıcıya CORS izni vermez; ücretsiz aynalar (tikwm vb.)
+Cloudflare ile kapatılmış, oEmbed yalnızca profil doğrulaması veriyor. Bu yüzden canlı olayı
+panel kendisi okuyamaz; olayları tek dokunuşla sen işaretlersin, panel süre ve toplamları yönetir.
 
-- Depo: tarayıcının IndexedDB'si, yedek olarak localStorage.
-- Tarayıcı verisi/site verisi silinirse kayıtlar gider → **Ayarlar → JSON yedek indir** ile düzenli yedek al.
-- Yedek dosyası cihazlar arasında taşınabilir (**Yedekten yükle**).
-- Hiçbir şifre saklanmaz; envanter yalnızca kullanıcı adı, ajans, durum ve jeton tutar.
-
-## Yayınlama
-
-GitHub Pages, `site/` klasörünü yayınlar:
-
-```
-site/index.html
-site/app.js
-site/store.js
-site/styles.css
-```
-
-Değişiklikten sonra `main` dalına push yeterlidir; `.github/workflows/pages.yml` siteyi yayınlar.
-Yerelde denemek için:
+## Yerelde çalıştırma
 
 ```bash
 cd site
 python3 -m http.server 8080
-# http://localhost:8080
+# http://localhost:8080  (panel)
+# http://localhost:8080/firsat/  (av aracı)
 ```
 
-## Teknik notlar
+## Yayınlama
 
-- Vanilla JS, derleme adımı yok. Tailwind CDN, lucide ikonları ve qrcodejs CDN'den gelir.
-- `store.js`: IndexedDB + localStorage + JSON içe/dışa aktarma.
-- `app.js`: av mantığı, sayaçlar, fırsat kuralları, envanter, ajans, gelir, bildirim.
-- Tarayıcı bildirimi ve bip sesi yalnızca zarf süresi dolmak üzereyken çalışır; izin vermezsen sessiz kalır.
+`main` dalına push yeterli; `.github/workflows/pages.yml` paneli ve `/firsat/` sayfasını yayınlar.
