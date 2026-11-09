@@ -164,6 +164,9 @@ function startChestTimerEngine() {
 }
 
 function connectWebSocket() {
+    if (ws && (ws.readyState === WebSocket.OPEN || ws.readyState === WebSocket.CONNECTING)) return;
+
+    manualDisconnect = false;
     const rawUrl = (document.getElementById('wsUrl').value || '').trim();
     const authQuery = window.RADAR_STORE && window.RADAR_STORE.wsAuthQuery ? window.RADAR_STORE.wsAuthQuery() : '';
     const url = rawUrl
@@ -183,7 +186,9 @@ function connectWebSocket() {
         btnConnectWs.classList.add('hidden');
         btnDisconnectWs.classList.remove('hidden');
         radarPulse.classList.remove('hidden');
-        
+
+        reconnectAttempts = 0;
+
         startChestTimerEngine();
 
         trackedUsernames.forEach(username => {
@@ -198,6 +203,7 @@ function connectWebSocket() {
         btnDisconnectWs.classList.add('hidden');
         radarPulse.classList.add('hidden');
         if (renderInterval) clearInterval(renderInterval);
+        scheduleServerReconnect();
     };
 
     ws.onerror = (err) => { console.error("WebSocket Hatası:", err); };
@@ -305,8 +311,84 @@ function connectWebSocket() {
     };
 }
 
+// ==================== OTOMATİK BAĞLANTI ====================
+// Panel açılışında arka uca bağlanır; düşerse yeniden dener. Böylece
+// "Arka Plana Bağlan" adımı işlemler için ön koşul değildir.
+let manualDisconnect = false;
+let reconnectAttempts = 0;
+let reconnectTimer = null;
+let serverWaitTimer = null;
+let serverWaiters = [];
+
+function serverUrlFromUi() {
+    const input = document.getElementById('wsUrl');
+    const value = (input && input.value ? input.value : '').trim();
+    if (value) return value;
+    if (typeof window.TIKTOK_BACKEND_URL === 'string') return window.TIKTOK_BACKEND_URL.trim();
+    return '';
+}
+
+function scheduleServerReconnect() {
+    if (manualDisconnect) return;
+    if (!serverUrlFromUi()) return;
+    if (reconnectAttempts >= 8) return;
+    reconnectAttempts += 1;
+    const delay = Math.min(30000, 1500 * reconnectAttempts);
+    clearTimeout(reconnectTimer);
+    reconnectTimer = setTimeout(function () { connectWebSocket(); }, delay);
+}
+
+// Bağlantı yoksa önce kurmayı dener, sonra istenen işlemi çalıştırır.
+function waitForServer(callback, label) {
+    if (ws && ws.readyState === WebSocket.OPEN) {
+        callback();
+        return;
+    }
+
+    if (!serverUrlFromUi()) {
+        appendBotLog('⚠️ Arka uç adresi tanımlı değil. "Sistem Bağlantısı" alanına sunucu adresini girin.');
+        return;
+    }
+
+    serverWaiters.push({ callback: callback, label: label || 'işlem', deadline: Date.now() + 12000 });
+    connectWebSocket();
+
+    if (serverWaitTimer) return;
+
+    serverWaitTimer = setInterval(function () {
+        if (ws && ws.readyState === WebSocket.OPEN) {
+            clearInterval(serverWaitTimer);
+            serverWaitTimer = null;
+            const list = serverWaiters.splice(0);
+            list.forEach(function (item) {
+                try { item.callback(); } catch (e) { console.error('[SERVER]', e); }
+            });
+            return;
+        }
+
+        serverWaiters = serverWaiters.filter(function (item) {
+            if (Date.now() > item.deadline) {
+                appendBotLog('⚠️ Sunucuya ulaşılamadı, "' + item.label + '" çalıştırılmadı. Adres ve panel anahtarını kontrol edin.');
+                return false;
+            }
+            return true;
+        });
+
+        if (serverWaiters.length === 0) {
+            clearInterval(serverWaitTimer);
+            serverWaitTimer = null;
+            return;
+        }
+
+        connectWebSocket();
+    }, 500);
+}
+
 btnConnectWs.addEventListener('click', connectWebSocket);
-btnDisconnectWs.addEventListener('click', () => { if (ws) ws.close(); });
+btnDisconnectWs.addEventListener('click', () => {
+    manualDisconnect = true;
+    if (ws) ws.close();
+});
 
 inputAddUser.addEventListener('input', (e) => { btnAddUser.disabled = e.target.value.trim().length === 0; });
 
@@ -1676,6 +1758,13 @@ loadPersistedUsers();
 loadAccounts();
 loadAgencies();
 renderSuggestedAgencies();
+
+// Arka uç adresi tanımlıysa panel açılırken bağlan (elle bağlanma gerekmez).
+setTimeout(function () {
+    try {
+        if (serverUrlFromUi() && (!ws || ws.readyState > WebSocket.OPEN)) connectWebSocket();
+    } catch (e) { /* yoksay */ }
+}, 600);
 // --- QR KOD TARAYICI (GLOBAL) ---
 let html5QrcodeScanner = null;
 let targetInputForQr = null;
@@ -2495,3 +2584,30 @@ setInterval(() => {
 }, 5000);
 
 // ===================================================================
+
+
+// Sunucu gerektiren işlemler: bağlantı yoksa önce bağlanmayı dener, sonra çalışır.
+(function wrapServerActions() {
+    var actions = [
+        'syncRadarToScanJson', 'triggerSingleBotAction', 'triggerBatchBotAction',
+        'triggerBatchCreateAccounts', 'runAutoActionWithSingleAccount',
+        'runAutoActionWithAllAccounts', 'toggleScanner', 'showDiscoveredStreamers',
+        'approveStreamer', 'rejectStreamer', 'cleanInactiveStreamers',
+        'testMobileBot', 'startMobileCollection', 'transferAllCoins', 'startViewerBot'
+    ];
+
+    actions.forEach(function (name) {
+        var original = window[name];
+        if (typeof original !== 'function' || original.__serverWrapped) return;
+
+        var wrapped = function () {
+            var args = arguments;
+            var self = this;
+            if (ws && ws.readyState === WebSocket.OPEN) return original.apply(self, args);
+            waitForServer(function () { original.apply(self, args); }, name);
+        };
+
+        wrapped.__serverWrapped = true;
+        window[name] = wrapped;
+    });
+})();
