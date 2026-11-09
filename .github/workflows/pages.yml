@@ -1,0 +1,54 @@
+name: 🎛️ Panel (GitHub Pages)
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "Tiktok/index.html"
+      - "Tiktok/main.js"
+      - "Tiktok/styles.css"
+      - "Tiktok/web-shim.js"
+      - "Tiktok/config.js"
+      - "Tiktok/store-client.js"
+      - "Tiktok/hunt.js"
+      - ".github/workflows/pages.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: 📥 Checkout
+        uses: actions/checkout@v4
+
+      - name: 📦 Paneli hazırla
+        run: |
+          mkdir -p _site
+          cp Tiktok/index.html Tiktok/main.js Tiktok/styles.css Tiktok/web-shim.js Tiktok/config.js Tiktok/store-client.js Tiktok/hunt.js _site/
+          # PowerShell/Windows'ta üretilmiş CRLF satır sonları tarayıcıyı etkilemez.
+          echo "Panel dosyaları:"
+          ls -la _site
+
+      - name: ⚙️ Pages ayarları
+        uses: actions/configure-pages@v5
+
+      - name: ⬆️ Artefakt yükle
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+
+      - name: 🚀 Yayınla
+        id: deployment
+        uses: actions/deploy-pages@v4

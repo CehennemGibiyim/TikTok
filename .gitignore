@@ -1,0 +1,40 @@
+# Bağımlılıklar
+node_modules/
+.pnp/
+.pnp.js
+
+# Yerel veri, yedek ve debug çıktıları
+# (TikTok hesap bilgileri / şifreler ASLA repoya girmez)
+Tiktok/data/
+Tiktok/backups/
+Tiktok/debug/
+*.zip
+
+# Ortam değişkenleri
+.env
+.env.*
+!.env.example
+
+# Loglar
+*.log
+logs/
+
+# Build / cache çıktıları
+.next/
+out/
+build/
+dist/
+__pycache__/
+*.py[cod]
+venv/
+.venv/
+.pytest_cache/
+
+# İşletim sistemi / editör
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+
+# Geçici çalışma çıktıları
+artifacts/

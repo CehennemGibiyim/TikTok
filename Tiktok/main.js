@@ -21,7 +21,8 @@ const tabs = {
     'tab-ai': 'view-ai',
     'tab-tools': 'view-tools',
     'tab-accounts': 'view-accounts',
-    'tab-agencies': 'view-agencies'
+    'tab-agencies': 'view-agencies',
+    'tab-hunt': 'view-hunt'
 };
 
 Object.keys(tabs).forEach(tabId => {
@@ -194,6 +195,7 @@ function connectWebSocket() {
     ws.onmessage = (msg) => {
         try {
             const data = JSON.parse(msg.data);
+            if (window.onHuntMessage && window.onHuntMessage(data)) return;
             if (data.type === 'status') {
                 const badge = document.getElementById(`status-${data.user}`);
                 if (badge) {

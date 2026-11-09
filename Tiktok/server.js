@@ -3,6 +3,7 @@ const WebSocket = require('ws');
 const axios = require('axios');
 const fs = require('fs');
 const path = require('path');
+const http = require('http');
 
 // ==================== DEBUG AYARLARI ====================
 const DEBUG = {
@@ -35,9 +36,271 @@ try {
     if (DEBUG.enabled) console.warn('[MOBILE BOT] Puppeteer Extra yüklenemedi:', e.message);
 }
 
-const port = 3000; 
-const wss = new WebSocket.Server({ port: port });
-console.log("Radar Sunucusu " + port + " portunda aktif! Panele baglanmayi bekliyor...");
+const port = Number(process.env.PORT) || 3000;
+
+// ==================== KALICI DEPO + JETON RADARI ====================
+const store = require('./store');
+const { createRadar } = require('./radar');
+
+store.load();
+
+const clients = new Set();
+
+function broadcast(payload) {
+    const message = typeof payload === 'string' ? payload : JSON.stringify(payload);
+    for (const client of clients) {
+        if (client.readyState === 1) {
+            try { client.send(message); } catch (e) { /* yoksay */ }
+        }
+    }
+}
+
+const radar = createRadar({
+    store: store,
+    broadcast: broadcast,
+    log: function (message) { broadcast({ type: 'hunt_log', message: message }); }
+});
+
+// Panelin web'den (tarayıcı) açılabilmesi için HTTP + WebSocket aynı portta.
+// Sadece arayüz dosyaları servis edilir; data/ ve backups/ asla dışarı açılmaz.
+const PUBLIC_FILES = {
+    '/': 'index.html',
+    '/index.html': 'index.html',
+    '/styles.css': 'styles.css',
+    '/main.js': 'main.js',
+    '/web-shim.js': 'web-shim.js',
+    '/config.js': 'config.js',
+    '/store-client.js': 'store-client.js',
+    '/hunt.js': 'hunt.js'
+};
+const MIME_TYPES = {
+    '.html': 'text/html; charset=utf-8',
+    '.css': 'text/css; charset=utf-8',
+    '.js': 'text/javascript; charset=utf-8'
+};
+
+const ALLOWED_ORIGINS = (process.env.PANEL_ORIGINS || 'https://cehennemgibiyim.github.io')
+    .split(',')
+    .map(function (value) { return value.trim(); })
+    .filter(Boolean);
+const RADAR_KEY = process.env.RADAR_KEY || '';
+const JSON_LIMIT = 8 * 1024 * 1024;
+
+function corsHeaders(req) {
+    const headers = { 'Cache-Control': 'no-store' };
+    const origin = req.headers.origin || '';
+    if (!origin) return headers;
+
+    let hostname = '';
+    try { hostname = new URL(origin).hostname; } catch (e) { return headers; }
+
+    const allowed = ALLOWED_ORIGINS.indexOf(origin) >= 0
+        || hostname === 'localhost'
+        || hostname === '127.0.0.1'
+        || /\.style\.dev$/.test(hostname);
+
+    if (!allowed) return headers;
+
+    headers['Access-Control-Allow-Origin'] = origin;
+    headers['Vary'] = 'Origin';
+    headers['Access-Control-Allow-Methods'] = 'GET,PUT,POST,DELETE,OPTIONS';
+    headers['Access-Control-Allow-Headers'] = 'Content-Type, x-radar-key';
+    headers['Access-Control-Max-Age'] = '600';
+    return headers;
+}
+
+function readJsonBody(req) {
+    return new Promise(function (resolve, reject) {
+        let body = '';
+        req.on('data', function (chunk) {
+            body += chunk;
+            if (body.length > JSON_LIMIT) {
+                reject(new Error('Gövde çok büyük.'));
+                req.destroy();
+            }
+        });
+        req.on('end', function () {
+            if (!body.trim()) return resolve(null);
+            try { resolve(JSON.parse(body)); } catch (e) { reject(new Error('Geçersiz JSON gövdesi.')); }
+        });
+        req.on('error', reject);
+    });
+}
+
+async function handleApi(req, res, parsed) {
+    const headers = Object.assign({ 'Content-Type': 'application/json; charset=utf-8' }, corsHeaders(req));
+
+    function send(code, payload) {
+        res.writeHead(code, headers);
+        res.end(JSON.stringify(payload));
+    }
+
+    if (req.method === 'OPTIONS') {
+        res.writeHead(204, headers);
+        res.end();
+        return;
+    }
+
+    if (RADAR_KEY && req.headers['x-radar-key'] !== RADAR_KEY) {
+        send(401, { ok: false, error: 'Yetkisiz istek: x-radar-key geçersiz.' });
+        return;
+    }
+
+    const pathname = parsed.pathname;
+    const query = parsed.searchParams;
+
+    if (req.method === 'GET' && pathname === '/api/health') {
+        send(200, {
+            ok: true,
+            uptime: Math.round(process.uptime()),
+            targets: radar.getState(false).targets.length,
+            store: store.STORE_FILE
+        });
+        return;
+    }
+
+    if (req.method === 'GET' && pathname === '/api/state') {
+        const data = store.get();
+        send(200, {
+            ok: true,
+            accounts: data.accounts || [],
+            agencies: data.agencies || [],
+            users: data.users || [],
+            updatedAt: data.updatedAt,
+            radar: radar.getState(true)
+        });
+        return;
+    }
+
+    if (req.method === 'PUT' && (pathname === '/api/accounts' || pathname === '/api/agencies' || pathname === '/api/users')) {
+        let body;
+        try {
+            body = await readJsonBody(req);
+        } catch (error) {
+            send(400, { ok: false, error: error.message });
+            return;
+        }
+
+        const list = Array.isArray(body) ? body : (body && Array.isArray(body.items) ? body.items : null);
+        if (!list) {
+            send(400, { ok: false, error: 'Gövde bir dizi olmalı.' });
+            return;
+        }
+
+        const key = pathname.split('/').pop();
+        const changes = {};
+        changes[key] = list;
+        store.patch(changes);
+        send(200, { ok: true, count: list.length, updatedAt: store.get().updatedAt });
+        return;
+    }
+
+    if (pathname === '/api/hunt/targets') {
+        if (req.method === 'POST') {
+            let body;
+            try {
+                body = await readJsonBody(req);
+            } catch (error) {
+                send(400, { ok: false, error: error.message });
+                return;
+            }
+
+            const list = Array.isArray(body) ? body : [body || {}];
+            const results = list.map(function (entry) {
+                if (typeof entry === 'string') return radar.add(entry);
+                return radar.add(entry && entry.username, entry && entry.country);
+            });
+
+            send(200, { ok: true, results: results, state: radar.getState(false) });
+            return;
+        }
+
+        if (req.method === 'DELETE') {
+            const result = radar.remove(query.get('username'));
+            send(result.ok ? 200 : 404, Object.assign({ ok: result.ok }, result, { state: radar.getState(false) }));
+            return;
+        }
+
+        if (req.method === 'PUT') {
+            let body;
+            try {
+                body = await readJsonBody(req);
+            } catch (error) {
+                send(400, { ok: false, error: error.message });
+                return;
+            }
+
+            const list = Array.isArray(body) ? body : (body && body.targets) || [];
+            send(200, { ok: true, state: radar.setTargets(list) });
+            return;
+        }
+    }
+
+    if (req.method === 'GET' && pathname === '/api/hunt/events') {
+        send(200, { ok: true, events: radar.getEvents(Number(query.get('limit')) || 300) });
+        return;
+    }
+
+    if (req.method === 'DELETE' && pathname === '/api/hunt/events') {
+        send(200, radar.clearEvents());
+        return;
+    }
+
+    send(404, { ok: false, error: 'Bilinmeyen API yolu: ' + pathname });
+}
+
+const httpServer = http.createServer(function (req, res) {
+    let parsed;
+    try {
+        parsed = new URL(req.url || '/', 'http://localhost');
+    } catch (e) {
+        res.writeHead(400, { 'Content-Type': 'text/plain; charset=utf-8' });
+        res.end('Gecersiz istek');
+        return;
+    }
+
+    const urlPath = decodeURIComponent(parsed.pathname);
+
+    if (urlPath.indexOf('/api/') === 0) {
+        handleApi(req, res, parsed).catch(function (error) {
+            console.error('[API]', error.message);
+            if (!res.headersSent) {
+                res.writeHead(500, Object.assign({ 'Content-Type': 'application/json; charset=utf-8' }, corsHeaders(req)));
+            }
+            res.end(JSON.stringify({ ok: false, error: error.message }));
+        });
+        return;
+    }
+
+    const relative = PUBLIC_FILES[urlPath];
+    if (!relative) {
+        res.writeHead(404, { 'Content-Type': 'text/plain; charset=utf-8' });
+        res.end('Bulunamadi');
+        return;
+    }
+
+    fs.readFile(path.join(__dirname, relative), function (err, content) {
+        if (err) {
+            res.writeHead(500, { 'Content-Type': 'text/plain; charset=utf-8' });
+            res.end('Dosya okunamadi');
+            return;
+        }
+        res.writeHead(200, {
+            'Content-Type': MIME_TYPES[path.extname(relative)] || 'application/octet-stream',
+            'Cache-Control': 'no-store',
+            'Access-Control-Allow-Origin': '*'
+        });
+        res.end(content);
+    });
+});
+
+const wss = new WebSocket.Server({ server: httpServer });
+process.on('SIGINT', function () { store.flush(); process.exit(0); });
+process.on('SIGTERM', function () { store.flush(); process.exit(0); });
+
+httpServer.listen(port, '0.0.0.0', function () {
+    console.log("Radar Sunucusu " + port + " portunda aktif! Panel: http://localhost:" + port);
+});
 
 let trackedUsers = {};
 
@@ -1608,6 +1871,18 @@ async function collectChestWithMobileBot(account, targetStreamer, ws, options = 
 wss.on('connection', function connection(ws) {
   console.log("Harika! Radar paneli baglandi.");
 
+  clients.add(ws);
+  ws.on('close', function () { clients.delete(ws); });
+
+  try {
+      ws.send(JSON.stringify({ type: 'hunt_state', state: radar.getState(false) }));
+      ws.send(JSON.stringify({ type: 'hunt_events', events: radar.getEvents(300) }));
+      ws.send(JSON.stringify({
+          type: 'bot_log',
+          message: 'Sunucu hazır · kalıcı depo: ' + store.STORE_FILE
+      }));
+  } catch (e) { /* yoksay */ }
+
   ws.on('message', async function incoming(message) {
     const data = JSON.parse(message);
 
@@ -1645,66 +1920,69 @@ wss.on('connection', function connection(ws) {
         ws.send(JSON.stringify({ type: 'bot_log', message: `🎉 Toplu ${actionType.toUpperCase()} işlemi ${accounts.length} hesap için tamamlandı!` }));
     }
 
+    // ==================== JETON RADARI (çoklu yayın) ====================
+    if (data.action === 'hunt_add') {
+        const list = data.usernames || (data.username ? [data.username] : []);
+        const entries = Array.isArray(list) ? list : [list];
+        const results = entries.map(function (entry) {
+            if (typeof entry === 'string') return radar.add(entry);
+            return radar.add(entry && entry.username, entry && entry.country);
+        });
+        ws.send(JSON.stringify({ type: 'hunt_result', results: results, state: radar.getState(false) }));
+    }
+
+    if (data.action === 'hunt_set_targets') {
+        ws.send(JSON.stringify({ type: 'hunt_state', state: radar.setTargets(data.targets || []) }));
+    }
+
+    if (data.action === 'hunt_remove' && data.username) {
+        const result = radar.remove(data.username);
+        ws.send(JSON.stringify({ type: 'hunt_result', results: [result], state: radar.getState(false) }));
+    }
+
+    if (data.action === 'hunt_get_state') {
+        ws.send(JSON.stringify({ type: 'hunt_state', state: radar.getState(false) }));
+        if (data.withEvents) {
+            ws.send(JSON.stringify({ type: 'hunt_events', events: radar.getEvents(300) }));
+        }
+    }
+
+    if (data.action === 'hunt_clear_events') {
+        radar.clearEvents();
+        ws.send(JSON.stringify({ type: 'hunt_events', events: [] }));
+    }
+
+    if (data.action === 'hunt_simulate' && process.env.RADAR_ALLOW_SIMULATION === '1') {
+        radar.simulate(data.username, data.event || {
+            coins: Number(data.coins) || 100,
+            canOpen: Number(data.canOpen) || 30,
+            timestamp: Math.floor(Date.now() / 1000)
+        });
+    }
+
+    if (data.action === 'hunt_stop_all') {
+        radar.disconnectAll();
+        ws.send(JSON.stringify({ type: 'hunt_state', state: radar.getState(false) }));
+    }
+
+    // Eski arayüz uyumluluğu: hedef ekleme radar motoruna devredilir
     if (data.action === 'add_user' && data.username) {
-      const username = data.username;
-      if (trackedUsers[username]) return;
-
-      // Radar'a eklendi - UI üzerinden bildiriliyor
-      const ttConnection = new WebcastPushConnection(username);
-      trackedUsers[username] = ttConnection;
-
-      ttConnection.connect().then(state => {
-          debugLog('chestDetection', `@${username} radar bağlandı`);
-          ws.send(JSON.stringify({ 
-              type: 'bot_log', 
-              message: `✅ [@${username}] Radar bağlantısı aktif, sandık bekleniyor...` 
-          }));
-          ws.send(JSON.stringify({ type: 'status', user: username, status: 'connected' }));
-      }).catch(err => {
-          console.error(`[RADAR] @${username} bağlantı hatası:`, err.message);
-          ws.send(JSON.stringify({ 
-              type: 'bot_log', 
-              message: `❌ [@${username}] Bağlantı hatası: ${err.message}` 
-          }));
-          ws.send(JSON.stringify({ type: 'status', user: username, status: 'error' }));
-          delete trackedUsers[username];
-      });
-
-      ttConnection.on('envelope', envData => {
-          // Tüm envelope verisini incele (debug)
-          debugLog('chestDetection', `@${username} envelope:`, envData);
-          
-          // treasureBoxData farklı isimlerde olabilir
-          const chestData = envData.treasureBoxData || envData.treasure || envData.data || envData;
-          debugLog('chestDetection', `@${username} parsed:`, chestData);
-          
-          ws.send(JSON.stringify({
-              type: 'chest',
-              user: username,
-              data: {
-                  coins: chestData?.coins || chestData?.coinCount || chestData?.coin_amount || 0,
-                  time: new Date().toLocaleTimeString(),
-                  duration: chestData?.duration || chestData?.time || chestData?.duration_seconds || 180,
-                  userCount: chestData?.userCount || chestData?.totalUsers || chestData?.recipientCount || 0,
-                  chestType: chestData?.type || 'normal'
-              }
-          }));
-          
-          // Bot loguna da yaz
-          ws.send(JSON.stringify({ 
-              type: 'bot_log', 
-              message: `🎁 [@${username}] Ödül çantası: ${envData.treasureBoxData?.coins || '?'} jeton` 
-          }));
-      });
+        const result = radar.add(data.username);
+        const state = radar.getState(false);
+        const session = state.sessions[(result.username || String(data.username).toLowerCase())] || {};
+        ws.send(JSON.stringify({
+            type: 'status',
+            user: result.username || data.username,
+            status: session.status === 'live' ? 'connected' : 'error'
+        }));
+        if (!result.ok && result.error) {
+            ws.send(JSON.stringify({ type: 'bot_log', message: '⚠️ ' + result.error }));
+        }
     }
 
     if (data.action === 'remove_user' && data.username) {
-        const username = data.username;
-        if (trackedUsers[username]) {
-            console.log(`Suresi doldu/Kaldirildi: @${username}`);
-            trackedUsers[username].disconnect();
-            delete trackedUsers[username];
-        }
+        radar.remove(data.username);
+        console.log('Radardan kaldirildi: @' + data.username);
     }
 
     // TOPLU HESAP OLUŞTURMA (10, 50, 100 adet)
@@ -2207,14 +2485,8 @@ wss.on('connection', function connection(ws) {
 
   });
 
-  ws.on('close', () => {
-      for (const user in trackedUsers) {
-          if(trackedUsers[user]) {
-              trackedUsers[user].disconnect();
-              delete trackedUsers[user];
-          }
-      }
-  });
+  // Radar sunucuda çalışmaya devam eder; panel kapansa bile yayınlar dinlenir.
+  ws.on('close', function () { clients.delete(ws); });
 });
 
 // Çizgi Film Karakterleri Listesi (Gerçekçi kullanıcı adları için)
