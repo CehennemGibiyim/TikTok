@@ -1,10 +1,9 @@
 name: 🚀 TikTok Panel Deployment
 
+# NOT: Panel artık pages.yml ile yayınlanıyor (Tiktok/ klasörü).
+# Bu eski iş akışı yalnızca elle çalıştırılabilir; aksi halde aynı Pages
+# sitesine iki farklı deploy yarışır ve panel kaybolabilir.
 on:
-  push:
-    branches: [ main, develop ]
-  pull_request:
-    branches: [ main ]
   workflow_dispatch:
 
 jobs:
