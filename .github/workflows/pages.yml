@@ -4,13 +4,7 @@ on:
   push:
     branches: [main]
     paths:
-      - "Tiktok/index.html"
-      - "Tiktok/main.js"
-      - "Tiktok/styles.css"
-      - "Tiktok/web-shim.js"
-      - "Tiktok/config.js"
-      - "Tiktok/store-client.js"
-      - "Tiktok/hunt.js"
+      - "site/**"
       - ".github/workflows/pages.yml"
   workflow_dispatch:
 
@@ -36,8 +30,7 @@ jobs:
       - name: 📦 Paneli hazırla
         run: |
           mkdir -p _site
-          cp Tiktok/index.html Tiktok/main.js Tiktok/styles.css Tiktok/web-shim.js Tiktok/config.js Tiktok/store-client.js Tiktok/hunt.js _site/
-          # PowerShell/Windows'ta üretilmiş CRLF satır sonları tarayıcıyı etkilemez.
+          cp site/index.html site/app.js site/store.js site/styles.css _site/
           echo "Panel dosyaları:"
           ls -la _site
 

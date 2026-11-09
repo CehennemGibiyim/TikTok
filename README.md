@@ -1,99 +1,82 @@
-# 🎯 TikTok Sandık Radarı
+# 🎯 TikTok Jeton Paneli — Sunucusuz
 
-TikTok canlı yayınlarındaki **sandık / zarf (mektup) / portal** jetonlarını çoklu
-yayında izleyen, süreleri ve ülke dağılımını çıkaran panel.
+Tarayıcıda çalışan, **sunucu ve API anahtarı gerektirmeyen** jeton takip paneli.
+Canlı: **https://cehennemgibiyim.github.io/TikTok/**
 
-## Nasıl çalışır
+Tüm veri (yayınlar, sandık/zarf olayları, hesap envanteri, ajanslar, ayarlar) yalnızca
+kullandığın cihazın tarayıcısında tutulur. Hiçbir ağ isteği yapılmaz, hiçbir yere
+veri gönderilmez.
 
-```
-Tarayıcı (panel)  ──HTTPS/WSS──►  Node servisi  ──►  TikTok LIVE
-      │                                │
-      │                                └── data/store.json (kalıcı)
-      └── QR kod ile telefonda yayına git
-```
+## Neden manuel giriş?
 
-Tek Node süreci hem arayüzü hem REST API'yi hem WebSocket'i sunar; bu yüzden
-panel ile arka uç **aynı origin** üzerinde çalışır.
+TikTok canlı yayın olayları tarayıcıdan okunamaz: TikTok'un canlı WebSocket'i imza
+ister ve tarayıcıya CORS izni vermez. Bunu otomatik yapmanın tek yolu bir sunucu ya da
+ücretli bir API anahtarıdır. Bu panel ikisini de kullanmaz; bu yüzden olayları
+(sandık/zarf düştüğünde) **tek dokunuşla sen girersin**, panel gerisini yapar:
 
-## Özellikler
+- gerçek süre sayacı (yayın süresi, sandık açılışı, zarf geçerliliği)
+- fırsat listesi ve bekleyen jeton toplamı
+- zarf süresi dolunca otomatik düşme, sandık süresi dolsa da kalma
+- QR ile telefonundan yayına gitme
+- envanter, ajans ve gelir hesapları
+- JSON yedek / geri yükleme
 
-- **Çoklu yayın dinleme** — aynı anda 40 yayıncıya kadar
-- **Tür ayrımı** — 📦 sandık, ✉️ zarf/mektup, 🌀 portal
-- **Fırsatlar** — içeride 1 jeton bile beklemedeyse listelenir
-  - sandık: süresi dolsa da listede kalır (kim tıklarsa alır)
-  - zarf: süresi dolunca jeton yayıncıya döner, listeden düşer
-- **Gerçek süreler** — açılma geri sayımı, zarfın son geçerlilik anı, dinleme süresi
-- **QR kod** — `tiktok.com/@kullanici/live` adresini telefonda aç
-- **Ülke özeti** — tüm ülkeler, sandık/zarf/jeton toplamları
-- **Kalıcı depo** — hesaplar, ajanslar, hedefler ve jeton geçmişi sunucuda
-- **Erişim anahtarı** — `PANEL_PASSWORD` ile API ve WebSocket korunur
-- **CSV dışa aktarma**
+## Sekmeler
 
-## Çalıştırma
-
-### Docker (önerilen)
-
-```bash
-cp .env.example .env      # PANEL_PASSWORD ve PANEL_ORIGINS
-docker compose up -d --build
-# http://SUNUCU_IP:3000
-```
-
-Alan adı varsa otomatik HTTPS:
-
-```bash
-DOMAIN=panel.ornek.com docker compose --profile https up -d
-```
-
-### Node ile
-
-```bash
-cd Tiktok
-npm ci --omit=dev
-PANEL_PASSWORD=anahtar node server.js
-```
-
-### GitHub Pages
-
-Panel statik olarak `https://cehennemgibiyim.github.io/TikTok/` adresinde
-yayınlanır (`.github/workflows/pages.yml`). Sayfa açılınca arka uç adresi ve
-panel anahtarı sorulur; veriler oradaki sunucuda tutulur.
-
-## Ortam değişkenleri
-
-| Değişken | Açıklama |
+| Sekme | Ne yapar |
 |---|---|
-| `PORT` | Sunucu portu (varsayılan 3000) |
-| `PANEL_PASSWORD` | Panel anahtarı. Doluysa API ve WebSocket anahtar ister |
-| `PANEL_ORIGINS` | API'ye erişebilecek origin listesi (virgülle) |
-| `RADAR_MAX_TARGETS` | Aynı anda dinlenecek yayın sayısı (varsayılan 40) |
-| `RADAR_LETTER_TTL` | Zarf/mektup jetonunun geçerlilik süresi, saniye (varsayılan 180) |
-| `RADAR_ALLOW_SIMULATION` | `1` ise test için sahte jeton olayı üretilebilir |
+| **Av** | Yayıncı ekle, süreyi başlat/durdur, + Sandık / + Zarf / + Portal ile jeton ve süre gir, fırsatları topla, QR aç |
+| **Envanter** | Hesap listesi (kullanıcı adı, ajans, durum, jeton), CSV dışa/içe aktarma |
+| **Ajanslar** | Ajans tanımı, komisyon, bağlı hesap ve jeton toplamları |
+| **Gelir** | Jeton → TikTok kesintisi → ajans kesintisi → USD/TRY hesabı |
+| **Ayarlar** | Zarf süresi, bildirim, JSON yedek, tüm veriyi silme |
 
-## Veri
+## Akış
 
-Tüm kalıcı veri `Tiktok/data/store.json` içinde; `data/` repoya **girmez**.
-Hesap şifreleri düz metin tutulur — sunucuyu yalnızca güvendiğiniz yerde
-çalıştırın ve `PANEL_PASSWORD` kullanın.
+1. **Av** sekmesinde yayıncı adını (ör. `@kullanici` veya tam link) gir, ülkesini seç, **Yayın ekle**.
+2. Yayın başlayınca satırdaki **Başlat** ile süreyi çalıştır.
+3. Yayında sandık düştüğünde **+ Sandık**: jeton miktarı ve açılış süresini gir.
+4. Zarf/mektup düştüğünde **+ Zarf**: jeton ve geçerlilik süresini gir.
+5. **Fırsatlar** bölümünde geri sayımları gör; yetişince **Topladım**, kaçırınca **Kaçtı**.
+6. Telefonla okutmak için **QR** düğmesi yayının canlı adresini gösterir.
 
-## API
+### Tür kuralları
 
-| Uç | Açıklama |
-|---|---|
-| `GET /api/health` | Servis durumu (anahtarsız) |
-| `GET /api/state` | Hesaplar, ajanslar, hedefler, oturumlar, olaylar, fırsatlar |
-| `PUT /api/accounts` · `/api/agencies` · `/api/users` | Listeyi kaydet |
-| `POST /api/hunt/targets` · `DELETE ?username=` | Yayın ekle / çıkar |
-| `GET /api/hunt/pending` | Bekleyen jetonlar |
-| `POST /api/hunt/collect` | Fırsatı "toplandı/kaçtı" işaretle |
-| `DELETE /api/hunt/events` | Geçmişi temizle |
+- **Sandık:** süresi dolsa bile listede bekler; jeton kaybolmaz.
+- **Zarf / mektup:** süresi dolunca jeton yayıncıya döner ve listeden düşer (süre dolmadan 60 sn kala bildirim).
+- **Portal:** sandık gibi davranır, ayrı etiketle gösterilir.
+- Tür belirtilmemişse sandık kabul edilir.
 
-Anahtar gerektiğinde `x-panel-key` başlığı, WebSocket'te `?key=` parametresi kullanılır.
+## Veri ve yedek
 
-## Sınırlar
+- Depo: tarayıcının IndexedDB'si, yedek olarak localStorage.
+- Tarayıcı verisi/site verisi silinirse kayıtlar gider → **Ayarlar → JSON yedek indir** ile düzenli yedek al.
+- Yedek dosyası cihazlar arasında taşınabilir (**Yedekten yükle**).
+- Hiçbir şifre saklanmaz; envanter yalnızca kullanıcı adı, ajans, durum ve jeton tutar.
 
-- TikTok'un resmî canlı olay API'si yok; veriler `tiktok-live-connector` ile okunur.
-- "Tüm ülkelerdeki yayınları keşfetme" bir keşif kaynağı (TikAPI, tik.tools vb.)
-  gerektirir; panel şu an elle eklenen ve QR ile eklenen yayıncıları izler.
-- Zarf/sandık ayrımı gelen olayın alanlarına göre yapılır; TikTok tarafı tür
-  bilgisini göndermezse olay sandık kabul edilir.
+## Yayınlama
+
+GitHub Pages, `site/` klasörünü yayınlar:
+
+```
+site/index.html
+site/app.js
+site/store.js
+site/styles.css
+```
+
+Değişiklikten sonra `main` dalına push yeterlidir; `.github/workflows/pages.yml` siteyi yayınlar.
+Yerelde denemek için:
+
+```bash
+cd site
+python3 -m http.server 8080
+# http://localhost:8080
+```
+
+## Teknik notlar
+
+- Vanilla JS, derleme adımı yok. Tailwind CDN, lucide ikonları ve qrcodejs CDN'den gelir.
+- `store.js`: IndexedDB + localStorage + JSON içe/dışa aktarma.
+- `app.js`: av mantığı, sayaçlar, fırsat kuralları, envanter, ajans, gelir, bildirim.
+- Tarayıcı bildirimi ve bip sesi yalnızca zarf süresi dolmak üzereyken çalışır; izin vermezsen sessiz kalır.
