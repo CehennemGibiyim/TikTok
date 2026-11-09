@@ -34,7 +34,7 @@
   var state = null;
   var sortKey = 'name';
   var sortDir = 1;
-  var oppSort = 'coins';
+  var oppSort = 'score';
   var searchTerm = '';
   var eventTarget = { streamerId: null, kind: 'chest' };
   var notified = {};
@@ -359,10 +359,67 @@
     });
   }
 
+  // ---------- Akıllı puanlama ----------
+  // Fırsatı aciliyet, jeton, jeton/kişi ve tazelik bileşenleriyle 0-100 arasında puanlar.
+  // Bilinmeyen alan uydurulmaz; o bileşen 0 sayılır.
+
+  function remainingSeconds(event) {
+    var now = Date.now();
+    if (event.kind === 'letter') {
+      return Number(event.expiresAt) > 0 ? Math.max(0, (Number(event.expiresAt) - now) / 1000) : null;
+    }
+    if (Number(event.durationSec) > 0 && Number(event.availableAt) > 0) {
+      return Math.max(0, (Number(event.availableAt) - now) / 1000);
+    }
+    return null;
+  }
+
+  function opportunityScore(event) {
+    var coins = Number(event.coins) || 0;
+    var shared = Number(event.shared) || 0;
+    var total = Number(event.durationSec) || 0;
+    var left = remainingSeconds(event);
+    var parts = { urgency: 0, coins: 0, yield: 0, freshness: 0 };
+
+    if (left !== null) {
+      var ratio = total > 0 ? Math.min(1, left / total) : Math.min(1, left / 600);
+      parts.urgency = 40 * (1 - ratio);
+    }
+    parts.coins = 30 * Math.min(1, coins / 1000);
+    parts.yield = 20 * Math.min(1, (coins / Math.max(1, shared)) / 100);
+    var ageSec = Math.max(0, (Date.now() - (Number(event.createdAt) || Date.now())) / 1000);
+    parts.freshness = 10 * (1 - Math.min(1, ageSec / 3600));
+
+    var score = Math.max(0, Math.min(100, Math.round(
+      parts.urgency + parts.coins + parts.yield + parts.freshness
+    )));
+
+    var best = Math.max(parts.urgency, parts.coins, parts.yield, parts.freshness);
+    var reason = 'dengeli';
+    if (best === parts.urgency && parts.urgency > 0) reason = 'süre kritik';
+    else if (best === parts.yield && parts.yield > 0) reason = 'jeton/kişi yüksek';
+    else if (best === parts.coins) reason = 'yüksek jeton';
+    else if (best === parts.freshness) reason = 'yeni fırsat';
+
+    return { score: score, reason: reason, left: left };
+  }
+
   function sortEvents(list) {
     return list.slice().sort(function (a, b) {
       if (oppSort === 'new') return b.createdAt - a.createdAt;
       if (oppSort === 'streamer') return a.username.localeCompare(b.username, 'tr');
+      if (oppSort === 'score') {
+        var sa = opportunityScore(a);
+        var sb = opportunityScore(b);
+        if (sb.score !== sa.score) return sb.score - sa.score;
+        var la = sa.left === null ? Number.MAX_SAFE_INTEGER : sa.left;
+        var lb = sb.left === null ? Number.MAX_SAFE_INTEGER : sb.left;
+        if (la !== lb) return la - lb;
+        var ca = Number(a.coins) || 0;
+        var cb = Number(b.coins) || 0;
+        if (cb !== ca) return cb - ca;
+        return b.createdAt - a.createdAt;
+      }
       if (oppSort === 'expiry') {
         var now = Date.now();
         var deadline = function (event) {
@@ -488,6 +545,7 @@
 
     container.innerHTML = pending.map(function (event) {
       var meta = KINDS[event.kind] || KINDS.chest;
+      var scored = opportunityScore(event);
       var urgent = false;
       var timeText = '';
 
@@ -512,8 +570,9 @@
         '    <span class="flex items-center gap-1"><span class="kind-badge ' + meta.cls + '">' + meta.icon + ' ' + meta.label + '</span>' + (event.auto ? '<span class="kind-badge kind-live">CANLI</span>' : '') + '</span>',
         '    <span class="font-black text-amber-400">' + fmt(event.coins) + ' <span class="text-[10px] font-normal text-yellow-50/40">jeton</span></span>',
         '  </div>',
+        '  <div class="text-[10px] mb-1"><span class="chip !py-0 !text-[10px]" title="aciliyet + jeton + jeton/kişi + tazelik">Puan ' + scored.score + ' · ' + esc(scored.reason) + '</span></div>',
         '  <a href="' + liveUrl(event.username) + '" target="_blank" rel="noopener" class="font-semibold text-yellow-100 hover:text-yellow-300 truncate block">@' + esc(event.username) + '</a>',
-        '  <div class="text-[10px] text-yellow-50/40">' + flag(event.country) + ' ' + esc(countryName(event.country)) + ' · ' + new Date(event.createdAt).toLocaleTimeString('tr-TR') + (shared > 1 ? ' · ' + shared + ' kişiye' : '') + (event.giftName ? ' · ' + esc(event.giftName) : '') + '</div>',
+        '  <div class="text-[10px] text-yellow-50/40">' + (event.country ? flag(event.country) + ' ' + esc(countryName(event.country)) + ' · ' : '') + new Date(event.createdAt).toLocaleTimeString('tr-TR') + (shared > 1 ? ' · ' + shared + ' kişiye' : '') + (event.giftName ? ' · ' + esc(event.giftName) : '') + '</div>',
         '  <div class="text-[11px] mt-1 ' + (urgent ? 'text-red-300 font-bold' : 'text-yellow-50/60') + '" data-countdown="' + (event.kind === 'letter' ? event.expiresAt : event.availableAt) + '" data-kind="' + event.kind + '" data-duration="' + (Number(event.durationSec) || 0) + '">' + timeText + '</div>',
         '  <div class="flex gap-2 mt-3">',
         '    <button class="chip chip-amber" data-qr="' + esc(event.username) + '">QR / Yayına git</button>',
@@ -1310,6 +1369,13 @@
     setInterval(tick, 1000);
     setInterval(refreshScan, 30000);
     setInterval(pruneInactive, 600000);
+    // Sıralama zamanla değişir (kalan süre azalır): liste kendiliğinden tazelenir.
+    setInterval(function () {
+      var opp = $('view-opportunities');
+      var streams = $('view-hunt');
+      if (opp && !opp.classList.contains('hidden')) renderOpportunities();
+      if (streams && !streams.classList.contains('hidden')) renderStreamers();
+    }, 30000);
   }
 
   if (document.readyState === 'loading') {
