@@ -1,14 +1,19 @@
 'use strict';
 /*
- * radar.js — Çoklu yayın jeton radarı.
+ * radar.js — Çoklu yayın jeton radarı (sandık / zarf-mektup / portal).
  *
- * Aynı anda birden fazla yayıncıya bağlanır, TikTok'un canlı "envelope"
- * (zarf / sandık) olaylarını yakalar ve şu bilgileri çıkarır:
+ * Aynı anda birden fazla yayıncıya bağlanır, TikTok'un canlı jeton
+ * olaylarını yakalar ve şu bilgileri çıkarır:
+ *   - tür: sandık (chest), zarf/mektup (letter), portal
  *   - paylaşılan jeton (coins)
- *   - açılma süresi (canOpen)
- *   - olay zamanı
- *   - yayıncının ülkesi (tikwm üzerinden, elle girilen ülke öncelikli)
+ *   - açılma süresi (canOpen) ve gerçek zaman damgası
+ *   - yayıncının ülkesi
  *   - oturum süresi ve yayıncı bazlı toplamlar
+ *
+ * Davranış kuralları:
+ *   - Sandık: süresi dolsa da kaybolmaz, "Fırsatlar" listesinde bekler.
+ *   - Zarf/mektup: süresi dolunca jeton yayıncıya döner; listeden düşer.
+ *   - 1 jeton bile beklemede olsa fırsat sayılır.
  *
  * Veriler store.json içinde tutulur; panel kapansa da kaybolmaz.
  */
@@ -17,11 +22,15 @@ const { WebcastPushConnection } = require('tiktok-live-connector');
 const axios = require('axios');
 
 const MAX_TARGETS = Number(process.env.RADAR_MAX_TARGETS) || 40;
-const MAX_EVENTS = 2000;
+const MAX_EVENTS = 3000;
 const CONNECT_STAGGER_MS = Number(process.env.RADAR_STAGGER_MS) || 1500;
-const ONLINE_RETRY_MS = 60 * 1000;      // yayında değilse tekrar dene
-const ERROR_RETRY_MS = 20 * 1000;       // bağlantı hatasında
+const ONLINE_RETRY_MS = 60 * 1000;
+const ERROR_RETRY_MS = 20 * 1000;
 const MAX_ERROR_RETRIES = 6;
+
+// Zarf/mektup jetonu süre sonunda yayıncıya döner. TikTok'un kendi süresi
+// bildirilmediğinde bu varsayılan kullanılır (saniye).
+const LETTER_TTL_SEC = Number(process.env.RADAR_LETTER_TTL) || 180;
 
 function sleep(ms) {
     return new Promise(function (resolve) { setTimeout(resolve, ms); });
@@ -41,18 +50,31 @@ function cleanUsername(value) {
         .toLowerCase();
 }
 
+/*
+ * Olay türünü ayırır.
+ * tiktok-live-connector "envelope" olayı hem sandık hem zarf verisiyle gelebilir.
+ * Ayırt edici alanlar varsa onlara bakar, yoksa sandık kabul eder
+ * (WebcastEnvelopeMessage normalde sandık mesajıdır).
+ */
+function detectKind(raw, box) {
+    if (box && (box.portal || box.isPortal || box.portalId || box.portal_id)) return 'portal';
+    if (box && (box.envelopeInfo || box.envelope_info || box.isEnvelope || box.letter)) return 'letter';
+    if (raw && (raw.envelopeInfo || raw.envelope_info || raw.isEnvelope)) return 'letter';
+    if (box && (box.treasureBoxData || box.canOpen || box.can_open)) return 'chest';
+    return 'chest';
+}
+
 function createRadar(options) {
     const store = options.store;
     const broadcast = options.broadcast || function () { };
     const log = options.log || function () { };
 
-    const targets = new Map();   // username -> { username, country, addedAt }
-    const live = new Map();      // username -> { conn, status, startedAt, retries, reconnectTimer }
+    const targets = new Map();
+    const live = new Map();
     const queue = [];
     let pumping = false;
     let stateBroadcastTimer = null;
 
-    // Diskten hedefleri geri yükle
     (store.get().huntTargets || []).forEach(function (target) {
         if (!target) return;
         const username = cleanUsername(target.username || target);
@@ -64,13 +86,16 @@ function createRadar(options) {
         });
     });
 
+    function emptyTotals() {
+        return { coins: 0, events: 0, chests: 0, letters: 0, portals: 0, collected: 0 };
+    }
+
     function sessionFor(username) {
         const sessions = store.get().huntSessions || {};
         const existing = sessions[username];
         if (existing) {
-            if (!existing.totals || typeof existing.totals !== 'object') {
-                existing.totals = { coins: 0, events: 0, envelopes: 0, portals: 0 };
-            }
+            const totals = Object.assign(emptyTotals(), existing.totals || {});
+            existing.totals = totals;
             return existing;
         }
         return {
@@ -83,7 +108,7 @@ function createRadar(options) {
             firstSeenAt: null,
             lastEventAt: null,
             error: null,
-            totals: { coins: 0, events: 0, envelopes: 0, portals: 0 }
+            totals: emptyTotals()
         };
     }
 
@@ -131,17 +156,24 @@ function createRadar(options) {
         return '';
     }
 
+    function isExpired(event, now) {
+        return event.kind === 'letter' && event.expiresAt && event.expiresAt <= (now || Date.now());
+    }
+
     function handleEnvelope(username, raw) {
         const box = (raw && (raw.treasureBoxData || raw.data)) || raw || {};
-        const coins = num(box.coins || box.coinCount || box.coin_amount);
-        const canOpen = num(box.canOpen || box.can_open || box.delay);
-        const rawTimestamp = num(box.timestamp);
-        const at = rawTimestamp > 0
-            ? new Date(rawTimestamp * 1000)
-            : new Date();
-        const isPortal = Boolean(box.portal || box.isPortal || box.portalId || box.portal_id);
-        const kind = isPortal ? 'portal' : 'envelope';
+        const kind = detectKind(raw, box);
+        const coins = num(box.coins || box.coinCount || box.coin_amount || (raw && raw.coins));
+        const canOpen = num(
+            box.canOpen || box.can_open || box.delay ||
+            (raw && (raw.canOpen || raw.can_open)) || 0
+        );
+        const rawTimestamp = num(box.timestamp || (raw && raw.timestamp));
+        const receivedAt = Date.now();
+        const at = rawTimestamp > 0 ? new Date(rawTimestamp * 1000) : new Date(receivedAt);
+        const availableAt = receivedAt + canOpen * 1000;
         const session = sessionFor(username);
+        const region = session.region || (targets.get(username) && targets.get(username).country) || '';
 
         const event = {
             id: username + '-' + at.getTime() + '-' + Math.random().toString(36).slice(2, 6),
@@ -149,31 +181,36 @@ function createRadar(options) {
             kind: kind,
             coins: coins,
             canOpenSec: canOpen,
-            region: session.region || (targets.get(username) && targets.get(username).country) || '',
+            region: region,
             at: at.toISOString(),
-            receivedAt: Date.now()
+            receivedAt: receivedAt,
+            availableAt: availableAt,
+            // Sandık süresi dolunca kaybolmaz; zarf/mektup jetonu geri döner.
+            expiresAt: kind === 'letter' ? availableAt + LETTER_TTL_SEC * 1000 : null,
+            collectedAt: null,
+            collectedBy: null
         };
 
         const events = [event].concat(store.get().huntEvents || []).slice(0, MAX_EVENTS);
         store.patch({ huntEvents: events });
 
-        const totals = session.totals || { coins: 0, events: 0, envelopes: 0, portals: 0 };
+        const totals = session.totals || emptyTotals();
+        totals.coins = num(totals.coins) + coins;
+        totals.events = num(totals.events) + 1;
+        if (kind === 'portal') totals.portals = num(totals.portals) + 1;
+        else if (kind === 'letter') totals.letters = num(totals.letters) + 1;
+        else totals.chests = num(totals.chests) + 1;
+
         patchSession(username, {
             status: 'live',
             lastEventAt: event.at,
             firstSeenAt: session.firstSeenAt || event.at,
             lastCoins: coins,
             lastCanOpenSec: canOpen,
-            totals: {
-                coins: num(totals.coins) + coins,
-                events: num(totals.events) + 1,
-                envelopes: num(totals.envelopes) + (kind === 'envelope' ? 1 : 0),
-                portals: num(totals.portals) + (kind === 'portal' ? 1 : 0)
-            }
+            totals: totals
         });
 
         broadcast({ type: 'hunt_event', event: event });
-        // Eski Radar sekmesi de çalışmaya devam etsin
         broadcast({
             type: 'chest',
             user: username,
@@ -220,13 +257,7 @@ function createRadar(options) {
         if (live.has(username)) return;
         if (!targets.has(username)) return;
 
-        const entry = {
-            conn: null,
-            status: 'connecting',
-            startedAt: null,
-            retries: 0,
-            reconnectTimer: null
-        };
+        const entry = { conn: null, status: 'connecting', startedAt: null, retries: 0, reconnectTimer: null };
         live.set(username, entry);
         patchSession(username, { status: 'connecting', error: null });
         scheduleStateBroadcast();
@@ -277,14 +308,10 @@ function createRadar(options) {
             log('@' + username + ' dinleniyor' + (region ? ' · ' + region : ''));
             scheduleStateBroadcast();
         } catch (error) {
-            const message = String(error && error.message || error);
+            const message = String((error && error.message) || error);
             const offline = /not online|offline|has ended|stream.*end|user_not_found|is not currently live/i.test(message);
             entry.status = offline ? 'offline' : 'error';
-            patchSession(username, {
-                status: entry.status,
-                error: message,
-                startedAt: null
-            });
+            patchSession(username, { status: entry.status, error: message, startedAt: null });
             broadcast({ type: 'status', user: username, status: 'error' });
             log('@' + username + ' bağlanamadı: ' + message);
             scheduleStateBroadcast();
@@ -389,25 +416,82 @@ function createRadar(options) {
         scheduleStateBroadcast();
     }
 
+    /** Bir fırsatı "toplandı" ya da "kaçırıldı" olarak işaretler. */
+    function markCollected(id, mode) {
+        const events = store.get().huntEvents || [];
+        const index = events.findIndex(function (event) { return event.id === id; });
+        if (index < 0) return { ok: false, error: 'Olay bulunamadı.' };
+        if (events[index].collectedAt) return { ok: true, event: events[index] };
+
+        const updated = events.slice();
+        updated[index] = Object.assign({}, events[index], {
+            collectedAt: Date.now(),
+            collectedBy: mode === 'dismissed' ? 'dismissed' : 'manual'
+        });
+        store.patch({ huntEvents: updated });
+
+        const username = updated[index].username;
+        const session = sessionFor(username);
+        session.totals.collected = num(session.totals.collected) + (mode === 'dismissed' ? 0 : num(updated[index].coins));
+        patchSession(username, { totals: session.totals });
+
+        broadcast({ type: 'hunt_event_update', event: updated[index] });
+        scheduleStateBroadcast();
+        return { ok: true, event: updated[index] };
+    }
+
     function clearEvents() {
         store.patch({ huntEvents: [], huntSessions: {} });
         broadcast({ type: 'hunt_events', events: [] });
+        broadcast({ type: 'hunt_state', state: getState(false) });
         return { ok: true };
     }
 
-    function getEvents(limit) {
-        return (store.get().huntEvents || []).slice(0, limit || 300);
+    function getEvents(limit, includeAll) {
+        const now = Date.now();
+        return (store.get().huntEvents || [])
+            .filter(function (event) {
+                if (includeAll) return true;
+                return !event.collectedAt && !isExpired(event, now);
+            })
+            .slice(0, limit || 300);
+    }
+
+    /** Bekleyen jetonlar: sandık (süresi dolmuş olsa da), süresi geçmemiş zarf, portal. */
+    function getPending() {
+        const now = Date.now();
+        return (store.get().huntEvents || [])
+            .filter(function (event) {
+                if (event.collectedAt) return false;
+                if (num(event.coins) < 1) return false;
+                if (isExpired(event, now)) return false;
+                return true;
+            })
+            .sort(function (a, b) {
+                const aLetter = a.kind === 'letter';
+                const bLetter = b.kind === 'letter';
+                if (aLetter !== bLetter) return aLetter ? -1 : 1;
+                if (aLetter) return (a.expiresAt || 0) - (b.expiresAt || 0);
+                return num(b.coins) - num(a.coins);
+            })
+            .slice(0, 200);
     }
 
     function getState(includeEvents) {
         const sessions = store.get().huntSessions || {};
+        const pending = getPending();
         const state = {
             targets: Array.from(targets.values()),
             sessions: sessions,
-            limits: { maxTargets: MAX_TARGETS },
+            pendingCount: pending.length,
+            pendingCoins: pending.reduce(function (sum, event) { return sum + num(event.coins); }, 0),
+            limits: { maxTargets: MAX_TARGETS, letterTtlSec: LETTER_TTL_SEC },
             serverTime: Date.now()
         };
-        if (includeEvents) state.events = getEvents(300);
+        if (includeEvents) {
+            state.events = getEvents(300, true);
+            state.pending = pending;
+        }
         return state;
     }
 
@@ -418,20 +502,33 @@ function createRadar(options) {
         setTargets: setTargets,
         disconnectAll: disconnectAll,
         clearEvents: clearEvents,
+        markCollected: markCollected,
         getEvents: getEvents,
+        getPending: getPending,
         getState: getState,
-        // Test/demo: gerçek yayın olmadan zarf olayı üretir (RADAR_ALLOW_SIMULATION=1 iken sunucudan çağrılır)
+        // Test/demo: gerçek yayın olmadan jeton olayı üretir
+        // (yalnızca RADAR_ALLOW_SIMULATION=1 iken sunucudan çağrılır).
         simulate: function (username, payload) {
             const clean = cleanUsername(username);
             const data = payload || {};
             const country = String(data.country || data.region || '').toUpperCase();
-            if (country) patchSession(clean, { region: country, status: 'live' });
+            const kind = data.kind === 'letter' || data.kind === 'portal' ? data.kind : 'chest';
+            if (country || kind) {
+                patchSession(clean, { region: country || sessionFor(clean).region, status: 'live' });
+            }
             if (!sessionFor(clean).startedAt) patchSession(clean, { startedAt: new Date().toISOString() });
             if (!targets.has(clean)) {
                 targets.set(clean, { username: clean, country: country, addedAt: new Date().toISOString() });
                 persistTargets();
             }
-            handleEnvelope(clean, data);
+            const box = {
+                coins: Number(data.coins) || 100,
+                canOpen: Number(data.canOpen) || 30,
+                timestamp: Number(data.timestamp) || Math.floor(Date.now() / 1000)
+            };
+            if (kind === 'letter') box.envelopeInfo = { letter: true };
+            if (kind === 'portal') box.portal = true;
+            handleEnvelope(clean, { treasureBoxData: box });
         }
     };
 }

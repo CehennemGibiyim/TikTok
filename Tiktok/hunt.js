@@ -1,9 +1,11 @@
 /*
  * hunt.js — Jeton Avı sekmesi.
  *
- * Aynı anda dinlenen yayınları, paylaşılan zarf/sandık jetonlarını,
- * açılma sürelerini ve ülke dağılımını gösterir. Veriler sunucudaki
- * radar motorundan gelir; sayfa yenilense de kaybolmaz.
+ * - Aynı anda dinlenen tüm yayınlar (ülke fark etmeksizin)
+ * - Sandık / zarf-mektup / portal ayrımı
+ * - Gerçek süreler: dinleme süresi, açılma geri sayımı, zarfın son geçerlilik anı
+ * - Fırsatlar: içeride 1 jeton bile beklemede olsa listelenir
+ * - QR kod: telefonla okutup doğrudan yayına gitme
  */
 (function () {
   'use strict';
@@ -28,14 +30,26 @@
     AL: 'Arnavutluk', MK: 'Kuzey Makedonya', MD: 'Moldova', CY: 'Kıbrıs', MT: 'Malta'
   };
 
-  var state = { targets: [], sessions: {}, limits: { maxTargets: 40 }, serverTime: 0 };
+  var KIND = {
+    chest: { label: 'SANDIK', cls: 'bg-amber-500/20 text-amber-300 border-amber-500/30', icon: '📦' },
+    letter: { label: 'ZARF / MEKTUP', cls: 'bg-pink-500/20 text-pink-300 border-pink-500/30', icon: '✉️' },
+    portal: { label: 'PORTAL', cls: 'bg-purple-500/20 text-purple-300 border-purple-500/30', icon: '🌀' }
+  };
+
+  var state = { targets: [], sessions: {}, limits: { maxTargets: 40, letterTtlSec: 180 }, serverTime: 0, pendingCount: 0, pendingCoins: 0 };
   var events = [];
-  var eventIds = {};
+  var eventIndex = {};
+  var pending = [];
+  var activeTab = 'streams';
   var sortMode = 'alpha';
   var countryFilter = 'ALL';
-  var logLines = [];
   var pollTimer = null;
   var shellReady = false;
+  var qrModal = null;
+
+  function kindMeta(kind) {
+    return KIND[kind] || KIND.chest;
+  }
 
   function countryName(code) {
     if (!code) return 'Bilinmiyor';
@@ -50,8 +64,7 @@
   }
 
   function formatCoins(value) {
-    var n = Number(value) || 0;
-    return n.toLocaleString('tr-TR');
+    return (Number(value) || 0).toLocaleString('tr-TR');
   }
 
   function formatClock(seconds) {
@@ -70,6 +83,10 @@
       .replace(/>/g, '&gt;')
       .replace(/"/g, '&quot;')
       .replace(/'/g, '&#39;');
+  }
+
+  function liveUrl(username) {
+    return 'https://www.tiktok.com/@' + encodeURIComponent(username) + '/live';
   }
 
   function sessionOf(username) {
@@ -97,7 +114,11 @@
     return map[status] || map.idle;
   }
 
-  // ---------- Kabuk (markup) ----------
+  function isLetterExpired(event) {
+    return event.kind === 'letter' && event.expiresAt && event.expiresAt <= Date.now();
+  }
+
+  // ---------- Kabuk ----------
 
   function buildShell() {
     if (document.getElementById('view-hunt')) return;
@@ -111,7 +132,7 @@
       '<div class="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-6 border-b border-white/5 pb-4">',
       '  <div>',
       '    <h2 class="text-2xl font-bold text-white flex items-center"><i data-lucide="crosshair" class="w-6 h-6 mr-3 text-yellow-400"></i> Jeton Avı Radarı</h2>',
-      '    <p class="text-xs text-yellow-50/50 mt-1 ml-9">Aynı anda birden fazla yayın · zarf / sandık jetonu · açılma süresi · ülke dağılımı</p>',
+      '    <p class="text-xs text-yellow-50/50 mt-1 ml-9">Tüm ülkelerdeki yayınlar · sandık / zarf ayrımı · gerçek süreler · QR ile yayına git</p>',
       '  </div>',
       '  <div class="flex items-center gap-2 mt-4 sm:mt-0">',
       '    <span id="huntServerBadge" class="text-[11px] px-3 py-1.5 rounded-full border border-white/10 bg-white/5 text-yellow-50/60">Sunucu kontrol ediliyor…</span>',
@@ -119,57 +140,74 @@
       '  </div>',
       '</div>',
 
-      '<div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">',
-      '  <div class="glass rounded-2xl p-4"><div class="text-[11px] text-yellow-50/50 uppercase tracking-wide">Dinlenen yayın</div><div id="huntStatStreams" class="text-2xl font-black text-yellow-300 mt-1">0</div></div>',
-      '  <div class="glass rounded-2xl p-4"><div class="text-[11px] text-yellow-50/50 uppercase tracking-wide">Şu an canlı</div><div id="huntStatLive" class="text-2xl font-black text-green-400 mt-1">0</div></div>',
-      '  <div class="glass rounded-2xl p-4"><div class="text-[11px] text-yellow-50/50 uppercase tracking-wide">Toplam zarf / sandık</div><div id="huntStatEnvelopes" class="text-2xl font-black text-white mt-1">0</div></div>',
-      '  <div class="glass rounded-2xl p-4"><div class="text-[11px] text-yellow-50/50 uppercase tracking-wide">Toplam jeton</div><div id="huntStatCoins" class="text-2xl font-black text-amber-400 mt-1">0</div></div>',
+      '<div class="grid grid-cols-2 lg:grid-cols-5 gap-3 mb-5">',
+      '  <div class="glass rounded-2xl p-4"><div class="text-[10px] text-yellow-50/50 uppercase tracking-wide">Dinlenen</div><div id="huntStatStreams" class="text-2xl font-black text-yellow-300 mt-1">0</div></div>',
+      '  <div class="glass rounded-2xl p-4"><div class="text-[10px] text-yellow-50/50 uppercase tracking-wide">Canlı</div><div id="huntStatLive" class="text-2xl font-black text-green-400 mt-1">0</div></div>',
+      '  <div class="glass rounded-2xl p-4"><div class="text-[10px] text-yellow-50/50 uppercase tracking-wide">Sandık</div><div id="huntStatChests" class="text-2xl font-black text-amber-400 mt-1">0</div></div>',
+      '  <div class="glass rounded-2xl p-4"><div class="text-[10px] text-yellow-50/50 uppercase tracking-wide">Zarf</div><div id="huntStatLetters" class="text-2xl font-black text-pink-400 mt-1">0</div></div>',
+      '  <div class="glass rounded-2xl p-4"><div class="text-[10px] text-yellow-50/50 uppercase tracking-wide">Bekleyen jeton</div><div id="huntStatPending" class="text-2xl font-black text-white mt-1">0</div></div>',
       '</div>',
 
-      '<div class="glass rounded-2xl p-5 mb-6">',
-      '  <div class="flex flex-col lg:flex-row gap-3">',
-      '    <div class="relative flex-1">',
-      '      <i data-lucide="at-sign" class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-yellow-500/50"></i>',
-      '      <input id="huntInput" type="text" placeholder="@yayinci, @yayinci2 veya tiktok.com/@yayinci" class="w-full bg-black/50 border border-yellow-500/30 rounded-xl pl-9 pr-3 py-2.5 text-yellow-100 text-sm outline-none focus:border-yellow-400">',
-      '    </div>',
-      '    <select id="huntCountryInput" class="bg-black/50 border border-yellow-500/30 rounded-xl px-3 py-2.5 text-yellow-100 text-sm outline-none focus:border-yellow-400 min-w-[160px]">',
-      '      <option value="">Ülke (oto)</option>',
-      '    </select>',
-      '    <button id="huntAddBtn" class="bg-yellow-500/20 hover:bg-yellow-500/40 border border-yellow-500/50 text-yellow-400 px-5 rounded-xl font-bold transition-all">Ekle</button>',
-      '    <button id="huntStopAllBtn" class="bg-red-500/10 hover:bg-red-500/25 border border-red-500/30 text-red-400 px-4 rounded-xl text-sm font-semibold transition-all">Tümünü Durdur</button>',
-      '  </div>',
-      '  <p id="huntHint" class="text-[11px] text-yellow-50/40 mt-2">Virgül veya satırla ayırarak toplu ekleyebilirsiniz. Aynı anda en fazla 40 yayın dinlenir.</p>',
+      '<div class="flex items-center gap-2 mb-4">',
+      '  <button data-hunt-tab="streams" class="hunt-tab px-4 py-2 rounded-xl text-sm font-bold border border-yellow-500/40 bg-yellow-500/20 text-yellow-300 transition-all">Yayınlar</button>',
+      '  <button data-hunt-tab="opportunities" class="hunt-tab px-4 py-2 rounded-xl text-sm font-bold border border-white/10 bg-white/5 text-yellow-50/60 transition-all">Fırsatlar <span id="huntPendingBadge" class="ml-1 text-[10px] px-1.5 py-0.5 rounded bg-red-500/20 text-red-300 border border-red-500/30">0</span></button>',
+      '  <button data-hunt-tab="countries" class="hunt-tab px-4 py-2 rounded-xl text-sm font-bold border border-white/10 bg-white/5 text-yellow-50/60 transition-all">Ülkeler</button>',
       '</div>',
 
-      '<div class="glass rounded-2xl p-5 mb-6">',
-      '  <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-4">',
-      '    <h3 class="text-lg font-semibold text-yellow-100 flex items-center"><i data-lucide="list-ordered" class="w-5 h-5 mr-2 text-yellow-400"></i>Dinlenen Yayınlar</h3>',
-      '    <div class="flex flex-wrap items-center gap-2">',
-      '      <select id="huntCountryFilter" class="bg-black/60 border border-yellow-500/30 rounded-lg px-3 py-1.5 text-yellow-100 text-xs outline-none"><option value="ALL">Tüm ülkeler</option></select>',
-      '      <select id="huntSort" class="bg-black/60 border border-yellow-500/30 rounded-lg px-3 py-1.5 text-yellow-100 text-xs outline-none">',
-      '        <option value="alpha">🔤 Alfabetik (A-Z)</option>',
-      '        <option value="coins">💰 En çok jeton</option>',
-      '        <option value="duration">⏱️ En uzun süre</option>',
-      '        <option value="country">🌍 Ülkeye göre</option>',
-      '        <option value="recent">🕒 Son olay</option>',
+      '<div id="huntPaneStreams">',
+      '  <div class="glass rounded-2xl p-5 mb-5">',
+      '    <div class="flex flex-col lg:flex-row gap-3">',
+      '      <div class="relative flex-1">',
+      '        <i data-lucide="at-sign" class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-yellow-500/50"></i>',
+      '        <input id="huntInput" type="text" placeholder="@yayinci, @yayinci2 veya tiktok.com/@yayinci" class="w-full bg-black/50 border border-yellow-500/30 rounded-xl pl-9 pr-3 py-2.5 text-yellow-100 text-sm outline-none focus:border-yellow-400">',
+      '      </div>',
+      '      <select id="huntCountryInput" class="bg-black/50 border border-yellow-500/30 rounded-xl px-3 py-2.5 text-yellow-100 text-sm outline-none focus:border-yellow-400 min-w-[160px]">',
+      '        <option value="">Ülke (oto)</option>',
       '      </select>',
-      '      <button id="huntCsvBtn" class="text-xs px-3 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 text-yellow-100 transition-all"><i data-lucide="download" class="w-3.5 h-3.5 inline mr-1"></i>CSV</button>',
+      '      <button id="huntAddBtn" class="bg-yellow-500/20 hover:bg-yellow-500/40 border border-yellow-500/50 text-yellow-400 px-5 rounded-xl font-bold transition-all">Ekle</button>',
+      '      <button id="huntStopAllBtn" class="bg-red-500/10 hover:bg-red-500/25 border border-red-500/30 text-red-400 px-4 rounded-xl text-sm font-semibold transition-all">Tümünü Durdur</button>',
       '    </div>',
+      '    <p id="huntHint" class="text-[11px] text-yellow-50/40 mt-2">Virgül veya satırla ayırarak toplu ekleyin. Aynı anda en fazla 40 yayın dinlenir; yayında olmayanlar 60 saniyede bir yeniden denenir.</p>',
       '  </div>',
-      '  <div id="huntTargetsList" class="overflow-x-auto"></div>',
+      '  <div class="glass rounded-2xl p-5">',
+      '    <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-4">',
+      '      <h3 class="text-lg font-semibold text-yellow-100 flex items-center"><i data-lucide="list-ordered" class="w-5 h-5 mr-2 text-yellow-400"></i>Dinlenen Yayınlar</h3>',
+      '      <div class="flex flex-wrap items-center gap-2">',
+      '        <select id="huntCountryFilter" class="bg-black/60 border border-yellow-500/30 rounded-lg px-3 py-1.5 text-yellow-100 text-xs outline-none"><option value="ALL">Tüm ülkeler</option></select>',
+      '        <select id="huntSort" class="bg-black/60 border border-yellow-500/30 rounded-lg px-3 py-1.5 text-yellow-100 text-xs outline-none">',
+      '          <option value="alpha">🔤 Alfabetik (A-Z)</option>',
+      '          <option value="coins">💰 En çok jeton</option>',
+      '          <option value="duration">⏱️ En uzun süre</option>',
+      '          <option value="country">🌍 Ülkeye göre</option>',
+      '          <option value="recent">🕒 Son olay</option>',
+      '        </select>',
+      '        <button id="huntCsvBtn" class="text-xs px-3 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 text-yellow-100 transition-all"><i data-lucide="download" class="w-3.5 h-3.5 inline mr-1"></i>CSV</button>',
+      '      </div>',
+      '    </div>',
+      '    <div id="huntTargetsList" class="overflow-x-auto"></div>',
+      '  </div>',
       '</div>',
 
-      '<div class="grid grid-cols-1 lg:grid-cols-12 gap-6">',
-      '  <div class="lg:col-span-5 glass rounded-2xl p-5">',
-      '    <h3 class="text-lg font-semibold text-yellow-100 flex items-center mb-3"><i data-lucide="globe-2" class="w-5 h-5 mr-2 text-yellow-400"></i>Ülke Özeti</h3>',
-      '    <div id="huntCountryTable" class="overflow-x-auto max-h-[460px] overflow-y-auto scrollbar-custom"></div>',
-      '  </div>',
-      '  <div class="lg:col-span-7 glass rounded-2xl p-5">',
-      '    <div class="flex items-center justify-between mb-3">',
-      '      <h3 class="text-lg font-semibold text-yellow-100 flex items-center"><i data-lucide="flame" class="w-5 h-5 mr-2 text-yellow-400"></i>Canlı Zarf Akışı</h3>',
-      '      <button id="huntClearEventsBtn" class="text-[11px] px-2.5 py-1 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 text-yellow-50/60">Temizle</button>',
+      '<div id="huntPaneOpportunities" class="hidden">',
+      '  <div class="glass rounded-2xl p-5 mb-5 border border-amber-500/20">',
+      '    <div class="flex items-start justify-between gap-3">',
+      '      <div>',
+      '        <h3 class="text-lg font-semibold text-yellow-100 flex items-center"><i data-lucide="gift" class="w-5 h-5 mr-2 text-amber-400"></i>Bekleyen Jetonlar</h3>',
+      '        <p class="text-[11px] text-yellow-50/50 mt-1">Sandık süresi dolsa da bekler; zarf/mektup süresi dolunca jeton yayıncıya döner. 1 jeton bile listelenir.</p>',
+      '      </div>',
+      '      <div class="text-right whitespace-nowrap">',
+      '        <div id="huntPendingCoins" class="text-xl font-black text-amber-400">0 jeton</div>',
+      '        <div id="huntPendingCount" class="text-[11px] text-yellow-50/50">0 fırsat</div>',
+      '      </div>',
       '    </div>',
-      '    <div id="huntEventList" class="max-h-[460px] overflow-y-auto scrollbar-custom space-y-2"></div>',
+      '  </div>',
+      '  <div id="huntOpportunityList" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3"></div>',
+      '</div>',
+
+      '<div id="huntPaneCountries" class="hidden">',
+      '  <div class="glass rounded-2xl p-5">',
+      '    <h3 class="text-lg font-semibold text-yellow-100 flex items-center mb-3"><i data-lucide="globe-2" class="w-5 h-5 mr-2 text-yellow-400"></i>Tüm Ülkeler</h3>',
+      '    <div id="huntCountryTable" class="overflow-x-auto"></div>',
       '  </div>',
       '</div>'
     ].join('\n');
@@ -194,45 +232,55 @@
     select.dataset.filled = '1';
   }
 
+  function switchTab(tab) {
+    activeTab = tab;
+    document.querySelectorAll('.hunt-tab').forEach(function (button) {
+      var isActive = button.getAttribute('data-hunt-tab') === tab;
+      button.className = 'hunt-tab px-4 py-2 rounded-xl text-sm font-bold border transition-all ' +
+        (isActive
+          ? 'border-yellow-500/40 bg-yellow-500/20 text-yellow-300'
+          : 'border-white/10 bg-white/5 text-yellow-50/60');
+    });
+    setHidden('huntPaneStreams', tab !== 'streams');
+    setHidden('huntPaneOpportunities', tab !== 'opportunities');
+    setHidden('huntPaneCountries', tab !== 'countries');
+    refresh(true);
+  }
+
+  function setHidden(id, hidden) {
+    var element = document.getElementById(id);
+    if (!element) return;
+    element.classList.toggle('hidden', hidden);
+  }
+
   function wire() {
     fillCountrySelects();
+
+    document.querySelectorAll('.hunt-tab').forEach(function (button) {
+      button.addEventListener('click', function () {
+        switchTab(button.getAttribute('data-hunt-tab'));
+      });
+    });
 
     var addBtn = document.getElementById('huntAddBtn');
     if (addBtn) addBtn.addEventListener('click', addFromInput);
 
     var input = document.getElementById('huntInput');
-    if (input) {
-      input.addEventListener('keydown', function (event) {
-        if (event.key === 'Enter') addFromInput();
-      });
-    }
+    if (input) input.addEventListener('keydown', function (event) { if (event.key === 'Enter') addFromInput(); });
 
     var refreshBtn = document.getElementById('huntRefreshBtn');
     if (refreshBtn) refreshBtn.addEventListener('click', function () { refresh(true); });
 
     var stopAll = document.getElementById('huntStopAllBtn');
     if (stopAll) stopAll.addEventListener('click', function () {
-      if (!confirm('Tüm yayınlar dinlenmeyi bıraksın mı? Kayıtlar ve toplamlar silinmez.')) return;
+      if (!confirm('Tüm yayınlar dinlenmeyi bıraksın mı? Geçmiş ve toplamlar silinmez.')) return;
       send({ action: 'hunt_stop_all' }, function () {
         window.RADAR_STORE.api('/api/hunt/targets', { method: 'PUT', body: '[]' }).then(function () { refresh(true); });
       });
     });
 
-    var clearBtn = document.getElementById('huntClearEventsBtn');
-    if (clearBtn) clearBtn.addEventListener('click', function () {
-      events = [];
-      eventIds = {};
-      send({ action: 'hunt_clear_events' }, function () {
-        window.RADAR_STORE.api('/api/hunt/events', { method: 'DELETE' }).then(function () { render(); });
-      });
-      render();
-    });
-
     var sortSelect = document.getElementById('huntSort');
-    if (sortSelect) sortSelect.addEventListener('change', function () {
-      sortMode = sortSelect.value;
-      renderTargets();
-    });
+    if (sortSelect) sortSelect.addEventListener('change', function () { sortMode = sortSelect.value; renderTargets(); });
 
     var countrySelect = document.getElementById('huntCountryFilter');
     if (countrySelect) countrySelect.addEventListener('change', function () {
@@ -243,20 +291,40 @@
     var csvBtn = document.getElementById('huntCsvBtn');
     if (csvBtn) csvBtn.addEventListener('click', exportCsv);
 
-    var list = document.getElementById('huntTargetsList');
-    if (list) list.addEventListener('click', function (event) {
-      var button = event.target.closest('[data-hunt-remove]');
-      if (!button) return;
-      var username = button.getAttribute('data-hunt-remove');
-      send({ action: 'hunt_remove', username: username }, function () {
-        window.RADAR_STORE.api('/api/hunt/targets?username=' + encodeURIComponent(username), { method: 'DELETE' })
-          .then(function () { refresh(true); })
-          .catch(function () { refresh(true); });
-      });
+    var targets = document.getElementById('huntTargetsList');
+    if (targets) targets.addEventListener('click', function (event) {
+      var removeButton = event.target.closest('[data-hunt-remove]');
+      if (removeButton) {
+        var username = removeButton.getAttribute('data-hunt-remove');
+        send({ action: 'hunt_remove', username: username }, function () {
+          window.RADAR_STORE.api('/api/hunt/targets?username=' + encodeURIComponent(username), { method: 'DELETE' })
+            .then(function () { refresh(true); })
+            .catch(function () { refresh(true); });
+        });
+        return;
+      }
+      var qrButton = event.target.closest('[data-hunt-qr]');
+      if (qrButton) openQr(qrButton.getAttribute('data-hunt-qr'));
+    });
+
+    var opportunities = document.getElementById('huntOpportunityList');
+    if (opportunities) opportunities.addEventListener('click', function (event) {
+      var collectButton = event.target.closest('[data-hunt-collect]');
+      if (collectButton) {
+        collect(collectButton.getAttribute('data-hunt-collect'), 'collected');
+        return;
+      }
+      var dismissButton = event.target.closest('[data-hunt-dismiss]');
+      if (dismissButton) {
+        collect(dismissButton.getAttribute('data-hunt-dismiss'), 'dismissed');
+        return;
+      }
+      var qrButton = event.target.closest('[data-hunt-qr]');
+      if (qrButton) openQr(qrButton.getAttribute('data-hunt-qr'));
     });
   }
 
-  // ---------- Veri yollari ----------
+  // ---------- Veri ----------
 
   function wsOpen() {
     try {
@@ -271,7 +339,7 @@
       try {
         ws.send(JSON.stringify(payload));
         return true;
-      } catch (e) { /* yedege dus */ }
+      } catch (e) { /* yedeğe düş */ }
     }
     if (typeof fallback === 'function') fallback();
     return false;
@@ -305,16 +373,17 @@
     }
 
     var country = countrySelect ? countrySelect.value : '';
-    var unique = [];
+    var seen = {};
+    var entries = [];
     usernames.forEach(function (username) {
-      if (unique.indexOf(username) < 0) unique.push(username);
+      if (seen[username]) return;
+      seen[username] = true;
+      entries.push({ username: username, country: country });
     });
 
-    var entries = unique.map(function (username) { return { username: username, country: country }; });
-
-    if (!send({ action: 'hunt_add', usernames: entries }, function () {
+    send({ action: 'hunt_add', usernames: entries }, function () {
       if (!window.RADAR_STORE || !window.RADAR_STORE.available()) {
-        addLog('Arka uç adresi yok. "Sistem Bağlantısı" alanına sunucu adresini girin.');
+        addLog('Arka uç adresi yok. Ayarlardan sunucu adresini ve anahtarı girin.');
         return;
       }
       entries.forEach(function (entry) {
@@ -322,13 +391,10 @@
           .then(function () { refresh(true); })
           .catch(function (error) { addLog(error.message); });
       });
-    })) {
-      input.value = '';
-      setTimeout(function () { refresh(true); }, 800);
-    } else {
-      input.value = '';
-      setTimeout(function () { refresh(true); }, 1200);
-    }
+    });
+
+    input.value = '';
+    setTimeout(function () { refresh(true); }, 1200);
   }
 
   function refresh(withEvents) {
@@ -336,15 +402,10 @@
       updateServerBadge();
       return;
     }
-    var tasks = [window.RADAR_STORE.pull()];
-    if (withEvents) {
-      tasks.push(window.RADAR_STORE.api('/api/hunt/events?limit=300').catch(function () { return null; }));
-    }
 
-    Promise.all(tasks).then(function (results) {
-      var payload = results[0];
+    window.RADAR_STORE.pull().then(function (payload) {
       if (payload && payload.radar) {
-        applyState(payload.radar, (results[1] && results[1].events) || payload.radar.events || null);
+        applyState(payload.radar, payload.radar.events || null, payload.pending || (payload.radar && payload.radar.pending) || null);
       }
       updateServerBadge();
     }).catch(function () {
@@ -357,63 +418,172 @@
     if (!badge) return;
     var info = window.RADAR_STORE ? window.RADAR_STORE.status() : { available: false };
     if (info.available) {
-      badge.className = 'text-[11px] px-3 py-1.5 rounded-full border border-green-500/30 bg-green-500/10 text-green-400';
       var host = info.base.replace(/^https?:\/\//, '').split('/')[0];
       if (host.length > 34) host = host.slice(0, 31) + '…';
+      badge.className = 'text-[11px] px-3 py-1.5 rounded-full border border-green-500/30 bg-green-500/10 text-green-400';
       badge.innerHTML = '<span class="inline-block w-1.5 h-1.5 rounded-full bg-green-400 mr-1"></span>Sunucu bağlı · ' + escapeHtml(host);
     } else {
       badge.className = 'text-[11px] px-3 py-1.5 rounded-full border border-yellow-500/30 bg-yellow-500/10 text-yellow-300';
-      badge.textContent = 'Çevrimdışı mod · arka uç adresi gerekli';
+      badge.textContent = info.error ? 'Çevrimdışı · ' + info.error : 'Çevrimdışı mod · sunucu adresi gerekli';
     }
   }
 
   function addLog(message) {
-    logLines.unshift({ at: new Date(), message: message });
-    logLines = logLines.slice(0, 50);
     var hint = document.getElementById('huntHint');
     if (hint) hint.textContent = message;
   }
 
-  function applyState(nextState, nextEvents) {
+  function applyState(nextState, nextEvents, nextPending) {
     if (nextState) {
       state.targets = Array.isArray(nextState.targets) ? nextState.targets : [];
       state.sessions = nextState.sessions || {};
       state.limits = nextState.limits || state.limits;
       state.serverTime = nextState.serverTime || Date.now();
+      state.pendingCount = Number(nextState.pendingCount) || 0;
+      state.pendingCoins = Number(nextState.pendingCoins) || 0;
     }
 
     if (Array.isArray(nextEvents)) {
       events = [];
-      eventIds = {};
+      eventIndex = {};
       nextEvents.forEach(function (event) { pushEvent(event, true); });
+    }
+
+    if (Array.isArray(nextPending)) {
+      pending = nextPending.filter(function (event) { return !event.collectedAt && !isLetterExpired(event); });
+    } else {
+      pending = computePending();
     }
 
     render();
   }
 
+  function computePending() {
+    return events.filter(function (event) {
+      if (event.collectedAt) return false;
+      if ((Number(event.coins) || 0) < 1) return false;
+      if (isLetterExpired(event)) return false;
+      return true;
+    }).sort(function (a, b) {
+      var aLetter = a.kind === 'letter';
+      var bLetter = b.kind === 'letter';
+      if (aLetter !== bLetter) return aLetter ? -1 : 1;
+      if (aLetter) return (a.expiresAt || 0) - (b.expiresAt || 0);
+      return (Number(b.coins) || 0) - (Number(a.coins) || 0);
+    });
+  }
+
   function pushEvent(event, silent) {
     if (!event || !event.username) return;
     var id = event.id || (event.username + '-' + event.at);
-    if (eventIds[id]) return;
-    eventIds[id] = true;
-    events.unshift(Object.assign({}, event, { id: id }));
-    if (events.length > 400) {
-      var removed = events.pop();
-      if (removed) delete eventIds[removed.id];
+    if (eventIndex[id]) {
+      events[eventIndex[id].index] = Object.assign({}, event, { id: id });
+    } else {
+      events.unshift(Object.assign({}, event, { id: id }));
+      eventIndex[id] = { index: 0 };
     }
-    if (!silent) renderEvents();
+    rebuildIndex();
+    events = events.slice(0, 500);
+    rebuildIndex();
+    if (!silent) render();
   }
 
-  // ---------- Cizim ----------
+  function updateEvent(event) {
+    if (!event || !event.id) return;
+    var entry = eventIndex[event.id];
+    if (entry) events[entry.index] = Object.assign({}, events[entry.index], event);
+    if (event.collectedAt) {
+      pending = pending.filter(function (item) { return item.id !== event.id; });
+    }
+    render();
+  }
+
+  function rebuildIndex() {
+    eventIndex = {};
+    events.forEach(function (item, index) { eventIndex[item.id] = { index: index }; });
+  }
+
+  function collect(id, mode) {
+    send({ action: 'hunt_collect', id: id, mode: mode }, function () {
+      if (!window.RADAR_STORE || !window.RADAR_STORE.available()) return;
+      window.RADAR_STORE.api('/api/hunt/collect', {
+        method: 'POST',
+        body: JSON.stringify({ id: id, mode: mode })
+      }).then(function (result) {
+        if (result && result.state) applyState(result.state, null, result.pending || null);
+      }).catch(function (error) { addLog(error.message); });
+    });
+  }
+
+  // ---------- QR ----------
+
+  function openQr(username) {
+    if (!username) return;
+    var url = liveUrl(username);
+
+    if (!qrModal) {
+      qrModal = document.createElement('div');
+      qrModal.id = 'huntQrModal';
+      qrModal.className = 'hidden fixed inset-0 z-50 flex items-center justify-center bg-black/85 backdrop-blur-sm px-4';
+      qrModal.innerHTML = [
+        '<div class="glass rounded-2xl p-6 w-full max-w-sm relative border-t-4 border-t-yellow-500">',
+        '  <button id="huntQrClose" class="absolute top-3 right-3 text-yellow-50/60 hover:text-yellow-300 p-1"><i data-lucide="x" class="w-5 h-5"></i></button>',
+        '  <h3 id="huntQrTitle" class="text-lg font-bold text-yellow-100 mb-1">Yayına git</h3>',
+        '  <p class="text-[11px] text-yellow-50/50 mb-4">Telefonunla okut, TikTok yayını doğrudan açılır.</p>',
+        '  <div id="huntQrBox" class="bg-white rounded-xl p-3 flex items-center justify-center min-h-[220px]"></div>',
+        '  <a id="huntQrLink" href="#" target="_blank" rel="noopener" class="block mt-4 text-center text-xs text-yellow-300 underline break-all"></a>',
+        '</div>'
+      ].join('');
+      document.body.appendChild(qrModal);
+
+      qrModal.addEventListener('click', function (event) {
+        if (event.target === qrModal) closeQr();
+      });
+      qrModal.querySelector('#huntQrClose').addEventListener('click', closeQr);
+      if (window.lucide) window.lucide.createIcons();
+    }
+
+    var box = qrModal.querySelector('#huntQrBox');
+    box.innerHTML = '';
+    qrModal.querySelector('#huntQrTitle').textContent = '@' + username + ' · canlı yayın';
+    var link = qrModal.querySelector('#huntQrLink');
+    link.href = url;
+    link.textContent = url;
+
+    if (window.QRCode) {
+      new window.QRCode(box, {
+        text: url,
+        width: 220,
+        height: 220,
+        colorDark: '#000000',
+        colorLight: '#ffffff',
+        correctLevel: window.QRCode.CorrectLevel.M
+      });
+    } else {
+      box.innerHTML = '<p class="text-black text-xs text-center">QR kitaplığı yüklenemedi. Bağlantıyı kullanın.</p>';
+    }
+
+    qrModal.classList.remove('hidden');
+  }
+
+  function closeQr() {
+    if (qrModal) qrModal.classList.add('hidden');
+  }
+
+  // ---------- Çizim ----------
 
   function totals() {
-    var result = { streams: state.targets.length, live: 0, envelopes: 0, portals: 0, coins: 0 };
+    var result = { streams: state.targets.length, live: 0, chests: 0, letters: 0, portals: 0, coins: 0 };
+    var targetNames = {};
+    state.targets.forEach(function (target) { targetNames[target.username] = true; });
     Object.keys(state.sessions).forEach(function (username) {
+      if (!targetNames[username]) return;
       var session = state.sessions[username];
       if (!session) return;
       if (session.status === 'live') result.live += 1;
       var t = session.totals || {};
-      result.envelopes += Number(t.envelopes) || 0;
+      result.chests += Number(t.chests) || 0;
+      result.letters += Number(t.letters) || 0;
       result.portals += Number(t.portals) || 0;
       result.coins += Number(t.coins) || 0;
     });
@@ -426,12 +596,16 @@
     var summary = totals();
     setText('huntStatStreams', summary.streams);
     setText('huntStatLive', summary.live);
-    setText('huntStatEnvelopes', formatCoins(summary.envelopes + summary.portals));
-    setText('huntStatCoins', formatCoins(summary.coins));
+    setText('huntStatChests', formatCoins(summary.chests));
+    setText('huntStatLetters', formatCoins(summary.letters));
+    setText('huntStatPending', formatCoins(state.pendingCoins || 0));
+    setText('huntPendingBadge', String(pending.length));
+    setText('huntPendingCoins', formatCoins(pending.reduce(function (sum, event) { return sum + (Number(event.coins) || 0); }, 0)) + ' jeton');
+    setText('huntPendingCount', pending.length + ' fırsat');
 
     renderTargets();
+    renderOpportunities();
     renderCountries();
-    renderEvents();
     updateServerBadge();
   }
 
@@ -452,15 +626,11 @@
     list.sort(function (a, b) {
       var sa = sessionOf(a.username);
       var sb = sessionOf(b.username);
-      if (sortMode === 'coins') {
-        return ((sb.totals || {}).coins || 0) - ((sa.totals || {}).coins || 0);
-      }
-      if (sortMode === 'duration') {
-        return liveSeconds(sb) - liveSeconds(sa);
-      }
+      if (sortMode === 'coins') return ((sb.totals || {}).coins || 0) - ((sa.totals || {}).coins || 0);
+      if (sortMode === 'duration') return liveSeconds(sb) - liveSeconds(sa);
       if (sortMode === 'country') {
-        var ca = (sa.region || a.country || 'ZZ');
-        var cb = (sb.region || b.country || 'ZZ');
+        var ca = sa.region || a.country || 'ZZ';
+        var cb = sb.region || b.country || 'ZZ';
         if (ca !== cb) return ca.localeCompare(cb);
         return a.username.localeCompare(b.username);
       }
@@ -496,21 +666,23 @@
       var region = session.region || target.country || '';
       var meta = statusMeta(session);
       var totalsData = session.totals || {};
-      var currentTitle = session.title ? escapeHtml(session.title).slice(0, 48) : '';
 
       return [
         '<tr class="border-b border-white/5 hover:bg-white/[0.03] transition-colors">',
         '  <td class="py-2.5 pr-3">',
-        '    <a href="https://www.tiktok.com/@' + encodeURIComponent(target.username) + '" target="_blank" rel="noopener" class="text-yellow-100 font-semibold hover:text-yellow-300">@' + escapeHtml(target.username) + '</a>',
-        currentTitle ? '    <div class="text-[10px] text-yellow-50/40 truncate max-w-[180px]">' + currentTitle + '</div>' : '',
+        '    <a href="' + liveUrl(target.username) + '" target="_blank" rel="noopener" class="text-yellow-100 font-semibold hover:text-yellow-300">@' + escapeHtml(target.username) + '</a>',
+        session.title ? '    <div class="text-[10px] text-yellow-50/40 truncate max-w-[180px]">' + escapeHtml(session.title).slice(0, 60) + '</div>' : '',
         '  </td>',
         '  <td class="py-2.5 pr-3 text-xs text-yellow-50/70 whitespace-nowrap">' + flagOf(region) + ' ' + escapeHtml(countryName(region)) + '</td>',
         '  <td class="py-2.5 pr-3"><span class="text-[10px] px-2 py-0.5 rounded-full border ' + meta.cls + ' whitespace-nowrap"><span class="inline-block w-1.5 h-1.5 rounded-full ' + meta.dot + ' mr-1"></span>' + meta.label + '</span></td>',
         '  <td class="py-2.5 pr-3 text-xs font-mono text-yellow-100/80" data-hunt-duration="' + escapeHtml(target.username) + '">' + formatClock(liveSeconds(session)) + '</td>',
-        '  <td class="py-2.5 pr-3 text-xs text-yellow-100/80">' + formatCoins(totalsData.envelopes || 0) + '</td>',
+        '  <td class="py-2.5 pr-3 text-xs text-amber-300">' + formatCoins(totalsData.chests || 0) + '</td>',
+        '  <td class="py-2.5 pr-3 text-xs text-pink-300">' + formatCoins(totalsData.letters || 0) + '</td>',
         '  <td class="py-2.5 pr-3 text-xs font-bold text-amber-400">' + formatCoins(totalsData.coins || 0) + '</td>',
-        '  <td class="py-2.5 pr-3 text-[11px] text-yellow-50/50 whitespace-nowrap">' + (session.lastEventAt ? new Date(session.lastEventAt).toLocaleTimeString('tr-TR') : '—') + '</td>',
-        '  <td class="py-2.5 text-right"><button data-hunt-remove="' + escapeHtml(target.username) + '" class="text-[11px] px-2 py-1 rounded bg-red-500/10 hover:bg-red-500/25 border border-red-500/20 text-red-400">Kaldır</button></td>',
+        '  <td class="py-2.5 pr-2 text-right whitespace-nowrap">',
+        '    <button data-hunt-qr="' + escapeHtml(target.username) + '" title="QR ile yayına git" class="text-[11px] px-2 py-1 rounded bg-yellow-500/10 hover:bg-yellow-500/25 border border-yellow-500/25 text-yellow-300 mr-1"><i data-lucide="qr-code" class="w-3.5 h-3.5 inline"></i></button>',
+        '    <button data-hunt-remove="' + escapeHtml(target.username) + '" class="text-[11px] px-2 py-1 rounded bg-red-500/10 hover:bg-red-500/25 border border-red-500/20 text-red-400">Kaldır</button>',
+        '  </td>',
         '</tr>'
       ].join('');
     }).join('');
@@ -518,9 +690,11 @@
     container.innerHTML = [
       '<table class="w-full text-left text-sm">',
       '<thead><tr class="text-[10px] uppercase tracking-wide text-yellow-50/40 border-b border-white/10">',
-      '<th class="py-2 pr-3">Yayıncı</th><th class="py-2 pr-3">Ülke</th><th class="py-2 pr-3">Durum</th><th class="py-2 pr-3">Süre</th><th class="py-2 pr-3">Zarf</th><th class="py-2 pr-3">Jeton</th><th class="py-2 pr-3">Son olay</th><th class="py-2 text-right">İşlem</th>',
+      '<th class="py-2 pr-3">Yayıncı</th><th class="py-2 pr-3">Ülke</th><th class="py-2 pr-3">Durum</th><th class="py-2 pr-3">Süre</th><th class="py-2 pr-3">Sandık</th><th class="py-2 pr-3">Zarf</th><th class="py-2 pr-3">Jeton</th><th class="py-2 text-right">İşlem</th>',
       '</tr></thead><tbody>' + rows + '</tbody></table>'
     ].join('');
+
+    if (window.lucide) window.lucide.createIcons();
   }
 
   function renderCountryFilter() {
@@ -530,12 +704,9 @@
     var codes = {};
     Object.keys(state.sessions).forEach(function (username) {
       var session = state.sessions[username];
-      var code = session && session.region;
-      if (code) codes[code] = true;
+      if (session && session.region) codes[session.region] = true;
     });
-    state.targets.forEach(function (target) {
-      if (target.country) codes[target.country] = true;
-    });
+    state.targets.forEach(function (target) { if (target.country) codes[target.country] = true; });
 
     var sorted = Object.keys(codes).sort(function (a, b) {
       return countryName(a).localeCompare(countryName(b), 'tr');
@@ -549,23 +720,73 @@
     select.value = countryFilter;
   }
 
+  function renderOpportunities() {
+    var container = document.getElementById('huntOpportunityList');
+    if (!container) return;
+
+    if (pending.length === 0) {
+      container.innerHTML = '<div class="md:col-span-2 xl:col-span-3 text-center text-yellow-50/30 text-sm py-12 border border-dashed border-white/10 rounded-2xl">' +
+        'Bekleyen jeton yok. Yayında sandık veya zarf düştüğü anda burada belirir; süresi geçen sandıklar da listede kalır.' +
+        '</div>';
+      return;
+    }
+
+    container.innerHTML = pending.map(function (event) {
+      var meta = kindMeta(event.kind);
+      var now = Date.now();
+      var remaining = 0;
+      var timeLabel = '';
+      var urgent = false;
+
+      if (event.kind === 'letter') {
+        remaining = Math.max(0, Math.round(((event.expiresAt || now) - now) / 1000));
+        timeLabel = 'jeton geri dönüyor: ' + formatClock(remaining);
+        urgent = remaining <= 60;
+      } else {
+        remaining = Math.max(0, Math.round(((event.availableAt || now) - now) / 1000));
+        timeLabel = remaining > 0 ? 'açılışa ' + formatClock(remaining) : 'bekliyor · süre doldu, kaybolmaz';
+      }
+
+      return [
+        '<div class="rounded-2xl border ' + (urgent ? 'border-red-500/40 bg-red-500/5' : 'border-white/10 bg-black/40') + ' p-4">',
+        '  <div class="flex items-center justify-between mb-2">',
+        '    <span class="text-[10px] px-2 py-0.5 rounded border ' + meta.cls + '">' + meta.icon + ' ' + meta.label + '</span>',
+        '    <span class="text-lg font-black text-amber-400">' + formatCoins(event.coins) + ' <span class="text-[10px] font-normal text-yellow-50/40">jeton</span></span>',
+        '  </div>',
+        '  <a href="' + liveUrl(event.username) + '" target="_blank" rel="noopener" class="text-sm font-semibold text-yellow-100 hover:text-yellow-300 truncate block">@' + escapeHtml(event.username) + '</a>',
+        '  <div class="text-[10px] text-yellow-50/40 mb-1">' + flagOf(event.region) + ' ' + escapeHtml(countryName(event.region)) + ' · ' + new Date(event.at).toLocaleTimeString('tr-TR') + '</div>',
+        '  <div class="text-[11px] ' + (urgent ? 'text-red-300 font-bold' : 'text-yellow-50/60') + '" data-hunt-remaining="' + (event.kind === 'letter' ? event.expiresAt : event.availableAt) + '" data-hunt-kind="' + event.kind + '">' + timeLabel + '</div>',
+        '  <div class="flex items-center gap-2 mt-3">',
+        '    <button data-hunt-qr="' + escapeHtml(event.username) + '" class="text-[11px] px-2.5 py-1.5 rounded-lg bg-yellow-500/15 hover:bg-yellow-500/30 border border-yellow-500/30 text-yellow-300">QR / Yayına git</button>',
+        '    <button data-hunt-collect="' + escapeHtml(event.id) + '" class="text-[11px] px-2.5 py-1.5 rounded-lg bg-green-500/15 hover:bg-green-500/30 border border-green-500/30 text-green-300">Topladım</button>',
+        '    <button data-hunt-dismiss="' + escapeHtml(event.id) + '" class="text-[11px] px-2 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 text-yellow-50/40">Kaçtı</button>',
+        '  </div>',
+        '</div>'
+      ].join('');
+    }).join('');
+  }
+
   function renderCountries() {
     var container = document.getElementById('huntCountryTable');
     if (!container) return;
 
     var groups = {};
+    var targetNames = {};
+    state.targets.forEach(function (target) { targetNames[target.username] = true; });
     Object.keys(state.sessions).forEach(function (username) {
+      if (!targetNames[username]) return;
       var session = state.sessions[username];
       if (!session) return;
       if (session.status === 'stopped') return;
 
       var code = session.region || 'UNKNOWN';
-      if (!groups[code]) groups[code] = { code: code, streamers: 0, live: 0, envelopes: 0, coins: 0 };
+      if (!groups[code]) groups[code] = { code: code, streamers: 0, live: 0, chests: 0, letters: 0, coins: 0 };
       var group = groups[code];
       group.streamers += 1;
       if (session.status === 'live') group.live += 1;
       var totalsData = session.totals || {};
-      group.envelopes += Number(totalsData.envelopes || 0) + Number(totalsData.portals || 0);
+      group.chests += Number(totalsData.chests || 0);
+      group.letters += Number(totalsData.letters || 0);
       group.coins += Number(totalsData.coins || 0);
     });
 
@@ -575,9 +796,18 @@
     });
 
     if (list.length === 0) {
-      container.innerHTML = '<div class="text-xs text-yellow-50/30 text-center py-6">Zarf verisi geldikçe ülkeler burada listelenir.</div>';
+      container.innerHTML = '<div class="text-xs text-yellow-50/30 text-center py-6">Jeton olayı geldikçe ülkeler burada listelenir.</div>';
       return;
     }
+
+    var total = { streamers: 0, live: 0, chests: 0, letters: 0, coins: 0 };
+    list.forEach(function (group) {
+      total.streamers += group.streamers;
+      total.live += group.live;
+      total.chests += group.chests;
+      total.letters += group.letters;
+      total.coins += group.coins;
+    });
 
     var rows = list.map(function (group) {
       var label = group.code === 'UNKNOWN' ? '🏳️ Bilinmiyor' : flagOf(group.code) + ' ' + escapeHtml(countryName(group.code));
@@ -586,7 +816,8 @@
         '<td class="py-2 pr-2 text-xs text-yellow-100 whitespace-nowrap">' + label + '</td>',
         '<td class="py-2 pr-2 text-xs text-yellow-50/60 text-center">' + group.streamers + '</td>',
         '<td class="py-2 pr-2 text-xs text-green-400 text-center">' + group.live + '</td>',
-        '<td class="py-2 pr-2 text-xs text-yellow-50/60 text-center">' + formatCoins(group.envelopes) + '</td>',
+        '<td class="py-2 pr-2 text-xs text-amber-300 text-center">' + formatCoins(group.chests) + '</td>',
+        '<td class="py-2 pr-2 text-xs text-pink-300 text-center">' + formatCoins(group.letters) + '</td>',
         '<td class="py-2 text-xs font-bold text-amber-400 text-right">' + formatCoins(group.coins) + '</td>',
         '</tr>'
       ].join('');
@@ -595,50 +826,20 @@
     container.innerHTML = [
       '<table class="w-full">',
       '<thead><tr class="text-[10px] uppercase text-yellow-50/40 border-b border-white/10">',
-      '<th class="py-1.5 pr-2 text-left">Ülke</th><th class="py-1.5 pr-2 text-center">Yayıncı</th><th class="py-1.5 pr-2 text-center">Canlı</th><th class="py-1.5 pr-2 text-center">Zarf</th><th class="py-1.5 text-right">Jeton</th>',
-      '</tr></thead><tbody>' + rows + '</tbody></table>'
+      '<th class="py-1.5 pr-2 text-left">Ülke</th><th class="py-1.5 pr-2 text-center">Yayıncı</th><th class="py-1.5 pr-2 text-center">Canlı</th><th class="py-1.5 pr-2 text-center">Sandık</th><th class="py-1.5 pr-2 text-center">Zarf</th><th class="py-1.5 text-right">Jeton</th>',
+      '</tr></thead><tbody>' + rows + '</tbody>',
+      '<tfoot><tr class="border-t border-white/10 text-yellow-100">',
+      '<td class="py-2 text-[11px] font-bold">TOPLAM</td>',
+      '<td class="py-2 text-[11px] text-center">' + total.streamers + '</td>',
+      '<td class="py-2 text-[11px] text-center text-green-400">' + total.live + '</td>',
+      '<td class="py-2 text-[11px] text-center text-amber-300">' + formatCoins(total.chests) + '</td>',
+      '<td class="py-2 text-[11px] text-center text-pink-300">' + formatCoins(total.letters) + '</td>',
+      '<td class="py-2 text-[11px] text-right text-amber-400">' + formatCoins(total.coins) + '</td>',
+      '</tr></tfoot></table>'
     ].join('');
   }
 
-  function renderEvents() {
-    var container = document.getElementById('huntEventList');
-    if (!container) return;
-
-    if (events.length === 0) {
-      container.innerHTML = '<div class="text-center text-yellow-50/30 text-sm py-10 border border-dashed border-white/10 rounded-xl">' +
-        'Zarf düştüğü anda burada jeton miktarı ve açılma süresi ile görünecek.</div>';
-      return;
-    }
-
-    var rows = events.slice(0, 120).map(function (event) {
-      var isPortal = event.kind === 'portal';
-      var badge = isPortal
-        ? '<span class="text-[10px] px-1.5 py-0.5 rounded bg-purple-500/20 text-purple-300 border border-purple-500/30">PORTAL</span>'
-        : '<span class="text-[10px] px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/30">ZARF</span>';
-
-      var openAt = (event.receivedAt || Date.now()) + (Number(event.canOpenSec) || 0) * 1000;
-      var remaining = Math.max(0, Math.round((openAt - Date.now()) / 1000));
-
-      return [
-        '<div class="flex items-center justify-between gap-3 rounded-xl border border-white/5 bg-black/30 px-3 py-2">',
-        '  <div class="min-w-0">',
-        '    <div class="flex items-center gap-2">' + badge,
-        '      <a href="https://www.tiktok.com/@' + encodeURIComponent(event.username) + '" target="_blank" rel="noopener" class="text-xs font-semibold text-yellow-100 truncate hover:text-yellow-300">@' + escapeHtml(event.username) + '</a>',
-        '    </div>',
-        '    <div class="text-[10px] text-yellow-50/40 mt-0.5">' + flagOf(event.region) + ' ' + escapeHtml(countryName(event.region)) + ' · ' + new Date(event.at).toLocaleTimeString('tr-TR') + '</div>',
-        '  </div>',
-        '  <div class="text-right whitespace-nowrap">',
-        '    <div class="text-sm font-black text-amber-400">' + formatCoins(event.coins) + ' <span class="text-[10px] font-normal text-yellow-50/40">jeton</span></div>',
-        '    <div class="text-[10px] text-yellow-50/50" data-hunt-countdown="' + openAt + '">' + (remaining > 0 ? 'açılışa ' + formatClock(remaining) : 'açıldı') + '</div>',
-        '  </div>',
-        '</div>'
-      ].join('');
-    }).join('');
-
-    container.innerHTML = rows;
-  }
-
-  // ---------- Canli sayaclar ----------
+  // ---------- Canlı sayaçlar ----------
 
   function tick() {
     Object.keys(state.sessions).forEach(function (username) {
@@ -646,40 +847,47 @@
       if (element) element.textContent = formatClock(liveSeconds(state.sessions[username]));
     });
 
-    document.querySelectorAll('[data-hunt-countdown]').forEach(function (element) {
-      var openAt = Number(element.getAttribute('data-hunt-countdown'));
-      var remaining = Math.max(0, Math.round((openAt - Date.now()) / 1000));
-      element.textContent = remaining > 0 ? 'açılışa ' + formatClock(remaining) : 'açıldı';
+    document.querySelectorAll('[data-hunt-remaining]').forEach(function (element) {
+      var target = Number(element.getAttribute('data-hunt-remaining'));
+      var kind = element.getAttribute('data-hunt-kind');
+      var remaining = Math.max(0, Math.round((target - Date.now()) / 1000));
+
+      if (kind === 'letter') {
+        element.textContent = remaining > 0
+          ? 'jeton geri dönüyor: ' + formatClock(remaining)
+          : 'süre doldu · jeton yayıncıya döndü';
+      } else {
+        element.textContent = remaining > 0
+          ? 'açılışa ' + formatClock(remaining)
+          : 'bekliyor · süre doldu, kaybolmaz';
+      }
     });
+
+    // Süresi dolan zarfları listeden düşür (sandıklar kalır).
+    var hasExpiredLetter = pending.some(function (event) { return isLetterExpired(event); });
+    if (hasExpiredLetter) {
+      pending = pending.filter(function (event) { return !isLetterExpired(event); });
+      renderOpportunities();
+      setText('huntPendingBadge', String(pending.length));
+      setText('huntPendingCoins', formatCoins(pending.reduce(function (sum, event) { return sum + (Number(event.coins) || 0); }, 0)) + ' jeton');
+      setText('huntPendingCount', pending.length + ' fırsat');
+    }
   }
 
   // ---------- CSV ----------
 
   function exportCsv() {
-    var lines = [];
-    lines.push('tur,yayinci,ulke,jeton,acilma_suresi,zaman');
-
-    visibleTargets().forEach(function (target) {
-      var session = sessionOf(target.username) || {};
-      var totalsData = session.totals || {};
-      lines.push([
-        'ozet',
-        target.username,
-        session.region || target.country || '',
-        totalsData.coins || 0,
-        '',
-        session.lastEventAt || ''
-      ].join(','));
-    });
+    var lines = ['tur,yayinci,ulke,jeton,acilma_suresi,zaman,durum'];
 
     events.forEach(function (event) {
       lines.push([
-        event.kind === 'portal' ? 'portal' : 'zarf',
+        event.kind || 'chest',
         event.username,
         event.region || '',
         event.coins || 0,
         event.canOpenSec || 0,
-        event.at || ''
+        event.at || '',
+        event.collectedAt ? 'toplandi' : (isLetterExpired(event) ? 'suresi_doldu' : 'bekliyor')
       ].join(','));
     });
 
@@ -694,27 +902,39 @@
     setTimeout(function () { URL.revokeObjectURL(url); }, 2000);
   }
 
-  // ---------- WebSocket mesajlari ----------
+  // ---------- WebSocket mesajları ----------
 
   window.onHuntMessage = function (data) {
     if (!data || !data.type) return false;
 
     if (data.type === 'hunt_state') {
-      applyState(data.state, null);
+      applyState(data.state, null, null);
       return true;
     }
     if (data.type === 'hunt_events') {
-      applyState(null, data.events || []);
+      applyState(null, data.events || [], null);
+      return true;
+    }
+    if (data.type === 'hunt_pending') {
+      pending = data.pending || [];
+      render();
       return true;
     }
     if (data.type === 'hunt_event') {
       pushEvent(data.event, false);
-      var session = sessionOf(data.event.username);
-      if (session) render();
+      return true;
+    }
+    if (data.type === 'hunt_event_update') {
+      updateEvent(data.event);
+      return true;
+    }
+    if (data.type === 'hunt_collect_result') {
+      if (data.state) applyState(data.state, null, data.pending || null);
+      if (!data.ok && data.error) addLog(data.error);
       return true;
     }
     if (data.type === 'hunt_result') {
-      if (data.state) applyState(data.state, null);
+      if (data.state) applyState(data.state, null, null);
       (data.results || []).forEach(function (result) {
         if (result && result.error) addLog(result.error);
       });
@@ -722,6 +942,10 @@
     }
     if (data.type === 'hunt_log') {
       addLog(data.message);
+      return true;
+    }
+    if (data.type === 'auth_required') {
+      if (window.RADAR_STORE && window.RADAR_STORE.promptLogin) window.RADAR_STORE.promptLogin();
       return true;
     }
     return false;
@@ -738,8 +962,8 @@
     pollTimer = setInterval(function () {
       if (document.hidden) return;
       var view = document.getElementById('view-hunt');
-      if (view && !view.classList.contains('hidden')) refresh(false);
-    }, 20000);
+      if (view && !view.classList.contains('hidden')) refresh(true);
+    }, 8000);
   }
 
   function boot() {

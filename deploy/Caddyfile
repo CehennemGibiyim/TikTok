@@ -1,0 +1,6 @@
+# Caddy: alan adı için otomatik Let's Encrypt sertifikası.
+# DOMAIN ortam değişkeni docker-compose.yml üzerinden gelir.
+{$DOMAIN:localhost} {
+	encode gzip
+	reverse_proxy panel:3000
+}

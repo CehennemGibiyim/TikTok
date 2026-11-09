@@ -164,7 +164,17 @@ function startChestTimerEngine() {
 }
 
 function connectWebSocket() {
-    const url = document.getElementById('wsUrl').value;
+    const rawUrl = (document.getElementById('wsUrl').value || '').trim();
+    const authQuery = window.RADAR_STORE && window.RADAR_STORE.wsAuthQuery ? window.RADAR_STORE.wsAuthQuery() : '';
+    const url = rawUrl
+        ? rawUrl + (authQuery ? (rawUrl.indexOf('?') >= 0 ? '&' : '?') + authQuery.replace(/^\?/, '') : '')
+        : '';
+
+    if (!url) {
+        appendBotLog('⚠️ Sunucu adresi yok. Ayarlardan arka uç adresini girin.');
+        return;
+    }
+
     ws = new WebSocket(url);
 
     ws.onopen = () => {
@@ -1660,45 +1670,6 @@ if(btnAddAgency) {
 }
 
 document.getElementById('sortAgenciesSelect')?.addEventListener('change', renderAgencies);
-
-// --- DOWNLOAD PROJECT LOGIC ---
-document.getElementById('btnDownloadProject').addEventListener('click', async () => {
-    const zip = new JSZip();
-    
-    try {
-        const files = [
-            'index.html',
-            'styles.css',
-            'main.js',
-            'server.js',
-            'package.json',
-            'baslat.bat',
-            'electron.js',
-            'miniapp.i18n.json',
-            'locales/en.json'
-        ];
-
-        for (const file of files) {
-            try {
-                const resp = await fetch(file + '?v=' + Date.now(), { cache: 'no-store' });
-                if(resp.ok) {
-                    const content = await resp.text();
-                    zip.file(file, content);
-                }
-            } catch(err) {
-                console.log(file + " indirilmedi, atlanıyor.");
-            }
-        }
-
-        const zipContent = await zip.generateAsync({type: "nodebuffer"});
-        const zipPath = path.join(__dirname, 'TikTok_Sandik_Radari_PRO.zip');
-        fs.writeFileSync(zipPath, zipContent);
-        alert(`✅ Proje başarıyla kaydedildi!\n\nKonum: ${zipPath}\n\nBu klasörü zip dosyasıyla birlikte kopyalayıp başka bir bilgisayarda kullanabilirsiniz.`);
-    } catch (e) {
-        console.error("İndirme hatası:", e);
-        alert("Projeyi indirirken bir hata oluştu.");
-    }
-});
 
 // --- INIT ---
 loadPersistedUsers();

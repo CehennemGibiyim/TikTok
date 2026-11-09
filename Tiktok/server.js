@@ -84,7 +84,15 @@ const ALLOWED_ORIGINS = (process.env.PANEL_ORIGINS || 'https://cehennemgibiyim.g
     .map(function (value) { return value.trim(); })
     .filter(Boolean);
 const RADAR_KEY = process.env.RADAR_KEY || '';
+// Panel erişim anahtarı: doluysa REST ve WebSocket istekleri anahtar ister.
+const PANEL_PASSWORD = process.env.PANEL_PASSWORD || RADAR_KEY || '';
 const JSON_LIMIT = 8 * 1024 * 1024;
+
+function authorized(req) {
+    if (!PANEL_PASSWORD) return true;
+    const header = req.headers['x-panel-key'] || req.headers['x-radar-key'] || '';
+    return header === PANEL_PASSWORD;
+}
 
 function corsHeaders(req) {
     const headers = { 'Cache-Control': 'no-store' };
@@ -141,11 +149,6 @@ async function handleApi(req, res, parsed) {
         return;
     }
 
-    if (RADAR_KEY && req.headers['x-radar-key'] !== RADAR_KEY) {
-        send(401, { ok: false, error: 'Yetkisiz istek: x-radar-key geçersiz.' });
-        return;
-    }
-
     const pathname = parsed.pathname;
     const query = parsed.searchParams;
 
@@ -159,6 +162,11 @@ async function handleApi(req, res, parsed) {
         return;
     }
 
+    if (!authorized(req)) {
+        send(401, { ok: false, error: 'Yetkisiz istek: panel anahtarı gerekli.' });
+        return;
+    }
+
     if (req.method === 'GET' && pathname === '/api/state') {
         const data = store.get();
         send(200, {
@@ -167,7 +175,8 @@ async function handleApi(req, res, parsed) {
             agencies: data.agencies || [],
             users: data.users || [],
             updatedAt: data.updatedAt,
-            radar: radar.getState(true)
+            radar: radar.getState(true),
+            pending: radar.getPending()
         });
         return;
     }
@@ -243,6 +252,25 @@ async function handleApi(req, res, parsed) {
 
     if (req.method === 'DELETE' && pathname === '/api/hunt/events') {
         send(200, radar.clearEvents());
+        return;
+    }
+
+    if (req.method === 'GET' && pathname === '/api/hunt/pending') {
+        send(200, { ok: true, pending: radar.getPending(), serverTime: Date.now() });
+        return;
+    }
+
+    if (req.method === 'POST' && pathname === '/api/hunt/collect') {
+        let body;
+        try {
+            body = await readJsonBody(req);
+        } catch (error) {
+            send(400, { ok: false, error: error.message });
+            return;
+        }
+
+        const result = radar.markCollected(body && body.id, body && body.mode);
+        send(result.ok ? 200 : 404, Object.assign({ ok: result.ok }, result, { state: radar.getState(false) }));
         return;
     }
 
@@ -1868,7 +1896,21 @@ async function collectChestWithMobileBot(account, targetStreamer, ws, options = 
         return { success: false, error: e.message };
     }
 }
-wss.on('connection', function connection(ws) {
+wss.on('connection', function connection(ws, req) {
+  if (PANEL_PASSWORD) {
+      let provided = '';
+      try {
+          provided = new URL(req.url || '/', 'http://localhost').searchParams.get('key') || '';
+      } catch (e) { /* yoksay */ }
+      if (provided !== PANEL_PASSWORD) {
+          try {
+              ws.send(JSON.stringify({ type: 'auth_required', message: 'Panel anahtarı gerekli.' }));
+          } catch (e) { /* yoksay */ }
+          ws.close(4001, 'auth required');
+          return;
+      }
+  }
+
   console.log("Harika! Radar paneli baglandi.");
 
   clients.add(ws);
@@ -1876,7 +1918,8 @@ wss.on('connection', function connection(ws) {
 
   try {
       ws.send(JSON.stringify({ type: 'hunt_state', state: radar.getState(false) }));
-      ws.send(JSON.stringify({ type: 'hunt_events', events: radar.getEvents(300) }));
+      ws.send(JSON.stringify({ type: 'hunt_events', events: radar.getEvents(300, true) }));
+      ws.send(JSON.stringify({ type: 'hunt_pending', pending: radar.getPending() }));
       ws.send(JSON.stringify({
           type: 'bot_log',
           message: 'Sunucu hazır · kalıcı depo: ' + store.STORE_FILE
@@ -1943,8 +1986,25 @@ wss.on('connection', function connection(ws) {
     if (data.action === 'hunt_get_state') {
         ws.send(JSON.stringify({ type: 'hunt_state', state: radar.getState(false) }));
         if (data.withEvents) {
-            ws.send(JSON.stringify({ type: 'hunt_events', events: radar.getEvents(300) }));
+            ws.send(JSON.stringify({ type: 'hunt_events', events: radar.getEvents(300, true) }));
+            ws.send(JSON.stringify({ type: 'hunt_pending', pending: radar.getPending() }));
         }
+    }
+
+    if (data.action === 'hunt_pending') {
+        ws.send(JSON.stringify({ type: 'hunt_pending', pending: radar.getPending() }));
+    }
+
+    if (data.action === 'hunt_collect' && data.id) {
+        const result = radar.markCollected(data.id, data.mode);
+        ws.send(JSON.stringify({
+            type: 'hunt_collect_result',
+            ok: result.ok,
+            error: result.error || null,
+            event: result.event || null,
+            state: radar.getState(false),
+            pending: radar.getPending()
+        }));
     }
 
     if (data.action === 'hunt_clear_events') {

@@ -1,146 +1,99 @@
-# 🎯 TikTok Jeton Paneli
+# 🎯 TikTok Sandık Radarı
 
-**Tamamen ücretsiz ve açık kaynak** TikTok jeton yönetim paneli. Canlı yayın takibi, otomatik sandık yakalama ve gelişmiş analitik özellikleri.
+TikTok canlı yayınlarındaki **sandık / zarf (mektup) / portal** jetonlarını çoklu
+yayında izleyen, süreleri ve ülke dağılımını çıkaran panel.
 
-## ✨ Özellikler
+## Nasıl çalışır
 
-- 🔴 **Canlı Yayın Takibi** - 100+ yayın aynı anda izleme
-- 💎 **Otomatik Sandık Yakalama** - Anlık tespit ve bildirim
-- 📊 **Real-time Analitik** - Detaylı grafikler ve istatistikler
-- 🎨 **Modern Koyu Tema** - Göz yorgunluğu azaltan tasarım
-- 🔐 **Güvenli** - End-to-end şifreleme ve GDPR uyumlu
-- 📱 **Responsive** - Mobil uyumlu arayüz
-- 🚀 **Hızlı** - <200ms API response time
-- 💻 **Açık Kaynak** - GitHub'da tamamen ücretsiz
+```
+Tarayıcı (panel)  ──HTTPS/WSS──►  Node servisi  ──►  TikTok LIVE
+      │                                │
+      │                                └── data/store.json (kalıcı)
+      └── QR kod ile telefonda yayına git
+```
 
-## 🛠️ Teknolojiler
+Tek Node süreci hem arayüzü hem REST API'yi hem WebSocket'i sunar; bu yüzden
+panel ile arka uç **aynı origin** üzerinde çalışır.
 
-### Backend
-- **FastAPI** (Python)
-- **PostgreSQL** + **Redis**
-- **WebSocket** + **Socket.io**
-- **JWT** Authentication
+## Özellikler
 
-### Frontend
-- **React** + **TypeScript**
-- **Tailwind CSS** + **Headless UI**
-- **Chart.js** + **D3.js**
-- **Zustand** State Management
+- **Çoklu yayın dinleme** — aynı anda 40 yayıncıya kadar
+- **Tür ayrımı** — 📦 sandık, ✉️ zarf/mektup, 🌀 portal
+- **Fırsatlar** — içeride 1 jeton bile beklemedeyse listelenir
+  - sandık: süresi dolsa da listede kalır (kim tıklarsa alır)
+  - zarf: süresi dolunca jeton yayıncıya döner, listeden düşer
+- **Gerçek süreler** — açılma geri sayımı, zarfın son geçerlilik anı, dinleme süresi
+- **QR kod** — `tiktok.com/@kullanici/live` adresini telefonda aç
+- **Ülke özeti** — tüm ülkeler, sandık/zarf/jeton toplamları
+- **Kalıcı depo** — hesaplar, ajanslar, hedefler ve jeton geçmişi sunucuda
+- **Erişim anahtarı** — `PANEL_PASSWORD` ile API ve WebSocket korunur
+- **CSV dışa aktarma**
 
-### API Entegrasyonları
-- **TikTokLive** - Canlı yayın verileri
-- **TikAPI.io** - Kullanıcı istatistikleri
-- **Web Scraping** - Ek veri kaynakları
+## Çalıştırma
 
-## 🚀 Hızlı Başlangıç
-
-### Gereksinimler
-- Python 3.9+
-- Node.js 16+
-- PostgreSQL 13+
-- Redis 6+
-
-### Kurulum
+### Docker (önerilen)
 
 ```bash
-# Repository'yi klonla
-git clone https://github.com/kullanici/TikTokPanel.git
-cd TikTokPanel
-
-# Backend kurulumu
-cd backend
-pip install -r requirements.txt
-uvicorn app.main:app --reload
-
-# Frontend kurulumu
-cd ../frontend
-npm install
-npm start
+cp .env.example .env      # PANEL_PASSWORD ve PANEL_ORIGINS
+docker compose up -d --build
+# http://SUNUCU_IP:3000
 ```
 
-### Docker ile Kurulum
+Alan adı varsa otomatik HTTPS:
 
 ```bash
-docker-compose up -d
+DOMAIN=panel.ornek.com docker compose --profile https up -d
 ```
 
-## 📱 Kullanım
+### Node ile
 
-1. **Kayıt Ol** - Ücretsiz hesap oluştur
-2. **TikTok Hesabı Ekle** - Çoklu hesap yönetimi
-3. **Canlı Yayın Seç** - İzlemek istediğin yayın
-4. **Otomasyonu Başlat** - Sandık yakalamayı otomatikleştir
-5. **Analizleri İzle** - Real-time grafikler ve istatistikler
-
-## 🎨 Ekran Görüntüleri
-
-### Dashboard
-- Genel bakış paneli
-- Canlı yayın istatistikleri
-- Jeton kazanma grafikleri
-
-### Canlı Takip
-- Real-time yayın izleme
-- Sandık bildirimleri
-- Hediye analizi
-
-### Analitik
-- Detaylı grafikler
-- Performans raporları
-- Trend analizi
-
-## 🔧 API Kullanımı
-
-### TikTokLive API
-```python
-from TikTokLive import TikTokLiveClient
-
-client = TikTokLiveClient(unique_id="@username")
-@client.on("gift")
-async def on_gift(event):
-    print(f"Gift received: {event.gift.name}")
+```bash
+cd Tiktok
+npm ci --omit=dev
+PANEL_PASSWORD=anahtar node server.js
 ```
 
-### TikAPI.io
-```python
-import requests
+### GitHub Pages
 
-response = requests.get(
-    "https://api.tikapi.io/user",
-    headers={"Authorization": "Bearer YOUR_TOKEN"}
-)
-```
+Panel statik olarak `https://cehennemgibiyim.github.io/TikTok/` adresinde
+yayınlanır (`.github/workflows/pages.yml`). Sayfa açılınca arka uç adresi ve
+panel anahtarı sorulur; veriler oradaki sunucuda tutulur.
 
-## 🤝 Katkıda Bulunma
+## Ortam değişkenleri
 
-Katkıda bulunmak isterseniz:
+| Değişken | Açıklama |
+|---|---|
+| `PORT` | Sunucu portu (varsayılan 3000) |
+| `PANEL_PASSWORD` | Panel anahtarı. Doluysa API ve WebSocket anahtar ister |
+| `PANEL_ORIGINS` | API'ye erişebilecek origin listesi (virgülle) |
+| `RADAR_MAX_TARGETS` | Aynı anda dinlenecek yayın sayısı (varsayılan 40) |
+| `RADAR_LETTER_TTL` | Zarf/mektup jetonunun geçerlilik süresi, saniye (varsayılan 180) |
+| `RADAR_ALLOW_SIMULATION` | `1` ise test için sahte jeton olayı üretilebilir |
 
-1. Fork yapın
-2. Feature branch oluşturun (`git checkout -b feature/AmazingFeature`)
-3. Commit yapın (`git commit -m 'Add some AmazingFeature'`)
-4. Push yapın (`git push origin feature/AmazingFeature`)
-5. Pull Request açın
+## Veri
 
-## 📄 Lisans
+Tüm kalıcı veri `Tiktok/data/store.json` içinde; `data/` repoya **girmez**.
+Hesap şifreleri düz metin tutulur — sunucuyu yalnızca güvendiğiniz yerde
+çalıştırın ve `PANEL_PASSWORD` kullanın.
 
-Bu proje **MIT Lisansı** altında tamamen ücretsizdir. İstediğiniz gibi kullanabilir, değiştirebilir ve dağıtabilirsiniz.
+## API
 
-## ⚠️ Uyarı
+| Uç | Açıklama |
+|---|---|
+| `GET /api/health` | Servis durumu (anahtarsız) |
+| `GET /api/state` | Hesaplar, ajanslar, hedefler, oturumlar, olaylar, fırsatlar |
+| `PUT /api/accounts` · `/api/agencies` · `/api/users` | Listeyi kaydet |
+| `POST /api/hunt/targets` · `DELETE ?username=` | Yayın ekle / çıkar |
+| `GET /api/hunt/pending` | Bekleyen jetonlar |
+| `POST /api/hunt/collect` | Fırsatı "toplandı/kaçtı" işaretle |
+| `DELETE /api/hunt/events` | Geçmişi temizle |
 
-Bu proje eğitim amaçlıdır. TikTok'un kullanım şartlarına uymaktan sorumlu değilsiniz. Lütfen platform kurallarına uygun şekilde kullanın.
+Anahtar gerektiğinde `x-panel-key` başlığı, WebSocket'te `?key=` parametresi kullanılır.
 
-## 🆘 Destek
+## Sınırlar
 
-- **GitHub Issues:** [Sorun bildir](https://github.com/kullanici/TikTokPanel/issues)
-- **Discord:** [Topluluğa katıl](https://discord.gg/tiktokpanel)
-- **E-posta:** support@tiktokpanel.com
-
-## 🌟 Yıldız Ver
-
-Eğer projeyi beğendiyseniz, lütfen GitHub'da yıldız vermeyi unutmayın!
-
-⭐ [Star](https://github.com/kullanici/TikTokPanel)
-
----
-
-**Made with ❤️ by TikTok Panel Community**
+- TikTok'un resmî canlı olay API'si yok; veriler `tiktok-live-connector` ile okunur.
+- "Tüm ülkelerdeki yayınları keşfetme" bir keşif kaynağı (TikAPI, tik.tools vb.)
+  gerektirir; panel şu an elle eklenen ve QR ile eklenen yayıncıları izler.
+- Zarf/sandık ayrımı gelen olayın alanlarına göre yapılır; TikTok tarafı tür
+  bilgisini göndermezse olay sandık kabul edilir.

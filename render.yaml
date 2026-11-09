@@ -1,16 +1,21 @@
-# Render.com — tek tıkla arka uç kurulumu
-# Arayüz GitHub Pages'te, WebSocket sunucusu burada çalışır.
+# Render.com — tek servis (panel + API + WebSocket aynı origin)
+# Ücretsiz planda servis boşta kalınca uyur; 7/24 radar için ücretli plan veya VPS.
 services:
   - type: web
-    name: tiktok-radar-api
+    name: tiktok-radar
     runtime: node
     plan: free
     rootDir: Tiktok
     buildCommand: npm ci --omit=dev --ignore-scripts --no-audit --no-fund
     startCommand: node server.js
-    healthCheckPath: /
+    healthCheckPath: /api/health
     envVars:
       - key: NODE_VERSION
         value: 20.19.0
-      # Panelin bağlanacağı origin'i kısıtlamak isterseniz ileride buraya
-      # PANEL_ORIGIN eklenebilir (şu an sunucu origin kontrolü yapmıyor).
+      # Panel anahtarı: Render panelinden elle girilir, repoya yazılmaz.
+      - key: PANEL_PASSWORD
+        sync: false
+      - key: PANEL_ORIGINS
+        value: https://cehennemgibiyim.github.io
+      - key: RADAR_LETTER_TTL
+        value: "180"

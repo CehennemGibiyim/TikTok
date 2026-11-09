@@ -1,15 +1,15 @@
 /*
  * config.js — Panel yapılandırması
  *
- * Yerelde (Electron veya `node server.js`) BOŞ BIRAKIN: panel kendi
- * sunucusuna bağlanır.
+ * Panel ile sunucu aynı origin'de çalışıyorsa (Docker/VPS) BOŞ BIRAKIN.
  *
- * GitHub Pages gibi statik bir yerde yayınlarken, arka ucun (WebSocket
- * sunucusunun) adresini buraya yazın. Örnek:
+ * GitHub Pages gibi statik bir yerde yayınlıyorsanız arka ucun adresini
+ * buraya yazın. Örnek:
  *
- *   window.TIKTOK_BACKEND_URL = "wss://tiktok-radar-api.onrender.com";
+ *   window.TIKTOK_BACKEND_URL = "wss://panel.ornek.com";
  *
- * Paneldeki "Sistem Bağlantısı" alanına adresi bir kez yazmanız da yeterlidir;
- * tarayıcı son kullanılan adresi hatırlar.
+ * Aynı adresi paneldeki "Sistem Bağlantısı" alanına bir kez yazmak da
+ * yeterlidir; tarayıcı hatırlar. Sunucuda PANEL_PASSWORD tanımlıysa panel
+ * açılışta anahtarı sorar.
  */
 window.TIKTOK_BACKEND_URL = "";
