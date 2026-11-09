@@ -369,21 +369,39 @@ function git(args) {
   return execFileSync('git', args, { cwd: ROOT, encoding: 'utf8', stdio: 'pipe' });
 }
 
+function abortRebase() {
+  try { git(['rebase', '--abort']); } catch (error) { /* rebase yoktu */ }
+}
+
+function syncWithRemote() {
+  try {
+    git(['pull', '--rebase', '--autostash', '--quiet']);
+  } catch (error) {
+    // Veri dosyası her turda yeniden üretiliyor; kavga edip depoyu kilitlemeyelim.
+    abortRebase();
+    throw error;
+  }
+}
+
 function commitData() {
   if (!CONFIG.commitSec) return;
   const now = Date.now();
   if (now - state.lastCommit < CONFIG.commitSec * 1000) return;
   state.lastCommit = now;
   try {
+    syncWithRemote();
     git(['add', 'site/firsat/data/live.json']);
-    const diff = git(['status', '--porcelain', 'site/firsat/data/live.json']);
-    if (!diff.trim()) return;
+    if (!git(['status', '--porcelain', 'site/firsat/data/live.json']).trim()) return;
     const summary = snapshot().scanner;
     git(['commit', '-m',
       'Canlı tarama: ' + summary.liveCount + '/' + summary.targetCount +
       ' yayında · ' + summary.watching + ' oda dinleniyor']);
-    try { git(['pull', '--rebase', '--autostash', 'origin', 'HEAD']); } catch (error) { /* çevrimdışı */ }
-    git(['push']);
+    try {
+      git(['push', '--quiet']);
+    } catch (pushError) {
+      syncWithRemote();
+      git(['push', '--quiet']);
+    }
     log('veri commit edildi');
   } catch (error) {
     log('commit atlandı:', (error.stdout || error.message || '').toString().slice(0, 160));
