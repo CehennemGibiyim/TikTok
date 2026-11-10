@@ -28,7 +28,8 @@
   var KINDS = {
     chest: { label: 'SANDIK', icon: '📦', cls: 'kind-chest' },
     letter: { label: 'ZARF / MEKTUP', icon: '✉️', cls: 'kind-letter' },
-    portal: { label: 'PORTAL', icon: '🌀', cls: 'kind-portal' }
+    portal: { label: 'PORTAL', icon: '🌀', cls: 'kind-portal' },
+    gift: { label: 'HEDİYE', icon: '🎁', cls: 'kind-gift' }
   };
 
   var state = null;
@@ -264,7 +265,9 @@
         streamerId: owner.id,
         username: owner.username,
         country: owner.country || '',
-        kind: item.kind === 'letter' ? 'letter' : (item.kind === 'portal' ? 'portal' : 'chest'),
+        kind: item.kind === 'letter' ? 'letter'
+          : (item.kind === 'portal' ? 'portal'
+          : (item.kind === 'gift' ? 'gift' : 'chest')),
         coins: Number(item.coins) || 0,
         durationSec: 0,
         availableAt: Number(item.t) || Date.now(),
