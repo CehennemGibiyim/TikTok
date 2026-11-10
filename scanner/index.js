@@ -52,6 +52,8 @@ const CONFIG = {
   discoverSec: Number(readArg('discover-sec', 300)),
   maxPool: Number(readArg('max-pool', 250)),
   watch: readArg('watch', readArg('once', 0) ? 0 : 1) ? true : false,
+  // tiktok-live-connector ile dinle (anahtarsız); 0 verilirse TikTools'a düşer.
+  connector: readArg('connector', 1) ? true : false,
   watchSec: Number(readArg('watch-sec', 300)),
   watchRooms: Number(readArg('watch-rooms', 8))
 };
@@ -75,6 +77,7 @@ const state = {
   seenMessages: new Set(),
   envelopeStats: { seen: 0, withCoins: 0, actions: {}, boxTypes: {} },
   envelopeSamples: [],
+  connectorCooldownUntil: 0,
   lastFlush: 0,
   lastCommit: 0,
   lastDiscover: 0,
@@ -197,6 +200,22 @@ async function discoverLive() {
       saveTargets();
     }
 
+    // Bu uç yalnızca yayında olan kanalları döndürür: bulunanlar canlıdır.
+    // Başlangıç saati verilmezse uydurulmaz; panel süreyi "—" gösterir.
+    channels.forEach((channel) => {
+      const username = cleanUsername(channel && channel.uniqueId);
+      if (!username) return;
+      const record = state.streamers.get(username) || { username, coins: 0, gifts: 0, live: false };
+      if (!record.country) {
+        record.country = String((channel && channel.region) || '').replace(/[^A-Za-z]/g, '').slice(0, 2).toUpperCase();
+      }
+      record.live = true;
+      record.lastSeenLiveAt = Date.now();
+      record.checkedAt = Date.now();
+      record.viewers = Number((channel && channel.viewerCount) || 0) || record.viewers || 0;
+      state.streamers.set(username, record);
+    });
+
     log('keşif: +' + fresh.length, 'yayıncı · havuz', state.targets.length);
     return fresh.length;
   } catch (error) {
@@ -216,8 +235,15 @@ async function fetchLiveStatus(uniqueId) {
       headers: { 'User-Agent': UA, Referer: 'https://www.tiktok.com/', Accept: 'application/json' },
       signal: AbortSignal.timeout(12000)
     });
-    if (!response.ok) return { live: false, reason: 'http ' + response.status };
-    const payload = await response.json();
+    const text = await response.text();
+    // TikTok bazı IP'lerde 200 + boş gövde döndürüyor: bu "yayında değil"
+    // demek DEĞİLDİR, bilinmeyen durumdur. Bilinmeyende eski durum korunur.
+    if (!text.trim()) return { unknown: true, reason: 'boş yanıt (doğrulanamadı)' };
+    let payload;
+    try { payload = JSON.parse(text); } catch (error) { return { unknown: true, reason: 'okunamayan yanıt' }; }
+    if (payload && payload.statusCode && payload.statusCode !== 0) {
+      return { unknown: true, reason: payload.message || ('kod ' + payload.statusCode) };
+    }
     const room = payload && payload.data && payload.data.liveRoom;
     if (!room) return { live: false, reason: (payload && payload.message) || 'oda yok' };
     const live = Number(room.status) === 2;
@@ -392,53 +418,9 @@ function handleStreamMessage(username, raw) {
     return;
   }
 
-  // Zarf / sandık (treasure box) ve portal aynı aileden gelir:
-  //   envelope        → zarf veya sandık (koin dağıtımı)
-  //   envelopePortal  → odalar arası portal zinciri
-  // Gerçek kutu: diamondCount (jeton), peopleCount (kişi), secondsUntilOpen (geri sayım).
+  // Zarf / sandık / portal: ortak ayrıştırıcı (handleEnvelope) kullanılır.
   if (/envelope|zarf|letter|portal/i.test(event)) {
-    const info = data.envelopeInfo || data;
-    const box = info.treasureBoxData || data.treasureBoxData || {};
-
-    state.envelopeStats.seen += 1;
-    const act = String(info.action || 'yok');
-    const boxType = String(info.boxType || 'yok');
-    state.envelopeStats.actions[act] = (state.envelopeStats.actions[act] || 0) + 1;
-    state.envelopeStats.boxTypes[boxType] = (state.envelopeStats.boxTypes[boxType] || 0) + 1;
-
-    const coins = Number(info.diamondCount || info.coins || box.coins) || 0;
-    const people = Number(info.peopleCount || info.recipientCount || box.canOpen) || 0;
-    const openIn = Number(info.secondsUntilOpen) || 0;
-    if (coins > 0 || people > 0) state.envelopeStats.withCoins += 1;
-
-    // Teşhis için ham örnek (en fazla 5), böylece gerçek kutu alanları görülür.
-    state.envelopeSamples.push({
-      t: Date.now(),
-      user: username,
-      event: event,
-      action: act,
-      boxType: boxType,
-      businessType: info.businessType || 0,
-      coins: coins,
-      people: people,
-      secondsUntilOpen: openIn
-    });
-    if (state.envelopeSamples.length > 5) state.envelopeSamples.shift();
-
-    // İçi boş "hide" bildirimi fırsat değildir; uydurma kayıt yazılmaz.
-    if (coins <= 0 && people <= 0) return;
-
-    const portalish = /portal/i.test(event) ||
-      /portal/i.test(String(info.envelopeScene || info.textKey || boxType));
-
-    recordEvent(username, {
-      kind: portalish ? 'portal' : 'letter',
-      coins: coins,
-      shared: people,
-      durationSec: openIn,
-      giftName: boxType !== 'yok' ? boxType : (portalish ? 'Portal' : 'Zarf'),
-      sender: info.sendUserName || ''
-    });
+    handleEnvelope(username, event, data);
     return;
   }
 
@@ -472,7 +454,10 @@ async function closeWatcher(username, reason) {
   if (!watcher) return;
   state.rooms.delete(username);
   if (watcher.timer) clearTimeout(watcher.timer);
-  try { watcher.socket.close(); } catch (error) { /* zaten kapalı */ }
+  try {
+    if (watcher.connection) watcher.connection.disconnect();
+    else if (watcher.socket) watcher.socket.close();
+  } catch (error) { /* zaten kapalı */ }
   log('dinleme bitti', username, reason || '');
 }
 
@@ -480,13 +465,150 @@ async function stopAllWatchers(reason) {
   await Promise.all(Array.from(state.rooms.keys()).map((username) => closeWatcher(username, reason)));
 }
 
+// tiktok-live-connector: anahtarsız, açık kaynak; TikTok olaylarını doğrudan
+// çözer. TikTools demo anahtarındaki 429 sınırı olmadığı için aynı anda çok
+// daha fazla oda dinlenebiliyor. Kurulu değilse null döner.
+let connectorLib;
+function loadConnector() {
+  if (connectorLib !== undefined) return connectorLib;
+  try {
+    connectorLib = require('tiktok-live-connector');
+  } catch (error) {
+    connectorLib = null;
+  }
+  return connectorLib;
+}
+
+// TikTok 
+// EnvelopeBusinessType: 9 = PLATFORM_PORTAL, 19 = SUPER_FAN_BOX.
+// Gözlemlenen gerçek kutu: businessType 20, 875 jeton / 500 kişi → sandık dağıtımı.
+// 21 ise jeton/kişi taşımayan zarf bildirimi.
+function envelopeKind(eventName, info) {
+  const bt = Number(info && info.businessType) || 0;
+  const text = String(eventName || '') + ' ' + String(
+    (info && (info.boxType || info.envelopeScene || info.textKey || info.displayKey)) || ''
+  );
+  if (/portal/i.test(text) || bt === 9) return 'portal';
+  if (/treasure|sand[ıi]k|chest/i.test(text) || bt === 19 || bt === 20) return 'chest';
+  if (bt === 21) return 'letter';
+  return 'letter';
+}
+
+function handleEnvelope(username, eventName, data) {
+  const info = (data && (data.envelopeInfo || data)) || {};
+  const box = (data && data.treasureBoxData) || info.treasureBoxData || {};
+
+  state.envelopeStats.seen += 1;
+  const act = String(info.action || 'yok');
+  const boxType = String(info.boxType || info.displayKey || 'yok');
+  state.envelopeStats.actions[act] = (state.envelopeStats.actions[act] || 0) + 1;
+  state.envelopeStats.boxTypes[boxType] = (state.envelopeStats.boxTypes[boxType] || 0) + 1;
+
+  const coins = Number(info.diamondCount || info.coins || box.coins) || 0;
+  const people = Number(info.peopleCount || info.recipientCount || box.canOpen) || 0;
+  const openIn = Number(info.secondsUntilOpen) || 0;
+  if (coins > 0 || people > 0) state.envelopeStats.withCoins += 1;
+
+  state.envelopeSamples.push({
+    t: Date.now(), user: username, event: eventName, action: act, boxType,
+    businessType: info.businessType || 0, coins, people, secondsUntilOpen: openIn
+  });
+  if (state.envelopeSamples.length > 5) state.envelopeSamples.shift();
+
+  // İçi boş bildirim fırsat değildir.
+  if (coins <= 0 && people <= 0) return;
+
+  recordEvent(username, {
+    kind: envelopeKind(eventName, info),
+    coins,
+    shared: people,
+    durationSec: openIn,
+    giftName: boxType !== 'yok' ? boxType : 'Zarf',
+    sender: info.sendUserName || ''
+  });
+}
+
+function handleConnectorGift(username, data) {
+  const repeat = Number(data.repeatCount) || 1;
+  const diamonds = Number(data.diamondCount) || 0;
+  const name = data.giftName || 'Hediye';
+  const sender = (data.user && data.user.uniqueId) || '';
+  const groupId = String(data.groupId || (data.giftId + '|' + sender + '|' + name));
+
+  const combo = state.combos.get(groupId) || { diamonds, repeat: 0 };
+  combo.diamonds = diamonds || combo.diamonds;
+  combo.repeat = Math.max(combo.repeat, repeat);
+  state.combos.set(groupId, combo);
+
+  const isEnd = data.repeatEnd === true || repeat <= 1;
+  if (!isEnd) return;
+  state.combos.delete(groupId);
+
+  const kind = kindFor(name);
+  if (!kind) return;
+
+  recordEvent(username, {
+    kind,
+    coins: diamonds > 0 ? diamonds * combo.repeat : 0,
+    diamonds: diamonds > 0 ? diamonds * combo.repeat : 0,
+    giftName: name,
+    sender
+  });
+}
+
+async function openConnectorWatcher(username) {
+  const lib = loadConnector();
+  if (!lib || !lib.TikTokLiveConnection) throw new Error('tiktok-live-connector yok');
+
+  const connection = new lib.TikTokLiveConnection(username, {
+    processInitialData: false,
+    fetchRoomInfoOnConnect: true
+  });
+
+  const watcher = { username, connection, startedAt: Date.now(), messages: 0, timer: null, kind: 'connector' };
+  state.rooms.set(username, watcher);
+
+  const bump = () => { watcher.messages += 1; };
+  connection.on('gift', (data) => { bump(); handleConnectorGift(username, data); });
+  connection.on('envelope', (data) => { bump(); handleEnvelope(username, 'envelope', data); });
+  connection.on('superFanBox', (data) => { bump(); handleEnvelope(username, 'superFanBox', data); });
+  connection.on('roomUser', (data) => {
+    const record = state.streamers.get(username);
+    if (record && data && data.viewerCount) record.viewers = Number(data.viewerCount) || record.viewers;
+  });
+  connection.on('streamEnd', () => { markOffline(username); closeWatcher(username, 'yayın bitti'); });
+  connection.on('disconnected', () => { state.rooms.delete(username); });
+  connection.on('error', (error) => { state.lastError = username + ': ' + ((error && error.message) || 'bağlantı hatası'); });
+
+  await connection.connect();
+
+  watcher.timer = setTimeout(() => { closeWatcher(username, 'süre doldu'); }, CONFIG.watchSec * 1000);
+  log('dinleniyor', username);
+}
+
 async function openWatcher(username) {
+  if (CONFIG.connector) {
+    try {
+      await openConnectorWatcher(username);
+      return;
+    } catch (error) {
+      state.lastError = 'dinleme: ' + username + ' ' + error.message;
+      log('bağlayıcı hatası', username, error.message);
+      closeWatcher(username, 'bağlanamadı');
+      // Hız sınırı / cihaz engeli: yedek yola düşmek de 429 yer; bekle.
+      if (/rate|too many connections|device_blocked/i.test(error.message || '')) {
+        throw error;
+      }
+      // Diğer hatalarda aşağıdaki TikTools yolu yedek olarak denenir.
+    }
+  }
+
   const token = await mintToken(username, Math.min(600, CONFIG.watchSec + 60));
   const WS = wsFactory();
   const socket = new WS('wss://api.tik.tools?uniqueId=' + encodeURIComponent(username) +
     '&jwtKey=' + encodeURIComponent(token));
 
-  const watcher = { username, socket, startedAt: Date.now(), messages: 0, timer: null };
+  const watcher = { username, socket, startedAt: Date.now(), messages: 0, timer: null, kind: 'tiktools' };
   state.rooms.set(username, watcher);
 
   const onMessage = (raw) => {
@@ -518,6 +640,8 @@ async function maintainWatchers() {
   if (!CONFIG.watch) return;
 
   const now = Date.now();
+  // Bağlantı açma hızı sınırlı: sınır yediğimizde kısa süre yeni oda açmayız.
+  if (state.connectorCooldownUntil > now) return;
   for (const [username, watcher] of Array.from(state.rooms.entries())) {
     if (now - watcher.startedAt >= CONFIG.watchSec * 1000) await closeWatcher(username, 'süre doldu');
   }
@@ -542,6 +666,10 @@ async function maintainWatchers() {
     } catch (error) {
       state.lastError = 'dinleme: ' + pick.username + ' ' + error.message;
       log('dinleme hatası', pick.username, error.message);
+      if (/rate|too many connections|device_blocked/i.test(error.message || '')) {
+        state.connectorCooldownUntil = Date.now() + 90000;
+        log('bağlantı hızı sınırı: 90 sn yeni oda açılmayacak');
+      }
       break;
     }
   }
@@ -572,6 +700,12 @@ async function pollTargets() {
     const seenBefore = Boolean(record.checkedAt);
     record.checkedAt = Date.now();
     record.reason = status.live ? '' : (status.reason || '');
+    if (status.unknown) {
+      // Doğrulanamadı: canlı/offline bilgisi değiştirilmez.
+      record.reason = status.reason || 'doğrulanamadı';
+      state.streamers.set(username, record);
+      return;
+    }
     if (status.live) {
       liveCount += 1;
       // Daha önce taranmış ama yayında değilken yeniden canlıya geçen oda.
@@ -735,8 +869,9 @@ if (process.env.SCANNER_SELFTEST === '1') {
   const frames = [
     ['sıradan hediye (Rose)', { event: 'gift', data: { giftName: 'Rose', giftId: 5655, diamondCount: 1, repeatCount: 1, repeatEnd: true, msgId: 'a1' } }],
     ['sandık hediyesi', { event: 'gift', data: { giftName: 'Sandık', giftId: 9001, diamondCount: 500, repeatCount: 1, repeatEnd: true, msgId: 'a2' } }],
-    ['gerçek zarf/sandık kutusu', { event: 'envelope', data: { envelopeInfo: { envelopeId: 'e1', action: 'show', boxType: 'treasure_box', diamondCount: 100, peopleCount: 25, secondsUntilOpen: 30 } } }],
-    ['portal zinciri', { event: 'envelopePortal', data: { envelopeInfo: { envelopeId: 'e2', boxType: 'portal', diamondCount: 200, peopleCount: 50, secondsUntilOpen: 15 } } }],
+    ['sandık kutusu (businessType 20)', { event: 'envelope', data: { envelopeInfo: { envelopeId: 'e1', businessType: 20, diamondCount: 100, peopleCount: 25, secondsUntilOpen: 30 } } }],
+    ['zarf kutusu (businessType 21)', { event: 'envelope', data: { envelopeInfo: { envelopeId: 'e4', businessType: 21, diamondCount: 50, peopleCount: 10 } } }],
+    ['portal zinciri (businessType 9)', { event: 'envelope', data: { envelopeInfo: { envelopeId: 'e2', businessType: 9, diamondCount: 200, peopleCount: 50, secondsUntilOpen: 15 } } }],
     ['boş zarf bildirimi', { event: 'envelope', data: { envelopeInfo: { envelopeId: 'e3', action: 'hide', boxType: 'spark_box', coins: null, recipientCount: null } } }]
   ];
   frames.forEach(([label, frame]) => {
