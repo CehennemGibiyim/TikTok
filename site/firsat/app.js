@@ -447,9 +447,9 @@
   function migrateEvents() {
     var settings = Object.assign({}, state.settings || {});
     if (Number(settings.eventsSchema) >= 2) return;
-    var kept = state.events.filter(function (event) {
-      return !event.auto && isOpportunity(event);
-    });
+    // Eski kurallarla yazılmış tarayıcı kayıtları (sıradan hediyeler) atılır;
+    // elle girilen kayıtlara dokunulmaz.
+    var kept = state.events.filter(function (event) { return !event.auto; });
     settings.eventsSchema = 2;
     Store.set({ events: kept, settings: settings });
     state = Store.get();
