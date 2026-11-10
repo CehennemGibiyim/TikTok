@@ -71,6 +71,8 @@ const state = {
   seenEvents: new Set(),
   targets: [],
   recent: [],
+  combos: new Map(),
+  seenMessages: new Set(),
   lastFlush: 0,
   lastCommit: 0,
   lastDiscover: 0,
@@ -263,6 +265,7 @@ function recordEvent(username, data) {
     username,
     kind: data.kind,
     coins,
+    diamonds: Math.max(0, Math.round(Number(data.diamonds) || 0)),
     giftName: data.giftName || '',
     sender: data.sender || '',
     source: 'scan'
@@ -335,14 +338,36 @@ function handleStreamMessage(username, raw) {
   const data = payload.data || {};
 
   if (event === 'gift') {
-    const count = Number(data.repeatCount || data.repeat_count) || 1;
+    const msgId = data.msgId || (data.transactionId ? String(data.transactionId) : '');
+    if (msgId) {
+      if (state.seenMessages.has(msgId)) return;
+      state.seenMessages.add(msgId);
+      if (state.seenMessages.size > 4000) state.seenMessages.clear();
+    }
+
+    const repeat = Number(data.repeatCount || data.repeat_count) || 1;
     const diamonds = Number(data.diamondCount || data.diamond_count) || 0;
     const name = data.giftName || (data.gift && data.gift.name) || 'Hediye';
+    const sender = (data.user && (data.user.uniqueId || data.user.nickname)) || '';
+    const groupId = String(data.groupId || data.group_id || (name + '|' + sender));
+
+    // TikTok aynı komboyu parça parça gönderiyor: son parça (repeatEnd) gelene
+    // kadar beklenir, jeton bir kez ve gerçek toplamla yazılır.
+    const combo = state.combos.get(groupId) || { diamonds, repeat: 0 };
+    combo.diamonds = diamonds || combo.diamonds;
+    combo.repeat = Math.max(combo.repeat, repeat);
+    state.combos.set(groupId, combo);
+
+    const isEnd = data.repeatEnd === true || data.repeatEnd === undefined || repeat <= 1;
+    if (!isEnd) return;
+    state.combos.delete(groupId);
+
     recordEvent(username, {
       kind: kindFor(name, data),
-      coins: diamonds * count,
+      coins: diamonds > 0 ? diamonds * combo.repeat : 0,
+      diamonds: diamonds > 0 ? diamonds * combo.repeat : 0,
       giftName: name,
-      sender: (data.user && (data.user.uniqueId || data.user.nickname)) || ''
+      sender
     });
     return;
   }
