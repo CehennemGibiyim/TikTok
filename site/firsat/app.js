@@ -44,6 +44,10 @@
   var scanInfo = null;
   var scanUrl = 'data/live.json';
   var poolUrl = 'data/targets.json';
+  // Halka açık canlı kanal listesi (girişsiz, tarayıcıdan okunabilir).
+  var discoveryUrl = 'https://api.tik.tools/api/live/top-channels';
+  // Bulunan yayın, tarama doğrulayana kadar bu süre boyunca "canlı" sayılır.
+  var discoverLiveMs = 30 * 60 * 1000;
 
   function $(id) { return document.getElementById(id); }
 
@@ -137,7 +141,8 @@
     var events = eventsOf(streamer.id);
     var metrics = {
       chest: 0, letter: 0, portal: 0, coins: 0, collected: 0, collectedCount: 0,
-      shared: 0, lastSeen: Number(streamer.lastLiveAt) || 0, live: Boolean(streamer.startedAt)
+      shared: 0,      lastSeen: Number(streamer.lastLiveAt) || 0,
+      live: Boolean(streamer.startedAt || streamer.scanLive)
     };
     events.forEach(function (event) {
       if (metrics[event.kind] !== undefined) metrics[event.kind] += 1;
@@ -239,6 +244,10 @@
         var name = cleanUsername(streamer.username);
         var inPool = name in scanned;
         if (inPool && scanned[name]) return streamer;
+        // Panelden "Canlı yayınları bul" ile eklenenler tarama havuzunda yok;
+        // bulundukları andan itibaren sınırlı süre canlı kalırlar.
+        if (!inPool && streamer.source === 'discover' && Number(streamer.foundLiveAt) > 0 &&
+            (Date.now() - Number(streamer.foundLiveAt)) < discoverLiveMs) return streamer;
         if (!streamer.startedAt && !streamer.scanLive) return streamer;
         changed = true;
         return Object.assign({}, streamer, {
@@ -352,6 +361,66 @@
         : 'Havuzdaki herkes zaten listede (' + result.skipped + ').';
     } catch (error) {
       $('addStatus').textContent = 'Havuz okunamadı: ' + error.message;
+    }
+  }
+
+  // ---------- Canlı yayınları bul (kendi başına keşif) ----------
+  // Arka plan taramasından ayrıdır: şu anda yayında olan adresleri sorar ve
+  // yalnızca yeni olanları listenin üstüne ekler. Hiçbir kaydı silmez.
+
+  async function findLiveStreams() {
+    var button = $('findLive');
+    var status = $('findStatus');
+    if (button.disabled) return;
+    button.disabled = true;
+    status.textContent = 'Canlı yayınlar aranıyor…';
+
+    try {
+      var response = await fetch(discoveryUrl + '?t=' + Date.now(), { cache: 'no-store' });
+      if (!response.ok) throw new Error('HTTP ' + response.status);
+      var data = await response.json();
+      var channels = Array.isArray(data.channels) ? data.channels : [];
+
+      var known = {};
+      state.streamers.forEach(function (streamer) { known[cleanUsername(streamer.username)] = true; });
+
+      var now = Date.now();
+      var fresh = [];
+      channels.forEach(function (channel) {
+        var username = cleanUsername(channel && channel.uniqueId);
+        if (!username || known[username]) return;
+        known[username] = true;
+        fresh.push({
+          id: uid('st'),
+          username: username,
+          country: String((channel && channel.region) || '').replace(/[^A-Za-z]/g, '').slice(0, 2).toUpperCase(),
+          startedAt: null,
+          accumulatedMs: 0,
+          createdAt: now,
+          lastLiveAt: now,
+          scanLive: true,
+          source: 'discover',
+          foundLiveAt: now,
+          viewers: Number((channel && channel.viewerCount) || 0) || 0,
+          liveTitle: String((channel && channel.displayName) || '')
+        });
+      });
+
+      if (fresh.length) {
+        Store.set({ streamers: fresh.concat(state.streamers) });
+        state = Store.get();
+        renderAll();
+      }
+
+      status.textContent = fresh.length
+        ? '+' + fresh.length + ' yeni canlı eklendi · ' + channels.length + ' kanal sorgulandı'
+        : channels.length
+          ? 'Yeni canlı yok · ' + channels.length + ' kanal sorgulandı, hepsi zaten listede'
+          : 'Liste boş döndü, biraz sonra tekrar dene';
+    } catch (error) {
+      status.textContent = 'Canlı yayınlar alınamadı: ' + error.message;
+    } finally {
+      button.disabled = false;
     }
   }
 
@@ -499,7 +568,8 @@
       var scannedOff = streamer.scanCheckedAt && !streamer.scanLive && !metrics.live;
       var missing = scannedOff && /not_found/i.test(streamer.scanReason || '');
       var liveChip = metrics.live
-        ? '<button class="chip chip-green" data-toggle-live="' + streamer.id + '" title="' + esc(streamer.liveTitle || '') + '">● Canlı' + (streamer.scanLive ? ' · tarama' : '') + '</button>'
+        ? '<button class="chip chip-green" data-toggle-live="' + streamer.id + '" title="' + esc(streamer.liveTitle || '') + '">● Canlı' +
+          (streamer.source === 'discover' ? ' · bulundu' : (streamer.scanLive ? ' · tarama' : '')) + '</button>'
         : missing
           ? '<span class="chip chip-danger" title="TikTok bu kullanıcı adını bulamadı; adresi düzelt">⚠ Hesap yok</span>'
           : scannedOff
@@ -1235,6 +1305,7 @@
     });
 
     $('addStreamer').addEventListener('click', addStreamer);
+    $('findLive').addEventListener('click', findLiveStreams);
     $('streamerName').addEventListener('keydown', function (event) { if (event.key === 'Enter') addStreamer(); });
 
     if ($('poolDownload')) $('poolDownload').addEventListener('click', downloadTargets);

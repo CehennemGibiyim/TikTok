@@ -401,6 +401,15 @@ function handleStreamMessage(username, raw) {
   }
 }
 
+// Yayın bitti sinyali: kayıt havuzda kalır, yayıncı tekrar canlıya geçtiğinde
+// bir sonraki turda kendiliğinden yeniden dinlenir.
+function markOffline(username) {
+  const record = state.streamers.get(username);
+  if (!record || !record.live) return;
+  record.live = false;
+  record.endedAt = Date.now();
+}
+
 async function closeWatcher(username, reason) {
   const watcher = state.rooms.get(username);
   if (!watcher) return;
@@ -503,10 +512,13 @@ async function pollTargets() {
       live: false
     };
 
+    const seenBefore = Boolean(record.checkedAt);
     record.checkedAt = Date.now();
     record.reason = status.live ? '' : (status.reason || '');
     if (status.live) {
       liveCount += 1;
+      // Daha önce taranmış ama yayında değilken yeniden canlıya geçen oda.
+      if (seenBefore && !record.live) log('yeniden canlı:', username);
       record.live = true;
       record.lastSeenLiveAt = Date.now();
       if (!target.lastSeenLiveAt) target.lastSeenLiveAt = Date.now();
