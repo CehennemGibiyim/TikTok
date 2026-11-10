@@ -167,7 +167,10 @@
     data.streamers.forEach(function (item) {
       var username = cleanUsername(item.username);
       if (!username) return;
-      var startIso = item.startTime ? new Date(Number(item.startTime) * 1000).toISOString() : null;
+      // Tarayıcı başlangıç saatini ms yazar; eski saniye kayıtları da doğru okunsun.
+      var rawStart = Number(item.startTime) || 0;
+      var startMs = rawStart > 0 && rawStart < 1e12 ? rawStart * 1000 : rawStart;
+      var startIso = startMs > 0 ? new Date(startMs).toISOString() : null;
       var existing = byName[username];
 
       if (existing) {
@@ -261,7 +264,7 @@
         streamerId: owner.id,
         username: owner.username,
         country: owner.country || '',
-        kind: item.kind === 'letter' ? 'letter' : 'chest',
+        kind: item.kind === 'letter' ? 'letter' : (item.kind === 'portal' ? 'portal' : 'chest'),
         coins: Number(item.coins) || 0,
         durationSec: 0,
         availableAt: Number(item.t) || Date.now(),

@@ -20,7 +20,6 @@
 const fs = require('fs');
 const path = require('path');
 const { execFileSync } = require('child_process');
-const { WebcastPushConnection } = require('tiktok-live-connector');
 
 const ROOT = path.resolve(__dirname, '..');
 const DATA_DIR = path.join(ROOT, 'site', 'firsat', 'data');
@@ -33,7 +32,7 @@ const UA = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 ' +
 // ---------- ayarlar ----------
 
 function readArg(name, fallback) {
-  const hit = process.argv.find((arg) => arg.startsWith('--' + name));
+  const hit = process.argv.find((arg) => arg === '--' + name || arg.startsWith('--' + name + '='));
   if (!hit) return fallback;
   const value = hit.split('=')[1];
   if (value === undefined) return true;
@@ -48,7 +47,13 @@ const CONFIG = {
   maxRooms: Number(readArg('max-rooms', 15)),
   concurrency: Number(readArg('concurrency', 4)),
   minCoins: Number(readArg('min-coins', 1)),
-  commitSec: Number(readArg('commit', 0))
+  commitSec: Number(readArg('commit', 0)),
+  discover: readArg('discover', 1) ? true : false,
+  discoverSec: Number(readArg('discover-sec', 300)),
+  maxPool: Number(readArg('max-pool', 600)),
+  watch: readArg('watch', readArg('once', 0) ? 0 : 1) ? true : false,
+  watchSec: Number(readArg('watch-sec', 300)),
+  watchRooms: Number(readArg('watch-rooms', 8))
 };
 
 const startedAtMs = Date.now();
@@ -65,8 +70,11 @@ const state = {
   events: [],
   seenEvents: new Set(),
   targets: [],
+  recent: [],
   lastFlush: 0,
   lastCommit: 0,
+  lastDiscover: 0,
+  discoveredTotal: 0,
   lastError: null,
   polls: 0
 };
@@ -104,13 +112,93 @@ function loadTargets() {
       seen.add(username);
       out.push({
         username,
-        country: (typeof item === 'object' && item && item.country) || ''
+        country: (typeof item === 'object' && item && item.country) || '',
+        source: (typeof item === 'object' && item && item.source) || 'manual',
+        addedAt: (typeof item === 'object' && item && Number(item.addedAt)) || 0,
+        lastSeenLiveAt: (typeof item === 'object' && item && Number(item.lastSeenLiveAt)) || 0
       });
     });
     return out;
   } catch (error) {
     log('havuz okunamadı:', error.message);
     return [];
+  }
+}
+
+function saveTargets() {
+  // Keşifle bulunanlar eklenir, kullanıcının kendi ekledikleri korunur.
+  const body = {
+    note: 'Taranacak adresler. Keşif kendi bulduklarını buraya ekler; elle eklenenler korunur.',
+    updatedAt: new Date().toISOString(),
+    targets: state.targets.map((target) => ({
+      username: target.username,
+      country: target.country || '',
+      source: target.source || 'manual',
+      addedAt: target.addedAt || 0,
+      lastSeenLiveAt: target.lastSeenLiveAt || 0
+    }))
+  };
+  fs.mkdirSync(DATA_DIR, { recursive: true });
+  fs.writeFileSync(TARGETS_FILE, JSON.stringify(body, null, 1) + '\n');
+}
+
+// ---------- 0) KEŞİF: canlı yayınları kendiliğinden bul ----------
+// Halka açık canlı kanal listesi; giriş/çerez istemez (5 dakikada 1 istek / IP).
+
+const DISCOVERY_URL = 'https://api.tik.tools/api/live/top-channels';
+
+async function discoverLive() {
+  if (!CONFIG.discover) return 0;
+  if (Date.now() - state.lastDiscover < CONFIG.discoverSec * 1000) return 0;
+  state.lastDiscover = Date.now();
+
+  try {
+    const response = await fetch(DISCOVERY_URL, {
+      headers: { 'User-Agent': UA, Accept: 'application/json' },
+      signal: AbortSignal.timeout(15000)
+    });
+    if (!response.ok) throw new Error('http ' + response.status);
+    const payload = await response.json();
+    const channels = (payload && payload.channels) || [];
+    const known = new Set(state.targets.map((target) => target.username));
+    const fresh = [];
+
+    channels.forEach((channel) => {
+      const username = cleanUsername(channel && channel.uniqueId);
+      if (!username || known.has(username)) return;
+      known.add(username);
+      fresh.push({
+        username,
+        country: String((channel && channel.region) || '').replace(/[^A-Za-z]/g, '').slice(0, 2).toUpperCase(),
+        source: 'discovery',
+        addedAt: Date.now(),
+        lastSeenLiveAt: 0
+      });
+    });
+
+    if (fresh.length) {
+      state.targets = fresh.concat(state.targets);
+      state.discoveredTotal += fresh.length;
+      // Havuz sınırı: en eski, canlı görülmemiş keşif kayıtları düşer; elle eklenenler kalır.
+      if (state.targets.length > CONFIG.maxPool) {
+        const overflow = state.targets.length - CONFIG.maxPool;
+        let dropped = 0;
+        state.targets = state.targets.filter((target) => {
+          if (dropped >= overflow) return true;
+          if (target.source !== 'discovery' || target.lastSeenLiveAt) return true;
+          dropped += 1;
+          return false;
+        });
+      }
+      saveTargets();
+    }
+
+    log('keşif: +' + fresh.length, 'yayıncı · havuz', state.targets.length);
+    return fresh.length;
+  } catch (error) {
+    state.lastError = 'keşif: ' + error.message;
+    log('keşif hatası:', error.message);
+    return 0;
   }
 }
 
@@ -129,9 +217,12 @@ async function fetchLiveStatus(uniqueId) {
     const room = payload && payload.data && payload.data.liveRoom;
     if (!room) return { live: false, reason: (payload && payload.message) || 'oda yok' };
     const live = Number(room.status) === 2;
+    // TikTok başlangıç saatini saniye olarak veriyor; ms'e çeviriyoruz.
+    const rawStart = Number(room.startTime) || 0;
+    const startTime = rawStart > 0 && rawStart < 1e12 ? rawStart * 1000 : rawStart;
     return {
       live,
-      startTime: Number(room.startTime) || 0,
+      startTime,
       title: room.title || '',
       viewers: (room.liveRoomStats && Number(room.liveRoomStats.enterCount)) || 0
     };
@@ -189,83 +280,178 @@ function recordEvent(username, data) {
   log('olay', username, data.kind, coins, 'jeton', data.giftName || '');
 }
 
-async function startWatching(username) {
-  if (state.rooms.has(username)) return;
-  if (state.rooms.size >= CONFIG.maxRooms) return;
+// ---------- 2) dinleme ----------
+// TikTok'un kendi olay akışı imza istiyor (403). Halka açık olay ağ geçidi
+// girişsiz çalışıyor ama tek soket + 10 dk oturum veriyor, bu yüzden odalar sırayla dinlenir.
 
-  const connection = new WebcastPushConnection(username, {
-    processInitialData: false,
-    fetchRoomInfoOnConnect: true,
-    enableExtendedGiftInfo: true,
-    requestOptions: { timeout: 15000 }
+const TIKTOOLS_KEY = process.env.TIKTOOLS_KEY || 'your_api_key';
+
+function wsFactory() {
+  if (typeof WebSocket === 'function') return WebSocket;
+  try {
+    return require('ws');
+  } catch (error) {
+    throw new Error('WebSocket yok: Node 22+ gerekli');
+  }
+}
+
+async function mintToken(username, seconds) {
+  // 1) birleşik uç: soket anahtarı + yayın adresleri (10 istek/dk).
+  try {
+    const response = await fetch('https://tik.tools/api/live/connect?uniqueId=' + encodeURIComponent(username), {
+      headers: { Accept: 'application/json' },
+      signal: AbortSignal.timeout(15000)
+    });
+    if (response.ok) {
+      const payload = await response.json();
+      if (payload && payload.token) return payload.token;
+    }
+  } catch (error) { /* ikinci yolu dene */ }
+
+  // 2) yedek: anahtarla token üret.
+  const response = await fetch('https://api.tik.tools/authentication/jwt?apiKey=' + encodeURIComponent(TIKTOOLS_KEY), {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ allowed_creators: [username], expire_after: seconds, max_websockets: 1 }),
+    signal: AbortSignal.timeout(15000)
   });
-  state.rooms.set(username, connection);
+  const payload = await response.json().catch(() => null);
+  const token = payload && payload.data && payload.data.token;
+  if (!token) throw new Error('token yok (' + response.status + ')');
+  return token;
+}
 
-  const stop = () => {
-    state.rooms.delete(username);
-    try { connection.disconnect(); } catch (error) { /* zaten kapalı */ }
-  };
+function kindFor(name, data) {
+  const text = String(name || '') + ' ' + String((data && data.giftType) || '');
+  if (/portal/i.test(text)) return 'portal';
+  if (/envelope|zarf|mektup|letter|red\s*packet/i.test(text)) return 'letter';
+  return 'chest';
+}
 
-  connection.on('gift', (message) => {
-    const gift = message && message.gift;
-    const count = Number(message && message.repeatCount) || 1;
-    const diamonds = Number(gift && (gift.diamond_count || gift.diamondCount)) || 0;
-    const name = (gift && (gift.name || gift.describe)) || (message && message.giftName) || 'Hediye';
+function handleStreamMessage(username, raw) {
+  let payload;
+  try { payload = JSON.parse(typeof raw === 'string' ? raw : String(raw)); } catch (error) { return; }
+  const event = payload.event || (payload.data && payload.data.type) || '';
+  const data = payload.data || {};
+
+  if (event === 'gift') {
+    const count = Number(data.repeatCount || data.repeat_count) || 1;
+    const diamonds = Number(data.diamondCount || data.diamond_count) || 0;
+    const name = data.giftName || (data.gift && data.gift.name) || 'Hediye';
     recordEvent(username, {
-      kind: 'chest',
+      kind: kindFor(name, data),
       coins: diamonds * count,
       giftName: name,
-      sender: (message && message.user && message.user.uniqueId) || ''
+      sender: (data.user && (data.user.uniqueId || data.user.nickname)) || ''
     });
-  });
+    return;
+  }
 
-  connection.on('envelope', (message) => {
-    const info = (message && message.envelopeInfo) || {};
+  if (/envelope|zarf|letter/i.test(event)) {
+    const info = data.envelopeInfo || data;
     recordEvent(username, {
       kind: 'letter',
       coins: Number(info.diamondCount || info.diamonds || info.coinCount) || 0,
       giftName: info.envelopeScene || 'Zarf',
       sender: ''
     });
-  });
+    return;
+  }
 
-  connection.on('streamEnd', () => {
+  if (event === 'roomInfo') {
+    const record = state.streamers.get(username);
+    if (record) {
+      if (data.title) record.title = data.title;
+      if (data.viewerCount) record.viewers = Number(data.viewerCount) || record.viewers;
+    }
+    return;
+  }
+
+  if (event === 'streamEnd') {
     log('yayın bitti', username);
     markOffline(username);
-    stop();
-  });
-
-  connection.on('disconnected', () => {
-    state.rooms.delete(username);
-  });
-
-  connection.on('error', (error) => {
-    state.lastError = username + ': ' + (error && error.message);
-  });
-
-  try {
-    const roomInfo = await connection.connect();
-    const record = state.streamers.get(username) || { username };
-    record.live = true;
-    record.startTime = Number(roomInfo && (roomInfo.startTime || roomInfo.createTime)) || record.startTime || 0;
-    record.title = (roomInfo && roomInfo.title) || record.title || '';
-    record.viewers = Number(roomInfo && roomInfo.stats && roomInfo.stats.totalUser) || record.viewers || 0;
-    record.country = (roomInfo && roomInfo.user && roomInfo.user.region) || record.country || '';
-    record.lastSeenLiveAt = Date.now();
-    state.streamers.set(username, record);
-    log('dinleniyor', username, '(' + (record.title || '').slice(0, 40) + ')');
-  } catch (error) {
-    log('bağlanamadı', username, error.message);
-    markOffline(username);
-    stop();
+    closeWatcher(username, 'yayın bitti');
   }
 }
 
-function markOffline(username) {
-  const record = state.streamers.get(username);
-  if (!record) return;
-  if (record.live) record.endedAt = Date.now();
-  record.live = false;
+async function closeWatcher(username, reason) {
+  const watcher = state.rooms.get(username);
+  if (!watcher) return;
+  state.rooms.delete(username);
+  if (watcher.timer) clearTimeout(watcher.timer);
+  try { watcher.socket.close(); } catch (error) { /* zaten kapalı */ }
+  log('dinleme bitti', username, reason || '');
+}
+
+async function stopAllWatchers(reason) {
+  await Promise.all(Array.from(state.rooms.keys()).map((username) => closeWatcher(username, reason)));
+}
+
+async function openWatcher(username) {
+  const token = await mintToken(username, Math.min(600, CONFIG.watchSec + 60));
+  const WS = wsFactory();
+  const socket = new WS('wss://api.tik.tools?uniqueId=' + encodeURIComponent(username) +
+    '&jwtKey=' + encodeURIComponent(token));
+
+  const watcher = { username, socket, startedAt: Date.now(), messages: 0, timer: null };
+  state.rooms.set(username, watcher);
+
+  const onMessage = (raw) => {
+    watcher.messages += 1;
+    const text = typeof raw === 'string' ? raw : (raw && raw.data) || raw;
+    handleStreamMessage(username, text);
+  };
+
+  if (typeof socket.addEventListener === 'function') {
+    socket.addEventListener('message', (event) => onMessage(event.data));
+    socket.addEventListener('close', () => { state.rooms.delete(username); });
+    socket.addEventListener('error', () => {
+      state.lastError = username + ': soket hatası';
+    });
+  } else {
+    socket.on('message', onMessage);
+    socket.on('close', () => { state.rooms.delete(username); });
+    socket.on('error', (error) => {
+      state.lastError = username + ': ' + ((error && error.message) || 'soket hatası');
+    });
+  }
+
+  watcher.timer = setTimeout(() => { closeWatcher(username, 'süre doldu'); }, CONFIG.watchSec * 1000);
+  log('dinleniyor', username);
+}
+
+// Canlı odalar sırayla değil, aynı anda birden çok soketle dinlenir.
+async function maintainWatchers() {
+  if (!CONFIG.watch) return;
+
+  const now = Date.now();
+  for (const [username, watcher] of Array.from(state.rooms.entries())) {
+    if (now - watcher.startedAt >= CONFIG.watchSec * 1000) await closeWatcher(username, 'süre doldu');
+  }
+
+  const live = Array.from(state.streamers.values())
+    .filter((record) => record.live)
+    .sort((a, b) => (Number(b.viewers) || 0) - (Number(a.viewers) || 0) ||
+      (Number(b.coins) || 0) - (Number(a.coins) || 0));
+
+  const target = Math.min(CONFIG.watchRooms, live.length);
+  let opened = 0;
+
+  while (state.rooms.size < target && opened < CONFIG.watchRooms) {
+    const fresh = live.find((record) => !state.rooms.has(record.username) && !state.recent.includes(record.username));
+    const pick = fresh || live.find((record) => !state.rooms.has(record.username));
+    if (!pick) break;
+    state.recent.push(pick.username);
+    if (state.recent.length > 120) state.recent.shift();
+    try {
+      await openWatcher(pick.username);
+      opened += 1;
+    } catch (error) {
+      state.lastError = 'dinleme: ' + pick.username + ' ' + error.message;
+      log('dinleme hatası', pick.username, error.message);
+      break;
+    }
+  }
 }
 
 // ---------- 3) tarama turu ----------
@@ -296,22 +482,18 @@ async function pollTargets() {
       liveCount += 1;
       record.live = true;
       record.lastSeenLiveAt = Date.now();
+      if (!target.lastSeenLiveAt) target.lastSeenLiveAt = Date.now();
       if (status.startTime) record.startTime = status.startTime;
       if (status.title) record.title = status.title;
       if (status.viewers) record.viewers = status.viewers;
       state.streamers.set(username, record);
-      if (!state.rooms.has(username)) startWatching(username);
     } else {
       if (record.live) {
         record.endedAt = Date.now();
         record.live = false;
       }
       state.streamers.set(username, record);
-      const connection = state.rooms.get(username);
-      if (connection) {
-        state.rooms.delete(username);
-        try { connection.disconnect(); } catch (error) { /* boş */ }
-      }
+      if (state.rooms.has(username)) closeWatcher(username, 'yayın bitti');
     }
   });
 
@@ -350,6 +532,8 @@ function snapshot() {
     scanner: {
       targetCount: state.targets.length,
       liveCount: streamers.filter((item) => item.live).length,
+      discovered: state.discoveredTotal,
+      poolSize: state.targets.length,
       watching: state.rooms.size,
       polls: state.polls,
       minutesLeft: CONFIG.minutes > 0 ? Math.max(0, Math.round((deadline - Date.now()) / 60000)) : null,
@@ -427,7 +611,9 @@ async function main() {
 
   do {
     try {
+      await discoverLive();
       await pollTargets();
+      await maintainWatchers();
     } catch (error) {
       state.lastError = error.message;
       log('tur hatası:', error.message);
@@ -438,9 +624,7 @@ async function main() {
     await sleep(CONFIG.pollSec * 1000);
   } while (Date.now() < deadline);
 
-  state.rooms.forEach((connection) => {
-    try { connection.disconnect(); } catch (error) { /* boş */ }
-  });
+  await stopAllWatchers('kapanış');
   state.rooms.clear();
   flush(true);
   commitData();
