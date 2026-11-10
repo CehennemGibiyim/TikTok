@@ -328,7 +328,9 @@ function kindFor(name, data) {
   const text = String(name || '') + ' ' + String((data && data.giftType) || '');
   if (/portal/i.test(text)) return 'portal';
   if (/envelope|zarf|mektup|letter|red\s*packet/i.test(text)) return 'letter';
-  if (/chest|sand[ıi]k|kutu|treasure|box/i.test(text)) return 'chest';
+  // "Treasure Clover", "Gift Box" gibi sıradan hediyeler sandık değildir;
+  // yalnızca adında gerçekten sandık/chest geçen olaylar sandık sayılır.
+  if (/chest|sand[ıi]k/i.test(text)) return 'chest';
   // Sandık/zarf/portal olmayan sıradan hediyeler hediye olarak yazılır.
   return 'gift';
 }

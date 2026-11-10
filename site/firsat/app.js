@@ -435,8 +435,12 @@
   }
 
   // ---------- Akıllı puanlama ----------
-  // Fırsatı aciliyet, jeton, jeton/kişi ve tazelik bileşenleriyle 0-100 arasında puanlar.
+  // Fırsatı aciliyet, jeton, paylaşım (kaç kişiye ulaştı), tür ve tazelik
+  // bileşenleriyle 0-100 arasında puanlar. Tür ağırlığı: sandık > portal > zarf > hediye.
   // Bilinmeyen alan uydurulmaz; o bileşen 0 sayılır.
+
+  var KIND_WEIGHT = { chest: 15, portal: 12, letter: 10, gift: 3 };
+  var KIND_ORDER = { chest: 0, portal: 1, letter: 2, gift: 3 };
 
   function remainingSeconds(event) {
     var now = Date.now();
@@ -454,26 +458,31 @@
     var shared = Number(event.shared) || 0;
     var total = Number(event.durationSec) || 0;
     var left = remainingSeconds(event);
-    var parts = { urgency: 0, coins: 0, yield: 0, freshness: 0 };
+    var parts = { urgency: 0, coins: 0, shared: 0, kind: 0, freshness: 0 };
 
     if (left !== null) {
       var ratio = total > 0 ? Math.min(1, left / total) : Math.min(1, left / 600);
-      parts.urgency = 40 * (1 - ratio);
+      parts.urgency = 30 * (1 - ratio);
     }
-    parts.coins = 30 * Math.min(1, coins / 1000);
-    parts.yield = 20 * Math.min(1, (coins / Math.max(1, shared)) / 100);
+    parts.coins = 25 * Math.min(1, coins / 1000);
+    // "En çok paylaşılan": jetonun kaç kişiye ulaştığı. Bilinmiyorsa puan verilmez.
+    parts.shared = 20 * Math.min(1, shared / 50);
+    parts.kind = KIND_WEIGHT[event.kind] || 0;
     var ageSec = Math.max(0, (Date.now() - (Number(event.createdAt) || Date.now())) / 1000);
     parts.freshness = 10 * (1 - Math.min(1, ageSec / 3600));
 
     var score = Math.max(0, Math.min(100, Math.round(
-      parts.urgency + parts.coins + parts.yield + parts.freshness
+      parts.urgency + parts.coins + parts.shared + parts.kind + parts.freshness
     )));
 
-    var best = Math.max(parts.urgency, parts.coins, parts.yield, parts.freshness);
+    var best = Math.max(parts.urgency, parts.coins, parts.shared, parts.kind, parts.freshness);
     var reason = 'dengeli';
     if (best === parts.urgency && parts.urgency > 0) reason = 'süre kritik';
-    else if (best === parts.yield && parts.yield > 0) reason = 'jeton/kişi yüksek';
     else if (best === parts.coins) reason = 'yüksek jeton';
+    else if (best === parts.shared) reason = 'çok kişiye paylaşıldı';
+    else if (best === parts.kind) {
+      reason = { chest: 'sandık öncelikli', portal: 'portal öncelikli', letter: 'zarf öncelikli', gift: 'hediye' }[event.kind] || 'dengeli';
+    }
     else if (best === parts.freshness) reason = 'yeni fırsat';
 
     return { score: score, reason: reason, left: left };
@@ -494,6 +503,12 @@
         var cb = Number(b.coins) || 0;
         if (cb !== ca) return cb - ca;
         return b.createdAt - a.createdAt;
+      }
+      if (oppSort === 'kind') {
+        var ka = KIND_ORDER[a.kind] === undefined ? 4 : KIND_ORDER[a.kind];
+        var kb = KIND_ORDER[b.kind] === undefined ? 4 : KIND_ORDER[b.kind];
+        if (ka !== kb) return ka - kb;
+        return (Number(b.coins) || 0) - (Number(a.coins) || 0);
       }
       if (oppSort === 'expiry') {
         var now = Date.now();
@@ -646,7 +661,7 @@
         '    <span class="flex items-center gap-1"><span class="kind-badge ' + meta.cls + '">' + meta.icon + ' ' + meta.label + '</span>' + (event.auto ? '<span class="kind-badge kind-live">CANLI</span>' : '') + '</span>',
         '    <span class="font-black text-amber-400">' + fmt(event.coins) + ' <span class="text-[10px] font-normal text-yellow-50/40">jeton</span></span>',
         '  </div>',
-        '  <div class="text-[10px] mb-1"><span class="chip !py-0 !text-[10px]" title="aciliyet + jeton + jeton/kişi + tazelik">Puan ' + scored.score + ' · ' + esc(scored.reason) + '</span></div>',
+        '  <div class="text-[10px] mb-1"><span class="chip !py-0 !text-[10px]" title="aciliyet + jeton + paylaşım + tür + tazelik">Puan ' + scored.score + ' · ' + esc(scored.reason) + '</span></div>',
         '  <a href="' + liveUrl(event.username) + '" target="_blank" rel="noopener" class="font-semibold text-yellow-100 hover:text-yellow-300 truncate block">@' + esc(event.username) + '</a>',
         '  <div class="text-[10px] text-yellow-50/40">' + (event.country ? flag(event.country) + ' ' + esc(countryName(event.country)) + ' · ' : '') + new Date(event.createdAt).toLocaleTimeString('tr-TR') + (shared > 1 ? ' · ' + shared + ' kişiye' : '') + (event.giftName ? ' · ' + esc(event.giftName) : '') + '</div>',
         '  <div class="text-[11px] mt-1 ' + (urgent ? 'text-red-300 font-bold' : 'text-yellow-50/60') + '" data-countdown="' + (event.kind === 'letter' ? event.expiresAt : event.availableAt) + '" data-kind="' + event.kind + '" data-duration="' + (Number(event.durationSec) || 0) + '">' + timeText + '</div>',
