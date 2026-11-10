@@ -56,12 +56,13 @@
       </div>
       <div class="flex flex-wrap items-center gap-2 mt-3 pt-3 border-t border-white/5">
         <button id="findLive" class="btn-primary"><i data-lucide="radar" class="w-4 h-4"></i> Canlı yayınları bul</button>
+        <button id="scanToggle" class="btn-ghost"><i data-lucide="pause" class="w-4 h-4"></i> Taramayı durdur</button>
         <span id="findStatus" class="text-[11px] text-yellow-300"></span>
         <span id="scanStatus" class="text-[11px] text-yellow-50/60 lg:ml-auto">Tarama verisi yok — arka plan tarayıcısı henüz çalışmadı.</span>
         <button id="poolDownload" class="chip" title="Havuzu GitHub'a yükle: site/firsat/data/targets.json">Tarama listesi indir</button>
         <button id="poolImport" class="chip">Havuzu içe al</button>
       </div>
-      <p class="hint mt-2">“Canlı yayınları bul” şu anda yayında olan adresleri kendisi arar ve listenin <b>üstüne ekler</b>; hiçbir kaydı silmez. Taranmış süre/jeton verisi gelene kadar durum “Canlı · bulundu” görünür.</p>
+      <p class="hint mt-2">“Canlı yayınları bul” başlayınca <b>durdurana kadar</b> 60 saniyede bir yayında olanları arar ve listenin üstüne ekler; hiçbir kaydı silmez. “Taramayı durdur” panelin yeni tarama verisi çekmesini ve canlı aramayı keser.</p>
     </div>
 
     <div class="card p-5">

@@ -303,6 +303,10 @@
   function renderScanStatus(error) {
     var el = $('scanStatus');
     if (!el) return;
+    if (scanPaused) {
+      el.innerHTML = '<span class="chip">⏸ Tarama durduruldu — başlatınca tazelenir</span>';
+      return;
+    }
     if (!scanInfo) {
       el.innerHTML = error
         ? 'Tarama verisi okunamadı (' + esc(error) + ').'
@@ -320,6 +324,7 @@
   }
 
   async function refreshScan() {
+    if (scanPaused) { renderScanStatus(); return; }
     try {
       var response = await fetch(scanUrl + '?t=' + Date.now(), { cache: 'no-store' });
       if (!response.ok) throw new Error('HTTP ' + response.status);
@@ -365,19 +370,33 @@
     }
   }
 
-  // ---------- Canlı yayınları bul (kendi başına keşif) ----------
-  // Arka plan taramasından ayrıdır: şu anda yayında olan adresleri sorar ve
-  // yalnızca yeni olanları listenin üstüne ekler. Hiçbir kaydı silmez.
+  // ---------- Canlı yayınları bul (sürekli keşif) ----------
+  // "Canlı yayınları bul" başlatıldığında durdurulana kadar 60 saniyede bir
+  // yayında olanları arar ve yalnızca yeni olanları listenin üstüne ekler.
+  // Hiçbir kaydı silmez.
+
+  var discoveryTimer = null;
+  var discoveryAdded = 0;
+  var discoveryRuns = 0;
+
+  function discoveryIcon(active) {
+    return active
+      ? '<i data-lucide="square" class="w-4 h-4"></i> Bulmayı durdur'
+      : '<i data-lucide="radar" class="w-4 h-4"></i> Canlı yayınları bul';
+  }
 
   async function findLiveStreams() {
-    var button = $('findLive');
     var status = $('findStatus');
-    if (button.disabled) return;
-    button.disabled = true;
-    status.textContent = 'Canlı yayınlar aranıyor…';
-
     try {
-      var response = await fetch(discoveryUrl + '?t=' + Date.now(), { cache: 'no-store' });
+      // Yanıt gelmezse sonsuza kadar beklemesin.
+      var controller = new AbortController();
+      var guard = setTimeout(function () { controller.abort(); }, 8000);
+      var response;
+      try {
+        response = await fetch(discoveryUrl + '?t=' + Date.now(), { cache: 'no-store', signal: controller.signal });
+      } finally {
+        clearTimeout(guard);
+      }
       if (!response.ok) throw new Error('HTTP ' + response.status);
       var data = await response.json();
       var channels = Array.isArray(data.channels) ? data.channels : [];
@@ -413,16 +432,71 @@
         renderAll();
       }
 
-      status.textContent = fresh.length
-        ? '+' + fresh.length + ' yeni canlı eklendi · ' + channels.length + ' kanal sorgulandı'
-        : channels.length
-          ? 'Yeni canlı yok · ' + channels.length + ' kanal sorgulandı, hepsi zaten listede'
-          : 'Liste boş döndü, biraz sonra tekrar dene';
+      discoveryAdded += fresh.length;
+      discoveryRuns += 1;
+      status.textContent = 'Aranıyor… +' + discoveryAdded + ' yeni · ' + discoveryRuns +
+        ' tur · son ' + new Date().toLocaleTimeString('tr-TR') +
+        ' · ' + channels.length + ' kanal';
     } catch (error) {
       status.textContent = 'Canlı yayınlar alınamadı: ' + error.message;
-    } finally {
-      button.disabled = false;
     }
+  }
+
+  function stopDiscovery(label) {
+    if (discoveryTimer) clearInterval(discoveryTimer);
+    discoveryTimer = null;
+    var button = $('findLive');
+    button.classList.remove('btn-danger');
+    button.classList.add('btn-primary');
+    button.innerHTML = discoveryIcon(false);
+    if (label !== false) $('findStatus').textContent = label || ('Durduruldu · toplam +' + discoveryAdded + ' yeni');
+    if (window.lucide) lucide.createIcons();
+  }
+
+  function startDiscovery() {
+    stopDiscovery(false);
+    discoveryAdded = 0;
+    discoveryRuns = 0;
+    var button = $('findLive');
+    button.classList.remove('btn-primary');
+    button.classList.add('btn-danger');
+    button.innerHTML = discoveryIcon(true);
+    $('findStatus').textContent = 'Canlı yayınlar aranıyor…';
+    if (window.lucide) lucide.createIcons();
+    findLiveStreams();
+    discoveryTimer = setInterval(findLiveStreams, 60000);
+  }
+
+  function toggleDiscovery() {
+    if (discoveryTimer) stopDiscovery();
+    else startDiscovery();
+  }
+
+  // ---------- Taramayı başlat / durdur ----------
+  // Durdurulduğunda panel yeni tarama verisi çekmez; başlatınca hemen tazeler.
+
+  var scanPaused = localStorage.getItem('tiktok-scan-paused') === '1';
+
+  function renderScanToggle() {
+    var button = $('scanToggle');
+    if (!button) return;
+    button.innerHTML = scanPaused
+      ? '<i data-lucide="play" class="w-4 h-4"></i> Taramayı başlat'
+      : '<i data-lucide="pause" class="w-4 h-4"></i> Taramayı durdur';
+    button.classList.toggle('btn-primary', scanPaused);
+    button.classList.toggle('btn-ghost', !scanPaused);
+    if (window.lucide) lucide.createIcons();
+  }
+
+  function toggleScan() {
+    scanPaused = !scanPaused;
+    localStorage.setItem('tiktok-scan-paused', scanPaused ? '1' : '0');
+    if (scanPaused) {
+      stopDiscovery('Tarama durduruldu · canlı arama da kapalı');
+    }
+    renderScanToggle();
+    renderScanStatus();
+    if (!scanPaused) refreshScan();
   }
 
   function isExpired(event) {
@@ -1349,7 +1423,9 @@
     });
 
     $('addStreamer').addEventListener('click', addStreamer);
-    $('findLive').addEventListener('click', findLiveStreams);
+    $('findLive').addEventListener('click', toggleDiscovery);
+    $('scanToggle').addEventListener('click', toggleScan);
+    renderScanToggle();
     $('streamerName').addEventListener('keydown', function (event) { if (event.key === 'Enter') addStreamer(); });
 
     if ($('poolDownload')) $('poolDownload').addEventListener('click', downloadTargets);
@@ -1493,7 +1569,7 @@
     pruneInactive();
     refreshScan();
     setInterval(tick, 1000);
-    setInterval(refreshScan, 30000);
+    setInterval(function () { if (!scanPaused) refreshScan(); }, 30000);
     setInterval(pruneInactive, 600000);
     // Sıralama zamanla değişir (kalan süre azalır): liste kendiliğinden tazelenir.
     setInterval(function () {
