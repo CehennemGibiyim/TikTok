@@ -28,8 +28,7 @@
   var KINDS = {
     chest: { label: 'SANDIK', icon: '📦', cls: 'kind-chest' },
     letter: { label: 'ZARF / MEKTUP', icon: '✉️', cls: 'kind-letter' },
-    portal: { label: 'PORTAL', icon: '🌀', cls: 'kind-portal' },
-    gift: { label: 'HEDİYE', icon: '🎁', cls: 'kind-gift' }
+    portal: { label: 'PORTAL', icon: '🌀', cls: 'kind-portal' }
   };
 
   var state = null;
@@ -266,6 +265,8 @@
 
     (data.events || []).forEach(function (item) {
       if (!item || !item.id || known[item.id]) return;
+      // Tarayıcı yalnızca sandık/portal/zarf yazar; hediye türü artık kabul edilmez.
+      if (item.kind && !['chest', 'portal', 'letter'].includes(item.kind)) return;
       var owner = byName[cleanUsername(item.username)];
       if (!owner) return;
       known[item.id] = true;
@@ -428,10 +429,30 @@
     return event.kind === 'letter' && event.expiresAt && event.expiresAt <= Date.now();
   }
 
+  // Fırsatlar yalnızca toplanabilir kazanç olaylarını gösterir:
+  // sandık, portal, zarf. Yayıncıya atılan sıradan hediyeler buraya girmez.
+  function isOpportunity(event) {
+    return event.kind === 'chest' || event.kind === 'portal' || event.kind === 'letter';
+  }
+
   function pendingEvents() {
     return state.events.filter(function (event) {
-      return event.status === 'pending' && !isExpired(event) && Number(event.coins) >= 1;
+      return isOpportunity(event) && event.status === 'pending' &&
+        !isExpired(event) && Number(event.coins) >= 1;
     });
+  }
+
+  // Eski sürümlerde Fırsatlar'a yayıncıya atılan hediyeler de yazılıyordu.
+  // Bir kez temizlenir; elle eklenen kayıtlara dokunulmaz.
+  function migrateEvents() {
+    var settings = Object.assign({}, state.settings || {});
+    if (Number(settings.eventsSchema) >= 2) return;
+    var kept = state.events.filter(function (event) {
+      return !event.auto && isOpportunity(event);
+    });
+    settings.eventsSchema = 2;
+    Store.set({ events: kept, settings: settings });
+    state = Store.get();
   }
 
   // ---------- Akıllı puanlama ----------
@@ -439,8 +460,8 @@
   // bileşenleriyle 0-100 arasında puanlar. Tür ağırlığı: sandık > portal > zarf > hediye.
   // Bilinmeyen alan uydurulmaz; o bileşen 0 sayılır.
 
-  var KIND_WEIGHT = { chest: 15, portal: 12, letter: 10, gift: 3 };
-  var KIND_ORDER = { chest: 0, portal: 1, letter: 2, gift: 3 };
+  var KIND_WEIGHT = { chest: 15, portal: 12, letter: 10 };
+  var KIND_ORDER = { chest: 0, portal: 1, letter: 2 };
 
   function remainingSeconds(event) {
     var now = Date.now();
@@ -481,7 +502,7 @@
     else if (best === parts.coins) reason = 'yüksek jeton';
     else if (best === parts.shared) reason = 'çok kişiye paylaşıldı';
     else if (best === parts.kind) {
-      reason = { chest: 'sandık öncelikli', portal: 'portal öncelikli', letter: 'zarf öncelikli', gift: 'hediye' }[event.kind] || 'dengeli';
+      reason = { chest: 'sandık öncelikli', portal: 'portal öncelikli', letter: 'zarf öncelikli' }[event.kind] || 'dengeli';
     }
     else if (best === parts.freshness) reason = 'yeni fırsat';
 
@@ -508,6 +529,13 @@
         var ka = KIND_ORDER[a.kind] === undefined ? 4 : KIND_ORDER[a.kind];
         var kb = KIND_ORDER[b.kind] === undefined ? 4 : KIND_ORDER[b.kind];
         if (ka !== kb) return ka - kb;
+        return (Number(b.coins) || 0) - (Number(a.coins) || 0);
+      }
+      // Sandık / portal / zarf sıralaması: seçilen tür önce, kendi içinde jetonca.
+      if (oppSort === 'chest' || oppSort === 'portal' || oppSort === 'letter') {
+        var fa = a.kind === oppSort ? 0 : 1;
+        var fb = b.kind === oppSort ? 0 : 1;
+        if (fa !== fb) return fa - fb;
         return (Number(b.coins) || 0) - (Number(a.coins) || 0);
       }
       if (oppSort === 'expiry') {
@@ -630,7 +658,7 @@
     var pending = sortEvents(pendingEvents());
 
     if (pending.length === 0) {
-      container.innerHTML = '<div class="empty-state md:col-span-2 xl:col-span-3">Bekleyen jeton yok. Yayında sandık veya zarf düştüğünde burada belirir.</div>';
+      container.innerHTML = '<div class="empty-state md:col-span-2 xl:col-span-3">Şu an toplanabilir sandık/portal/zarf yok. Tarama sürüyor; yayında sandık, portal veya zarf düştüğünde burada belirir.</div>';
       return;
     }
 
@@ -1452,6 +1480,8 @@
   async function boot() {
     await Store.ready();
     state = Store.get();
+
+    migrateEvents();
 
     Store.subscribe(function (next) { state = next; });
 

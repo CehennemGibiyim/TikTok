@@ -40,4 +40,4 @@ jobs:
           git config user.email "actions@users.noreply.github.com"
 
       - name: 🔍 Tara ve dinle
-        run: node scanner/index.js --minutes=185 --commit=600 --watch=1 --watch-rooms=8 --watch-sec=300 --discover-sec=300
+        run: node scanner/index.js --minutes=185 --commit=600 --watch=1 --watch-rooms=12 --watch-sec=300 --discover-sec=300

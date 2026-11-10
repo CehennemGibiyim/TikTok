@@ -98,12 +98,15 @@
       <div class="flex items-start justify-between gap-3 mb-4 flex-wrap">
         <div>
           <h2 class="section-title"><i data-lucide="gift" class="w-5 h-5 text-amber-400"></i> Fırsatlar <span id="opportunityCount" class="badge ml-2">0</span></h2>
-          <p class="hint mt-1">Yalnızca jeton paylaşan yayınlar. Sandık süresi dolsa da bekler; zarf/mektup süresi dolunca jeton yayıncıya döner ve düşer.</p>
+          <p class="hint mt-1">Yalnızca toplanabilir kazanç olayları: sandık, portal, zarf. Yayıncıya atılan sıradan hediyeler buraya yazılmaz. Sandık süresi dolsa da bekler; zarf/mektup süresi dolunca jeton yayıncıya döner ve düşer.</p>
         </div>
         <div class="flex items-center gap-3">
           <select id="oppSort" class="input !py-1.5 !text-xs w-auto">
             <option value="score" selected>Akıllı sıralama (acil + kârlı)</option>
-            <option value="kind">Tür: Sandık → Portal → Zarf → Hediye</option>
+            <option value="chest">📦 Sandık sıralaması</option>
+            <option value="portal">🌀 Portal sıralaması</option>
+            <option value="letter">✉️ Zarf sıralaması</option>
+            <option value="kind">Tür: Sandık → Portal → Zarf</option>
             <option value="coins">Jeton (çok → az)</option>
             <option value="expiry">Yaklaşan süre</option>
             <option value="new">Yeni eklenen</option>

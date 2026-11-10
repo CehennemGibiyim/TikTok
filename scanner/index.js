@@ -73,6 +73,7 @@ const state = {
   recent: [],
   combos: new Map(),
   seenMessages: new Set(),
+  envelopeStats: { seen: 0, withCoins: 0, actions: {}, boxTypes: {} },
   lastFlush: 0,
   lastCommit: 0,
   lastDiscover: 0,
@@ -324,15 +325,21 @@ async function mintToken(username, seconds) {
   return token;
 }
 
-function kindFor(name, data) {
-  const text = String(name || '') + ' ' + String((data && data.giftType) || '');
-  if (/portal/i.test(text)) return 'portal';
-  if (/envelope|zarf|mektup|letter|red\s*packet/i.test(text)) return 'letter';
-  // "Treasure Clover", "Gift Box" gibi sıradan hediyeler sandık değildir;
-  // yalnızca adında gerçekten sandık/chest geçen olaylar sandık sayılır.
-  if (/chest|sand[ıi]k/i.test(text)) return 'chest';
-  // Sandık/zarf/portal olmayan sıradan hediyeler hediye olarak yazılır.
-  return 'gift';
+// Toplanabilir kazanç olayları ülkeye göre farklı adlarla geliyor; aynı
+// hediyenin adı dil değiştiriyor. Bu yüzden yalnızca adı bu listeye uyan
+// olaylar yazılır, sıradan hediyeler hiç kaydedilmez.
+const KIND_WORDS = [
+  ['portal', /portal|port[áa]l|портал|بوابة|पोर्टल|c[ổo]ng\s*tr[ờo]i|portail/i],
+  ['letter', /zarf|envelope|mektup|letter|red\s*packet|hongbao|红包|sobre|sobre\s*rojo|\u7ea2\u5305/i],
+  ['chest', /sand[ıi]k|chest|cofre|ba[uú]l?|caixa|coffre|forziere|truhe|сундук|скриня|сандык|صندوق|h[ộo]p\s*qu[àa]|rương|宝箱|상자|kotak\s*harta|peti\s*harta|kahon|baul|संदूक|সিন্দুক|หีบ|පෙට්ටිය|သေတ္တာ/i]
+];
+
+function kindFor(name) {
+  const text = String(name || '');
+  for (const [kind, pattern] of KIND_WORDS) {
+    if (pattern.test(text)) return kind;
+  }
+  return null; // sıradan hediye: Fırsatlar'a yazılmaz
 }
 
 function handleStreamMessage(username, raw) {
@@ -366,8 +373,12 @@ function handleStreamMessage(username, raw) {
     if (!isEnd) return;
     state.combos.delete(groupId);
 
+    // Yalnızca sandık/portal/zarf yazılır; yayıncıya atılan sıradan hediyeler atlanır.
+    const kind = kindFor(name);
+    if (!kind) return;
+
     recordEvent(username, {
-      kind: kindFor(name, data),
+      kind: kind,
       coins: diamonds > 0 ? diamonds * combo.repeat : 0,
       diamonds: diamonds > 0 ? diamonds * combo.repeat : 0,
       giftName: name,
@@ -378,10 +389,21 @@ function handleStreamMessage(username, raw) {
 
   if (/envelope|zarf|letter/i.test(event)) {
     const info = data.envelopeInfo || data;
+    // Teşhis: hangi zarf/sandık kutuları hangi alanlarla geliyor (uydurma yok, sayım).
+    state.envelopeStats.seen += 1;
+    const act = String(info.action || 'yok');
+    const box = String(info.boxType || 'yok');
+    state.envelopeStats.actions[act] = (state.envelopeStats.actions[act] || 0) + 1;
+    state.envelopeStats.boxTypes[box] = (state.envelopeStats.boxTypes[box] || 0) + 1;
+    const coins = Number(info.coins || info.diamondCount || info.diamonds || info.coinCount) || 0;
+    const recipients = Number(info.recipientCount) || 0;
+    // İçi boş/kapalı zarf bildirimleri (action=hide, coins=null) fırsat değildir.
+    if (coins > 0 || recipients > 0) state.envelopeStats.withCoins += 1;
+    if (coins <= 0 && recipients <= 0) return;
     recordEvent(username, {
       kind: 'letter',
-      coins: Number(info.diamondCount || info.diamonds || info.coinCount) || 0,
-      giftName: info.envelopeScene || 'Zarf',
+      coins: coins,
+      giftName: info.boxType || info.envelopeScene || 'Zarf',
       sender: ''
     });
     return;
@@ -579,6 +601,7 @@ function snapshot() {
       polls: state.polls,
       minutesLeft: CONFIG.minutes > 0 ? Math.max(0, Math.round((deadline - Date.now()) / 60000)) : null,
       lastError: state.lastError,
+      envelopes: state.envelopeStats,
       version: 1
     },
     streamers,
