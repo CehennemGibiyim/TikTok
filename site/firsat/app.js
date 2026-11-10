@@ -446,11 +446,11 @@
   // Bir kez temizlenir; elle eklenen kayıtlara dokunulmaz.
   function migrateEvents() {
     var settings = Object.assign({}, state.settings || {});
-    if (Number(settings.eventsSchema) >= 2) return;
+    if (Number(settings.eventsSchema) >= 3) return;
     // Eski kurallarla yazılmış tarayıcı kayıtları (sıradan hediyeler) atılır;
     // elle girilen kayıtlara dokunulmaz.
     var kept = state.events.filter(function (event) { return !event.auto; });
-    settings.eventsSchema = 2;
+    settings.eventsSchema = 3;
     Store.set({ events: kept, settings: settings });
     state = Store.get();
   }
