@@ -514,7 +514,7 @@
         '    ' + liveNote,
         '  </td>',
         '  <td>' + liveChip + '</td>',
-        '  <td class="font-mono text-xs" data-streamer-timer="' + streamer.id + '">' + clock(streamerDuration(streamer)) + '</td>',
+        '  <td class="font-mono text-xs" data-streamer-timer="' + streamer.id + '">' + (streamer.scanLive && !streamer.startedAt ? '—' : clock(streamerDuration(streamer))) + '</td>',
         '  <td class="text-amber-300">' + metrics.chest + '</td>',
         '  <td class="text-pink-300">' + metrics.letter + '</td>',
         '  <td class="text-purple-300">' + metrics.portal + '</td>',
@@ -1156,7 +1156,10 @@
   function tick() {
     state.streamers.forEach(function (streamer) {
       var element = document.querySelector('[data-streamer-timer="' + streamer.id + '"]');
-      if (element) element.textContent = clock(streamerDuration(streamer));
+      if (!element) return;
+      // Başlangıç saati TikTok'tan gelmediyse süre uydurulmaz.
+      if (streamer.scanLive && !streamer.startedAt) { element.textContent = '—'; return; }
+      element.textContent = clock(streamerDuration(streamer));
     });
 
     document.querySelectorAll('[data-countdown]').forEach(function (element) {
