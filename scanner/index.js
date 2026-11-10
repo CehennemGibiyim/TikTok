@@ -74,6 +74,7 @@ const state = {
   combos: new Map(),
   seenMessages: new Set(),
   envelopeStats: { seen: 0, withCoins: 0, actions: {}, boxTypes: {} },
+  envelopeSamples: [],
   lastFlush: 0,
   lastCommit: 0,
   lastDiscover: 0,
@@ -269,6 +270,10 @@ function recordEvent(username, data) {
     diamonds: Math.max(0, Math.round(Number(data.diamonds) || 0)),
     giftName: data.giftName || '',
     sender: data.sender || '',
+    // Zarf/sandıkta gerçek kişi sayısı ve açılışa kalan süre varsa yazılır.
+    shared: Math.max(0, Math.round(Number(data.shared) || 0)),
+    durationSec: Math.max(0, Math.round(Number(data.durationSec) || 0)),
+    availableAt: Date.now() + Math.max(0, Math.round(Number(data.durationSec) || 0)) * 1000,
     source: 'scan'
   };
   state.events.unshift(event);
@@ -387,24 +392,52 @@ function handleStreamMessage(username, raw) {
     return;
   }
 
-  if (/envelope|zarf|letter/i.test(event)) {
+  // Zarf / sandık (treasure box) ve portal aynı aileden gelir:
+  //   envelope        → zarf veya sandık (koin dağıtımı)
+  //   envelopePortal  → odalar arası portal zinciri
+  // Gerçek kutu: diamondCount (jeton), peopleCount (kişi), secondsUntilOpen (geri sayım).
+  if (/envelope|zarf|letter|portal/i.test(event)) {
     const info = data.envelopeInfo || data;
-    // Teşhis: hangi zarf/sandık kutuları hangi alanlarla geliyor (uydurma yok, sayım).
+    const box = info.treasureBoxData || data.treasureBoxData || {};
+
     state.envelopeStats.seen += 1;
     const act = String(info.action || 'yok');
-    const box = String(info.boxType || 'yok');
+    const boxType = String(info.boxType || 'yok');
     state.envelopeStats.actions[act] = (state.envelopeStats.actions[act] || 0) + 1;
-    state.envelopeStats.boxTypes[box] = (state.envelopeStats.boxTypes[box] || 0) + 1;
-    const coins = Number(info.coins || info.diamondCount || info.diamonds || info.coinCount) || 0;
-    const recipients = Number(info.recipientCount) || 0;
-    // İçi boş/kapalı zarf bildirimleri (action=hide, coins=null) fırsat değildir.
-    if (coins > 0 || recipients > 0) state.envelopeStats.withCoins += 1;
-    if (coins <= 0 && recipients <= 0) return;
-    recordEvent(username, {
-      kind: 'letter',
+    state.envelopeStats.boxTypes[boxType] = (state.envelopeStats.boxTypes[boxType] || 0) + 1;
+
+    const coins = Number(info.diamondCount || info.coins || box.coins) || 0;
+    const people = Number(info.peopleCount || info.recipientCount || box.canOpen) || 0;
+    const openIn = Number(info.secondsUntilOpen) || 0;
+    if (coins > 0 || people > 0) state.envelopeStats.withCoins += 1;
+
+    // Teşhis için ham örnek (en fazla 5), böylece gerçek kutu alanları görülür.
+    state.envelopeSamples.push({
+      t: Date.now(),
+      user: username,
+      event: event,
+      action: act,
+      boxType: boxType,
+      businessType: info.businessType || 0,
       coins: coins,
-      giftName: info.boxType || info.envelopeScene || 'Zarf',
-      sender: ''
+      people: people,
+      secondsUntilOpen: openIn
+    });
+    if (state.envelopeSamples.length > 5) state.envelopeSamples.shift();
+
+    // İçi boş "hide" bildirimi fırsat değildir; uydurma kayıt yazılmaz.
+    if (coins <= 0 && people <= 0) return;
+
+    const portalish = /portal/i.test(event) ||
+      /portal/i.test(String(info.envelopeScene || info.textKey || boxType));
+
+    recordEvent(username, {
+      kind: portalish ? 'portal' : 'letter',
+      coins: coins,
+      shared: people,
+      durationSec: openIn,
+      giftName: boxType !== 'yok' ? boxType : (portalish ? 'Portal' : 'Zarf'),
+      sender: info.sendUserName || ''
     });
     return;
   }
@@ -602,6 +635,7 @@ function snapshot() {
       minutesLeft: CONFIG.minutes > 0 ? Math.max(0, Math.round((deadline - Date.now()) / 60000)) : null,
       lastError: state.lastError,
       envelopes: state.envelopeStats,
+      envelopeSamples: state.envelopeSamples,
       version: 1
     },
     streamers,
@@ -693,6 +727,27 @@ async function main() {
   flush(true);
   commitData();
   log('bitti');
+}
+
+// Kendi kendini sınama: ayrıştırıcının hangi paketleri yazıp hangilerini
+// atladığını gerçek alan adlarıyla gösterir. Ağa çıkmaz.
+if (process.env.SCANNER_SELFTEST === '1') {
+  const frames = [
+    ['sıradan hediye (Rose)', { event: 'gift', data: { giftName: 'Rose', giftId: 5655, diamondCount: 1, repeatCount: 1, repeatEnd: true, msgId: 'a1' } }],
+    ['sandık hediyesi', { event: 'gift', data: { giftName: 'Sandık', giftId: 9001, diamondCount: 500, repeatCount: 1, repeatEnd: true, msgId: 'a2' } }],
+    ['gerçek zarf/sandık kutusu', { event: 'envelope', data: { envelopeInfo: { envelopeId: 'e1', action: 'show', boxType: 'treasure_box', diamondCount: 100, peopleCount: 25, secondsUntilOpen: 30 } } }],
+    ['portal zinciri', { event: 'envelopePortal', data: { envelopeInfo: { envelopeId: 'e2', boxType: 'portal', diamondCount: 200, peopleCount: 50, secondsUntilOpen: 15 } } }],
+    ['boş zarf bildirimi', { event: 'envelope', data: { envelopeInfo: { envelopeId: 'e3', action: 'hide', boxType: 'spark_box', coins: null, recipientCount: null } } }]
+  ];
+  frames.forEach(([label, frame]) => {
+    const before = state.events.length;
+    handleStreamMessage('test_user', JSON.stringify(frame));
+    const added = state.events.length > before ? state.events[0] : null;
+    console.log(added
+      ? `YAZDI  ${label} → ${added.kind} ${added.coins} jeton · ${added.shared} kişi · ${added.durationSec} sn`
+      : `ATLADI ${label}`);
+  });
+  process.exit(0);
 }
 
 main().catch((error) => {

@@ -279,10 +279,10 @@
           : (item.kind === 'portal' ? 'portal'
           : (item.kind === 'gift' ? 'gift' : 'chest')),
         coins: Number(item.coins) || 0,
-        durationSec: 0,
-        availableAt: Number(item.t) || Date.now(),
+        durationSec: Number(item.durationSec) || 0,
+        availableAt: Number(item.availableAt) || Number(item.t) || Date.now(),
         expiresAt: 0,
-        shared: 0,
+        shared: Number(item.shared) || 0,
         status: 'pending',
         createdAt: Number(item.t) || Date.now(),
         scanId: item.id,
@@ -465,8 +465,8 @@
 
   function remainingSeconds(event) {
     var now = Date.now();
-    if (event.kind === 'letter') {
-      return Number(event.expiresAt) > 0 ? Math.max(0, (Number(event.expiresAt) - now) / 1000) : null;
+    if (event.kind === 'letter' && Number(event.expiresAt) > 0) {
+      return Math.max(0, (Number(event.expiresAt) - now) / 1000);
     }
     if (Number(event.durationSec) > 0 && Number(event.availableAt) > 0) {
       return Math.max(0, (Number(event.availableAt) - now) / 1000);
@@ -672,11 +672,12 @@
         var remaining = Math.max(0, Math.round((Number(event.expiresAt) - Date.now()) / 1000));
         urgent = remaining <= 60;
         timeText = 'jeton geri dönüyor: ' + clock(remaining);
-      } else if (event.kind === 'letter') {
-        timeText = event.auto ? 'tarayıcı yakaladı · jeton dağıtıldı' : 'hemen açıldı · kaybolmaz';
       } else if (Number(event.durationSec) > 0) {
         var toOpen = Math.max(0, Math.round(((event.availableAt || Date.now()) - Date.now()) / 1000));
+        urgent = toOpen > 0 && toOpen <= 60;
         timeText = toOpen > 0 ? 'açılışa ' + clock(toOpen) : 'açıldı · süre doldu, kaybolmaz';
+      } else if (event.kind === 'letter') {
+        timeText = event.auto ? 'tarayıcı yakaladı · jeton dağıtıldı' : 'hemen açıldı · kaybolmaz';
       } else {
         timeText = 'hemen açıldı · kaybolmaz';
       }
