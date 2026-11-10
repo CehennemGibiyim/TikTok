@@ -518,12 +518,14 @@ function handleEnvelope(username, eventName, data) {
   // İçi boş bildirim fırsat değildir.
   if (coins <= 0 && people <= 0) return;
 
+  const kind = envelopeKind(eventName, info);
   recordEvent(username, {
-    kind: envelopeKind(eventName, info),
+    kind,
     coins,
     shared: people,
     durationSec: openIn,
-    giftName: boxType !== 'yok' ? boxType : 'Zarf',
+    giftName: boxType !== 'yok' ? boxType
+      : ({ chest: 'Sandık', portal: 'Portal', letter: 'Zarf' }[kind] || 'Kutu'),
     sender: info.sendUserName || ''
   });
 }
