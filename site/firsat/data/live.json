@@ -1,18 +1,18 @@
 {
- "scannedAt": "2026-11-11T14:48:40.112Z",
+ "scannedAt": "2026-11-11T14:55:10.964Z",
  "scanner": {
-  "targetCount": 209,
-  "liveCount": 123,
-  "discovered": 137,
-  "poolSize": 209,
+  "targetCount": 218,
+  "liveCount": 132,
+  "discovered": 146,
+  "poolSize": 218,
   "watching": 1,
-  "budget": 15,
-  "freshLive": 95,
+  "budget": 10,
+  "freshLive": 102,
   "probes": 1,
-  "probeRatio": 0.45,
+  "probeRatio": 0.5,
   "probeStats": {
-   "sessions": 38,
-   "withBox": 10
+   "sessions": 40,
+   "withBox": 11
   },
   "probeHistory": [
    {
@@ -50,47 +50,35 @@
     "hotRate": null,
     "sessions": 8,
     "boxSessions": 1
+   },
+   {
+    "at": 1794408897949,
+    "from": 45,
+    "to": 50,
+    "probeRate": 63,
+    "hotRate": null,
+    "sessions": 8,
+    "boxSessions": 5
    }
   ],
   "connectFailures": 0,
-  "polls": 48,
-  "minutesLeft": 151,
-  "lastError": "dinleme: mimaaa_96 Failed to retrieve Room ID from all sources.",
+  "polls": 52,
+  "minutesLeft": 144,
+  "lastError": "dinleme: dbl.176 Failed to retrieve Room ID from all sources.",
   "envelopes": {
-   "seen": 17,
-   "withCoins": 10,
+   "seen": 19,
+   "withCoins": 12,
    "actions": {
     "yok": 16,
-    "new": 1
+    "new": 3
    },
    "boxTypes": {
     "yok": 16,
-    "spark_box": 1
+    "spark_box": 2,
+    "coins": 1
    }
   },
   "envelopeSamples": [
-   {
-    "t": 1794407961654,
-    "user": "danielitaalinda",
-    "event": "envelope",
-    "action": "yok",
-    "boxType": "yok",
-    "businessType": 20,
-    "coins": 140,
-    "people": 84,
-    "secondsUntilOpen": 0
-   },
-   {
-    "t": 1794408052316,
-    "user": "danielitaalinda",
-    "event": "envelope",
-    "action": "yok",
-    "boxType": "yok",
-    "businessType": 20,
-    "coins": 0,
-    "people": 0,
-    "secondsUntilOpen": 0
-   },
    {
     "t": 1794408095761,
     "user": "lifeisadance_official",
@@ -123,6 +111,28 @@
     "coins": 28,
     "people": 20,
     "secondsUntilOpen": 29
+   },
+   {
+    "t": 1794408538406,
+    "user": "mimaaa_96",
+    "event": "envelope",
+    "action": "new",
+    "boxType": "coins",
+    "businessType": 1,
+    "coins": 50,
+    "people": 30,
+    "secondsUntilOpen": 179
+   },
+   {
+    "t": 1794408664392,
+    "user": "mimaaa_96",
+    "event": "envelope",
+    "action": "new",
+    "boxType": "spark_box",
+    "businessType": 20,
+    "coins": 200,
+    "people": 127,
+    "secondsUntilOpen": 29
    }
   ],
   "version": 1
@@ -141,7 +151,7 @@
    "lastGiftName": "Sandık",
    "lastSeenLiveAt": 1794408035361,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794408517717,
+   "checkedAt": 1794408909382,
    "roomId": "7706903798077229831",
    "boxes": 1,
    "lastBoxAt": 1794405716865
@@ -159,10 +169,28 @@
    "lastGiftName": "Sandık",
    "lastSeenLiveAt": 1794408035361,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794408517717,
+   "checkedAt": 1794408909382,
    "roomId": "7706903940033743648",
    "boxes": 1,
    "lastBoxAt": 1794408095761
+  },
+  {
+   "username": "mimaaa_96",
+   "country": "BG",
+   "live": true,
+   "startTime": 1794402084000,
+   "title": "",
+   "viewers": 3707,
+   "coins": 250,
+   "gifts": 2,
+   "lastGiftAt": 1794408664392,
+   "lastGiftName": "Sandık",
+   "lastSeenLiveAt": 1794408035361,
+   "reason": "boş yanıt (doğrulanamadı)",
+   "checkedAt": 1794408909382,
+   "roomId": "",
+   "boxes": 2,
+   "lastBoxAt": 1794408664392
   },
   {
    "username": "danielitaalinda",
@@ -177,7 +205,7 @@
    "lastGiftName": "Sandık",
    "lastSeenLiveAt": 1794408035361,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794408517717,
+   "checkedAt": 1794408909382,
    "roomId": "7706880352686050066",
    "boxes": 1,
    "lastBoxAt": 1794407961654
@@ -195,7 +223,7 @@
    "lastGiftName": "Sandık",
    "lastSeenLiveAt": 1794408035361,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794408517717,
+   "checkedAt": 1794408909382,
    "roomId": "7706879299399322374",
    "boxes": 1,
    "lastBoxAt": 1794405141316
@@ -213,7 +241,7 @@
    "lastGiftName": "Sandık",
    "lastSeenLiveAt": 1794408035361,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794408517717,
+   "checkedAt": 1794408909382,
    "roomId": "7706896331721296662",
    "boxes": 1,
    "lastBoxAt": 1794408378309
@@ -231,7 +259,7 @@
    "lastGiftName": "Zarf",
    "lastSeenLiveAt": 1794408035361,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794408517717,
+   "checkedAt": 1794408909382,
    "roomId": "7706892702842899252",
    "boxes": 1,
    "lastBoxAt": 1794405867405
@@ -249,7 +277,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 1794408035361,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794408517717,
+   "checkedAt": 1794408909382,
    "roomId": "7706850722570193665",
    "boxes": 0,
    "lastBoxAt": 0
@@ -267,7 +295,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 1794408035361,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794408517717,
+   "checkedAt": 1794408909382,
    "roomId": "7706902234696076053",
    "boxes": 0,
    "lastBoxAt": 0
@@ -285,7 +313,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 1794408035361,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794408517717,
+   "checkedAt": 1794408909382,
    "roomId": "7706919137469139734",
    "boxes": 0,
    "lastBoxAt": 0
@@ -301,9 +329,9 @@
    "gifts": 0,
    "lastGiftAt": 0,
    "lastGiftName": "",
-   "lastSeenLiveAt": 1794408035361,
+   "lastSeenLiveAt": 1794408808095,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794408517717,
+   "checkedAt": 1794408909382,
    "roomId": "7706863226142722823",
    "boxes": 0,
    "lastBoxAt": 0
@@ -321,26 +349,8 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 1794408225843,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794408517717,
+   "checkedAt": 1794408909382,
    "roomId": "7706894614125202198",
-   "boxes": 0,
-   "lastBoxAt": 0
-  },
-  {
-   "username": "mimaaa_96",
-   "country": "BG",
-   "live": true,
-   "startTime": 1794402084000,
-   "title": "",
-   "viewers": 3707,
-   "coins": 0,
-   "gifts": 0,
-   "lastGiftAt": 0,
-   "lastGiftName": "",
-   "lastSeenLiveAt": 1794408035361,
-   "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794408517717,
-   "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
   },
@@ -357,7 +367,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 1794408035361,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794408517717,
+   "checkedAt": 1794408909382,
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -375,7 +385,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 1794408035361,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794408517717,
+   "checkedAt": 1794408909382,
    "roomId": "7706898103131015956",
    "boxes": 0,
    "lastBoxAt": 0
@@ -393,7 +403,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 1794408035361,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794408517717,
+   "checkedAt": 1794408909382,
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -411,7 +421,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 1794408035361,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794408517717,
+   "checkedAt": 1794408909382,
    "roomId": "7706899004874033938",
    "boxes": 0,
    "lastBoxAt": 0
@@ -429,7 +439,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 1794408035361,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794408517717,
+   "checkedAt": 1794408909382,
    "roomId": "7706898854674828054",
    "boxes": 0,
    "lastBoxAt": 0
@@ -447,7 +457,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 1794408035361,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794408517717,
+   "checkedAt": 1794408909382,
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -465,7 +475,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 1794408035361,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794408517717,
+   "checkedAt": 1794408909382,
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -481,9 +491,9 @@
    "gifts": 0,
    "lastGiftAt": 0,
    "lastGiftName": "",
-   "lastSeenLiveAt": 1794408416790,
+   "lastSeenLiveAt": 1794408611908,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794408517717,
+   "checkedAt": 1794408909382,
    "roomId": "7706899080261208865",
    "boxes": 0,
    "lastBoxAt": 0
@@ -501,7 +511,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 1794408035361,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794408517717,
+   "checkedAt": 1794408909382,
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -519,7 +529,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 1794408035361,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794408517717,
+   "checkedAt": 1794408909382,
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -537,7 +547,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 1794408035361,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794408517717,
+   "checkedAt": 1794408909382,
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -555,7 +565,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 1794408035361,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794408517717,
+   "checkedAt": 1794408909382,
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -573,7 +583,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 1794408035361,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794408517717,
+   "checkedAt": 1794408909382,
    "roomId": "7706915473903864594",
    "boxes": 0,
    "lastBoxAt": 0
@@ -591,7 +601,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 1794408035361,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794408517717,
+   "checkedAt": 1794408909382,
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -609,7 +619,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 1794408035361,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794408517717,
+   "checkedAt": 1794408909382,
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -627,7 +637,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 1794408035361,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794408517717,
+   "checkedAt": 1794408909382,
    "roomId": "7706906406057675521",
    "boxes": 0,
    "lastBoxAt": 0
@@ -645,7 +655,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 1794408035361,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794408517717,
+   "checkedAt": 1794408909382,
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -663,7 +673,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 1794408035361,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794408517717,
+   "checkedAt": 1794408909382,
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -681,7 +691,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 1794408035361,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794408517717,
+   "checkedAt": 1794408909382,
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -699,7 +709,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 1794408035361,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794408517717,
+   "checkedAt": 1794408909382,
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -717,7 +727,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 1794408035361,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794408517717,
+   "checkedAt": 1794408909382,
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -735,7 +745,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 1794408035361,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794408517717,
+   "checkedAt": 1794408909382,
    "roomId": "7706845464868096789",
    "boxes": 0,
    "lastBoxAt": 0
@@ -753,7 +763,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 1794408035361,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794408517717,
+   "checkedAt": 1794408909382,
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -771,7 +781,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 1794408035361,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794408517717,
+   "checkedAt": 1794408909382,
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -789,7 +799,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 1794408035361,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794408517717,
+   "checkedAt": 1794408909382,
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -807,7 +817,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 1794408035361,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794408517717,
+   "checkedAt": 1794408909382,
    "roomId": "7706899200595741492",
    "boxes": 0,
    "lastBoxAt": 0
@@ -825,7 +835,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 1794408035361,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794408517717,
+   "checkedAt": 1794408909382,
    "roomId": "7706898770223385366",
    "boxes": 0,
    "lastBoxAt": 0
@@ -843,7 +853,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 1794408035361,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794408517717,
+   "checkedAt": 1794408909382,
    "roomId": "7706900531751144206",
    "boxes": 0,
    "lastBoxAt": 0
@@ -861,7 +871,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 1794408035361,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794408517717,
+   "checkedAt": 1794408909382,
    "roomId": "7706900811662854932",
    "boxes": 0,
    "lastBoxAt": 0
@@ -877,9 +887,9 @@
    "gifts": 0,
    "lastGiftAt": 0,
    "lastGiftName": "",
-   "lastSeenLiveAt": 1794408035361,
+   "lastSeenLiveAt": 1794408808095,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794408517717,
+   "checkedAt": 1794408909382,
    "roomId": "7706887799916808980",
    "boxes": 0,
    "lastBoxAt": 0
@@ -895,9 +905,9 @@
    "gifts": 0,
    "lastGiftAt": 0,
    "lastGiftName": "",
-   "lastSeenLiveAt": 1794408035361,
+   "lastSeenLiveAt": 1794408808095,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794408517717,
+   "checkedAt": 1794408909382,
    "roomId": "7706901210444253970",
    "boxes": 0,
    "lastBoxAt": 0
@@ -915,7 +925,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 1794408035361,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794408517717,
+   "checkedAt": 1794408909382,
    "roomId": "7706814707633539862",
    "boxes": 0,
    "lastBoxAt": 0
@@ -933,7 +943,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 1794408035361,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794408517717,
+   "checkedAt": 1794408909382,
    "roomId": "7706900967182256918",
    "boxes": 0,
    "lastBoxAt": 0
@@ -951,7 +961,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 1794408035361,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794408517717,
+   "checkedAt": 1794408909382,
    "roomId": "7706905696510249748",
    "boxes": 0,
    "lastBoxAt": 0
@@ -969,7 +979,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 1794408035361,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794408517717,
+   "checkedAt": 1794408909382,
    "roomId": "7706814365743909654",
    "boxes": 0,
    "lastBoxAt": 0
@@ -987,7 +997,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 1794408035361,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794408517717,
+   "checkedAt": 1794408909382,
    "roomId": "7706905866591718152",
    "boxes": 0,
    "lastBoxAt": 0
@@ -1005,7 +1015,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 1794408035361,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794408517717,
+   "checkedAt": 1794408909382,
    "roomId": "7706892243161254708",
    "boxes": 0,
    "lastBoxAt": 0
@@ -1023,7 +1033,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 1794408035361,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794408517717,
+   "checkedAt": 1794408909382,
    "roomId": "7706890885350329095",
    "boxes": 0,
    "lastBoxAt": 0
@@ -1041,7 +1051,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 1794408035361,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794408517717,
+   "checkedAt": 1794408909382,
    "roomId": "7706876787927747348",
    "boxes": 0,
    "lastBoxAt": 0
@@ -1059,7 +1069,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 1794408035361,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794408517717,
+   "checkedAt": 1794408909382,
    "roomId": "7706901027055733525",
    "boxes": 0,
    "lastBoxAt": 0
@@ -1077,7 +1087,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 1794408035361,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794408517717,
+   "checkedAt": 1794408909382,
    "roomId": "7706898500105669382",
    "boxes": 0,
    "lastBoxAt": 0
@@ -1095,7 +1105,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 1794408035361,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794408517717,
+   "checkedAt": 1794408909382,
    "roomId": "7706867444389071636",
    "boxes": 0,
    "lastBoxAt": 0
@@ -1113,7 +1123,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 1794408035361,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794408517717,
+   "checkedAt": 1794408909382,
    "roomId": "7706853806084000519",
    "boxes": 0,
    "lastBoxAt": 0
@@ -1131,7 +1141,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 1794408035361,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794408517717,
+   "checkedAt": 1794408909382,
    "roomId": "7706900515050851093",
    "boxes": 0,
    "lastBoxAt": 0
@@ -1149,7 +1159,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 1794408035361,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794408517717,
+   "checkedAt": 1794408909382,
    "roomId": "7706883851498294036",
    "boxes": 0,
    "lastBoxAt": 0
@@ -1167,7 +1177,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 1794408035361,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794408517717,
+   "checkedAt": 1794408909382,
    "roomId": "7706884017778641684",
    "boxes": 0,
    "lastBoxAt": 0
@@ -1185,7 +1195,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 1794408026489,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794408517717,
+   "checkedAt": 1794408909382,
    "roomId": "7706904805733600022",
    "boxes": 0,
    "lastBoxAt": 0
@@ -1201,9 +1211,9 @@
    "gifts": 0,
    "lastGiftAt": 0,
    "lastGiftName": "",
-   "lastSeenLiveAt": 1794408035361,
+   "lastSeenLiveAt": 1794408611908,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794408517717,
+   "checkedAt": 1794408909382,
    "roomId": "7706884342974335762",
    "boxes": 0,
    "lastBoxAt": 0
@@ -1221,7 +1231,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 1794408035361,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794408517717,
+   "checkedAt": 1794408909382,
    "roomId": "7706888593234496262",
    "boxes": 0,
    "lastBoxAt": 0
@@ -1239,7 +1249,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 1794408035361,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794408517717,
+   "checkedAt": 1794408909382,
    "roomId": "7706881743055293192",
    "boxes": 0,
    "lastBoxAt": 0
@@ -1257,7 +1267,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 1794408035361,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794408517717,
+   "checkedAt": 1794408909382,
    "roomId": "7706892983009954580",
    "boxes": 0,
    "lastBoxAt": 0
@@ -1275,7 +1285,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 1794408035361,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794408517717,
+   "checkedAt": 1794408909382,
    "roomId": "7706898437937466144",
    "boxes": 0,
    "lastBoxAt": 0
@@ -1293,7 +1303,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 1794408035361,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794408517717,
+   "checkedAt": 1794408909382,
    "roomId": "7706907776529730322",
    "boxes": 0,
    "lastBoxAt": 0
@@ -1309,9 +1319,9 @@
    "gifts": 0,
    "lastGiftAt": 0,
    "lastGiftName": "",
-   "lastSeenLiveAt": 1794408035361,
+   "lastSeenLiveAt": 1794408808095,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794408517717,
+   "checkedAt": 1794408909382,
    "roomId": "7706911188591921921",
    "boxes": 0,
    "lastBoxAt": 0
@@ -1329,7 +1339,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 1794408035361,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794408517717,
+   "checkedAt": 1794408909382,
    "roomId": "7706883186320296711",
    "boxes": 0,
    "lastBoxAt": 0
@@ -1347,7 +1357,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 1794408035361,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794408517717,
+   "checkedAt": 1794408909382,
    "roomId": "7706909222186191637",
    "boxes": 0,
    "lastBoxAt": 0
@@ -1365,7 +1375,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 1794408035361,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794408517717,
+   "checkedAt": 1794408909382,
    "roomId": "7706887993412029236",
    "boxes": 0,
    "lastBoxAt": 0
@@ -1381,9 +1391,9 @@
    "gifts": 0,
    "lastGiftAt": 0,
    "lastGiftName": "",
-   "lastSeenLiveAt": 1794408035361,
+   "lastSeenLiveAt": 1794408611908,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794408517717,
+   "checkedAt": 1794408909382,
    "roomId": "7706907885044976404",
    "boxes": 0,
    "lastBoxAt": 0
@@ -1401,7 +1411,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 1794408035361,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794408517717,
+   "checkedAt": 1794408909382,
    "roomId": "7706912363076717332",
    "boxes": 0,
    "lastBoxAt": 0
@@ -1419,7 +1429,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 1794408035361,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794408517717,
+   "checkedAt": 1794408909382,
    "roomId": "7706913540765944598",
    "boxes": 0,
    "lastBoxAt": 0
@@ -1437,7 +1447,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 1794408035361,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794408517717,
+   "checkedAt": 1794408909382,
    "roomId": "7706899427415378696",
    "boxes": 0,
    "lastBoxAt": 0
@@ -1455,7 +1465,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 1794408035361,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794408517717,
+   "checkedAt": 1794408909382,
    "roomId": "7706899585884572422",
    "boxes": 0,
    "lastBoxAt": 0
@@ -1473,7 +1483,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 1794408035361,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794408517717,
+   "checkedAt": 1794408909382,
    "roomId": "7706873651018812180",
    "boxes": 0,
    "lastBoxAt": 0
@@ -1491,7 +1501,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 1794408416790,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794408517717,
+   "checkedAt": 1794408909382,
    "roomId": "7706893638681529108",
    "boxes": 0,
    "lastBoxAt": 0
@@ -1509,7 +1519,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 1794408035361,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794408517717,
+   "checkedAt": 1794408909382,
    "roomId": "7706888425338522389",
    "boxes": 0,
    "lastBoxAt": 0
@@ -1527,7 +1537,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 1794408035361,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794408517717,
+   "checkedAt": 1794408909382,
    "roomId": "7706909114789661441",
    "boxes": 0,
    "lastBoxAt": 0
@@ -1545,7 +1555,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 1794408035361,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794408517717,
+   "checkedAt": 1794408909382,
    "roomId": "7706902004359891732",
    "boxes": 0,
    "lastBoxAt": 0
@@ -1563,7 +1573,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 1794408035361,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794408517717,
+   "checkedAt": 1794408909382,
    "roomId": "7706902384698919700",
    "boxes": 0,
    "lastBoxAt": 0
@@ -1581,7 +1591,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 1794408035361,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794408517717,
+   "checkedAt": 1794408909382,
    "roomId": "7706912711246514950",
    "boxes": 0,
    "lastBoxAt": 0
@@ -1599,7 +1609,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 1794408035361,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794408517717,
+   "checkedAt": 1794408909382,
    "roomId": "7706913114666978070",
    "boxes": 0,
    "lastBoxAt": 0
@@ -1615,9 +1625,9 @@
    "gifts": 0,
    "lastGiftAt": 0,
    "lastGiftName": "",
-   "lastSeenLiveAt": 1794408035361,
+   "lastSeenLiveAt": 1794408611908,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794408517717,
+   "checkedAt": 1794408909382,
    "roomId": "7706915398154865429",
    "boxes": 0,
    "lastBoxAt": 0
@@ -1635,7 +1645,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 1794408035361,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794408517717,
+   "checkedAt": 1794408909382,
    "roomId": "7706904585339685654",
    "boxes": 0,
    "lastBoxAt": 0
@@ -1653,7 +1663,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 1794408035361,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794408517717,
+   "checkedAt": 1794408909382,
    "roomId": "7706910924586814228",
    "boxes": 0,
    "lastBoxAt": 0
@@ -1671,7 +1681,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 1794408035361,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794408517717,
+   "checkedAt": 1794408909382,
    "roomId": "7706906779654064914",
    "boxes": 0,
    "lastBoxAt": 0
@@ -1689,7 +1699,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 1794408035361,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794408517717,
+   "checkedAt": 1794408909382,
    "roomId": "7706911080535329544",
    "boxes": 0,
    "lastBoxAt": 0
@@ -1707,7 +1717,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 1794408035361,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794408517717,
+   "checkedAt": 1794408909382,
    "roomId": "7706897286395185942",
    "boxes": 0,
    "lastBoxAt": 0
@@ -1725,7 +1735,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 1794408035361,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794408517717,
+   "checkedAt": 1794408909382,
    "roomId": "7706916590331857665",
    "boxes": 0,
    "lastBoxAt": 0
@@ -1743,7 +1753,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 1794408035361,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794408517717,
+   "checkedAt": 1794408909382,
    "roomId": "7706915383302802208",
    "boxes": 0,
    "lastBoxAt": 0
@@ -1761,7 +1771,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 1794408035361,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794408517717,
+   "checkedAt": 1794408909382,
    "roomId": "7706887448080517896",
    "boxes": 0,
    "lastBoxAt": 0
@@ -1779,7 +1789,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 1794408035361,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794408517717,
+   "checkedAt": 1794408909382,
    "roomId": "7706855072994659103",
    "boxes": 0,
    "lastBoxAt": 0
@@ -1797,7 +1807,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 1794408035361,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794408517717,
+   "checkedAt": 1794408909382,
    "roomId": "7706891013936417557",
    "boxes": 0,
    "lastBoxAt": 0
@@ -1815,7 +1825,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 1794408035361,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794408517717,
+   "checkedAt": 1794408909382,
    "roomId": "7706874080730204948",
    "boxes": 0,
    "lastBoxAt": 0
@@ -1831,9 +1841,9 @@
    "gifts": 0,
    "lastGiftAt": 0,
    "lastGiftName": "",
-   "lastSeenLiveAt": 1794408035361,
+   "lastSeenLiveAt": 1794408808095,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794408517717,
+   "checkedAt": 1794408909382,
    "roomId": "7706906199056272150",
    "boxes": 0,
    "lastBoxAt": 0
@@ -1851,7 +1861,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 1794408035361,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794408517717,
+   "checkedAt": 1794408909382,
    "roomId": "7706914086302944020",
    "boxes": 0,
    "lastBoxAt": 0
@@ -1869,7 +1879,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 1794408035361,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794408517717,
+   "checkedAt": 1794408909382,
    "roomId": "7706904955679935254",
    "boxes": 0,
    "lastBoxAt": 0
@@ -1887,7 +1897,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 1794408035361,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794408517717,
+   "checkedAt": 1794408909382,
    "roomId": "7706898215690046228",
    "boxes": 0,
    "lastBoxAt": 0
@@ -1905,7 +1915,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 1794408035361,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794408517717,
+   "checkedAt": 1794408909382,
    "roomId": "7706902564251486998",
    "boxes": 0,
    "lastBoxAt": 0
@@ -1923,7 +1933,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 1794408416790,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794408517717,
+   "checkedAt": 1794408909382,
    "roomId": "7706895855127661318",
    "boxes": 0,
    "lastBoxAt": 0
@@ -1941,7 +1951,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 1794408225843,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794408517717,
+   "checkedAt": 1794408909382,
    "roomId": "7706895949259442966",
    "boxes": 0,
    "lastBoxAt": 0
@@ -1959,7 +1969,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 1794408035361,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794408517717,
+   "checkedAt": 1794408909382,
    "roomId": "7706910810721372946",
    "boxes": 0,
    "lastBoxAt": 0
@@ -1977,7 +1987,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 1794408035361,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794408517717,
+   "checkedAt": 1794408909382,
    "roomId": "7706916594940791558",
    "boxes": 0,
    "lastBoxAt": 0
@@ -1995,7 +2005,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 1794408035361,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794408517717,
+   "checkedAt": 1794408909382,
    "roomId": "7706919345298197269",
    "boxes": 0,
    "lastBoxAt": 0
@@ -2013,7 +2023,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 1794408035361,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794408517717,
+   "checkedAt": 1794408909382,
    "roomId": "7706920400559278849",
    "boxes": 0,
    "lastBoxAt": 0
@@ -2031,7 +2041,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 1794408035361,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794408517717,
+   "checkedAt": 1794408909382,
    "roomId": "7706883212417796884",
    "boxes": 0,
    "lastBoxAt": 0
@@ -2049,7 +2059,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 1794408035361,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794408517717,
+   "checkedAt": 1794408909382,
    "roomId": "7706901167338900246",
    "boxes": 0,
    "lastBoxAt": 0
@@ -2067,7 +2077,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 1794408225843,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794408517717,
+   "checkedAt": 1794408909382,
    "roomId": "7706890163707824904",
    "boxes": 0,
    "lastBoxAt": 0
@@ -2085,7 +2095,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 1794408035361,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794408517717,
+   "checkedAt": 1794408909382,
    "roomId": "7706914017649937174",
    "boxes": 0,
    "lastBoxAt": 0
@@ -2101,9 +2111,9 @@
    "gifts": 0,
    "lastGiftAt": 0,
    "lastGiftName": "",
-   "lastSeenLiveAt": 1794408416790,
+   "lastSeenLiveAt": 1794408611908,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794408517717,
+   "checkedAt": 1794408909382,
    "roomId": "7706880476316830494",
    "boxes": 0,
    "lastBoxAt": 0
@@ -2121,7 +2131,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 1794408035361,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794408517717,
+   "checkedAt": 1794408909382,
    "roomId": "7706890545521134337",
    "boxes": 0,
    "lastBoxAt": 0
@@ -2139,7 +2149,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 1794408035361,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794408517717,
+   "checkedAt": 1794408909382,
    "roomId": "7706859708480588550",
    "boxes": 0,
    "lastBoxAt": 0
@@ -2155,9 +2165,9 @@
    "gifts": 0,
    "lastGiftAt": 0,
    "lastGiftName": "",
-   "lastSeenLiveAt": 1794408416790,
+   "lastSeenLiveAt": 1794408611908,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794408517717,
+   "checkedAt": 1794408909382,
    "roomId": "7706914687829052178",
    "boxes": 0,
    "lastBoxAt": 0
@@ -2175,7 +2185,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 1794408416790,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794408517717,
+   "checkedAt": 1794408909382,
    "roomId": "7706903240759069448",
    "boxes": 0,
    "lastBoxAt": 0
@@ -2193,7 +2203,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 1794408225843,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794408517717,
+   "checkedAt": 1794408909382,
    "roomId": "7706907040102353670",
    "boxes": 0,
    "lastBoxAt": 0
@@ -2211,7 +2221,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 1794408225843,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794408517717,
+   "checkedAt": 1794408909382,
    "roomId": "7706905126430100246",
    "boxes": 0,
    "lastBoxAt": 0
@@ -2229,7 +2239,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 1794408225843,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794408517717,
+   "checkedAt": 1794408909382,
    "roomId": "7706915627679795969",
    "boxes": 0,
    "lastBoxAt": 0
@@ -2247,7 +2257,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 1794408225843,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794408517717,
+   "checkedAt": 1794408909382,
    "roomId": "7706863695149746951",
    "boxes": 0,
    "lastBoxAt": 0
@@ -2265,7 +2275,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 1794408225843,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794408517717,
+   "checkedAt": 1794408909382,
    "roomId": "7706847075246672661",
    "boxes": 0,
    "lastBoxAt": 0
@@ -2283,7 +2293,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 1794408416790,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794408517717,
+   "checkedAt": 1794408909382,
    "roomId": "7706919474686937869",
    "boxes": 0,
    "lastBoxAt": 0
@@ -2301,7 +2311,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 1794408416790,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794408517717,
+   "checkedAt": 1794408909382,
    "roomId": "7706887585427868422",
    "boxes": 0,
    "lastBoxAt": 0
@@ -2319,7 +2329,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 1794408416790,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794408517717,
+   "checkedAt": 1794408909382,
    "roomId": "7706919765046020885",
    "boxes": 0,
    "lastBoxAt": 0
@@ -2337,8 +2347,170 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 1794408416790,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794408517717,
+   "checkedAt": 1794408909382,
    "roomId": "7706878334327737110",
+   "boxes": 0,
+   "lastBoxAt": 0
+  },
+  {
+   "username": "slocovia24",
+   "country": "HU",
+   "live": true,
+   "startTime": 0,
+   "title": "",
+   "viewers": 0,
+   "coins": 0,
+   "gifts": 0,
+   "lastGiftAt": 0,
+   "lastGiftName": "",
+   "lastSeenLiveAt": 1794408611908,
+   "reason": "boş yanıt (doğrulanamadı)",
+   "checkedAt": 1794408909382,
+   "roomId": "7706920129799523094",
+   "boxes": 0,
+   "lastBoxAt": 0
+  },
+  {
+   "username": "guiller11jgmm",
+   "country": "BO",
+   "live": true,
+   "startTime": 0,
+   "title": "",
+   "viewers": 0,
+   "coins": 0,
+   "gifts": 0,
+   "lastGiftAt": 0,
+   "lastGiftName": "",
+   "lastSeenLiveAt": 1794408611908,
+   "reason": "boş yanıt (doğrulanamadı)",
+   "checkedAt": 1794408909382,
+   "roomId": "7706924806325046034",
+   "boxes": 0,
+   "lastBoxAt": 0
+  },
+  {
+   "username": "daricheron",
+   "country": "ES",
+   "live": true,
+   "startTime": 0,
+   "title": "",
+   "viewers": 0,
+   "coins": 0,
+   "gifts": 0,
+   "lastGiftAt": 0,
+   "lastGiftName": "",
+   "lastSeenLiveAt": 1794408611908,
+   "reason": "boş yanıt (doğrulanamadı)",
+   "checkedAt": 1794408909382,
+   "roomId": "7706916664549313281",
+   "boxes": 0,
+   "lastBoxAt": 0
+  },
+  {
+   "username": "handsome1105",
+   "country": "TW",
+   "live": true,
+   "startTime": 0,
+   "title": "",
+   "viewers": 0,
+   "coins": 0,
+   "gifts": 0,
+   "lastGiftAt": 0,
+   "lastGiftName": "",
+   "lastSeenLiveAt": 1794408611908,
+   "reason": "boş yanıt (doğrulanamadı)",
+   "checkedAt": 1794408909382,
+   "roomId": "7706918648692149013",
+   "boxes": 0,
+   "lastBoxAt": 0
+  },
+  {
+   "username": "waifu_stream",
+   "country": "KZ",
+   "live": true,
+   "startTime": 0,
+   "title": "",
+   "viewers": 0,
+   "coins": 0,
+   "gifts": 0,
+   "lastGiftAt": 0,
+   "lastGiftName": "",
+   "lastSeenLiveAt": 1794408808095,
+   "reason": "boş yanıt (doğrulanamadı)",
+   "checkedAt": 1794408909382,
+   "roomId": "7706882655300324097",
+   "boxes": 0,
+   "lastBoxAt": 0
+  },
+  {
+   "username": "ingestibile0",
+   "country": "LU",
+   "live": true,
+   "startTime": 0,
+   "title": "",
+   "viewers": 0,
+   "coins": 0,
+   "gifts": 0,
+   "lastGiftAt": 0,
+   "lastGiftName": "",
+   "lastSeenLiveAt": 1794408808095,
+   "reason": "boş yanıt (doğrulanamadı)",
+   "checkedAt": 1794408909382,
+   "roomId": "7706909941797325601",
+   "boxes": 0,
+   "lastBoxAt": 0
+  },
+  {
+   "username": "msqueendimple12official",
+   "country": "PH",
+   "live": true,
+   "startTime": 0,
+   "title": "",
+   "viewers": 0,
+   "coins": 0,
+   "gifts": 0,
+   "lastGiftAt": 0,
+   "lastGiftName": "",
+   "lastSeenLiveAt": 1794408808095,
+   "reason": "boş yanıt (doğrulanamadı)",
+   "checkedAt": 1794408909382,
+   "roomId": "7706918025417100038",
+   "boxes": 0,
+   "lastBoxAt": 0
+  },
+  {
+   "username": "la.purge.big",
+   "country": "CA",
+   "live": true,
+   "startTime": 0,
+   "title": "",
+   "viewers": 0,
+   "coins": 0,
+   "gifts": 0,
+   "lastGiftAt": 0,
+   "lastGiftName": "",
+   "lastSeenLiveAt": 1794408808095,
+   "reason": "boş yanıt (doğrulanamadı)",
+   "checkedAt": 1794408909382,
+   "roomId": "7706707227311721223",
+   "boxes": 0,
+   "lastBoxAt": 0
+  },
+  {
+   "username": "shainabautista05",
+   "country": "PH",
+   "live": true,
+   "startTime": 0,
+   "title": "",
+   "viewers": 0,
+   "coins": 0,
+   "gifts": 0,
+   "lastGiftAt": 0,
+   "lastGiftName": "",
+   "lastSeenLiveAt": 1794408808095,
+   "reason": "boş yanıt (doğrulanamadı)",
+   "checkedAt": 1794408909382,
+   "roomId": "7706848560821668628",
    "boxes": 0,
    "lastBoxAt": 0
   },
@@ -2355,7 +2527,7 @@
    "lastGiftName": "Sandık",
    "lastSeenLiveAt": 1794407932866,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794408517717,
+   "checkedAt": 1794408909382,
    "roomId": "7706895777960233780",
    "boxes": 1,
    "lastBoxAt": 1794407892988
@@ -2373,7 +2545,7 @@
    "lastGiftName": "Sandık",
    "lastSeenLiveAt": 1794406404444,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794408517717,
+   "checkedAt": 1794408909382,
    "roomId": "7706874249206188808",
    "boxes": 1,
    "lastBoxAt": 1794404768499
@@ -2391,7 +2563,7 @@
    "lastGiftName": "Sandık",
    "lastSeenLiveAt": 1794407320875,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794408517717,
+   "checkedAt": 1794408909382,
    "roomId": "7706898446104038176",
    "boxes": 1,
    "lastBoxAt": 1794406251465
@@ -2409,7 +2581,7 @@
    "lastGiftName": "Sandık",
    "lastSeenLiveAt": 1794407007892,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794408517717,
+   "checkedAt": 1794408909382,
    "roomId": "7706879915673848597",
    "boxes": 1,
    "lastBoxAt": 1794406734140
@@ -2427,7 +2599,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 1794404764628,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794408517717,
+   "checkedAt": 1794408909382,
    "roomId": "7706882152624933654",
    "boxes": 0,
    "lastBoxAt": 0
@@ -2445,7 +2617,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 1794403775225,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794408517717,
+   "checkedAt": 1794408909382,
    "roomId": "7706800735450614550",
    "boxes": 0,
    "lastBoxAt": 0
@@ -2463,7 +2635,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 1794405801178,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794408517717,
+   "checkedAt": 1794408909382,
    "roomId": "7706811764163332871",
    "boxes": 0,
    "lastBoxAt": 0
@@ -2481,7 +2653,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 1794405384942,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794408517717,
+   "checkedAt": 1794408909382,
    "roomId": "7706899886340655894",
    "boxes": 0,
    "lastBoxAt": 0
@@ -2499,7 +2671,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 1794405801178,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794408517717,
+   "checkedAt": 1794408909382,
    "roomId": "7706856160124504834",
    "boxes": 0,
    "lastBoxAt": 0
@@ -2517,7 +2689,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794408517717,
+   "checkedAt": 1794408909382,
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -2535,7 +2707,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794408517717,
+   "checkedAt": 1794408909382,
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -2553,7 +2725,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794408517717,
+   "checkedAt": 1794408909382,
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -2571,7 +2743,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794408517717,
+   "checkedAt": 1794408909382,
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -2589,7 +2761,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794408517717,
+   "checkedAt": 1794408909382,
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -2607,7 +2779,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794408517717,
+   "checkedAt": 1794408909382,
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -2625,7 +2797,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794408517717,
+   "checkedAt": 1794408909382,
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -2643,7 +2815,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794408517717,
+   "checkedAt": 1794408909382,
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -2661,7 +2833,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794408517717,
+   "checkedAt": 1794408909382,
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -2679,7 +2851,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794408517717,
+   "checkedAt": 1794408909382,
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -2697,7 +2869,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794408517717,
+   "checkedAt": 1794408909382,
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -2715,7 +2887,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794408517717,
+   "checkedAt": 1794408909382,
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -2733,7 +2905,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794408517717,
+   "checkedAt": 1794408909382,
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -2751,7 +2923,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794408517717,
+   "checkedAt": 1794408909382,
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -2769,7 +2941,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794408517717,
+   "checkedAt": 1794408909382,
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -2787,7 +2959,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794408517717,
+   "checkedAt": 1794408909382,
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -2805,7 +2977,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794408517717,
+   "checkedAt": 1794408909382,
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -2823,7 +2995,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794408517717,
+   "checkedAt": 1794408909382,
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -2841,7 +3013,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794408517717,
+   "checkedAt": 1794408909382,
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -2859,7 +3031,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794408517717,
+   "checkedAt": 1794408909382,
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -2877,7 +3049,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794408517717,
+   "checkedAt": 1794408909382,
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -2895,7 +3067,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794408517717,
+   "checkedAt": 1794408909382,
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -2913,7 +3085,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794408517717,
+   "checkedAt": 1794408909382,
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -2931,7 +3103,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794408517717,
+   "checkedAt": 1794408909382,
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -2949,7 +3121,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 1794406908660,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794408517717,
+   "checkedAt": 1794408909382,
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -2967,7 +3139,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794408517717,
+   "checkedAt": 1794408909382,
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -2985,7 +3157,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794408517717,
+   "checkedAt": 1794408909382,
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -3003,7 +3175,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794408517717,
+   "checkedAt": 1794408909382,
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -3021,7 +3193,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794408517717,
+   "checkedAt": 1794408909382,
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -3039,7 +3211,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794408517717,
+   "checkedAt": 1794408909382,
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -3057,7 +3229,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794408517717,
+   "checkedAt": 1794408909382,
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -3075,7 +3247,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794408517717,
+   "checkedAt": 1794408909382,
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -3093,7 +3265,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794408517717,
+   "checkedAt": 1794408909382,
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -3111,7 +3283,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794408517717,
+   "checkedAt": 1794408909382,
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -3129,7 +3301,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794408517717,
+   "checkedAt": 1794408909382,
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -3147,7 +3319,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794408517717,
+   "checkedAt": 1794408909382,
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -3165,7 +3337,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794408517717,
+   "checkedAt": 1794408909382,
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -3183,7 +3355,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794408517717,
+   "checkedAt": 1794408909382,
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -3201,7 +3373,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794408517717,
+   "checkedAt": 1794408909382,
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -3219,7 +3391,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794408517717,
+   "checkedAt": 1794408909382,
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -3237,7 +3409,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794408517717,
+   "checkedAt": 1794408909382,
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -3255,7 +3427,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794408517717,
+   "checkedAt": 1794408909382,
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -3273,7 +3445,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794408517717,
+   "checkedAt": 1794408909382,
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -3291,7 +3463,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794408517717,
+   "checkedAt": 1794408909382,
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -3309,7 +3481,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 1794407932866,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794408517717,
+   "checkedAt": 1794408909382,
    "roomId": "7706909074532911894",
    "boxes": 0,
    "lastBoxAt": 0
@@ -3327,7 +3499,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 1794405483882,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794408517717,
+   "checkedAt": 1794408909382,
    "roomId": "7706874705449421601",
    "boxes": 0,
    "lastBoxAt": 0
@@ -3345,7 +3517,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 1794406102569,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794408517717,
+   "checkedAt": 1794408909382,
    "roomId": "7706878323133795090",
    "boxes": 0,
    "lastBoxAt": 0
@@ -3363,7 +3535,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 1794407221175,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794408517717,
+   "checkedAt": 1794408909382,
    "roomId": "7706892068774529814",
    "boxes": 0,
    "lastBoxAt": 0
@@ -3381,7 +3553,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 1794407726972,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794408517717,
+   "checkedAt": 1794408909382,
    "roomId": "7706841494017788693",
    "boxes": 0,
    "lastBoxAt": 0
@@ -3399,7 +3571,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 1794405583815,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794408517717,
+   "checkedAt": 1794408909382,
    "roomId": "7706872826103417622",
    "boxes": 0,
    "lastBoxAt": 0
@@ -3417,7 +3589,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 1794406002047,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794408517717,
+   "checkedAt": 1794408909382,
    "roomId": "7706874194797726485",
    "boxes": 0,
    "lastBoxAt": 0
@@ -3435,7 +3607,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 1794405685629,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794408517717,
+   "checkedAt": 1794408909382,
    "roomId": "7706897696275925781",
    "boxes": 0,
    "lastBoxAt": 0
@@ -3453,7 +3625,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 1794405284577,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794408517717,
+   "checkedAt": 1794408909382,
    "roomId": "7706874446401374996",
    "boxes": 0,
    "lastBoxAt": 0
@@ -3471,7 +3643,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 1794405685629,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794408517717,
+   "checkedAt": 1794408909382,
    "roomId": "7706888571180862221",
    "boxes": 0,
    "lastBoxAt": 0
@@ -3489,7 +3661,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 1794405995093,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794408517717,
+   "checkedAt": 1794408909382,
    "roomId": "7706904042119252758",
    "boxes": 0,
    "lastBoxAt": 0
@@ -3507,7 +3679,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 1794404368570,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794408517717,
+   "checkedAt": 1794408909382,
    "roomId": "7706866963099831062",
    "boxes": 0,
    "lastBoxAt": 0
@@ -3525,7 +3697,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 1794404764628,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794408517717,
+   "checkedAt": 1794408909382,
    "roomId": "7706900154033867553",
    "boxes": 0,
    "lastBoxAt": 0
@@ -3543,7 +3715,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 1794405284577,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794408517717,
+   "checkedAt": 1794408909382,
    "roomId": "7706893736299186966",
    "boxes": 0,
    "lastBoxAt": 0
@@ -3561,7 +3733,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 1794407106271,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794408517717,
+   "checkedAt": 1794408909382,
    "roomId": "7706875201673399048",
    "boxes": 0,
    "lastBoxAt": 0
@@ -3579,7 +3751,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 1794406908660,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794408517717,
+   "checkedAt": 1794408909382,
    "roomId": "7706877777580018440",
    "boxes": 0,
    "lastBoxAt": 0
@@ -3597,7 +3769,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 1794405899894,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794408517717,
+   "checkedAt": 1794408909382,
    "roomId": "7706876570980567828",
    "boxes": 0,
    "lastBoxAt": 0
@@ -3615,7 +3787,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 1794406607007,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794408517717,
+   "checkedAt": 1794408909382,
    "roomId": "7706889742805240597",
    "boxes": 0,
    "lastBoxAt": 0
@@ -3633,7 +3805,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 1794405379269,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794408517717,
+   "checkedAt": 1794408909382,
    "roomId": "7706878266015615762",
    "boxes": 0,
    "lastBoxAt": 0
@@ -3651,7 +3823,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 1794407932866,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794408517717,
+   "checkedAt": 1794408909382,
    "roomId": "7706916850633804566",
    "boxes": 0,
    "lastBoxAt": 0
@@ -3669,7 +3841,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 1794407820932,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794408517717,
+   "checkedAt": 1794408909382,
    "roomId": "7706899345770351380",
    "boxes": 0,
    "lastBoxAt": 0
@@ -3687,7 +3859,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 1794407829827,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794408517717,
+   "checkedAt": 1794408909382,
    "roomId": "7706894437092133652",
    "boxes": 0,
    "lastBoxAt": 0
@@ -3705,7 +3877,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 1794406404444,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794408517717,
+   "checkedAt": 1794408909382,
    "roomId": "7706906302598187783",
    "boxes": 0,
    "lastBoxAt": 0
@@ -3723,7 +3895,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 1794406196056,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794408517717,
+   "checkedAt": 1794408909382,
    "roomId": "7706906989397429012",
    "boxes": 0,
    "lastBoxAt": 0
@@ -3741,7 +3913,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 1794407521948,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794408517717,
+   "checkedAt": 1794408909382,
    "roomId": "7706853845984447265",
    "boxes": 0,
    "lastBoxAt": 0
@@ -3759,7 +3931,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 1794406600188,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794408517717,
+   "checkedAt": 1794408909382,
    "roomId": "7706868827023313694",
    "boxes": 0,
    "lastBoxAt": 0
@@ -3777,7 +3949,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 1794407221175,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794408517717,
+   "checkedAt": 1794408909382,
    "roomId": "7706908174439254836",
    "boxes": 0,
    "lastBoxAt": 0
@@ -3795,7 +3967,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 1794407625527,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794408517717,
+   "checkedAt": 1794408909382,
    "roomId": "7706917172829063954",
    "boxes": 0,
    "lastBoxAt": 0
@@ -3813,7 +3985,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 1794407521948,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794408517717,
+   "checkedAt": 1794408909382,
    "roomId": "7706855125028981526",
    "boxes": 0,
    "lastBoxAt": 0
@@ -3831,7 +4003,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 1794406799940,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794408517717,
+   "checkedAt": 1794408909382,
    "roomId": "7706900451236547350",
    "boxes": 0,
    "lastBoxAt": 0
@@ -3849,7 +4021,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 1794407221175,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794408517717,
+   "checkedAt": 1794408909382,
    "roomId": "7706917524411009813",
    "boxes": 0,
    "lastBoxAt": 0
@@ -3867,7 +4039,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 1794407932866,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794408517717,
+   "checkedAt": 1794408909382,
    "roomId": "7706885941629176583",
    "boxes": 0,
    "lastBoxAt": 0
@@ -3885,13 +4057,49 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 1794407932866,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794408517717,
+   "checkedAt": 1794408909382,
    "roomId": "7706910202448136981",
    "boxes": 0,
    "lastBoxAt": 0
   }
  ],
  "events": [
+  {
+   "id": "mimaaa_96-1794408664-v5lji",
+   "t": 1794408664392,
+   "username": "mimaaa_96",
+   "kind": "chest",
+   "coins": 200,
+   "diamonds": 0,
+   "giftName": "Sandık",
+   "boxName": "Sandık",
+   "businessType": 20,
+   "boxType": "spark_box",
+   "sender": "",
+   "senderName": "",
+   "shared": 127,
+   "durationSec": 29,
+   "availableAt": 1794408693392,
+   "source": "scan"
+  },
+  {
+   "id": "mimaaa_96-1794408538-86ifj",
+   "t": 1794408538406,
+   "username": "mimaaa_96",
+   "kind": "letter",
+   "coins": 50,
+   "diamonds": 0,
+   "giftName": "coins",
+   "boxName": "coins",
+   "businessType": 1,
+   "boxType": "coins",
+   "sender": "",
+   "senderName": "",
+   "shared": 30,
+   "durationSec": 179,
+   "availableAt": 1794408717406,
+   "source": "scan"
+  },
   {
    "id": "lia_papa_-1794408378-vzg7e",
    "t": 1794408378309,
