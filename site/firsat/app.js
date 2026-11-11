@@ -411,7 +411,8 @@
       Object.keys(countries).length + ' ülke',
       (Number(scanInfo.watching) || 0) + '/' +
         (Number(scanInfo.budget) || Number(scanInfo.watching) || 0) + ' oda dinleniyor',
-      (Number(scanInfo.freshLive) || 0) + ' yeni aday'
+      (Number(scanInfo.freshLive) || 0) + ' yeni aday',
+      'keşif %' + Math.round((Number(scanInfo.probeRatio) || 0) * 100)
     ];
     el.innerHTML = '<span class="chip chip-green">● ' + esc(parts.join(' · ')) + '</span>';
   }

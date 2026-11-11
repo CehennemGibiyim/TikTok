@@ -69,7 +69,11 @@ const CONFIG = {
   // Hiç dinlenmemiş yeni adaylara ayrılan oda oranı (sıcak odayı boğmaz).
   probeRatio: Math.min(0.6, Math.max(0, Number(readArg('probe-ratio', 0.4)))),
   // Yeni adayı kaç saniye dinleyip karar veririz (kutu düşerse sıcağa geçer).
-  probeSec: Number(readArg('probe-sec', 180))
+  probeSec: Number(readArg('probe-sec', 180)),
+  // Oran uyarlaması: kaç deneme sonrası karar verilir ve eşikler.
+  probeWindow: Math.max(4, Number(readArg('probe-window', 8))),
+  probeUpRate: Number(readArg('probe-up-rate', 0.25)),
+  probeDownRate: Number(readArg('probe-down-rate', 0.05))
 };
 
 const startedAtMs = Date.now();
@@ -97,6 +101,12 @@ const state = {
   connectFailures: 0,
   lastConnectAt: 0,
   targetsDirty: false,
+  // Keşif oranı: deneme oturumlarının kutu başarısına göre kendini ayarlar.
+  probe: {
+    ratio: 0, sessions: 0, withBox: 0,
+    winSessions: 0, winBoxSessions: 0, winHot: 0, winHotBox: 0
+  },
+  savedRatio: 0,
   lastFlush: 0,
   lastCommit: 0,
   lastDiscover: 0,
@@ -129,6 +139,11 @@ function loadTargets() {
   try {
     const parsed = JSON.parse(fs.readFileSync(TARGETS_FILE, 'utf8'));
     const list = Array.isArray(parsed) ? parsed : parsed.targets || [];
+    // Önceki koşuda öğrenilen keşif oranı korunur.
+    const savedRatio = Number(parsed && parsed.probeRatio);
+    if (Number.isFinite(savedRatio) && savedRatio > 0) {
+      state.savedRatio = Math.min(0.6, Math.max(0.1, savedRatio));
+    }
     const seen = new Set();
     const out = [];
     list.forEach((item) => {
@@ -164,6 +179,12 @@ function saveTargets() {
   // Keşifle bulunanlar eklenir, kullanıcının kendi ekledikleri korunur.
   const body = {
     note: 'Taranacak adresler. Keşif kendi bulduklarını buraya ekler; elle eklenenler korunur.',
+    // Öğrenilen keşif oranı: sonraki koşu buradan devam eder.
+    probeRatio: Math.round(state.probe.ratio * 100) / 100,
+    probeStats: {
+      sessions: state.probe.sessions,
+      withBox: state.probe.withBox
+    },
     updatedAt: new Date().toISOString(),
     targets: state.targets.map((target) => ({
       username: target.username,
@@ -494,10 +515,62 @@ function markOffline(username) {
   record.endedAt = Date.now();
 }
 
+// Keşif oranını ölçülen kutu başarısına göre ayarlar:
+//   • deneme odaları, sıcak odalardan 1,5 kat fazla kutu çıkarıyorsa oran artar,
+//   • yarısından az çıkarıyorsa oran düşer (sıcak odalara dönülür).
+// Sıcak oda verisi yoksa mutlak eşikler kullanılır. Oran %10-%60 arasında kalır.
+function adaptProbeRatio() {
+  const pSessions = state.probe.winSessions;
+  const pBox = state.probe.winBoxSessions;
+  const hSessions = state.probe.winHot;
+  const hBox = state.probe.winHotBox;
+  if (pSessions < CONFIG.probeWindow) return;
+
+  const pRate = pSessions ? pBox / pSessions : 0;
+  const hRate = hSessions >= 3 ? hBox / hSessions : null;
+  const before = state.probe.ratio;
+
+  if (hRate === null) {
+    if (pRate >= CONFIG.probeUpRate) state.probe.ratio += 0.05;
+    else if (pRate <= CONFIG.probeDownRate) state.probe.ratio -= 0.05;
+  } else if (pRate > 0 && pRate >= hRate * 1.5) {
+    state.probe.ratio += 0.05;
+  } else if (pRate < hRate * 0.5) {
+    state.probe.ratio -= 0.05;
+  }
+
+  state.probe.ratio = Math.min(0.6, Math.max(0.1, state.probe.ratio));
+  state.probe.winSessions = 0;
+  state.probe.winBoxSessions = 0;
+  state.probe.winHot = 0;
+  state.probe.winHotBox = 0;
+  state.targetsDirty = true;
+
+  log('keşif oranı %' + Math.round(state.probe.ratio * 100) +
+    ' (deneme ' + pSessions + ' oturum · %' + Math.round(pRate * 100) + ' kutulu' +
+    (hRate === null ? '' : ' · sıcak %' + Math.round(hRate * 100)) +
+    ' · önceki %' + Math.round(before * 100) + ')');
+}
+
 async function closeWatcher(username, reason) {
   const watcher = state.rooms.get(username);
   if (!watcher) return;
   state.rooms.delete(username);
+
+  // Oturum sonucu: kutu çıktı mı? (oran uyarlamasının girdisi)
+  const gotBox = Number(watcher.boxes) > 0;
+  if (watcher.probe) {
+    state.probe.sessions += 1;
+    state.probe.winSessions += 1;
+    if (gotBox) {
+      state.probe.withBox += 1;
+      state.probe.winBoxSessions += 1;
+    }
+  } else if (Number(watcher.boxes) >= 0) {
+    state.probe.winHot += 1;
+    if (gotBox) state.probe.winHotBox += 1;
+  }
+  adaptProbeRatio();
   if (watcher.timer) clearTimeout(watcher.timer);
   try {
     if (watcher.connection) watcher.connection.disconnect();
@@ -580,6 +653,10 @@ function handleEnvelope(username, eventName, data) {
   const boxRecord = state.streamers.get(username);
   if (boxRecord) boxRecord.boxes = (Number(boxRecord.boxes) || 0) + 1;
   // Kutu veren yayıncı havuzda işaretlenir: sonraki koşularda da önce o dinlenir.
+  // Oturum bazında kutu sayısı: keşif oranı bu sonuçlara göre ayarlanır.
+  const sessionWatcher = state.rooms.get(username);
+  if (sessionWatcher) sessionWatcher.boxes = (Number(sessionWatcher.boxes) || 0) + 1;
+
   const boxTarget = targetFor(username);
   if (boxTarget) {
     boxTarget.boxEvents = (Number(boxTarget.boxEvents) || 0) + 1;
@@ -802,7 +879,8 @@ async function maintainWatchers() {
   const target = Math.min(Math.max(CONFIG.minRooms, Math.round(state.roomBudget)),
     CONFIG.watchRooms, live.length);
 
-  const probeBudget = Math.max(1, Math.round(target * CONFIG.probeRatio));
+  // Oran artık sabit değil: kutu başarısına göre uyarlanır (probe-ratio başlangıç).
+  const probeBudget = Math.max(1, Math.round(target * state.probe.ratio));
 
   while (state.rooms.size < target) {
     if (Date.now() - state.lastConnectAt < CONFIG.connectGapMs) break;
@@ -953,6 +1031,11 @@ function snapshot() {
       freshLive: state.targets.filter((target) => !target.lastWatchedAt &&
         state.streamers.has(target.username) && state.streamers.get(target.username).live).length,
       probes: Array.from(state.rooms.values()).filter((watcher) => watcher.probe).length,
+      probeRatio: Math.round(state.probe.ratio * 100) / 100,
+      probeStats: {
+        sessions: state.probe.sessions,
+        withBox: state.probe.withBox
+      },
       connectFailures: state.connectFailures,
       polls: state.polls,
       minutesLeft: CONFIG.minutes > 0 ? Math.max(0, Math.round((deadline - Date.now()) / 60000)) : null,
@@ -1033,6 +1116,8 @@ async function main() {
     log('uyarı: site/firsat/data/targets.json boş — taranacak adres yok.');
   }
   state.roomBudget = CONFIG.watchRooms;
+  // Kayıtlı oran varsa ondan devam et; yoksa ayardaki başlangıç oranı.
+  state.probe.ratio = state.savedRatio || CONFIG.probeRatio;
   log('havuz', state.targets.length, 'adres · süre',
     CONFIG.minutes > 0 ? CONFIG.minutes + ' dk' : 'tek tur');
 
@@ -1093,6 +1178,30 @@ if (process.env.SCANNER_SELFTEST === '1') {
   });
   console.log('SEÇİM aday bütçesi dolunca →', hotCase.record.username,
     '(sıcak:', hotCase.hot, ')');
+
+  // Keşif oranı uyarlaması: ölçülen kutu başarısına göre artar/azalır.
+  state.probe.ratio = 0.4;
+  state.probe.winSessions = 8;
+  state.probe.winBoxSessions = 4;
+  state.probe.winHot = 8;
+  state.probe.winHotBox = 1;
+  adaptProbeRatio();
+  console.log('ORAN deneme kutu çok →', state.probe.ratio, '(beklenen 0.45)');
+
+  state.probe.winSessions = 8;
+  state.probe.winBoxSessions = 0;
+  state.probe.winHot = 8;
+  state.probe.winHotBox = 4;
+  adaptProbeRatio();
+  console.log('ORAN deneme kutu yok →', state.probe.ratio, '(beklenen 0.4)');
+
+  state.probe.ratio = 0.58;
+  state.probe.winSessions = 8;
+  state.probe.winBoxSessions = 8;
+  state.probe.winHot = 3;
+  state.probe.winHotBox = 0;
+  adaptProbeRatio();
+  console.log('ORAN üst sınır →', state.probe.ratio, '(beklenen 0.6)');
 
   frames.forEach(([label, frame]) => {
     const before = state.events.length;
