@@ -107,6 +107,8 @@ const state = {
     winSessions: 0, winBoxSessions: 0, winHot: 0, winHotBox: 0
   },
   savedRatio: 0,
+  // Oran uyarlamasının son kararları (panelde gösterilir, en fazla 5).
+  probeHistory: [],
   lastFlush: 0,
   lastCommit: 0,
   lastDiscover: 0,
@@ -540,6 +542,19 @@ function adaptProbeRatio() {
   }
 
   state.probe.ratio = Math.min(0.6, Math.max(0.1, state.probe.ratio));
+
+  // Karar geçmişi: panel "neden değişti" sorusunu buradan yanıtlar.
+  state.probeHistory.push({
+    at: Date.now(),
+    from: Math.round(before * 100),
+    to: Math.round(state.probe.ratio * 100),
+    probeRate: Math.round(pRate * 100),
+    hotRate: hRate === null ? null : Math.round(hRate * 100),
+    sessions: pSessions,
+    boxSessions: pBox
+  });
+  if (state.probeHistory.length > 5) state.probeHistory.shift();
+
   state.probe.winSessions = 0;
   state.probe.winBoxSessions = 0;
   state.probe.winHot = 0;
@@ -1036,6 +1051,7 @@ function snapshot() {
         sessions: state.probe.sessions,
         withBox: state.probe.withBox
       },
+      probeHistory: state.probeHistory,
       connectFailures: state.connectFailures,
       polls: state.polls,
       minutesLeft: CONFIG.minutes > 0 ? Math.max(0, Math.round((deadline - Date.now()) / 60000)) : null,
@@ -1202,6 +1218,9 @@ if (process.env.SCANNER_SELFTEST === '1') {
   state.probe.winHotBox = 0;
   adaptProbeRatio();
   console.log('ORAN üst sınır →', state.probe.ratio, '(beklenen 0.6)');
+
+  console.log('KARAR geçmişi →', state.probeHistory.map((item) =>
+    item.from + '->' + item.to).join(' '));
 
   frames.forEach(([label, frame]) => {
     const before = state.events.length;

@@ -387,6 +387,7 @@
 
   function renderScanStatus(error) {
     renderBoxDiag();
+    renderProbeSummary();
     var el = $('scanStatus');
     if (!el) return;
     if (scanPaused) {
@@ -871,6 +872,43 @@
       return '<button class="chip ' + (active ? 'chip-amber' : '') + '" data-opp-filter="' + tab[0] + '">' +
         tab[2] + ' ' + tab[1] + ' <b>' + (counts[tab[0]] || 0) + '</b></button>';
     }).join('');
+  }
+
+  // Keşif oranı özeti: mevcut oran, kutu başarısı ve son kararlar.
+  function renderProbeSummary() {
+    var el = $('probeSummary');
+    if (!el) return;
+    if (!scanInfo) { el.innerHTML = ''; return; }
+
+    var ratio = Math.round((Number(scanInfo.probeRatio) || 0) * 100);
+    var stats = scanInfo.probeStats || {};
+    var sessions = Number(stats.sessions) || 0;
+    var withBox = Number(stats.withBox) || 0;
+    var rate = sessions ? Math.round((withBox / sessions) * 100) : 0;
+    var history = Array.isArray(scanInfo.probeHistory) ? scanInfo.probeHistory : [];
+
+    var chips = '<span class="chip chip-amber" title="Deneme odalarına ayrılan pay">🔎 Keşif oranı %' + ratio + '</span>' +
+      '<span class="chip" title="Deneme oturumlarında kutu yakalama">Kutulu deneme ' +
+        (sessions ? withBox + '/' + sessions + ' · %' + rate : 'henüz yok') + '</span>' +
+      '<span class="chip" title="O an dinlenen yeni aday sayısı">Aday odada ' +
+        (Number(scanInfo.probes) || 0) + '</span>';
+
+    if (!history.length) {
+      el.innerHTML = chips + '<div class="w-full mt-1 text-[10px] text-yellow-50/40">' +
+        'Henüz oran kararı yok — 8 deneme oturumu dolunca ilk karar buraya yazılır.</div>';
+      return;
+    }
+
+    var rows = history.slice(-3).reverse().map(function (item) {
+      var time = new Date(Number(item.at) || Date.now()).toLocaleTimeString('tr-TR',
+        { hour: '2-digit', minute: '2-digit' });
+      var text = time + ' · %' + item.from + ' → %' + item.to;
+      if (item.sessions) text += ' · deneme %' + item.probeRate + ' kutulu (' + item.boxSessions + '/' + item.sessions + ')';
+      if (item.hotRate !== null && item.hotRate !== undefined) text += ' · sıcak %' + item.hotRate;
+      return '<div class="text-[10px] text-yellow-50/50">' + esc(text) + '</div>';
+    }).join('');
+
+    el.innerHTML = chips + '<div class="w-full mt-1 space-y-0.5">' + rows + '</div>';
   }
 
   // Tarayıcının yakaladığı son kutu bildirimleri: hangi tür kod geldiyse görünür.
