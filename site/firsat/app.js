@@ -694,6 +694,8 @@
   var UNKNOWN_WINDOW_MS = 30 * 60 * 1000;
 
   function isExpired(event) {
+    // Sandık asla kaçmaz: süre dolsa bile beklemede kalır ("KONTROL ET!").
+    if (event && event.kind === 'chest') return false;
     var now = Date.now();
     var end = eventEndAt(event);
     // Sandık: kullanıcı toplamayı deneyebilsin diye süresi geçse bile listede
@@ -725,7 +727,22 @@
   // Bir kez temizlenir; elle eklenen kayıtlara dokunulmaz.
   function migrateEvents() {
     var settings = Object.assign({}, state.settings || {});
-    if (Number(settings.eventsSchema) >= 4) return;
+    if (Number(settings.eventsSchema) >= 4) {
+      // Sandık asla kaçmaz: eski sürümlerde süresi dolunca "expired" işaretlenen
+      // sandıklar beklemedeye alınır (KONTROL ET!).
+      if (Number(settings.eventsSchema) < 5) {
+        var recovered = state.events.map(function (event) {
+          if (event.kind === 'chest' && (event.status === 'expired' || event.status === 'missed')) {
+            return Object.assign({}, event, { status: 'pending' });
+          }
+          return event;
+        });
+        settings.eventsSchema = 5;
+        Store.set({ events: recovered, settings: settings });
+        state = Store.get();
+      }
+      return;
+    }
     // Eski sürüm kutunun gerçek türünü/adını yazmıyordu; o otomatik kayıtlar bir
     // kez düşürülür, yerine doğru türde yenileri gelir. Elle eklenenler ve
     // kutu bilgisi taşıyan kayıtlar korunur.
@@ -734,7 +751,7 @@
       if (event.kind === 'gift') return false;
       return event.boxName !== undefined;
     });
-    settings.eventsSchema = 4;
+    settings.eventsSchema = 5;
     Store.set({ events: kept, settings: settings });
     state = Store.get();
   }
@@ -1827,9 +1844,9 @@
       }
     });
 
-    if (state.events.some(function (event) { return event.status === 'pending' && isExpired(event); })) {
+    if (state.events.some(function (event) { return event.status === 'pending' && event.kind !== 'chest' && isExpired(event); })) {
       var events = state.events.map(function (event) {
-        if (event.status === 'pending' && isExpired(event)) {
+        if (event.status === 'pending' && event.kind !== 'chest' && isExpired(event)) {
           return Object.assign({}, event, { status: 'expired' });
         }
         return event;
