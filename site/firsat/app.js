@@ -410,7 +410,8 @@
       (Number(scanInfo.targetCount) || 0) + ' adres',
       Object.keys(countries).length + ' ülke',
       (Number(scanInfo.watching) || 0) + '/' +
-        (Number(scanInfo.budget) || Number(scanInfo.watching) || 0) + ' oda dinleniyor'
+        (Number(scanInfo.budget) || Number(scanInfo.watching) || 0) + ' oda dinleniyor',
+      (Number(scanInfo.freshLive) || 0) + ' yeni aday'
     ];
     el.innerHTML = '<span class="chip chip-green">● ' + esc(parts.join(' · ')) + '</span>';
   }

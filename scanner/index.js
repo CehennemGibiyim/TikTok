@@ -65,7 +65,11 @@ const CONFIG = {
   // Sıcak odaya en erken bu kadar sonra geri dönülür (12 dk).
   hotRevisitMs: Number(readArg('hot-revisit-sec', 720)) * 1000,
   // Sıradan odaya geri dönüş aralığı (30 dk).
-  revisitMs: Number(readArg('revisit-sec', 1800)) * 1000
+  revisitMs: Number(readArg('revisit-sec', 1800)) * 1000,
+  // Hiç dinlenmemiş yeni adaylara ayrılan oda oranı (sıcak odayı boğmaz).
+  probeRatio: Math.min(0.6, Math.max(0, Number(readArg('probe-ratio', 0.4)))),
+  // Yeni adayı kaç saniye dinleyip karar veririz (kutu düşerse sıcağa geçer).
+  probeSec: Number(readArg('probe-sec', 180))
 };
 
 const startedAtMs = Date.now();
@@ -723,8 +727,12 @@ async function openWatcher(username, sessionSec) {
 //   • odalar arası en az CONFIG.connectGapMs boşluk (ani bağlantı dalgası yok),
 //   • hız sınırı yiyince bütçe %25 düşer ve bekleme üstel artar (1→2→4→8 dk),
 //   • başarılı her bağlantıda bütçe yarım oda toparlanır (üst sınır watchRooms).
-// Kutu paylaşan odalar kalıcı olarak önceliklidir (havuzdaki boxEvents) ve
-// normal odadan daha kısa arayla yeniden dinlenir; oturumları 1,5 kat uzundur.
+// Üç tür oda vardır:
+//   • SICAK  : kutu geçmişi olan oda (12 dk sonra geri dönülür, 1,5× oturum),
+//   • ADAY   : keşifte bulunup hiç dinlenmemiş yayıncı (kısa deneme oturumu),
+//   • NORMAL : geri kalanlar (30 dk aralık).
+// Adaylara bütçenin bir kısmı ayrılır: sıcak listede olmayan ama kutu paylaşan
+// yeni yayıncılar böylece kendiliğinden bulunur, kutu düşerse sıcağa geçer.
 
 function boxPriority(record, now) {
   const target = targetFor(record.username);
@@ -743,6 +751,31 @@ function isHotRoom(record, now) {
 function lastWatchedAt(record) {
   const target = targetFor(record.username);
   return Number(target && target.lastWatchedAt) || 0;
+}
+
+// Sıradaki odayı seçer (ağa çıkmaz, saf fonksiyon → test edilebilir).
+function pickRoom(options) {
+  const {
+    live, rooms, probing, probeBudget, recent, now,
+    hotRevisitMs, revisitMs, isHot, watchedAt
+  } = options;
+
+  const free = live.filter((record) =>
+    !rooms.has(record.username) && now - watchedAt(record) >= 60000);
+  if (!free.length) return null;
+
+  // Hiç dinlenmemiş adaylar: keşifte yeni bulunan, sıcak listede olmayanlar.
+  const untouched = free.filter((record) => !watchedAt(record));
+  const probeRoom = probing < probeBudget ? untouched[0] : null;
+
+  const hotRoom = free.find((record) =>
+    isHot(record, now) && now - watchedAt(record) >= hotRevisitMs);
+  const coldRoom = free.find((record) => now - watchedAt(record) >= revisitMs);
+  const fallback = free.find((record) => !recent.includes(record.username)) || free[0];
+
+  const record = probeRoom || hotRoom || coldRoom || fallback;
+  if (!record) return null;
+  return { record, probe: record === probeRoom, hot: isHot(record, now) };
 }
 
 async function maintainWatchers() {
@@ -769,39 +802,45 @@ async function maintainWatchers() {
   const target = Math.min(Math.max(CONFIG.minRooms, Math.round(state.roomBudget)),
     CONFIG.watchRooms, live.length);
 
+  const probeBudget = Math.max(1, Math.round(target * CONFIG.probeRatio));
+
   while (state.rooms.size < target) {
     if (Date.now() - state.lastConnectAt < CONFIG.connectGapMs) break;
 
-    // Aynı odaya hemen geri dönülmez (en az 1 dk).
-    const free = live.filter((record) =>
-      !state.rooms.has(record.username) && Date.now() - lastWatchedAt(record) >= 60000);
-
-    const hot = free.find((record) =>
-      isHotRoom(record, now) && Date.now() - lastWatchedAt(record) >= CONFIG.hotRevisitMs);
-    const cold = free.find((record) => Date.now() - lastWatchedAt(record) >= CONFIG.revisitMs);
-    const pick = hot || cold || free.find((record) => !state.recent.includes(record.username)) || free[0];
+    const probing = Array.from(state.rooms.values()).filter((watcher) => watcher.probe).length;
+    const pick = pickRoom({
+      live, rooms: state.rooms, probing, probeBudget, recent: state.recent, now,
+      hotRevisitMs: CONFIG.hotRevisitMs, revisitMs: CONFIG.revisitMs,
+      isHot: isHotRoom, watchedAt: lastWatchedAt
+    });
     if (!pick) break;
 
-    const hotSession = isHotRoom(pick, now);
-    const sessionSec = hotSession ? Math.round(CONFIG.watchSec * 1.5) : CONFIG.watchSec;
+    const sessionSec = pick.probe
+      ? CONFIG.probeSec
+      : (pick.hot ? Math.round(CONFIG.watchSec * 1.5) : CONFIG.watchSec);
 
-    state.recent.push(pick.username);
+    state.recent.push(pick.record.username);
     if (state.recent.length > 200) state.recent.shift();
 
     try {
-      await openWatcher(pick.username, sessionSec);
+      await openWatcher(pick.record.username, sessionSec);
       state.lastConnectAt = Date.now();
       state.connectFailures = 0;
       state.roomBudget = Math.min(CONFIG.watchRooms, state.roomBudget + 0.5);
-      const watched = targetFor(pick.username);
+
+      const watcher = state.rooms.get(pick.record.username);
+      if (watcher) watcher.probe = pick.probe;
+
+      const watched = targetFor(pick.record.username);
       if (watched) {
         watched.lastWatchedAt = Date.now();
         state.targetsDirty = true;
       }
-      if (hotSession) log('sıcak oda (kutu geçmişi):', pick.username, sessionSec + ' sn');
+      if (pick.probe) log('yeni aday deneniyor:', pick.record.username, sessionSec + ' sn');
+      else if (pick.hot) log('sıcak oda (kutu geçmişi):', pick.record.username, sessionSec + ' sn');
     } catch (error) {
-      state.lastError = 'dinleme: ' + pick.username + ' ' + error.message;
-      log('dinleme hatası', pick.username, error.message);
+      state.lastError = 'dinleme: ' + pick.record.username + ' ' + error.message;
+      log('dinleme hatası', pick.record.username, error.message);
       // 429 / "token yok (429)" da hız sınırıdır: bütçeyi düşür, bekle.
       if (/rate|too many|device_blocked|429|\b503\b/i.test(error.message || '')) {
         state.connectFailures = Math.min(6, state.connectFailures + 1);
@@ -911,6 +950,9 @@ function snapshot() {
       poolSize: state.targets.length,
       watching: state.rooms.size,
       budget: Math.round(state.roomBudget) || CONFIG.watchRooms,
+      freshLive: state.targets.filter((target) => !target.lastWatchedAt &&
+        state.streamers.has(target.username) && state.streamers.get(target.username).live).length,
+      probes: Array.from(state.rooms.values()).filter((watcher) => watcher.probe).length,
       connectFailures: state.connectFailures,
       polls: state.polls,
       minutesLeft: CONFIG.minutes > 0 ? Math.max(0, Math.round((deadline - Date.now()) / 60000)) : null,
@@ -1029,6 +1071,29 @@ if (process.env.SCANNER_SELFTEST === '1') {
     ['portal zinciri (businessType 9)', { event: 'envelope', data: { envelopeInfo: { envelopeId: 'e2', businessType: 9, diamondCount: 200, peopleCount: 50, secondsUntilOpen: 15 } } }],
     ['boş zarf bildirimi', { event: 'envelope', data: { envelopeInfo: { envelopeId: 'e3', action: 'hide', boxType: 'spark_box', coins: null, recipientCount: null } } }]
   ];
+  // Oda seçimi: aday / sıcak / normal önceliği.
+  const nowMs = Date.now();
+  const fake = (username) => ({ username, live: true, viewers: 0, coins: 0 });
+  const probeCase = pickRoom({
+    live: [fake('aday'), fake('sicak'), fake('normal')],
+    rooms: new Map(), probing: 0, probeBudget: 2, recent: [], now: nowMs,
+    hotRevisitMs: 720000, revisitMs: 1800000,
+    isHot: (record) => record.username === 'sicak',
+    watchedAt: (record) => (record.username === 'aday' ? 0 : nowMs - 3600000)
+  });
+  console.log('SEÇİM aday varken →', probeCase.record.username,
+    '(aday:', probeCase.probe, '· sıcak:', probeCase.hot, ')');
+
+  const hotCase = pickRoom({
+    live: [fake('sicak'), fake('normal')],
+    rooms: new Map(), probing: 2, probeBudget: 2, recent: [], now: nowMs,
+    hotRevisitMs: 720000, revisitMs: 1800000,
+    isHot: (record) => record.username === 'sicak',
+    watchedAt: () => nowMs - 3600000
+  });
+  console.log('SEÇİM aday bütçesi dolunca →', hotCase.record.username,
+    '(sıcak:', hotCase.hot, ')');
+
   frames.forEach(([label, frame]) => {
     const before = state.events.length;
     handleStreamMessage('test_user', JSON.stringify(frame));
