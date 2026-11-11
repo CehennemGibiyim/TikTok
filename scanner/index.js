@@ -62,6 +62,9 @@ const CONFIG = {
   watchRooms: Number(readArg('watch-rooms', 8)),
   // Bağlantılar arası en az boşluk: hız sınırına çarpmadan sırayla açılır.
   connectGapMs: Number(readArg('connect-gap', 4000)),
+  // Dakikada en fazla kaç yeni bağlantı başlatılır (Euler: "too many connections
+  // started" hatası dakikalık sayaca bakıyor).
+  startsPerMin: Math.max(1, Number(readArg('starts-per-min', 8))),
   // Sınır yediğimizde inilebilecek en düşük eşzamanlı oda sayısı.
   minRooms: Number(readArg('min-rooms', 8)),
   // Kutu vermiş oda bu süre boyunca "sıcak" sayılır (6 saat).
@@ -105,6 +108,7 @@ const state = {
   connectFailures: 0,
   // Bağlantı teşhisi: panel "neden 0 oda" sorusunu buradan yanıtlar.
   connectStats: { attempts: 0, ok: 0, failed: 0, rateLimited: 0, offline: 0, errors: [] },
+  connectStarts: [],
   lastConnectorError: null,
   closeReasons: {},
   lastConnectAt: 0,
@@ -1119,6 +1123,15 @@ async function maintainWatchers() {
     }
     if (state.connectorCooldownUntil > Date.now()) break;
 
+    // Dakikalık bağlantı sayacı: sınırı aşarsak (Euler "too many connections
+    // started") yeni bağlantı açmadan bekle, sınırı kendi kendimize aşmayalım.
+    const minuteAgo = Date.now() - 60000;
+    state.connectStarts = state.connectStarts.filter((at) => at > minuteAgo);
+    if (state.connectStarts.length >= CONFIG.startsPerMin) {
+      await sleep(2000);
+      continue;
+    }
+
     const probing = Array.from(state.rooms.values()).filter((watcher) => watcher.probe).length;
     const pick = pickRoom({
       live, rooms: state.rooms, probing, probeBudget, recent: state.recent, now,
@@ -1135,6 +1148,7 @@ async function maintainWatchers() {
     if (state.recent.length > 200) state.recent.shift();
 
     state.connectStats.attempts += 1;
+    state.connectStarts.push(Date.now());
     try {
       await openWatcher(pick.record.username, sessionSec);
       state.lastConnectAt = Date.now();
