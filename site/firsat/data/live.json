@@ -1,65 +1,76 @@
 {
- "scannedAt": "2026-11-11T12:30:38.994Z",
+ "scannedAt": "2026-11-11T12:41:36.430Z",
  "scanner": {
-  "targetCount": 213,
-  "liveCount": 91,
-  "discovered": 141,
-  "poolSize": 213,
-  "watching": 12,
-  "polls": 108,
-  "minutesLeft": 58,
-  "lastError": "dinleme: monita_921 token yok (429)",
+  "targetCount": 222,
+  "liveCount": 98,
+  "discovered": 150,
+  "poolSize": 222,
+  "watching": 16,
+  "polls": 117,
+  "minutesLeft": 47,
+  "lastError": "dinleme: theunbeatablequeen26 token yok (429)",
   "envelopes": {
-   "seen": 70,
-   "withCoins": 31,
+   "seen": 77,
+   "withCoins": 35,
    "actions": {
     "yok": 55,
-    "new": 6,
-    "hide": 9
+    "new": 10,
+    "hide": 12
    },
    "boxTypes": {
     "yok": 55,
-    "spark_box": 8,
-    "coins": 7
+    "spark_box": 12,
+    "coins": 10
    }
   },
   "envelopeSamples": [
    {
-    "t": 1794400142886,
-    "user": "nnonoo38",
+    "t": 1794400387818,
+    "user": "skinnybets",
     "event": "envelope",
     "action": "new",
     "boxType": "spark_box",
     "businessType": 20,
-    "coins": 88,
-    "people": 63,
+    "coins": 117,
+    "people": 84,
+    "secondsUntilOpen": 29
+   },
+   {
+    "t": 1794400478361,
+    "user": "skinnybets",
+    "event": "envelope",
+    "action": "hide",
+    "boxType": "spark_box",
+    "businessType": 20,
+    "coins": 0,
+    "people": 0,
+    "secondsUntilOpen": 0
+   },
+   {
+    "t": 1794400723865,
+    "user": "homseababa",
+    "event": "envelope",
+    "action": "new",
+    "boxType": "spark_box",
+    "businessType": 20,
+    "coins": 640,
+    "people": 457,
     "secondsUntilOpen": 30
    },
    {
-    "t": 1794400175928,
-    "user": "sefutau051",
+    "t": 1794400764766,
+    "user": "kamran_aqsa",
     "event": "envelope",
-    "action": "hide",
+    "action": "new",
     "boxType": "coins",
     "businessType": 1,
-    "coins": 0,
-    "people": 0,
-    "secondsUntilOpen": 0
+    "coins": 20,
+    "people": 16,
+    "secondsUntilOpen": 180
    },
    {
-    "t": 1794400213013,
-    "user": "sefutau051",
-    "event": "envelope",
-    "action": "hide",
-    "boxType": "coins",
-    "businessType": 1,
-    "coins": 0,
-    "people": 0,
-    "secondsUntilOpen": 0
-   },
-   {
-    "t": 1794400233801,
-    "user": "nnonoo38",
+    "t": 1794400813849,
+    "user": "homseababa",
     "event": "envelope",
     "action": "hide",
     "boxType": "spark_box",
@@ -67,17 +78,6 @@
     "coins": 0,
     "people": 0,
     "secondsUntilOpen": 0
-   },
-   {
-    "t": 1794400235588,
-    "user": "sefutau051",
-    "event": "envelope",
-    "action": "new",
-    "boxType": "coins",
-    "businessType": 1,
-    "coins": 36,
-    "people": 3,
-    "secondsUntilOpen": 59
    }
   ],
   "version": 1
@@ -96,7 +96,7 @@
    "lastGiftName": "Sandık",
    "lastSeenLiveAt": 1794399381792,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794400234339
+   "checkedAt": 1794400894653
   },
   {
    "username": "fouad_al_shihmani",
@@ -111,7 +111,37 @@
    "lastGiftName": "spark_box",
    "lastSeenLiveAt": 1794399381792,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794400234339
+   "checkedAt": 1794400894653
+  },
+  {
+   "username": "homseababa",
+   "country": "NL",
+   "live": true,
+   "startTime": 0,
+   "title": "",
+   "viewers": 0,
+   "coins": 640,
+   "gifts": 1,
+   "lastGiftAt": 1794400723865,
+   "lastGiftName": "spark_box",
+   "lastSeenLiveAt": 1794400674293,
+   "reason": "boş yanıt (doğrulanamadı)",
+   "checkedAt": 1794400894652
+  },
+  {
+   "username": "tanzverbot",
+   "country": "DE",
+   "live": true,
+   "startTime": 0,
+   "title": "",
+   "viewers": 0,
+   "coins": 400,
+   "gifts": 1,
+   "lastGiftAt": 1794400372515,
+   "lastGiftName": "coins",
+   "lastSeenLiveAt": 1794399381792,
+   "reason": "boş yanıt (doğrulanamadı)",
+   "checkedAt": 1794400894652
   },
   {
    "username": "nnonoo38",
@@ -126,7 +156,7 @@
    "lastGiftName": "spark_box",
    "lastSeenLiveAt": 1794399381792,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794400234339
+   "checkedAt": 1794400894653
   },
   {
    "username": "al.roxy",
@@ -141,7 +171,7 @@
    "lastGiftName": "Sandık",
    "lastSeenLiveAt": 1794399381792,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794400234339
+   "checkedAt": 1794400894653
   },
   {
    "username": "markos8988",
@@ -156,7 +186,22 @@
    "lastGiftName": "Portal",
    "lastSeenLiveAt": 1794399381792,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794400234339
+   "checkedAt": 1794400894653
+  },
+  {
+   "username": "skinnybets",
+   "country": "CA",
+   "live": true,
+   "startTime": 0,
+   "title": "",
+   "viewers": 0,
+   "coins": 117,
+   "gifts": 1,
+   "lastGiftAt": 1794400387818,
+   "lastGiftName": "spark_box",
+   "lastSeenLiveAt": 1794399381792,
+   "reason": "boş yanıt (doğrulanamadı)",
+   "checkedAt": 1794400894653
   },
   {
    "username": "minaloveu2",
@@ -171,7 +216,22 @@
    "lastGiftName": "Zarf",
    "lastSeenLiveAt": 1794399381792,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794400234339
+   "checkedAt": 1794400894652
+  },
+  {
+   "username": "kamran_aqsa",
+   "country": "DK",
+   "live": true,
+   "startTime": 1794388744000,
+   "title": "HANDSKE LIVE",
+   "viewers": 1101,
+   "coins": 40,
+   "gifts": 2,
+   "lastGiftAt": 1794400764766,
+   "lastGiftName": "coins",
+   "lastSeenLiveAt": 1794400674293,
+   "reason": "boş yanıt (doğrulanamadı)",
+   "checkedAt": 1794400894653
   },
   {
    "username": "sefutau051",
@@ -186,22 +246,7 @@
    "lastGiftName": "coins",
    "lastSeenLiveAt": 1794400012963,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794400234339
-  },
-  {
-   "username": "kamran_aqsa",
-   "country": "DK",
-   "live": true,
-   "startTime": 1794388744000,
-   "title": "HANDSKE LIVE",
-   "viewers": 1101,
-   "coins": 20,
-   "gifts": 1,
-   "lastGiftAt": 1794393642564,
-   "lastGiftName": "Zarf",
-   "lastSeenLiveAt": 1794399381792,
-   "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794400234339
+   "checkedAt": 1794400894652
   },
   {
    "username": "bcohrwgfyvm",
@@ -216,7 +261,7 @@
    "lastGiftName": "coins",
    "lastSeenLiveAt": 1794399381792,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794400234339
+   "checkedAt": 1794400894652
   },
   {
    "username": "pemachoden78",
@@ -231,7 +276,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 1794399381792,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794400234339
+   "checkedAt": 1794400894653
   },
   {
    "username": "nickytanixviva",
@@ -246,7 +291,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 1794399381792,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794400234339
+   "checkedAt": 1794400894653
   },
   {
    "username": "nomnomsoyummy",
@@ -261,7 +306,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 1794399381792,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794400234339
+   "checkedAt": 1794400894653
   },
   {
    "username": "theroyalqueens13",
@@ -274,9 +319,9 @@
    "gifts": 0,
    "lastGiftAt": 0,
    "lastGiftName": "",
-   "lastSeenLiveAt": 1794399381792,
+   "lastSeenLiveAt": 1794400370632,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794400234339
+   "checkedAt": 1794400894653
   },
   {
    "username": "pardon168",
@@ -291,7 +336,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 1794399381792,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794400234339
+   "checkedAt": 1794400894653
   },
   {
    "username": "qristine.manukyan1",
@@ -306,7 +351,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 1794399381792,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794400234339
+   "checkedAt": 1794400894653
   },
   {
    "username": "wang.tanny",
@@ -321,22 +366,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 1794399381792,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794400234339
-  },
-  {
-   "username": "skinnybets",
-   "country": "CA",
-   "live": true,
-   "startTime": 0,
-   "title": "",
-   "viewers": 0,
-   "coins": 0,
-   "gifts": 0,
-   "lastGiftAt": 0,
-   "lastGiftName": "",
-   "lastSeenLiveAt": 1794399381792,
-   "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794400234339
+   "checkedAt": 1794400894653
   },
   {
    "username": "rosalia.camacho82",
@@ -351,7 +381,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 1794399381792,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794400234339
+   "checkedAt": 1794400894653
   },
   {
    "username": "la.purge.big",
@@ -366,7 +396,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 1794399381792,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794400234339
+   "checkedAt": 1794400894653
   },
   {
    "username": "olafpou0317",
@@ -381,22 +411,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 1794399381792,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794400234339
-  },
-  {
-   "username": "woneeyday",
-   "country": "KR",
-   "live": true,
-   "startTime": 1794381614000,
-   "title": "Welcome MY Live !",
-   "viewers": 12423,
-   "coins": 0,
-   "gifts": 0,
-   "lastGiftAt": 0,
-   "lastGiftName": "",
-   "lastSeenLiveAt": 1794399381792,
-   "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794400234339
+   "checkedAt": 1794400894653
   },
   {
    "username": "ilda.fahed_22",
@@ -411,7 +426,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 1794399381792,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794400234339
+   "checkedAt": 1794400894653
   },
   {
    "username": "ryupo_piano",
@@ -426,7 +441,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 1794399381792,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794400234339
+   "checkedAt": 1794400894653
   },
   {
    "username": "vnuss_01",
@@ -441,7 +456,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 1794399381792,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794400234339
+   "checkedAt": 1794400894653
   },
   {
    "username": "janoskovacshivataloos4",
@@ -454,9 +469,9 @@
    "gifts": 0,
    "lastGiftAt": 0,
    "lastGiftName": "",
-   "lastSeenLiveAt": 1794399381792,
+   "lastSeenLiveAt": 1794400674293,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794400234339
+   "checkedAt": 1794400894653
   },
   {
    "username": "szwagierkaqueen",
@@ -471,7 +486,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 1794399381792,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794400234339
+   "checkedAt": 1794400894653
   },
   {
    "username": "terrylobo1",
@@ -486,7 +501,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 1794400012963,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794400234339
+   "checkedAt": 1794400894653
   },
   {
    "username": "karolina6kk",
@@ -501,7 +516,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 1794399381792,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794400234339
+   "checkedAt": 1794400894653
   },
   {
    "username": "dilmurodqaroev",
@@ -516,7 +531,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 1794399662195,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794400234339
+   "checkedAt": 1794400894653
   },
   {
    "username": "theunbeatablequeen26",
@@ -531,7 +546,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 1794399381792,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794400234339
+   "checkedAt": 1794400894653
   },
   {
    "username": "sztiflerr18",
@@ -546,7 +561,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 1794399381792,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794400234339
+   "checkedAt": 1794400894653
   },
   {
    "username": "doraa.aaa",
@@ -561,7 +576,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 1794399381792,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794400234339
+   "checkedAt": 1794400894653
   },
   {
    "username": "diamond23199",
@@ -576,7 +591,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 1794399381792,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794400234339
+   "checkedAt": 1794400894653
   },
   {
    "username": "judy.pinky",
@@ -591,7 +606,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 1794399381792,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794400234339
+   "checkedAt": 1794400894653
   },
   {
    "username": "sunny0711h",
@@ -604,9 +619,9 @@
    "gifts": 0,
    "lastGiftAt": 0,
    "lastGiftName": "",
-   "lastSeenLiveAt": 1794399381792,
+   "lastSeenLiveAt": 1794400674293,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794400234339
+   "checkedAt": 1794400894653
   },
   {
    "username": "mirei0626_",
@@ -621,7 +636,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 1794399381792,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794400234339
+   "checkedAt": 1794400894653
   },
   {
    "username": "yyuyu0508",
@@ -636,7 +651,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 1794400012963,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794400234339
+   "checkedAt": 1794400894653
   },
   {
    "username": "ak_rajput143",
@@ -651,7 +666,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 1794399381792,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794400234339
+   "checkedAt": 1794400894653
   },
   {
    "username": "itslitoshow",
@@ -666,7 +681,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 1794400012963,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794400234339
+   "checkedAt": 1794400894653
   },
   {
    "username": "iii.yaya",
@@ -681,7 +696,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 1794399381792,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794400234339
+   "checkedAt": 1794400894653
   },
   {
    "username": "beautyvendorau.10",
@@ -696,7 +711,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 1794399381792,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794400234339
+   "checkedAt": 1794400894652
   },
   {
    "username": "kazuto.1105",
@@ -711,7 +726,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 1794399381792,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794400234339
+   "checkedAt": 1794400894652
   },
   {
    "username": "mittu.maldives",
@@ -726,7 +741,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 1794399381792,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794400234339
+   "checkedAt": 1794400894653
   },
   {
    "username": "kiyong.j",
@@ -741,7 +756,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 1794399381792,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794400234339
+   "checkedAt": 1794400894653
   },
   {
    "username": "lemon69panda",
@@ -756,7 +771,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 1794399381792,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794400234339
+   "checkedAt": 1794400894652
   },
   {
    "username": "quantum.stream0",
@@ -771,7 +786,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 1794399381792,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794400234339
+   "checkedAt": 1794400894652
   },
   {
    "username": "queenisabela01",
@@ -786,7 +801,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 1794399381792,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794400234339
+   "checkedAt": 1794400894652
   },
   {
    "username": "super_saiyan_king_au",
@@ -801,7 +816,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 1794399381792,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794400234339
+   "checkedAt": 1794400894652
   },
   {
    "username": "jacub474",
@@ -814,9 +829,9 @@
    "gifts": 0,
    "lastGiftAt": 0,
    "lastGiftName": "",
-   "lastSeenLiveAt": 1794399662195,
+   "lastSeenLiveAt": 1794400674293,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794400234339
+   "checkedAt": 1794400894652
   },
   {
    "username": "itz.april.aries",
@@ -831,7 +846,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 1794399381792,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794400234339
+   "checkedAt": 1794400894652
   },
   {
    "username": "steyntjie_1",
@@ -846,7 +861,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 1794399381792,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794400234339
+   "checkedAt": 1794400894652
   },
   {
    "username": "sombody508_27",
@@ -861,7 +876,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 1794399381792,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794400234339
+   "checkedAt": 1794400894652
   },
   {
    "username": "leprechaun.backuppage",
@@ -876,7 +891,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 1794399381792,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794400234339
+   "checkedAt": 1794400894652
   },
   {
    "username": "1_ackeem_boss_backuppage",
@@ -891,7 +906,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 1794399381792,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794400234339
+   "checkedAt": 1794400894652
   },
   {
    "username": "officialsynuss",
@@ -906,7 +921,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 1794399381792,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794400234339
+   "checkedAt": 1794400894652
   },
   {
    "username": "stephenlewis7055",
@@ -921,7 +936,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 1794399381792,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794400234339
+   "checkedAt": 1794400894652
   },
   {
    "username": "isahernandez111",
@@ -934,9 +949,9 @@
    "gifts": 0,
    "lastGiftAt": 0,
    "lastGiftName": "",
-   "lastSeenLiveAt": 1794399662195,
+   "lastSeenLiveAt": 1794400370632,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794400234339
+   "checkedAt": 1794400894652
   },
   {
    "username": "2hypeshowboy_",
@@ -951,7 +966,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 1794399381792,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794400234339
+   "checkedAt": 1794400894652
   },
   {
    "username": "luvoff_ameila",
@@ -966,7 +981,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 1794399381792,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794400234339
+   "checkedAt": 1794400894652
   },
   {
    "username": "1psycho_official",
@@ -981,22 +996,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 1794399381792,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794400234339
-  },
-  {
-   "username": "tanzverbot",
-   "country": "DE",
-   "live": true,
-   "startTime": 0,
-   "title": "",
-   "viewers": 0,
-   "coins": 0,
-   "gifts": 0,
-   "lastGiftAt": 0,
-   "lastGiftName": "",
-   "lastSeenLiveAt": 1794399381792,
-   "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794400234339
+   "checkedAt": 1794400894652
   },
   {
    "username": "phonegadzz",
@@ -1011,7 +1011,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 1794399381792,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794400234339
+   "checkedAt": 1794400894652
   },
   {
    "username": "aya.tajjour",
@@ -1026,7 +1026,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 1794399381792,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794400234339
+   "checkedAt": 1794400894652
   },
   {
    "username": "nouf.381",
@@ -1041,7 +1041,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 1794399381792,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794400234339
+   "checkedAt": 1794400894652
   },
   {
    "username": "stefannys__",
@@ -1056,7 +1056,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 1794399381792,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794400234339
+   "checkedAt": 1794400894652
   },
   {
    "username": "itsbtw.hmo",
@@ -1071,7 +1071,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 1794399381792,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794400234339
+   "checkedAt": 1794400894652
   },
   {
    "username": "sianspzone",
@@ -1086,7 +1086,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 1794399381792,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794400234339
+   "checkedAt": 1794400894652
   },
   {
    "username": "preshevare_1",
@@ -1101,7 +1101,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 1794399381792,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794400234339
+   "checkedAt": 1794400894652
   },
   {
    "username": "robertonagy4",
@@ -1116,7 +1116,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 1794399381792,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794400234339
+   "checkedAt": 1794400894652
   },
   {
    "username": "elsoltana___hor",
@@ -1131,7 +1131,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 1794400020105,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794400234339
+   "checkedAt": 1794400894652
   },
   {
    "username": "myoujou.mei",
@@ -1146,7 +1146,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 1794399381792,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794400234339
+   "checkedAt": 1794400894652
   },
   {
    "username": "thegospelsinger",
@@ -1161,7 +1161,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 1794399381792,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794400234339
+   "checkedAt": 1794400894652
   },
   {
    "username": "rysbek_atash",
@@ -1176,7 +1176,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 1794399381792,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794400234339
+   "checkedAt": 1794400894652
   },
   {
    "username": "n_n_m20",
@@ -1191,7 +1191,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 1794399381792,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794400234339
+   "checkedAt": 1794400894652
   },
   {
    "username": "wake_radio",
@@ -1206,7 +1206,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 1794400012963,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794400234339
+   "checkedAt": 1794400894652
   },
   {
    "username": "saldyte",
@@ -1221,7 +1221,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 1794400012963,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794400234339
+   "checkedAt": 1794400894652
   },
   {
    "username": "riya.thapa1magar",
@@ -1236,7 +1236,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 1794399381792,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794400234339
+   "checkedAt": 1794400894652
   },
   {
    "username": "zaferkalfaa",
@@ -1249,9 +1249,9 @@
    "gifts": 0,
    "lastGiftAt": 0,
    "lastGiftName": "",
-   "lastSeenLiveAt": 1794399381792,
+   "lastSeenLiveAt": 1794400370632,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794400234339
+   "checkedAt": 1794400894652
   },
   {
    "username": "zewa__",
@@ -1266,7 +1266,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 1794399381792,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794400234339
+   "checkedAt": 1794400894652
   },
   {
    "username": "renethatsme",
@@ -1281,7 +1281,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 1794399381792,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794400234339
+   "checkedAt": 1794400894652
   },
   {
    "username": "1__lawd",
@@ -1296,7 +1296,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 1794399381792,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794400234339
+   "checkedAt": 1794400894652
   },
   {
    "username": "fyrahkhan",
@@ -1309,9 +1309,9 @@
    "gifts": 0,
    "lastGiftAt": 0,
    "lastGiftName": "",
-   "lastSeenLiveAt": 1794399381792,
+   "lastSeenLiveAt": 1794400674293,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794400234339
+   "checkedAt": 1794400894652
   },
   {
    "username": "monita_921",
@@ -1324,9 +1324,9 @@
    "gifts": 0,
    "lastGiftAt": 0,
    "lastGiftName": "",
-   "lastSeenLiveAt": 1794399662195,
+   "lastSeenLiveAt": 1794400370632,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794400234339
+   "checkedAt": 1794400894652
   },
   {
    "username": "elsorrentino7",
@@ -1341,7 +1341,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 1794399662195,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794400234339
+   "checkedAt": 1794400894652
   },
   {
    "username": "kimlia_model",
@@ -1356,7 +1356,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 1794399662195,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794400234339
+   "checkedAt": 1794400894652
   },
   {
    "username": "sebaiszymek",
@@ -1371,7 +1371,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 1794399662195,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794400234339
+   "checkedAt": 1794400894652
   },
   {
    "username": "aluminijacuuka",
@@ -1386,7 +1386,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 1794399662195,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794400234339
+   "checkedAt": 1794400894652
   },
   {
    "username": "sinan.dst",
@@ -1401,7 +1401,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 1794399662195,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794400234339
+   "checkedAt": 1794400894652
   },
   {
    "username": "cin.favorite",
@@ -1416,7 +1416,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 1794400012963,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794400234339
+   "checkedAt": 1794400894652
   },
   {
    "username": "mdlbqdve60t",
@@ -1429,9 +1429,9 @@
    "gifts": 0,
    "lastGiftAt": 0,
    "lastGiftName": "",
-   "lastSeenLiveAt": 1794400012963,
+   "lastSeenLiveAt": 1794400674293,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794400234339
+   "checkedAt": 1794400894652
   },
   {
    "username": "rr306gg89",
@@ -1446,7 +1446,112 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 1794400012963,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794400234339
+   "checkedAt": 1794400894652
+  },
+  {
+   "username": "solomumlr24",
+   "country": "LU",
+   "live": true,
+   "startTime": 0,
+   "title": "",
+   "viewers": 0,
+   "coins": 0,
+   "gifts": 0,
+   "lastGiftAt": 0,
+   "lastGiftName": "",
+   "lastSeenLiveAt": 1794400370632,
+   "reason": "boş yanıt (doğrulanamadı)",
+   "checkedAt": 1794400894652
+  },
+  {
+   "username": "fvgowsjlisvd4g",
+   "country": "VN",
+   "live": true,
+   "startTime": 0,
+   "title": "",
+   "viewers": 0,
+   "coins": 0,
+   "gifts": 0,
+   "lastGiftAt": 0,
+   "lastGiftName": "",
+   "lastSeenLiveAt": 1794400370632,
+   "reason": "boş yanıt (doğrulanamadı)",
+   "checkedAt": 1794400894652
+  },
+  {
+   "username": "kktiktok6688",
+   "country": "SG",
+   "live": true,
+   "startTime": 0,
+   "title": "",
+   "viewers": 0,
+   "coins": 0,
+   "gifts": 0,
+   "lastGiftAt": 0,
+   "lastGiftName": "",
+   "lastSeenLiveAt": 1794400370632,
+   "reason": "boş yanıt (doğrulanamadı)",
+   "checkedAt": 1794400894652
+  },
+  {
+   "username": "marina.rezzk",
+   "country": "ME",
+   "live": true,
+   "startTime": 0,
+   "title": "",
+   "viewers": 0,
+   "coins": 0,
+   "gifts": 0,
+   "lastGiftAt": 0,
+   "lastGiftName": "",
+   "lastSeenLiveAt": 1794400370632,
+   "reason": "boş yanıt (doğrulanamadı)",
+   "checkedAt": 1794400894652
+  },
+  {
+   "username": "beau.meesseman",
+   "country": "BE",
+   "live": true,
+   "startTime": 0,
+   "title": "",
+   "viewers": 0,
+   "coins": 0,
+   "gifts": 0,
+   "lastGiftAt": 0,
+   "lastGiftName": "",
+   "lastSeenLiveAt": 1794400674293,
+   "reason": "boş yanıt (doğrulanamadı)",
+   "checkedAt": 1794400894652
+  },
+  {
+   "username": "reinekhoury0",
+   "country": "ME",
+   "live": true,
+   "startTime": 0,
+   "title": "",
+   "viewers": 0,
+   "coins": 0,
+   "gifts": 0,
+   "lastGiftAt": 0,
+   "lastGiftName": "",
+   "lastSeenLiveAt": 1794400674293,
+   "reason": "boş yanıt (doğrulanamadı)",
+   "checkedAt": 1794400894652
+  },
+  {
+   "username": "js.entertainment",
+   "country": "AU",
+   "live": true,
+   "startTime": 0,
+   "title": "",
+   "viewers": 0,
+   "coins": 0,
+   "gifts": 0,
+   "lastGiftAt": 0,
+   "lastGiftName": "",
+   "lastSeenLiveAt": 1794400674293,
+   "reason": "boş yanıt (doğrulanamadı)",
+   "checkedAt": 1794400894652
   },
   {
    "username": "tiiroo13",
@@ -1461,7 +1566,7 @@
    "lastGiftName": "Sandık",
    "lastSeenLiveAt": 1794394520056,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794400234339
+   "checkedAt": 1794400894653
   },
   {
    "username": "berenikebe",
@@ -1476,7 +1581,7 @@
    "lastGiftName": "Sandık",
    "lastSeenLiveAt": 1794398310722,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794400234339
+   "checkedAt": 1794400894652
   },
   {
    "username": "kristjankuuseste",
@@ -1491,7 +1596,7 @@
    "lastGiftName": "Sandık",
    "lastSeenLiveAt": 1794394520056,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794400234339
+   "checkedAt": 1794400894653
   },
   {
    "username": "junioryayin1",
@@ -1506,7 +1611,7 @@
    "lastGiftName": "spark_box",
    "lastSeenLiveAt": 1794399381792,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794400234339
+   "checkedAt": 1794400894652
   },
   {
    "username": "dolay3803",
@@ -1521,7 +1626,7 @@
    "lastGiftName": "Sandık",
    "lastSeenLiveAt": 1794396395824,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794400234339
+   "checkedAt": 1794400894653
   },
   {
    "username": "tr3hlebova",
@@ -1536,7 +1641,7 @@
    "lastGiftName": "Sandık",
    "lastSeenLiveAt": 1794397372897,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794400234339
+   "checkedAt": 1794400894652
   },
   {
    "username": "the_realangelo",
@@ -1551,7 +1656,7 @@
    "lastGiftName": "Sandık",
    "lastSeenLiveAt": 1794399238671,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794400234339
+   "checkedAt": 1794400894653
   },
   {
    "username": "airin_rahman_payel",
@@ -1566,7 +1671,7 @@
    "lastGiftName": "Sandık",
    "lastSeenLiveAt": 1794393057660,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794400234339
+   "checkedAt": 1794400894653
   },
   {
    "username": "vikulya_bakaeva",
@@ -1581,7 +1686,7 @@
    "lastGiftName": "Zarf",
    "lastSeenLiveAt": 1794396849742,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794400234339
+   "checkedAt": 1794400894653
   },
   {
    "username": "a.s.h.a.t_pushka",
@@ -1596,7 +1701,7 @@
    "lastGiftName": "Sandık",
    "lastSeenLiveAt": 1794397946782,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794400234339
+   "checkedAt": 1794400894652
   },
   {
    "username": "_kgz_a1maz__",
@@ -1611,7 +1716,7 @@
    "lastGiftName": "Zarf",
    "lastSeenLiveAt": 1794395687397,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794400234339
+   "checkedAt": 1794400894653
   },
   {
    "username": "albelisbelandria",
@@ -1626,7 +1731,7 @@
    "lastGiftName": "Sandık",
    "lastSeenLiveAt": 1794395049907,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794400234339
+   "checkedAt": 1794400894653
   },
   {
    "username": "jhanzaib_tokhi",
@@ -1641,7 +1746,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 1794392614533,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794400234339
+   "checkedAt": 1794400894653
   },
   {
    "username": "yasin.krd07",
@@ -1656,7 +1761,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 1794392991087,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794400234339
+   "checkedAt": 1794400894653
   },
   {
    "username": "calimeroo__",
@@ -1671,7 +1776,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 1794396778747,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794400234339
+   "checkedAt": 1794400894653
   },
   {
    "username": "mimaaa_96",
@@ -1686,7 +1791,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794400234339
+   "checkedAt": 1794400894653
   },
   {
    "username": "darivzm0",
@@ -1701,7 +1806,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794400234339
+   "checkedAt": 1794400894653
   },
   {
    "username": "bujardemirii",
@@ -1716,7 +1821,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794400234339
+   "checkedAt": 1794400894653
   },
   {
    "username": "mettyekaa_",
@@ -1731,7 +1836,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794400234339
+   "checkedAt": 1794400894653
   },
   {
    "username": "chenxi0915",
@@ -1746,7 +1851,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794400234339
+   "checkedAt": 1794400894653
   },
   {
    "username": "geldsta",
@@ -1761,7 +1866,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794400234339
+   "checkedAt": 1794400894653
   },
   {
    "username": "charlesdobronxsoficial",
@@ -1776,7 +1881,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794400234339
+   "checkedAt": 1794400894653
   },
   {
    "username": "garciafollowers1",
@@ -1791,7 +1896,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794400234339
+   "checkedAt": 1794400894653
   },
   {
    "username": "abduraxmon_mavlonov",
@@ -1806,7 +1911,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794400234339
+   "checkedAt": 1794400894653
   },
   {
    "username": "vanha_1626",
@@ -1821,7 +1926,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794400234339
+   "checkedAt": 1794400894653
   },
   {
    "username": "syamelamzah91",
@@ -1836,7 +1941,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794400234339
+   "checkedAt": 1794400894653
   },
   {
    "username": "tiff_jadunath",
@@ -1851,7 +1956,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794400234339
+   "checkedAt": 1794400894653
   },
   {
    "username": "markmynister",
@@ -1866,7 +1971,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 1794398310722,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794400234339
+   "checkedAt": 1794400894653
   },
   {
    "username": "muonkiepnhansinh0402",
@@ -1881,7 +1986,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794400234339
+   "checkedAt": 1794400894653
   },
   {
    "username": "venefc11",
@@ -1896,7 +2001,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794400234339
+   "checkedAt": 1794400894653
   },
   {
    "username": "brittatarot",
@@ -1911,7 +2016,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794400234339
+   "checkedAt": 1794400894653
   },
   {
    "username": "xmina_official8x",
@@ -1926,7 +2031,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794400234339
+   "checkedAt": 1794400894653
   },
   {
    "username": "krishilyerriah",
@@ -1941,7 +2046,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 1794396104863,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794400234339
+   "checkedAt": 1794400894653
   },
   {
    "username": "khaleesianahita",
@@ -1956,7 +2061,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794400234339
+   "checkedAt": 1794400894653
   },
   {
    "username": "abujassim009",
@@ -1971,7 +2076,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794400234339
+   "checkedAt": 1794400894653
   },
   {
    "username": "bossup_babe",
@@ -1986,7 +2091,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794400234339
+   "checkedAt": 1794400894653
   },
   {
    "username": "cherylinchaos",
@@ -2001,7 +2106,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794400234339
+   "checkedAt": 1794400894653
   },
   {
    "username": "zahitaoficial",
@@ -2016,7 +2121,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794400234339
+   "checkedAt": 1794400894653
   },
   {
    "username": "numbe_nine",
@@ -2031,7 +2136,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794400234339
+   "checkedAt": 1794400894653
   },
   {
    "username": "bulochka_sll",
@@ -2046,7 +2151,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794400234339
+   "checkedAt": 1794400894653
   },
   {
    "username": "ee_110124",
@@ -2061,7 +2166,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794400234339
+   "checkedAt": 1794400894653
   },
   {
    "username": "kapatagakids2",
@@ -2076,7 +2181,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794400234339
+   "checkedAt": 1794400894653
   },
   {
    "username": "jc__2525",
@@ -2091,7 +2196,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794400234339
+   "checkedAt": 1794400894653
   },
   {
    "username": "donfarida",
@@ -2106,7 +2211,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794400234339
+   "checkedAt": 1794400894653
   },
   {
    "username": "vanillasaywer69120",
@@ -2121,7 +2226,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794400234339
+   "checkedAt": 1794400894653
   },
   {
    "username": "kalle.kalle096",
@@ -2136,7 +2241,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 1794394183287,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794400234339
+   "checkedAt": 1794400894653
   },
   {
    "username": "munkobaoo",
@@ -2151,7 +2256,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794400234339
+   "checkedAt": 1794400894653
   },
   {
    "username": "elsegundodefrancomejia",
@@ -2166,7 +2271,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794400234339
+   "checkedAt": 1794400894653
   },
   {
    "username": "dwroula0",
@@ -2181,7 +2286,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 1794392912353,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794400234339
+   "checkedAt": 1794400894653
   },
   {
    "username": "melechia.springer",
@@ -2196,7 +2301,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794400234339
+   "checkedAt": 1794400894653
   },
   {
    "username": "bedetozjadl",
@@ -2211,7 +2316,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 1794394183287,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794400234339
+   "checkedAt": 1794400894653
   },
   {
    "username": "douhalaribiii",
@@ -2226,7 +2331,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794400234339
+   "checkedAt": 1794400894653
   },
   {
    "username": "hanaday_.com",
@@ -2241,7 +2346,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794400234339
+   "checkedAt": 1794400894653
   },
   {
    "username": "skumfidus0",
@@ -2256,7 +2361,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794400234339
+   "checkedAt": 1794400894653
   },
   {
    "username": "___88358",
@@ -2271,7 +2376,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 1794395125399,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794400234339
+   "checkedAt": 1794400894653
   },
   {
    "username": "xoangeline",
@@ -2286,7 +2391,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794400234339
+   "checkedAt": 1794400894653
   },
   {
    "username": "rodifyy",
@@ -2301,7 +2406,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 1794394520056,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794400234339
+   "checkedAt": 1794400894653
   },
   {
    "username": "unawa",
@@ -2316,7 +2421,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794400234339
+   "checkedAt": 1794400894653
   },
   {
    "username": "nanyamsababanayam",
@@ -2331,7 +2436,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794400234339
+   "checkedAt": 1794400894653
   },
   {
    "username": "sayatissembayev",
@@ -2346,7 +2451,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794400234339
+   "checkedAt": 1794400894653
   },
   {
    "username": "na.5e",
@@ -2361,7 +2466,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794400234339
+   "checkedAt": 1794400894653
   },
   {
    "username": "bosswan88",
@@ -2376,7 +2481,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794400234339
+   "checkedAt": 1794400894653
   },
   {
    "username": "zulal",
@@ -2391,7 +2496,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794400234339
+   "checkedAt": 1794400894653
   },
   {
    "username": "elifsu",
@@ -2406,7 +2511,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794400234339
+   "checkedAt": 1794400894653
   },
   {
    "username": "cznburak",
@@ -2421,7 +2526,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794400234339
+   "checkedAt": 1794400894653
   },
   {
    "username": "pqueen",
@@ -2436,7 +2541,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794400234339
+   "checkedAt": 1794400894653
   },
   {
    "username": "emredgn",
@@ -2451,7 +2556,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794400234339
+   "checkedAt": 1794400894653
   },
   {
    "username": "dilaraa.s",
@@ -2466,7 +2571,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794400234339
+   "checkedAt": 1794400894653
   },
   {
    "username": "barisozcan",
@@ -2481,7 +2586,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794400234339
+   "checkedAt": 1794400894653
   },
   {
    "username": "cagrimutlu",
@@ -2496,7 +2601,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794400234339
+   "checkedAt": 1794400894653
   },
   {
    "username": "turkticaret",
@@ -2511,7 +2616,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794400234339
+   "checkedAt": 1794400894653
   },
   {
    "username": "charlidamelio",
@@ -2526,7 +2631,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794400234339
+   "checkedAt": 1794400894653
   },
   {
    "username": "khaby.lame",
@@ -2541,7 +2646,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794400234339
+   "checkedAt": 1794400894653
   },
   {
    "username": "tiktok",
@@ -2556,7 +2661,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794400234339
+   "checkedAt": 1794400894653
   },
   {
    "username": "username29092015",
@@ -2571,7 +2676,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 1794394653032,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794400234339
+   "checkedAt": 1794400894653
   },
   {
    "username": "rahidamahmud",
@@ -2586,7 +2691,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 1794395412368,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794400234339
+   "checkedAt": 1794400894653
   },
   {
    "username": "anibal_soy3",
@@ -2601,7 +2706,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 1794397505192,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794400234339
+   "checkedAt": 1794400894653
   },
   {
    "username": "_nhi0611_",
@@ -2616,7 +2721,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 1794394787777,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794400234339
+   "checkedAt": 1794400894653
   },
   {
    "username": "ninogashi",
@@ -2631,7 +2736,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 1794397304720,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794400234339
+   "checkedAt": 1794400894653
   },
   {
    "username": "abed_comedy",
@@ -2646,7 +2751,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 1794394115488,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794400234339
+   "checkedAt": 1794400894653
   },
   {
    "username": "stiankleven80",
@@ -2661,7 +2766,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 1794392985379,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794400234339
+   "checkedAt": 1794400894653
   },
   {
    "username": "hawtmouth_kay",
@@ -2676,7 +2781,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 1794394787777,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794400234339
+   "checkedAt": 1794400894653
   },
   {
    "username": "kingofflinegirl",
@@ -2691,7 +2796,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 1794394922009,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794400234339
+   "checkedAt": 1794400894653
   },
   {
    "username": "kubicekkrokadyl",
@@ -2706,7 +2811,22 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 1794394046604,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794400234339
+   "checkedAt": 1794400894653
+  },
+  {
+   "username": "woneeyday",
+   "country": "KR",
+   "live": false,
+   "startTime": 1794381614000,
+   "title": "Welcome MY Live !",
+   "viewers": 12423,
+   "coins": 0,
+   "gifts": 0,
+   "lastGiftAt": 0,
+   "lastGiftName": "",
+   "lastSeenLiveAt": 1794399381792,
+   "reason": "boş yanıt (doğrulanamadı)",
+   "checkedAt": 1794400894653
   },
   {
    "username": "its.jovanas",
@@ -2721,7 +2841,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 1794394115488,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794400234339
+   "checkedAt": 1794400894653
   },
   {
    "username": "sakiderechte",
@@ -2736,7 +2856,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 1794397733899,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794400234339
+   "checkedAt": 1794400894653
   },
   {
    "username": "ledyush",
@@ -2751,7 +2871,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 1794396395824,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794400234339
+   "checkedAt": 1794400894653
   },
   {
    "username": "yangyangdeyi.21",
@@ -2766,7 +2886,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 1794397090732,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794400234339
+   "checkedAt": 1794400894653
   },
   {
    "username": "ah.juv7",
@@ -2781,7 +2901,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 1794394653032,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794400234339
+   "checkedAt": 1794400894653
   },
   {
    "username": "__gul__25",
@@ -2796,7 +2916,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 1794399164089,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794400234339
+   "checkedAt": 1794400894653
   },
   {
    "username": "sonul__2121",
@@ -2811,7 +2931,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 1794393910534,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794400234339
+   "checkedAt": 1794400894653
   },
   {
    "username": "el.reymusic",
@@ -2826,7 +2946,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 1794398807366,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794400234339
+   "checkedAt": 1794400894653
   },
   {
    "username": "gabrielabrantes884",
@@ -2841,7 +2961,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 1794396034655,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794400234339
+   "checkedAt": 1794400894653
   },
   {
    "username": "nazkhnnn",
@@ -2856,7 +2976,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 1794397873882,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794400234339
+   "checkedAt": 1794400894653
   },
   {
    "username": "ngm2471",
@@ -2871,7 +2991,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 1794397090732,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794400234339
+   "checkedAt": 1794400894653
   },
   {
    "username": "enyerbert_",
@@ -2886,7 +3006,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 1794394040753,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794400234339
+   "checkedAt": 1794400894653
   },
   {
    "username": "empr3sszion",
@@ -2901,7 +3021,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 1794394040753,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794400234339
+   "checkedAt": 1794400894653
   },
   {
    "username": "biintalsham",
@@ -2916,7 +3036,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 1794395754563,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794400234339
+   "checkedAt": 1794400894653
   },
   {
    "username": "talord",
@@ -2931,7 +3051,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 1794394520056,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794400234339
+   "checkedAt": 1794400894653
   },
   {
    "username": "mr_1city",
@@ -2946,7 +3066,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 1794397233762,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794400234339
+   "checkedAt": 1794400894653
   },
   {
    "username": "minttumarleena",
@@ -2961,7 +3081,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 1794398226270,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794400234339
+   "checkedAt": 1794400894653
   },
   {
    "username": "chineykandchina12",
@@ -2976,7 +3096,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 1794394520056,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794400234339
+   "checkedAt": 1794400894653
   },
   {
    "username": "wwwenitheberry",
@@ -2991,7 +3111,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 1794396849742,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794400234339
+   "checkedAt": 1794400894653
   },
   {
    "username": "2liutai",
@@ -3006,7 +3126,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 1794395748868,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794400234339
+   "checkedAt": 1794400894653
   },
   {
    "username": "samaalixo",
@@ -3021,7 +3141,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 1794397443846,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794400234339
+   "checkedAt": 1794400894653
   },
   {
    "username": "terroristahn",
@@ -3036,7 +3156,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 1794395049907,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794400234339
+   "checkedAt": 1794400894653
   },
   {
    "username": "batlisttt",
@@ -3051,7 +3171,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 1794398586325,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794400234339
+   "checkedAt": 1794400894653
   },
   {
    "username": "iill794",
@@ -3066,7 +3186,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 1794398586325,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794400234339
+   "checkedAt": 1794400894652
   },
   {
    "username": "wychudzony.gerlat4",
@@ -3081,7 +3201,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 1794396471887,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794400234339
+   "checkedAt": 1794400894652
   },
   {
    "username": "tyreasnanton",
@@ -3096,7 +3216,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 1794396471887,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794400234339
+   "checkedAt": 1794400894652
   },
   {
    "username": "daviekitchen",
@@ -3111,7 +3231,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 1794397090732,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794400234339
+   "checkedAt": 1794400894652
   },
   {
    "username": "melekatasevenn",
@@ -3126,7 +3246,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 1794396838956,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794400234339
+   "checkedAt": 1794400894652
   },
   {
    "username": "dalila_lifestyle",
@@ -3141,7 +3261,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 1794396838956,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794400234339
+   "checkedAt": 1794400894652
   },
   {
    "username": "orhansari61",
@@ -3156,7 +3276,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 1794396838956,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794400234339
+   "checkedAt": 1794400894652
   },
   {
    "username": "meli18908",
@@ -3171,7 +3291,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 1794397150949,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794400234339
+   "checkedAt": 1794400894652
   },
   {
    "username": "bassant_raed1",
@@ -3186,7 +3306,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 1794398807365,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794400234339
+   "checkedAt": 1794400894652
   },
   {
    "username": "dodoresmi01",
@@ -3201,7 +3321,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 1794397150949,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794400234339
+   "checkedAt": 1794400894652
   },
   {
    "username": "misslova0702",
@@ -3216,7 +3336,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 1794399090760,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794400234339
+   "checkedAt": 1794400894652
   },
   {
    "username": "claudianv07",
@@ -3231,7 +3351,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 1794398733192,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794400234339
+   "checkedAt": 1794400894652
   },
   {
    "username": "nelli__________",
@@ -3246,7 +3366,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 1794397862051,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794400234339
+   "checkedAt": 1794400894652
   },
   {
    "username": "v2ios0",
@@ -3261,7 +3381,7 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 1794398807365,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794400234339
+   "checkedAt": 1794400894652
   },
   {
    "username": "_.sofi.bby._",
@@ -3276,10 +3396,81 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 1794399298878,
    "reason": "boş yanıt (doğrulanamadı)",
-   "checkedAt": 1794400234339
+   "checkedAt": 1794400894652
+  },
+  {
+   "username": "cedhd_",
+   "country": "FR",
+   "live": false,
+   "startTime": 0,
+   "title": "",
+   "viewers": 0,
+   "coins": 0,
+   "gifts": 0,
+   "lastGiftAt": 0,
+   "lastGiftName": "",
+   "lastSeenLiveAt": 1794400370632,
+   "reason": "boş yanıt (doğrulanamadı)",
+   "checkedAt": 1794400894652
   }
  ],
  "events": [
+  {
+   "id": "kamran_aqsa-1794400764-yowsr",
+   "t": 1794400764766,
+   "username": "kamran_aqsa",
+   "kind": "letter",
+   "coins": 20,
+   "diamonds": 0,
+   "giftName": "coins",
+   "sender": "",
+   "shared": 16,
+   "durationSec": 180,
+   "availableAt": 1794400944766,
+   "source": "scan"
+  },
+  {
+   "id": "homseababa-1794400723-8j6ud",
+   "t": 1794400723865,
+   "username": "homseababa",
+   "kind": "chest",
+   "coins": 640,
+   "diamonds": 0,
+   "giftName": "spark_box",
+   "sender": "",
+   "shared": 457,
+   "durationSec": 30,
+   "availableAt": 1794400753865,
+   "source": "scan"
+  },
+  {
+   "id": "skinnybets-1794400387-ev0xp",
+   "t": 1794400387818,
+   "username": "skinnybets",
+   "kind": "chest",
+   "coins": 117,
+   "diamonds": 0,
+   "giftName": "spark_box",
+   "sender": "",
+   "shared": 84,
+   "durationSec": 29,
+   "availableAt": 1794400416818,
+   "source": "scan"
+  },
+  {
+   "id": "tanzverbot-1794400372-1fuxs",
+   "t": 1794400372515,
+   "username": "tanzverbot",
+   "kind": "letter",
+   "coins": 400,
+   "diamonds": 0,
+   "giftName": "coins",
+   "sender": "",
+   "shared": 400,
+   "durationSec": 59,
+   "availableAt": 1794400431515,
+   "source": "scan"
+  },
   {
    "id": "sefutau051-1794400235-a1y8h",
    "t": 1794400235588,
