@@ -736,7 +736,9 @@ function handleEnvelope(username, eventName, data) {
   state.envelopeSamples.push({
     t: nowMs, user: username, event: eventName, action: act, boxType,
     businessType: info.businessType || 0, coins, people,
-    secondsUntilOpen: openIn, unpackAt: timing.unpackAt
+    secondsUntilOpen: openIn, unpackAt: timing.unpackAt,
+    // Teşhis: gelen kutuda hangi alanlar var? Süre alanı adı değişirse buradan görülür.
+    keys: Object.keys(info).slice(0, 14)
   });
   if (state.envelopeSamples.length > 5) state.envelopeSamples.shift();
 
