@@ -418,7 +418,43 @@
       (Number(scanInfo.freshLive) || 0) + ' yeni aday',
       'keşif %' + Math.round((Number(scanInfo.probeRatio) || 0) * 100)
     ];
-    el.innerHTML = '<span class="chip chip-green">● ' + esc(parts.join(' · ')) + '</span>';
+    // Bağlantı teşhisi: "0 oda dinleniyor" görünüyorsa sebebi burada yazsın.
+    var stats = scanInfo.connectStats || {};
+    var attempts = Number(stats.attempts) || 0;
+    var okCount = Number(stats.ok) || 0;
+    var failedCount = Number(stats.failed) || 0;
+    var cooldown = Number(scanInfo.cooldownLeftSec) || 0;
+    var watching = Number(scanInfo.watching) || 0;
+    var errors = Array.isArray(stats.errors) ? stats.errors : [];
+    var hints = [];
+    if (watching === 0 && live > 0) {
+      hints.push(cooldown > 0
+        ? '⏳ hız sınırı soğuması ' + clock(cooldown) + ' — yeni bağlantı kurulmuyor'
+        : '⚠ canlı var ama dinlenen oda yok');
+    }
+    if (attempts > 0) {
+      hints.push('bağlantı ' + okCount + '/' + attempts + ' başarılı' +
+        (failedCount ? ' · ' + failedCount + ' hata' : ''));
+    }
+    var offlineCount = Number(stats.offline) || 0;
+    if (offlineCount > 0) hints.push(offlineCount + ' biten yayın atlandı');
+    var lastError = scanInfo.lastConnectorError ||
+      (errors.length ? errors[errors.length - 1].message : scanInfo.lastError);
+    if (lastError) hints.push('son hata: ' + lastError);
+
+    var detail = errors.map(function (item) {
+      var when = new Date(Number(item.at) || Date.now()).toLocaleTimeString('tr-TR',
+        { hour: '2-digit', minute: '2-digit' });
+      return when + ' · @' + (item.username || '?') + ' (' + (item.source || '?') + ') ' + (item.message || '');
+    }).join('\n');
+
+    var connLine = hints.length
+      ? '<div class="w-full mt-1 text-[10px] ' +
+        (watching === 0 && live > 0 ? 'text-amber-300' : 'text-yellow-50/40') + '"' +
+        (detail ? ' title="' + esc(detail) + '"' : '') + '>' + esc(hints.join(' · ')) + '</div>'
+      : '';
+
+    el.innerHTML = '<span class="chip chip-green">● ' + esc(parts.join(' · ')) + '</span>' + connLine;
   }
 
   async function refreshScan() {

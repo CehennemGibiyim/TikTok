@@ -53,8 +53,11 @@ const CONFIG = {
 
   maxPool: Number(readArg('max-pool', 250)),
   watch: readArg('watch', readArg('once', 0) ? 0 : 1) ? true : false,
-  // tiktok-live-connector ile dinle (anahtarsız); 0 verilirse TikTools'a düşer.
+  // tiktok-live-connector ile dinle (anahtarsız).
   connector: readArg('connector', 1) ? true : false,
+  // TikTools demo anahtarı neredeyse her zaman 429 veriyor; varsayılan kapalı.
+  // Açıkken bağlayıcı hatası bu 429'un arkasında kayboluyordu.
+  tiktools: readArg('tiktools', 0) ? true : false,
   watchSec: Number(readArg('watch-sec', 300)),
   watchRooms: Number(readArg('watch-rooms', 8)),
   // Bağlantılar arası en az boşluk: hız sınırına çarpmadan sırayla açılır.
@@ -100,6 +103,10 @@ const state = {
   // Eşzamanlı oda bütçesi: sınır yedikçe düşer, başarılı bağlantıda toparlanır.
   roomBudget: 0,
   connectFailures: 0,
+  // Bağlantı teşhisi: panel "neden 0 oda" sorusunu buradan yanıtlar.
+  connectStats: { attempts: 0, ok: 0, failed: 0, rateLimited: 0, offline: 0, errors: [] },
+  lastConnectorError: null,
+  closeReasons: {},
   lastConnectAt: 0,
   targetsDirty: false,
   // Keşif oranı: deneme oturumlarının kutu başarısına göre kendini ayarlar.
@@ -123,6 +130,39 @@ const state = {
 
 function log(...args) {
   console.log(new Date().toISOString().slice(11, 19), ...args);
+}
+
+// "Yayın bitmiş" hatası hız sınırı değildir: ayrı sayılır, ceza verilmez.
+function isOfflineError(error) {
+  return /isn'?t online|is not online|not live|offline|room (is )?not found|\b404\b/i
+    .test(String((error && error.message) || ''));
+}
+
+// Bağlantı hatasını kaynağıyla birlikte saklar (panelde gösterilir).
+function noteConnect(username, source, error) {
+  if (error && typeof error === 'object') error.noted = true;
+  const message = String((error && error.message) || error || 'bilinmeyen hata').slice(0, 140);
+  state.connectStats.errors.push({ at: Date.now(), username, source, message });
+  if (state.connectStats.errors.length > 5) state.connectStats.errors.shift();
+  if (source === 'connector') state.lastConnectorError = message;
+  state.lastError = 'dinleme: ' + username + ' (' + source + ') ' + message;
+}
+
+// Oturum kapanışını planlar. Hız sınırı soğumasında yeni bağlantı kurulamadığı
+// için çalışan oda kapatılmaz: birer dakika uzatılır (en fazla 10 dk).
+function armWatcherTimer(watcher) {
+  if (watcher.timer) clearTimeout(watcher.timer);
+  const base = (watcher.sessionSec || CONFIG.watchSec) * 1000 + (watcher.extendedMs || 0);
+  const left = Math.max(0, watcher.startedAt + base - Date.now());
+  watcher.timer = setTimeout(() => {
+    if (state.connectorCooldownUntil > Date.now() && (watcher.extendedMs || 0) < 10 * 60000) {
+      watcher.extendedMs = (watcher.extendedMs || 0) + 60000;
+      log('soğuma sürüyor, oturum 1 dk uzatıldı:', watcher.username);
+      armWatcherTimer(watcher);
+      return;
+    }
+    closeWatcher(watcher.username, 'süre doldu');
+  }, Math.max(1000, left));
 }
 
 function sleep(ms) {
@@ -624,6 +664,8 @@ async function closeWatcher(username, reason) {
   const watcher = state.rooms.get(username);
   if (!watcher) return;
   state.rooms.delete(username);
+  const reasonKey = reason || 'bilinmiyor';
+  state.closeReasons[reasonKey] = (Number(state.closeReasons[reasonKey]) || 0) + 1;
 
   // Oturum sonucu: kutu çıktı mı? (oran uyarlamasının girdisi)
   const gotBox = Number(watcher.boxes) > 0;
@@ -852,8 +894,7 @@ async function openConnectorWatcher(username, sessionSec) {
   const liveRecord = state.streamers.get(username);
   if (liveRecord && connection.roomId) liveRecord.roomId = String(connection.roomId);
 
-  watcher.timer = setTimeout(() => { closeWatcher(username, 'süre doldu'); },
-    (watcher.sessionSec || CONFIG.watchSec) * 1000);
+  armWatcherTimer(watcher);
   log('dinleniyor', username);
 }
 
@@ -863,19 +904,34 @@ async function openWatcher(username, sessionSec) {
       await openConnectorWatcher(username, sessionSec);
       return;
     } catch (error) {
-      state.lastError = 'dinleme: ' + username + ' ' + error.message;
+      if (isOfflineError(error)) {
+        // Oda listesi bayat: yayın bitmiş. Havuzda "yayında değil" işaretlenir,
+        // böylece aynı oda tekrar tekrar seçilmez ve ceza sayılmaz.
+        error.offline = true;
+        markOffline(username);
+        closeWatcher(username, 'yayın bitti');
+        throw error;
+      }
+      noteConnect(username, 'connector', error);
       log('bağlayıcı hatası', username, error.message);
       closeWatcher(username, 'bağlanamadı');
-      // Hız sınırı / cihaz engeli: yedek yola düşmek de 429 yer; bekle.
-      // 429 / "token yok (429)" da hız sınırıdır: bütçeyi düşür, bekle.
+      // Hız sınırı / cihaz engeli: yedek yol da 429 yer; bekle.
       if (/rate|too many|device_blocked|429|\b503\b/i.test(error.message || '')) {
         throw error;
       }
-      // Diğer hatalarda aşağıdaki TikTools yolu yedek olarak denenir.
+      // Yedek yol kapalıysa gerçek hata yukarı çıkar; TikTools'un 429'u
+      // bağlayıcının gerçek hatasını gizlemesin.
+      if (!CONFIG.tiktools) throw error;
     }
   }
 
-  const token = await mintToken(username, Math.min(900, (sessionSec || CONFIG.watchSec) + 60));
+  let token;
+  try {
+    token = await mintToken(username, Math.min(900, (sessionSec || CONFIG.watchSec) + 60));
+  } catch (error) {
+    noteConnect(username, 'tiktools', error);
+    throw error;
+  }
   const WS = wsFactory();
   const socket = new WS('wss://api.tik.tools?uniqueId=' + encodeURIComponent(username) +
     '&jwtKey=' + encodeURIComponent(token));
@@ -906,8 +962,7 @@ async function openWatcher(username, sessionSec) {
     });
   }
 
-  watcher.timer = setTimeout(() => { closeWatcher(username, 'süre doldu'); },
-    (watcher.sessionSec || CONFIG.watchSec) * 1000);
+  armWatcherTimer(watcher);
   log('dinleniyor', username);
 }
 
@@ -994,6 +1049,7 @@ async function maintainWatchers() {
   // Oran artık sabit değil: kutu başarısına göre uyarlanır (probe-ratio başlangıç).
   const probeBudget = Math.max(1, Math.round(target * state.probe.ratio));
 
+  let tries = 0;
   while (state.rooms.size < target) {
     if (Date.now() - state.lastConnectAt < CONFIG.connectGapMs) break;
 
@@ -1012,10 +1068,12 @@ async function maintainWatchers() {
     state.recent.push(pick.record.username);
     if (state.recent.length > 200) state.recent.shift();
 
+    state.connectStats.attempts += 1;
     try {
       await openWatcher(pick.record.username, sessionSec);
       state.lastConnectAt = Date.now();
       state.connectFailures = 0;
+      state.connectStats.ok += 1;
       state.roomBudget = Math.min(CONFIG.watchRooms, state.roomBudget + 0.5);
 
       const watcher = state.rooms.get(pick.record.username);
@@ -1029,18 +1087,34 @@ async function maintainWatchers() {
       if (pick.probe) log('yeni aday deneniyor:', pick.record.username, sessionSec + ' sn');
       else if (pick.hot) log('sıcak oda (kutu geçmişi):', pick.record.username, sessionSec + ' sn');
     } catch (error) {
-      state.lastError = 'dinleme: ' + pick.record.username + ' ' + error.message;
+      // Yayın bitmişse hata değil, bayat kayıt: sıradaki odaya geçilir.
+      if (error.offline) {
+        state.connectStats.offline += 1;
+        const index = live.indexOf(pick.record);
+        if (index >= 0) live.splice(index, 1);
+        tries += 1;
+        if (tries >= 5) break;
+        continue;
+      }
+      state.connectStats.failed += 1;
+      if (!error.noted) noteConnect(pick.record.username, 'watcher', error);
       log('dinleme hatası', pick.record.username, error.message);
+      // Bağlantı aralığı hatadan sonra da korunur: istek yağmuru olmasın.
+      state.lastConnectAt = Date.now();
+      tries += 1;
       // 429 / "token yok (429)" da hız sınırıdır: bütçeyi düşür, bekle.
       if (/rate|too many|device_blocked|429|\b503\b/i.test(error.message || '')) {
         state.connectFailures = Math.min(6, state.connectFailures + 1);
+        state.connectStats.rateLimited += 1;
         const waitMs = Math.min(8 * 60000, 60000 * Math.pow(2, state.connectFailures - 1));
         state.connectorCooldownUntil = Date.now() + waitMs;
         state.roomBudget = Math.max(CONFIG.minRooms, Math.round(state.roomBudget * 0.75));
         log('hız sınırı: bütçe ' + Math.round(state.roomBudget) + ' oda · ' +
           Math.round(waitMs / 1000) + ' sn yeni bağlantı yok');
+        break;
       }
-      break;
+      // Hız sınırı değilse sıradaki oda denenir: tek bozuk oda turu kilitlemesin.
+      if (tries >= 3) break;
     }
   }
 }
@@ -1151,6 +1225,18 @@ function snapshot() {
       probeHistory: state.probeHistory,
       boxHourly: state.boxHourly,
       connectFailures: state.connectFailures,
+      // Bağlantı teşhisi: kaç deneme, kaçı başarılı, son hatalar, soğuma.
+      connectStats: {
+        attempts: state.connectStats.attempts,
+        ok: state.connectStats.ok,
+        failed: state.connectStats.failed,
+        rateLimited: state.connectStats.rateLimited,
+        offline: state.connectStats.offline,
+        errors: state.connectStats.errors.slice(-3)
+      },
+      lastConnectorError: state.lastConnectorError,
+      closeReasons: state.closeReasons,
+      cooldownLeftSec: Math.max(0, Math.round((state.connectorCooldownUntil - Date.now()) / 1000)),
       polls: state.polls,
       minutesLeft: CONFIG.minutes > 0 ? Math.max(0, Math.round((deadline - Date.now()) / 60000)) : null,
       lastError: state.lastError,
@@ -1256,6 +1342,13 @@ async function main() {
   state.rooms.clear();
   flush(true);
   commitData();
+  // Koşu sonu bilanço: "neden az oda dinlendi" sorusunun cevabı burada.
+  log('bağlantı özeti',
+    'deneme', state.connectStats.attempts,
+    '· başarılı', state.connectStats.ok,
+    '· hata', state.connectStats.failed,
+    '· hız sınırı', state.connectStats.rateLimited,
+    '· biten yayın', state.connectStats.offline);
   log('bitti');
 }
 
@@ -1333,6 +1426,14 @@ if (process.env.SCANNER_SELFTEST === '1') {
   const nowHour = Math.floor(Date.now() / 3600000);
   console.log('KUTU saatlik →', Object.keys(state.boxHourly).length, 'kova ·',
     Number(state.boxHourly[nowHour]) || 0, '(beklenen 1 kova · 2)');
+
+  // Panelin teşhis satırı bu alanlardan beslenir: eksikse "0 oda" sessiz kalır.
+  const diag = snapshot().scanner;
+  console.log('TEŞHİS →', ['connectStats', 'closeReasons', 'cooldownLeftSec', 'lastConnectorError']
+    .map((key) => key + ':' + (key in diag ? 'var' : 'YOK')).join(' '),
+    '· bağlantı alanları:',
+    ['attempts', 'ok', 'failed', 'rateLimited', 'offline', 'errors']
+      .map((key) => key + ':' + (key in (diag.connectStats || {}) ? 'var' : 'YOK')).join(' '));
 
   frames.forEach(([label, frame]) => {
     const before = state.events.length;
