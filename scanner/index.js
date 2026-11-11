@@ -963,8 +963,10 @@ function commitData() {
   state.lastCommit = now;
   try {
     syncWithRemote();
-    git(['add', 'site/firsat/data/live.json']);
-    if (!git(['status', '--porcelain', 'site/firsat/data/live.json']).trim()) return;
+    // targets.json de commit edilir: kutu geçmişi ve son izleme zamanı
+    // koşu bitince kaybolmasın, sonraki koşu aynı odaları öncelikli dinlesin.
+    git(['add', 'site/firsat/data/live.json', 'site/firsat/data/targets.json']);
+    if (!git(['status', '--porcelain', 'site/firsat/data/live.json', 'site/firsat/data/targets.json']).trim()) return;
     const summary = snapshot().scanner;
     git(['commit', '-m',
       'Canlı tarama: ' + summary.liveCount + '/' + summary.targetCount +
