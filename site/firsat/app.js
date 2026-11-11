@@ -874,6 +874,55 @@
     }).join('');
   }
 
+  // Son 24 saatteki oran kararlarını küçük bir çizgi grafik olarak çizer.
+  // Dikey ölçek sabit %10-%60 (uyarlamanın alt/üst sınırı): böylece değişim
+  // gerçekten görünür, grafik kendi kendine "süs" gibi düzleşmez.
+  function probeChart(history, now) {
+    var width = 240, height = 62, padX = 6, padY = 8;
+    var lo = 10, hi = 60;
+    var points = history.map(function (item) {
+      var value = Number(item.to);
+      return {
+        at: Number(item.at) || 0,
+        value: Math.max(lo, Math.min(hi, Number.isFinite(value) ? value : lo))
+      };
+    }).sort(function (a, b) { return a.at - b.at; });
+    if (!points.length) return '';
+
+    var from = now - 24 * 3600 * 1000;
+    var span = Math.max(1, now - from);
+    function x(time) { return padX + ((time - from) / span) * (width - padX * 2); }
+    function y(value) { return height - padY - ((value - lo) / (hi - lo)) * (height - padY * 2); }
+
+    var line = points.map(function (item) {
+      return x(item.at).toFixed(1) + ',' + y(item.value).toFixed(1);
+    }).join(' ');
+
+    var dots = points.map(function (item) {
+      var time = new Date(item.at).toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' });
+      return '<circle cx="' + x(item.at).toFixed(1) + '" cy="' + y(item.value).toFixed(1) +
+        '" r="2.5" fill="#facc15"><title>' + esc(time + ' · %' + item.value) + '</title></circle>';
+    }).join('');
+
+    return '<svg viewBox="0 0 ' + width + ' ' + height + '" class="w-full" height="62" role="img" ' +
+      'aria-label="Keşif oranının son 24 saatteki değişimi">' +
+      '<line x1="' + padX + '" y1="' + y(lo).toFixed(1) + '" x2="' + (width - padX) +
+        '" y2="' + y(lo).toFixed(1) + '" stroke="rgba(255,255,255,0.14)" stroke-width="1"/>' +
+      '<line x1="' + padX + '" y1="' + y(hi).toFixed(1) + '" x2="' + (width - padX) +
+        '" y2="' + y(hi).toFixed(1) + '" stroke="rgba(255,255,255,0.14)" stroke-width="1"/>' +
+      '<polyline points="' + line + '" fill="none" stroke="#facc15" stroke-width="1.5" ' +
+        'stroke-linejoin="round" stroke-linecap="round"/>' +
+      dots +
+      '<text x="' + padX + '" y="' + (height - 1) + '" font-size="7" fill="rgba(255,255,255,0.4)">24 sa önce</text>' +
+      '<text x="' + (width - padX) + '" y="' + (height - 1) + '" font-size="7" text-anchor="end" ' +
+        'fill="rgba(255,255,255,0.4)">şimdi</text>' +
+      '<text x="' + padX + '" y="' + (y(hi) + 7).toFixed(1) + '" font-size="7" ' +
+        'fill="rgba(255,255,255,0.3)">%' + hi + '</text>' +
+      '<text x="' + padX + '" y="' + (y(lo) - 2).toFixed(1) + '" font-size="7" ' +
+        'fill="rgba(255,255,255,0.3)">%' + lo + '</text>' +
+      '</svg>';
+  }
+
   // Keşif oranı özeti: mevcut oran, kutu başarısı ve son kararlar.
   function renderProbeSummary() {
     var el = $('probeSummary');
@@ -914,7 +963,8 @@
 
     el.innerHTML = chips +
       '<div class="w-full mt-1 text-[10px] text-yellow-50/40">Son 24 saat · ' +
-        history.length + ' karar</div>' +
+        history.length + ' karar · oran değişimi</div>' +
+      '<div class="w-full mt-1">' + probeChart(history, Date.now()) + '</div>' +
       '<div class="w-full space-y-0.5">' + rows + '</div>';
   }
 
