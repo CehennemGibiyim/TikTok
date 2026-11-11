@@ -438,6 +438,8 @@
     }
     var offlineCount = Number(stats.offline) || 0;
     if (offlineCount > 0) hints.push(offlineCount + ' biten yayın atlandı');
+    var withRoomId = Number(scanInfo.liveWithRoomId) || 0;
+    if (live > 0) hints.push('oda kimliği ' + withRoomId + '/' + live);
     var lastError = scanInfo.lastConnectorError ||
       (errors.length ? errors[errors.length - 1].message : scanInfo.lastError);
     if (lastError) hints.push('son hata: ' + lastError);

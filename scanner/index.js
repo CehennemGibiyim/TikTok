@@ -231,6 +231,8 @@ function loadTargets() {
         country: (typeof item === 'object' && item && item.country) || '',
         source: (typeof item === 'object' && item && item.source) || 'manual',
         roomId: (typeof item === 'object' && item && String(item.roomId || '')) || '',
+        roomIdAt: (typeof item === 'object' && item && Number(item.roomIdAt)) || 0,
+        roomIdMiss: (typeof item === 'object' && item && Number(item.roomIdMiss)) || 0,
         // Kutu geçmişi dosyada kalır: yeni koşu yayıncıyı yine öncelikli izler.
         boxEvents: (typeof item === 'object' && item && Number(item.boxEvents)) || 0,
         lastBoxAt: (typeof item === 'object' && item && Number(item.lastBoxAt)) || 0,
@@ -270,6 +272,8 @@ function saveTargets() {
       country: target.country || '',
       source: target.source || 'manual',
       roomId: target.roomId || '',
+      roomIdAt: target.roomIdAt || 0,
+      roomIdMiss: target.roomIdMiss || 0,
       boxEvents: target.boxEvents || 0,
       lastBoxAt: target.lastBoxAt || 0,
       lastWatchedAt: target.lastWatchedAt || 0,
@@ -318,6 +322,7 @@ async function discoverLive() {
         country: String((channel && channel.region) || '').replace(/[^A-Za-z]/g, '').slice(0, 2).toUpperCase(),
         source: 'discovery',
         roomId: String((channel && channel.roomId) || ''),
+        roomIdAt: channel && channel.roomId ? Date.now() : 0,
         addedAt: Date.now(),
         lastSeenLiveAt: 0
       });
@@ -354,7 +359,10 @@ async function discoverLive() {
       record.checkedAt = Date.now();
       record.viewers = Number((channel && channel.viewerCount) || 0) || record.viewers || 0;
       // Oda kimliği uygulamada doğrudan yayına gitmek için gerekli.
-      if (channel && channel.roomId) record.roomId = String(channel.roomId);
+      if (channel && channel.roomId) {
+        record.roomId = String(channel.roomId);
+        record.roomIdAt = Date.now();
+      }
       state.streamers.set(username, record);
     });
 
@@ -681,6 +689,29 @@ async function closeWatcher(username, reason) {
     if (gotBox) state.probe.winHotBox += 1;
   }
   adaptProbeRatio();
+
+  // Hiç mesaj gelmeyen oturum: oda kimliği bayat olabilir (yanlış/bitmiş oda).
+  // İki boş oturumdan sonra kimlik silinir, keşifte yenisi yazılır.
+  if (watcher.kind === 'connector') {
+    const watchedTarget = targetFor(username);
+    if (watchedTarget && watchedTarget.roomId) {
+      if (Number(watcher.messages) === 0) {
+        watchedTarget.roomIdMiss = (Number(watchedTarget.roomIdMiss) || 0) + 1;
+        if (watchedTarget.roomIdMiss >= 2) {
+          const record = state.streamers.get(username);
+          watchedTarget.roomId = '';
+          watchedTarget.roomIdAt = 0;
+          watchedTarget.roomIdMiss = 0;
+          if (record) { record.roomId = ''; record.roomIdAt = 0; }
+          log('oda kimliği bayat:', username, '— keşifte yenisi yazılacak');
+        }
+      } else if (watchedTarget.roomIdMiss) {
+        watchedTarget.roomIdMiss = 0;
+      }
+      state.targetsDirty = true;
+    }
+  }
+
   if (watcher.timer) clearTimeout(watcher.timer);
   try {
     if (watcher.connection) watcher.connection.disconnect();
@@ -866,6 +897,18 @@ async function openConnectorWatcher(username, sessionSec) {
   const lib = loadConnector();
   if (!lib || !lib.TikTokLiveConnection) throw new Error('tiktok-live-connector yok');
 
+  // Keşiften gelen oda kimliği: TikTok'un "oda kimliği" ucu bu IP'lerde boş
+  // dönüyor, bu yüzden bağlantı "Room ID from all sources" hatasıyla düşüyordu.
+  // Taze kimlikle doğrudan bağlanılır. Eski kimlik yanlış odaya bağlanabildiği
+  // için yalnızca son 45 dakikada doğrulanmış kimlik kullanılır.
+  const targetInfo = targetFor(username) || {};
+  const recordInfo = state.streamers.get(username) || {};
+  const rawRoomId = String(targetInfo.roomId || recordInfo.roomId || '').trim();
+  const roomIdAt = Number(targetInfo.roomIdAt || recordInfo.roomIdAt || 0);
+  const knownRoomId = rawRoomId && roomIdAt && (Date.now() - roomIdAt < 6 * 3600000)
+    ? rawRoomId
+    : '';
+
   const connection = new lib.TikTokLiveConnection(username, {
     processInitialData: false,
     fetchRoomInfoOnConnect: true
@@ -879,6 +922,10 @@ async function openConnectorWatcher(username, sessionSec) {
 
   const bump = () => { watcher.messages += 1; };
   connection.on('gift', (data) => { bump(); handleConnectorGift(username, data); });
+  // Sohbet/üye/beğeni yalnızca "oda gerçekten akıyor mu" sayacını besler.
+  connection.on('chat', bump);
+  connection.on('member', bump);
+  connection.on('like', bump);
   connection.on('envelope', (data) => { bump(); handleEnvelope(username, 'envelope', data); });
   connection.on('superFanBox', (data) => { bump(); handleEnvelope(username, 'superFanBox', data); });
   connection.on('roomUser', (data) => {
@@ -892,7 +939,7 @@ async function openConnectorWatcher(username, sessionSec) {
   });
   connection.on('error', (error) => { state.lastError = username + ': ' + ((error && error.message) || 'bağlantı hatası'); });
 
-  await connection.connect();
+  await connection.connect(knownRoomId || undefined);
 
   const liveRecord = state.streamers.get(username);
   if (liveRecord && connection.roomId) liveRecord.roomId = String(connection.roomId);
@@ -1169,7 +1216,10 @@ async function pollTargets() {
       record.live = true;
       record.lastSeenLiveAt = Date.now();
       if (!target.lastSeenLiveAt) target.lastSeenLiveAt = Date.now();
-      if (status.roomId) record.roomId = String(status.roomId);
+      if (status.roomId) {
+        record.roomId = String(status.roomId);
+        record.roomIdAt = Date.now();
+      }
       if (status.startTime) record.startTime = status.startTime;
       if (status.title) record.title = status.title;
       if (status.viewers) record.viewers = status.viewers;
@@ -1225,6 +1275,8 @@ function snapshot() {
       discovered: state.discoveredTotal,
       poolSize: state.targets.length,
       watching: state.rooms.size,
+      // Kaç canlı odanın kimliği biliniyor: bağlantı başarısının anahtarı.
+      liveWithRoomId: streamers.filter((item) => item.live && item.roomId).length,
       budget: Math.round(state.roomBudget) || CONFIG.watchRooms,
       freshLive: state.targets.filter((target) => !target.lastWatchedAt &&
         state.streamers.has(target.username) && state.streamers.get(target.username).live).length,
