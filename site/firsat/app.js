@@ -362,6 +362,9 @@
         coins: Number(item.coins) || 0,
         durationSec: Number(item.durationSec) || 0,
         availableAt: Number(item.availableAt) || Number(item.t) || Date.now(),
+        // TikTok'un bildirdiği gerçek açılış anı: süre bundan sayılır.
+        unpackAt: Number(item.unpackAt) || 0,
+        hasWindow: Boolean(item.hasWindow) || Number(item.unpackAt) > 0,
         expiresAt: 0,
         shared: Number(item.shared) || 0,
         status: 'pending',
@@ -616,8 +619,34 @@
     if (!scanPaused) refreshScan();
   }
 
+  // Fırsatın kapanış anı: önce TikTok'un bildirdiği açılış anı (unpackAt),
+  // yoksa zarfın bitişi, yoksa yakalama anı + pencere süresi.
+  function eventEndAt(event) {
+    var end = Number(event.unpackAt) || Number(event.expiresAt) || 0;
+    if (end > 0) return end;
+    // Tarayıcı pencere bildirdiyse yakalama anı + süre yerine onun verdiği an.
+    if (Number(event.availableAt) > 0 && (event.hasWindow || Number(event.durationSec) > 0)) {
+      return Number(event.availableAt);
+    }
+    return 0;
+  }
+
+  // Süresi dolan fırsat kendiliğinden düşer; "Kaçtı"ya basmak gerekmez.
+  // Sandık pencere bitince hemen silinmez, kısa süre "beklemede" kalır.
+  var CHEST_GRACE_MS = 15 * 60 * 1000;
+  var UNKNOWN_WINDOW_MS = 30 * 60 * 1000;
+
   function isExpired(event) {
-    return event.kind === 'letter' && event.expiresAt && event.expiresAt <= Date.now();
+    var now = Date.now();
+    var end = eventEndAt(event);
+    if (!end) {
+      // Süresi hiç bildirilmemiş zarf/portal: liste sonsuza kadar birikmesin.
+      if (event.kind === 'chest') return false;
+      var created = Number(event.createdAt) || 0;
+      return created > 0 && now - created > UNKNOWN_WINDOW_MS;
+    }
+    var grace = event.kind === 'chest' ? CHEST_GRACE_MS : 0;
+    return now >= end + grace;
   }
 
   // Fırsatlar yalnızca toplanabilir kazanç olaylarını gösterir:
@@ -1080,19 +1109,20 @@
       var scored = opportunityScore(event);
       var urgent = false;
       var timeText = '';
+      var endAt = eventEndAt(event);
+      var opensIn = endAt ? Math.round((endAt - Date.now()) / 1000) : null;
 
-      if (event.kind === 'letter' && Number(event.expiresAt) > 0) {
-        var remaining = Math.max(0, Math.round((Number(event.expiresAt) - Date.now()) / 1000));
-        urgent = remaining <= 60;
-        timeText = 'jeton geri dönüyor: ' + clock(remaining);
-      } else if (Number(event.durationSec) > 0) {
-        var toOpen = Math.max(0, Math.round(((event.availableAt || Date.now()) - Date.now()) / 1000));
-        urgent = toOpen > 0 && toOpen <= 60;
-        timeText = toOpen > 0 ? 'açılışa ' + clock(toOpen) : 'açıldı · süre doldu, kaybolmaz';
-      } else if (event.kind === 'letter') {
-        timeText = event.auto ? 'tarayıcı yakaladı · jeton dağıtıldı' : 'hemen açıldı · kaybolmaz';
+      if (opensIn !== null && opensIn > 0) {
+        urgent = opensIn <= 60;
+        timeText = event.kind === 'letter'
+          ? 'jeton geri dönüyor: ' + clock(opensIn)
+          : 'açılışa ' + clock(opensIn);
+      } else if (opensIn !== null) {
+        timeText = event.kind === 'chest'
+          ? 'açıldı · süre doldu, beklemede'
+          : 'süre doldu';
       } else {
-        timeText = 'hemen açıldı · kaybolmaz';
+        timeText = event.auto ? 'tarayıcı yakaladı · süre bildirilmedi' : 'hemen açıldı · kaybolmaz';
       }
 
       var shared = Number(event.shared) || 0;
@@ -1101,18 +1131,19 @@
         '<div class="opp-card ' + (urgent ? 'opp-urgent' : '') + '">',
         '  <div class="flex items-center justify-between mb-2">',
         '    <span class="flex items-center gap-1"><span class="kind-badge ' + meta.cls + '">' + meta.icon + ' ' + meta.label + '</span>' + (event.auto ? '<span class="kind-badge kind-live">CANLI</span>' : '') + '</span>',
-        '    <span class="font-black text-amber-400">' + fmt(event.coins) + ' <span class="text-[10px] font-normal text-yellow-50/40">jeton</span></span>',
+        '    <span class="font-black text-amber-400" title="Kutunun toplam jeton değeri (TikTok bildirimi). Açan kişi başına düşen pay daha azdır.">' + fmt(event.coins) + ' <span class="text-[10px] font-normal text-yellow-50/40">jeton · kutu değeri</span></span>',
         '  </div>',
         '  <div class="text-[10px] mb-1"><span class="chip !py-0 !text-[10px]" title="aciliyet + jeton + paylaşım + tür + tazelik">Puan ' + scored.score + ' · ' + esc(scored.reason) + '</span></div>',
         '  <a href="' + liveUrl(event.username) + '" target="_blank" rel="noopener" class="font-semibold text-yellow-100 hover:text-yellow-300 truncate block">@' + esc(event.username) + '</a>',
-        '  <div class="text-[10px] text-yellow-50/40">' + (event.country ? flag(event.country) + ' ' + esc(countryName(event.country)) + ' · ' : '') + new Date(event.createdAt).toLocaleTimeString('tr-TR') + (shared > 1 ? ' · ' + shared + ' kişiye' : '') + '</div>',
+        '  <div class="text-[10px] text-yellow-50/40">' + (event.country ? flag(event.country) + ' ' + esc(countryName(event.country)) + ' · ' : '') + new Date(event.createdAt).toLocaleTimeString('tr-TR') +
+          (endAt ? ' → ' + new Date(endAt).toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' }) + ' açılır' : '') +
+          (shared > 1 ? ' · ' + shared + ' kişiye' : '') + '</div>',
         '  <div class="text-[10px] text-yellow-50/50 mt-0.5">Kutu: <b>' + esc(event.boxName || event.giftName || 'Kutu') + '</b>' + (Number(event.businessType) ? ' · tür kodu ' + Number(event.businessType) : '') + (event.senderName && event.senderName !== event.username ? ' · paylaşan @' + esc(event.senderName) : '') + (event.boxType ? ' · ' + esc(event.boxType) : '') + '</div>',
-        '  <div class="text-[11px] mt-1 ' + (urgent ? 'text-red-300 font-bold' : 'text-yellow-50/60') + '" data-countdown="' + (event.kind === 'letter' ? event.expiresAt : event.availableAt) + '" data-kind="' + event.kind + '" data-duration="' + (Number(event.durationSec) || 0) + '">' + timeText + '</div>',
+        '  <div class="text-[11px] mt-1 ' + (urgent ? 'text-red-300 font-bold' : 'text-yellow-50/60') + '" data-countdown="' + (endAt || 0) + '" data-kind="' + event.kind + '" data-duration="' + (Number(event.durationSec) || 0) + '">' + timeText + '</div>',
         '  <div class="flex gap-2 mt-3">',
         '    <button class="chip chip-green" data-open-app="' + esc(event.username) + '" data-room-id="' + esc(roomIdForStreamer(event.streamerId)) + '">📱 Uygulamada</button>',
         '    <button class="chip chip-amber" data-qr="' + esc(event.username) + '" data-room-id="' + esc(roomIdForStreamer(event.streamerId)) + '">QR / Yayına git</button>',
         '    <button class="chip chip-green" data-collect="' + event.id + '">Topladım</button>',
-        '    <button class="chip chip-danger" data-miss="' + event.id + '">Kaçtı</button>',
         '  </div>',
         '</div>'
       ].join('');
@@ -1708,15 +1739,16 @@
 
     document.querySelectorAll('[data-countdown]').forEach(function (element) {
       var target = Number(element.getAttribute('data-countdown'));
+      // Süre hiç bildirilmediyse metin olduğu gibi kalır: sayı uydurulmaz.
+      if (!target) return;
       var kind = element.getAttribute('data-kind');
-      var duration = Number(element.getAttribute('data-duration')) || 0;
       var remaining = Math.max(0, Math.round((target - Date.now()) / 1000));
       if (kind === 'letter') {
         element.textContent = remaining > 0 ? 'jeton geri dönüyor: ' + clock(remaining) : 'süre doldu · jeton yayıncıya döndü';
       } else if (remaining > 0) {
         element.textContent = 'açılışa ' + clock(remaining);
       } else {
-        element.textContent = duration > 0 ? 'açıldı · süre doldu, kaybolmaz' : 'hemen açıldı · kaybolmaz';
+        element.textContent = kind === 'chest' ? 'açıldı · süre doldu, beklemede' : 'süre doldu';
       }
     });
 

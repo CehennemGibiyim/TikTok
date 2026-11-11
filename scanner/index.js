@@ -50,6 +50,7 @@ const CONFIG = {
   commitSec: Number(readArg('commit', 0)),
   discover: readArg('discover', 1) ? true : false,
   discoverSec: Number(readArg('discover-sec', 300)),
+
   maxPool: Number(readArg('max-pool', 250)),
   watch: readArg('watch', readArg('once', 0) ? 0 : 1) ? true : false,
   // tiktok-live-connector ile dinle (anahtarsız); 0 verilirse TikTools'a düşer.
@@ -245,19 +246,26 @@ function saveTargets() {
 
 const DISCOVERY_URL = 'https://api.tik.tools/api/live/top-channels';
 
+async function fetchDiscoveryPage() {
+  const response = await fetch(DISCOVERY_URL, {
+    headers: { 'User-Agent': UA, Accept: 'application/json' },
+    signal: AbortSignal.timeout(15000)
+  });
+  if (!response.ok) throw new Error('http ' + response.status);
+  const payload = await response.json();
+  return (payload && payload.channels) || [];
+}
+
 async function discoverLive() {
   if (!CONFIG.discover) return 0;
   if (Date.now() - state.lastDiscover < CONFIG.discoverSec * 1000) return 0;
   state.lastDiscover = Date.now();
 
   try {
-    const response = await fetch(DISCOVERY_URL, {
-      headers: { 'User-Agent': UA, Accept: 'application/json' },
-      signal: AbortSignal.timeout(15000)
-    });
-    if (!response.ok) throw new Error('http ' + response.status);
-    const payload = await response.json();
-    const channels = (payload && payload.channels) || [];
+    // Uç 10 kanallık bir anlık görüntü veriyor: aynı saniyede atılan istekler
+    // aynı listeyi döndürür, liste dakikalar içinde komple değişir. Bu yüzden
+    // yeni yayıncı için isteği sık atmak gerekir, tek seferde çok atmayı değil.
+    const channels = await fetchDiscoveryPage();
     const known = new Set(state.targets.map((target) => target.username));
     const fresh = [];
 
@@ -400,7 +408,12 @@ function recordEvent(username, data) {
     // Zarf/sandıkta gerçek kişi sayısı ve açılışa kalan süre varsa yazılır.
     shared: Math.max(0, Math.round(Number(data.shared) || 0)),
     durationSec: Math.max(0, Math.round(Number(data.durationSec) || 0)),
-    availableAt: Date.now() + Math.max(0, Math.round(Number(data.durationSec) || 0)) * 1000,
+    // TikTok'un bildirdiği açılış anı (ms). Yoksa hesaplanmaz.
+    unpackAt: Math.max(0, Math.round(Number(data.unpackAt) || 0)),
+    // Gerçek bir pencere bildirildi mi? Panel buna göre otomatik düşürür.
+    hasWindow: Math.max(0, Math.round(Number(data.availableAt) || 0)) > 0,
+    availableAt: Math.max(0, Math.round(Number(data.availableAt) || 0)) ||
+      Date.now() + Math.max(0, Math.round(Number(data.durationSec) || 0)) * 1000,
     source: 'scan'
   };
   state.events.unshift(event);
@@ -679,6 +692,30 @@ function envelopeKind(eventName, info) {
   return 'letter';
 }
 
+// Kutunun gerçek zamanı: TikTok mesajı açılış anını (unpackAt) ve paylaşım
+// anını (createAt) saniye olarak taşır. Bunlar yoksa secondsUntilOpen gibi
+// alanlara bakılır; hiçbiri yoksa süre uydurulmaz (0 kalır).
+function boxTiming(info, box, now) {
+  const seconds = (value) => {
+    const num = Number(value) || 0;
+    if (num > 1e12) return Math.round(num / 1000);
+    return num > 1e9 ? Math.round(num) : 0;
+  };
+  const unpackAt = seconds(info.unpackAt || box.unpackAt);
+  const createAt = seconds(info.createAt || box.createAt);
+  const openIn = Number(info.secondsUntilOpen) || 0;
+  let endMs = 0;
+  if (unpackAt) endMs = unpackAt * 1000;
+  else if (openIn > 0) endMs = now + openIn * 1000;
+
+  let durationSec = 0;
+  if (endMs) {
+    const startMs = createAt ? createAt * 1000 : Math.min(now, endMs);
+    durationSec = Math.max(0, Math.round((endMs - startMs) / 1000));
+  }
+  return { endMs, durationSec, unpackAt: endMs || 0 };
+}
+
 function handleEnvelope(username, eventName, data) {
   const info = (data && (data.envelopeInfo || data)) || {};
   const box = (data && data.treasureBoxData) || info.treasureBoxData || {};
@@ -691,12 +728,15 @@ function handleEnvelope(username, eventName, data) {
 
   const coins = Number(info.diamondCount || info.coins || box.coins) || 0;
   const people = Number(info.peopleCount || info.recipientCount || box.canOpen) || 0;
-  const openIn = Number(info.secondsUntilOpen) || 0;
+  const nowMs = Date.now();
+  const timing = boxTiming(info, box, nowMs);
+  const openIn = timing.durationSec;
   if (coins > 0 || people > 0) state.envelopeStats.withCoins += 1;
 
   state.envelopeSamples.push({
-    t: Date.now(), user: username, event: eventName, action: act, boxType,
-    businessType: info.businessType || 0, coins, people, secondsUntilOpen: openIn
+    t: nowMs, user: username, event: eventName, action: act, boxType,
+    businessType: info.businessType || 0, coins, people,
+    secondsUntilOpen: openIn, unpackAt: timing.unpackAt
   });
   if (state.envelopeSamples.length > 5) state.envelopeSamples.shift();
 
@@ -723,7 +763,10 @@ function handleEnvelope(username, eventName, data) {
     kind,
     coins,
     shared: people,
-    durationSec: openIn,
+    // Açılış anı ve pencere süresi TikTok'un kendi mesajından gelir.
+    durationSec: timing.durationSec,
+    availableAt: timing.endMs,
+    unpackAt: timing.unpackAt,
     giftName: name,
     boxName: name,
     businessType: Number(info.businessType) || 0,
@@ -1223,6 +1266,11 @@ if (process.env.SCANNER_SELFTEST === '1') {
     ['sandık kutusu (businessType 20)', { event: 'envelope', data: { envelopeInfo: { envelopeId: 'e1', businessType: 20, diamondCount: 100, peopleCount: 25, secondsUntilOpen: 30 } } }],
     ['zarf kutusu (businessType 21)', { event: 'envelope', data: { envelopeInfo: { envelopeId: 'e4', businessType: 21, diamondCount: 50, peopleCount: 10 } } }],
     ['portal zinciri (businessType 9)', { event: 'envelope', data: { envelopeInfo: { envelopeId: 'e2', businessType: 9, diamondCount: 200, peopleCount: 50, secondsUntilOpen: 15 } } }],
+    ['portal (gerçek açılış anı)', { event: 'envelope', data: { envelopeInfo: {
+      envelopeId: 'e5', businessType: 9, diamondCount: 300, peopleCount: 40,
+      createAt: String(Math.floor(Date.now() / 1000) - 20),
+      unpackAt: Math.floor(Date.now() / 1000) + 70
+    } } }],
     ['boş zarf bildirimi', { event: 'envelope', data: { envelopeInfo: { envelopeId: 'e3', action: 'hide', boxType: 'spark_box', coins: null, recipientCount: null } } }]
   ];
   // Oda seçimi: aday / sıcak / normal önceliği.
@@ -1288,8 +1336,11 @@ if (process.env.SCANNER_SELFTEST === '1') {
     const before = state.events.length;
     handleStreamMessage('test_user', JSON.stringify(frame));
     const added = state.events.length > before ? state.events[0] : null;
+    const opensIn = added && added.unpackAt ? Math.round((added.unpackAt - Date.now()) / 1000) : null;
     console.log(added
-      ? `YAZDI  ${label} → ${added.kind} ${added.coins} jeton · ${added.shared} kişi · ${added.durationSec} sn · kutu: ${added.boxName || '-'} (tür ${added.businessType || 0})`
+      ? `YAZDI  ${label} → ${added.kind} ${added.coins} jeton · ${added.shared} kişi · ${added.durationSec} sn` +
+        (opensIn === null ? ' · açılış anı yok' : ` · ${opensIn} sn sonra açılır`) +
+        ` · kutu: ${added.boxName || '-'} (tür ${added.businessType || 0})`
       : `ATLADI ${label}`);
   });
   process.exit(0);
