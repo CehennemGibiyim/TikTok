@@ -365,6 +365,10 @@
         scanId: item.id,
         auto: true,
         giftName: item.giftName || '',
+        boxName: item.boxName || item.giftName || '',
+        businessType: Number(item.businessType) || 0,
+        boxType: item.boxType || '',
+        senderName: item.senderName || item.sender || '',
         sender: item.sender || ''
       });
       changed = true;
@@ -378,6 +382,7 @@
   }
 
   function renderScanStatus(error) {
+    renderBoxDiag();
     var el = $('scanStatus');
     if (!el) return;
     if (scanPaused) {
@@ -624,13 +629,16 @@
   // Bir kez temizlenir; elle eklenen kayıtlara dokunulmaz.
   function migrateEvents() {
     var settings = Object.assign({}, state.settings || {});
-    if (Number(settings.eventsSchema) >= 3) return;
-    // Eski kurallarla yazılan yalnızca sıradan hediye kayıtları atılır.
-    // Sandık/zarf/portal kayıtları KORUNUR (asıl toplanabilir kazanç onlar).
+    if (Number(settings.eventsSchema) >= 4) return;
+    // Eski sürüm kutunun gerçek türünü/adını yazmıyordu; o otomatik kayıtlar bir
+    // kez düşürülür, yerine doğru türde yenileri gelir. Elle eklenenler ve
+    // kutu bilgisi taşıyan kayıtlar korunur.
     var kept = state.events.filter(function (event) {
-      return !event.auto || (event.kind !== 'gift' && event.kind !== undefined);
+      if (!event.auto) return true;
+      if (event.kind === 'gift') return false;
+      return event.boxName !== undefined;
     });
-    settings.eventsSchema = 3;
+    settings.eventsSchema = 4;
     Store.set({ events: kept, settings: settings });
     state = Store.get();
   }
@@ -834,12 +842,56 @@
 
   // ---------- Fırsatlar ----------
 
+  var oppFilter = 'all';
+
+  // Tür sayaçları: kaç sandık, kaç zarf, kaç portal var — tek bakışta görünsün.
+  function renderOppFilters(list) {
+    var box = $('oppFilters');
+    if (!box) return;
+    var counts = { all: list.length, chest: 0, letter: 0, portal: 0 };
+    list.forEach(function (event) { counts[event.kind] = (counts[event.kind] || 0) + 1; });
+    var tabs = [
+      ['all', 'Tümü', '🗂️'],
+      ['chest', 'Sandık', '📦'],
+      ['letter', 'Zarf', '✉️'],
+      ['portal', 'Portal', '🌀']
+    ];
+    box.innerHTML = tabs.map(function (tab) {
+      var active = oppFilter === tab[0];
+      return '<button class="chip ' + (active ? 'chip-amber' : '') + '" data-opp-filter="' + tab[0] + '">' +
+        tab[2] + ' ' + tab[1] + ' <b>' + (counts[tab[0]] || 0) + '</b></button>';
+    }).join('');
+  }
+
+  // Tarayıcının yakaladığı son kutu bildirimleri: hangi tür kod geldiyse görünür.
+  function renderBoxDiag() {
+    var el = $('boxDiag');
+    if (!el) return;
+    if (scanPaused) { el.textContent = 'Kutu tanılama: tarama durduruldu.'; return; }
+    var samples = (scanInfo && scanInfo.envelopeSamples) || [];
+    if (!samples.length) {
+      el.textContent = 'Kutu tanılama: tarayıcı henüz kutu bildirimi yakalamadı (sandık/zarf/portal ancak dinlenen odada paylaşılınca düşer).';
+      return;
+    }
+    el.innerHTML = '<b>Tarayıcının son yakaladığı kutular:</b> ' + samples.slice(-4).map(function (sample) {
+      return '@' + esc(sample.user || '') + ' · tür ' + (Number(sample.businessType) || '?') +
+        ' · ' + (Number(sample.coins) || 0) + ' jeton · ' + (Number(sample.people) || 0) + ' kişi';
+    }).join(' · ');
+  }
+
   function renderOpportunities() {
     var container = $('opportunityList');
-    var pending = sortEvents(pendingEvents());
+    var pendingAll = pendingEvents();
+    renderOppFilters(pendingAll);
+    var pending = sortEvents(oppFilter === 'all' ? pendingAll : pendingAll.filter(function (event) {
+      return event.kind === oppFilter;
+    }));
 
     if (pending.length === 0) {
-      container.innerHTML = '<div class="empty-state md:col-span-2 xl:col-span-3">Şu an toplanabilir sandık/portal/zarf yok. Tarama sürüyor; yayında sandık, portal veya zarf düştüğünde burada belirir.</div>';
+      container.innerHTML = '<div class="empty-state md:col-span-2 xl:col-span-3">' +
+        (pendingAll.length === 0
+          ? 'Şu an toplanabilir sandık/portal/zarf yok. Tarama sürüyor; yayında sandık, portal veya zarf düştüğünde burada belirir.'
+          : 'Bu türde bekleyen fırsat yok. “Tümü”ne basıp diğer türleri gör.') + '</div>';
       return;
     }
 
@@ -873,7 +925,8 @@
         '  </div>',
         '  <div class="text-[10px] mb-1"><span class="chip !py-0 !text-[10px]" title="aciliyet + jeton + paylaşım + tür + tazelik">Puan ' + scored.score + ' · ' + esc(scored.reason) + '</span></div>',
         '  <a href="' + liveUrl(event.username) + '" target="_blank" rel="noopener" class="font-semibold text-yellow-100 hover:text-yellow-300 truncate block">@' + esc(event.username) + '</a>',
-        '  <div class="text-[10px] text-yellow-50/40">' + (event.country ? flag(event.country) + ' ' + esc(countryName(event.country)) + ' · ' : '') + new Date(event.createdAt).toLocaleTimeString('tr-TR') + (shared > 1 ? ' · ' + shared + ' kişiye' : '') + (event.giftName ? ' · ' + esc(event.giftName) : '') + '</div>',
+        '  <div class="text-[10px] text-yellow-50/40">' + (event.country ? flag(event.country) + ' ' + esc(countryName(event.country)) + ' · ' : '') + new Date(event.createdAt).toLocaleTimeString('tr-TR') + (shared > 1 ? ' · ' + shared + ' kişiye' : '') + '</div>',
+        '  <div class="text-[10px] text-yellow-50/50 mt-0.5">Kutu: <b>' + esc(event.boxName || event.giftName || 'Kutu') + '</b>' + (Number(event.businessType) ? ' · tür kodu ' + Number(event.businessType) : '') + (event.senderName && event.senderName !== event.username ? ' · paylaşan @' + esc(event.senderName) : '') + (event.boxType ? ' · ' + esc(event.boxType) : '') + '</div>',
         '  <div class="text-[11px] mt-1 ' + (urgent ? 'text-red-300 font-bold' : 'text-yellow-50/60') + '" data-countdown="' + (event.kind === 'letter' ? event.expiresAt : event.availableAt) + '" data-kind="' + event.kind + '" data-duration="' + (Number(event.durationSec) || 0) + '">' + timeText + '</div>',
         '  <div class="flex gap-2 mt-3">',
         '    <button class="chip chip-green" data-open-app="' + esc(event.username) + '" data-room-id="' + esc(roomIdForStreamer(event.streamerId)) + '">📱 Uygulamada</button>',
@@ -1582,6 +1635,15 @@
       if (target.dataset.qr) return openQr(target.dataset.qr, target.dataset.roomId);
       if (target.dataset.removeStreamer) return removeStreamer(target.dataset.removeStreamer);
     });
+
+    if ($('oppFilters')) {
+      $('oppFilters').addEventListener('click', function (event) {
+        var button = event.target.closest('button');
+        if (!button) return;
+        oppFilter = button.getAttribute('data-opp-filter') || 'all';
+        renderOpportunities();
+      });
+    }
 
     $('oppSort').addEventListener('change', function () {
       oppSort = $('oppSort').value;

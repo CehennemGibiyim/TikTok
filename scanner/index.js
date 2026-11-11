@@ -302,7 +302,12 @@ function recordEvent(username, data) {
     coins,
     diamonds: Math.max(0, Math.round(Number(data.diamonds) || 0)),
     giftName: data.giftName || '',
+    // Kutunun gerçek adı ve TikTok'un tür kodu: panel türü buna göre yazar.
+    boxName: data.boxName || data.giftName || '',
+    businessType: Math.max(0, Math.round(Number(data.businessType) || 0)),
+    boxType: data.boxType || '',
     sender: data.sender || '',
+    senderName: data.senderName || data.sender || '',
     // Zarf/sandıkta gerçek kişi sayısı ve açılışa kalan süre varsa yazılır.
     shared: Math.max(0, Math.round(Number(data.shared) || 0)),
     durationSec: Math.max(0, Math.round(Number(data.durationSec) || 0)),
@@ -420,6 +425,9 @@ function handleStreamMessage(username, raw) {
       coins: diamonds > 0 ? diamonds * combo.repeat : 0,
       diamonds: diamonds > 0 ? diamonds * combo.repeat : 0,
       giftName: name,
+      boxName: name,
+      businessType: 0,
+      boxType: '',
       sender
     });
     return;
@@ -490,6 +498,18 @@ function loadConnector() {
 // EnvelopeBusinessType: 9 = PLATFORM_PORTAL, 19 = SUPER_FAN_BOX.
 // Gözlemlenen gerçek kutu: businessType 20, 875 jeton / 500 kişi → sandık dağıtımı.
 // 21 ise jeton/kişi taşımayan zarf bildirimi.
+// TikTok'un businessType kodları: 9 portal, 19 süper fan kutusu, 20 sandık,
+// 21 zarf/mektup. Kodu bilinmeyen kutuda uydurma ad yazılmaz: "Kutu" denir.
+const BOX_NAMES = { 9: 'Portal', 19: 'Süper Fan Kutusu', 20: 'Sandık', 21: 'Zarf' };
+
+function envelopeName(kind, info) {
+  const bt = Number(info && info.businessType) || 0;
+  const raw = String((info && (info.boxType || info.displayKey || info.textKey)) || '').trim();
+  if (BOX_NAMES[bt]) return BOX_NAMES[bt];
+  if (raw && raw !== 'yok') return raw;
+  return ({ chest: 'Sandık', portal: 'Portal', letter: 'Zarf' }[kind] || 'Kutu');
+}
+
 function envelopeKind(eventName, info) {
   const bt = Number(info && info.businessType) || 0;
   const text = String(eventName || '') + ' ' + String(
@@ -526,14 +546,18 @@ function handleEnvelope(username, eventName, data) {
   if (coins <= 0 && people <= 0) return;
 
   const kind = envelopeKind(eventName, info);
+  const name = envelopeName(kind, info);
   recordEvent(username, {
     kind,
     coins,
     shared: people,
     durationSec: openIn,
-    giftName: boxType !== 'yok' ? boxType
-      : ({ chest: 'Sandık', portal: 'Portal', letter: 'Zarf' }[kind] || 'Kutu'),
-    sender: info.sendUserName || ''
+    giftName: name,
+    boxName: name,
+    businessType: Number(info.businessType) || 0,
+    boxType: boxType === 'yok' ? '' : boxType,
+    sender: info.sendUserName || '',
+    senderName: info.sendUserName || info.senderName || ''
   });
 }
 
@@ -561,6 +585,9 @@ function handleConnectorGift(username, data) {
     coins: diamonds > 0 ? diamonds * combo.repeat : 0,
     diamonds: diamonds > 0 ? diamonds * combo.repeat : 0,
     giftName: name,
+    boxName: name,
+    businessType: 0,
+    boxType: '',
     sender
   });
 }
@@ -893,7 +920,7 @@ if (process.env.SCANNER_SELFTEST === '1') {
     handleStreamMessage('test_user', JSON.stringify(frame));
     const added = state.events.length > before ? state.events[0] : null;
     console.log(added
-      ? `YAZDI  ${label} → ${added.kind} ${added.coins} jeton · ${added.shared} kişi · ${added.durationSec} sn`
+      ? `YAZDI  ${label} → ${added.kind} ${added.coins} jeton · ${added.shared} kişi · ${added.durationSec} sn · kutu: ${added.boxName || '-'} (tür ${added.businessType || 0})`
       : `ATLADI ${label}`);
   });
   process.exit(0);
