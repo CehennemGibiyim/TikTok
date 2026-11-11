@@ -43,4 +43,4 @@ jobs:
       - name: 🔍 Tara ve dinle
         # Havuz büyük: keşif her 2 dakikada 10 yeni kanal ekler (tüm ülkelerden).
         # Daha çok oda dinlenir; bağlantı hızı sınırına takılınca tarayıcı kendi bekler.
-        run: node scanner/index.js --minutes=230 --commit=300 --watch=1 --watch-rooms=24 --watch-sec=900 --discover-sec=120 --max-pool=1500 --concurrency=10 --poll=90
+        run: node scanner/index.js --minutes=230 --commit=300 --watch=1 --watch-rooms=32 --watch-sec=600 --connect-gap=4000 --min-rooms=8 --discover-sec=120 --max-pool=1500 --concurrency=10 --poll=90

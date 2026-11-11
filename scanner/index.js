@@ -55,7 +55,11 @@ const CONFIG = {
   // tiktok-live-connector ile dinle (anahtarsız); 0 verilirse TikTools'a düşer.
   connector: readArg('connector', 1) ? true : false,
   watchSec: Number(readArg('watch-sec', 300)),
-  watchRooms: Number(readArg('watch-rooms', 8))
+  watchRooms: Number(readArg('watch-rooms', 8)),
+  // Bağlantılar arası en az boşluk: hız sınırına çarpmadan sırayla açılır.
+  connectGapMs: Number(readArg('connect-gap', 4000)),
+  // Sınır yediğimizde inilebilecek en düşük eşzamanlı oda sayısı.
+  minRooms: Number(readArg('min-rooms', 8))
 };
 
 const startedAtMs = Date.now();
@@ -78,6 +82,10 @@ const state = {
   envelopeStats: { seen: 0, withCoins: 0, actions: {}, boxTypes: {} },
   envelopeSamples: [],
   connectorCooldownUntil: 0,
+  // Eşzamanlı oda bütçesi: sınır yedikçe düşer, başarılı bağlantıda toparlanır.
+  roomBudget: 0,
+  connectFailures: 0,
+  lastConnectAt: 0,
   lastFlush: 0,
   lastCommit: 0,
   lastDiscover: 0,
@@ -547,6 +555,8 @@ function handleEnvelope(username, eventName, data) {
 
   const kind = envelopeKind(eventName, info);
   const name = envelopeName(kind, info);
+  const boxRecord = state.streamers.get(username);
+  if (boxRecord) boxRecord.boxes = (Number(boxRecord.boxes) || 0) + 1;
   recordEvent(username, {
     kind,
     coins,
@@ -635,7 +645,8 @@ async function openWatcher(username) {
       log('bağlayıcı hatası', username, error.message);
       closeWatcher(username, 'bağlanamadı');
       // Hız sınırı / cihaz engeli: yedek yola düşmek de 429 yer; bekle.
-      if (/rate|too many connections|device_blocked/i.test(error.message || '')) {
+      // 429 / "token yok (429)" da hız sınırıdır: bütçeyi düşür, bekle.
+      if (/rate|too many|device_blocked|429|\b503\b/i.test(error.message || '')) {
         throw error;
       }
       // Diğer hatalarda aşağıdaki TikTools yolu yedek olarak denenir.
@@ -675,39 +686,57 @@ async function openWatcher(username) {
 }
 
 // Canlı odalar sırayla değil, aynı anda birden çok soketle dinlenir.
+// Dinleme kapasitesi kendini ayarlar:
+//   • odalar arası en az CONFIG.connectGapMs boşluk (ani bağlantı dalgası yok),
+//   • hız sınırı yiyince bütçe %25 düşer ve bekleme üstel artar (1→2→4→8 dk),
+//   • başarılı her bağlantıda bütçe yarım oda toparlanır (üst sınır watchRooms).
+// Böylece sınır yemeden mümkün olan en çok oda dinlenir.
 async function maintainWatchers() {
   if (!CONFIG.watch) return;
 
   const now = Date.now();
-  // Bağlantı açma hızı sınırlı: sınır yediğimizde kısa süre yeni oda açmayız.
   if (state.connectorCooldownUntil > now) return;
+  if (now - state.lastConnectAt < CONFIG.connectGapMs) return;
+
   for (const [username, watcher] of Array.from(state.rooms.entries())) {
     if (now - watcher.startedAt >= CONFIG.watchSec * 1000) await closeWatcher(username, 'süre doldu');
   }
 
+  // Kutu paylaşan odalar önce dinlenir: aynı yayıncıda ikinci kutu gelme olasılığı
+  // daha yüksek. Sonra izleyici sayısı, sonra toplanan jeton gelir.
   const live = Array.from(state.streamers.values())
     .filter((record) => record.live)
-    .sort((a, b) => (Number(b.viewers) || 0) - (Number(a.viewers) || 0) ||
+    .sort((a, b) =>
+      (Number(b.boxes) || 0) - (Number(a.boxes) || 0) ||
+      (Number(b.viewers) || 0) - (Number(a.viewers) || 0) ||
       (Number(b.coins) || 0) - (Number(a.coins) || 0));
 
-  const target = Math.min(CONFIG.watchRooms, live.length);
-  let opened = 0;
+  if (!state.roomBudget) state.roomBudget = CONFIG.watchRooms;
+  const target = Math.min(Math.max(CONFIG.minRooms, Math.round(state.roomBudget)), CONFIG.watchRooms, live.length);
 
-  while (state.rooms.size < target && opened < CONFIG.watchRooms) {
+  while (state.rooms.size < target) {
     const fresh = live.find((record) => !state.rooms.has(record.username) && !state.recent.includes(record.username));
     const pick = fresh || live.find((record) => !state.rooms.has(record.username));
     if (!pick) break;
+    if (Date.now() - state.lastConnectAt < CONFIG.connectGapMs) break;
     state.recent.push(pick.username);
-    if (state.recent.length > 120) state.recent.shift();
+    if (state.recent.length > 200) state.recent.shift();
     try {
       await openWatcher(pick.username);
-      opened += 1;
+      state.lastConnectAt = Date.now();
+      state.connectFailures = 0;
+      state.roomBudget = Math.min(CONFIG.watchRooms, state.roomBudget + 0.5);
     } catch (error) {
       state.lastError = 'dinleme: ' + pick.username + ' ' + error.message;
       log('dinleme hatası', pick.username, error.message);
-      if (/rate|too many connections|device_blocked/i.test(error.message || '')) {
-        state.connectorCooldownUntil = Date.now() + 90000;
-        log('bağlantı hızı sınırı: 90 sn yeni oda açılmayacak');
+      // 429 / "token yok (429)" da hız sınırıdır: bütçeyi düşür, bekle.
+      if (/rate|too many|device_blocked|429|\b503\b/i.test(error.message || '')) {
+        state.connectFailures = Math.min(6, state.connectFailures + 1);
+        const waitMs = Math.min(8 * 60000, 60000 * Math.pow(2, state.connectFailures - 1));
+        state.connectorCooldownUntil = Date.now() + waitMs;
+        state.roomBudget = Math.max(CONFIG.minRooms, Math.round(state.roomBudget * 0.75));
+        log('hız sınırı: bütçe ' + Math.round(state.roomBudget) + ' oda · ' +
+          Math.round(waitMs / 1000) + ' sn yeni bağlantı yok');
       }
       break;
     }
@@ -806,6 +835,8 @@ function snapshot() {
       discovered: state.discoveredTotal,
       poolSize: state.targets.length,
       watching: state.rooms.size,
+      budget: Math.round(state.roomBudget) || CONFIG.watchRooms,
+      connectFailures: state.connectFailures,
       polls: state.polls,
       minutesLeft: CONFIG.minutes > 0 ? Math.max(0, Math.round((deadline - Date.now()) / 60000)) : null,
       lastError: state.lastError,
@@ -877,6 +908,7 @@ async function main() {
   if (state.targets.length === 0) {
     log('uyarı: site/firsat/data/targets.json boş — taranacak adres yok.');
   }
+  state.roomBudget = CONFIG.watchRooms;
   log('havuz', state.targets.length, 'adres · süre',
     CONFIG.minutes > 0 ? CONFIG.minutes + ' dk' : 'tek tur');
 
