@@ -886,7 +886,10 @@ async function openConnectorWatcher(username, sessionSec) {
     if (record && data && data.viewerCount) record.viewers = Number(data.viewerCount) || record.viewers;
   });
   connection.on('streamEnd', () => { markOffline(username); closeWatcher(username, 'yayın bitti'); });
-  connection.on('disconnected', () => { state.rooms.delete(username); });
+  connection.on('disconnected', () => {
+    state.rooms.delete(username);
+    state.closeReasons['bağlantı düştü'] = (Number(state.closeReasons['bağlantı düştü']) || 0) + 1;
+  });
   connection.on('error', (error) => { state.lastError = username + ': ' + ((error && error.message) || 'bağlantı hatası'); });
 
   await connection.connect();
@@ -1050,8 +1053,17 @@ async function maintainWatchers() {
   const probeBudget = Math.max(1, Math.round(target * state.probe.ratio));
 
   let tries = 0;
-  while (state.rooms.size < target) {
-    if (Date.now() - state.lastConnectAt < CONFIG.connectGapMs) break;
+  // Dolum için bu çağrıya ayrılan süre: 4 sn arayı beklemek yerine turu bitirmek,
+  // 32 odaya çıkmayı 48 dakikaya yayıyordu (oturum 10 dk olduğu için kapasite
+  // hep düşük kalıyordu). Artık arada beklenir, ısrarla doldurulur.
+  const fillDeadline = Date.now() + 110000;
+  while (state.rooms.size < target && Date.now() < fillDeadline) {
+    const gapLeft = CONFIG.connectGapMs - (Date.now() - state.lastConnectAt);
+    if (gapLeft > 0) {
+      await sleep(Math.min(gapLeft, 2000));
+      continue;
+    }
+    if (state.connectorCooldownUntil > Date.now()) break;
 
     const probing = Array.from(state.rooms.values()).filter((watcher) => watcher.probe).length;
     const pick = pickRoom({
@@ -1323,11 +1335,25 @@ async function main() {
 
   flush(true);
 
+  // Dinleme dolumu ayrı döngüde çalışır: tarama turu uzun sürse bile odalar
+  // kendiliğinden dolar, oturum bitince yerine hemen yenisi açılır.
+  let watchLoop = true;
+  const watchTask = CONFIG.watch ? (async () => {
+    while (watchLoop && Date.now() < deadline) {
+      try {
+        await maintainWatchers();
+      } catch (error) {
+        state.lastError = error.message;
+        log('dinleme turu hatası:', error.message);
+      }
+      await sleep(3000);
+    }
+  })() : null;
+
   do {
     try {
       await discoverLive();
       await pollTargets();
-      await maintainWatchers();
     } catch (error) {
       state.lastError = error.message;
       log('tur hatası:', error.message);
@@ -1337,6 +1363,9 @@ async function main() {
     if (CONFIG.once) break;
     await sleep(CONFIG.pollSec * 1000);
   } while (Date.now() < deadline);
+
+  watchLoop = false;
+  if (watchTask) await watchTask;
 
   await stopAllWatchers('kapanış');
   state.rooms.clear();
