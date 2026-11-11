@@ -459,6 +459,7 @@
 
   var discoveryTimer = null;
   var discoveryAdded = 0;
+  var discoveryRooms = 0;
   var discoveryRuns = 0;
 
   function discoveryIcon(active) {
@@ -483,8 +484,26 @@
       var data = await response.json();
       var channels = Array.isArray(data.channels) ? data.channels : [];
 
+      // Aynı turda gelen oda kimlikleri: mevcut kayıtlara da yazılır ki
+      // uygulamada açma bağlantısı taramayı beklemeden çalışsın.
+      var channelRoom = {};
+      channels.forEach(function (channel) {
+        var name = cleanUsername(channel && channel.uniqueId);
+        if (name && channel && channel.roomId && !channelRoom[name]) {
+          channelRoom[name] = String(channel.roomId);
+        }
+      });
+
       var known = {};
-      state.streamers.forEach(function (streamer) { known[cleanUsername(streamer.username)] = true; });
+      var streamers = state.streamers.map(function (streamer) {
+        var name = cleanUsername(streamer.username);
+        known[name] = true;
+        if (channelRoom[name] && !streamer.roomId) {
+          discoveryRooms += 1;
+          return Object.assign({}, streamer, { roomId: channelRoom[name] });
+        }
+        return streamer;
+      });
 
       var now = Date.now();
       var fresh = [];
@@ -509,17 +528,19 @@
         });
       });
 
-      if (fresh.length) {
-        Store.set({ streamers: fresh.concat(state.streamers) });
+      if (fresh.length || streamers.some(function (streamer, index) {
+        return streamer !== state.streamers[index];
+      })) {
+        Store.set({ streamers: fresh.concat(streamers) });
         state = Store.get();
         renderAll();
       }
 
       discoveryAdded += fresh.length;
       discoveryRuns += 1;
-      status.textContent = 'Aranıyor… +' + discoveryAdded + ' yeni · ' + discoveryRuns +
-        ' tur · son ' + new Date().toLocaleTimeString('tr-TR') +
-        ' · ' + channels.length + ' kanal';
+      status.textContent = 'Aranıyor… +' + discoveryAdded + ' yeni · ' + discoveryRooms +
+        ' oda kimliği · ' + discoveryRuns + ' tur · son ' +
+        new Date().toLocaleTimeString('tr-TR') + ' · ' + channels.length + ' kanal';
     } catch (error) {
       status.textContent = 'Canlı yayınlar alınamadı: ' + error.message;
     }
