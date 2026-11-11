@@ -59,7 +59,13 @@ const CONFIG = {
   // Bağlantılar arası en az boşluk: hız sınırına çarpmadan sırayla açılır.
   connectGapMs: Number(readArg('connect-gap', 4000)),
   // Sınır yediğimizde inilebilecek en düşük eşzamanlı oda sayısı.
-  minRooms: Number(readArg('min-rooms', 8))
+  minRooms: Number(readArg('min-rooms', 8)),
+  // Kutu vermiş oda bu süre boyunca "sıcak" sayılır (6 saat).
+  hotWindowMs: Number(readArg('hot-window-sec', 21600)) * 1000,
+  // Sıcak odaya en erken bu kadar sonra geri dönülür (12 dk).
+  hotRevisitMs: Number(readArg('hot-revisit-sec', 720)) * 1000,
+  // Sıradan odaya geri dönüş aralığı (30 dk).
+  revisitMs: Number(readArg('revisit-sec', 1800)) * 1000
 };
 
 const startedAtMs = Date.now();
@@ -86,6 +92,7 @@ const state = {
   roomBudget: 0,
   connectFailures: 0,
   lastConnectAt: 0,
+  targetsDirty: false,
   lastFlush: 0,
   lastCommit: 0,
   lastDiscover: 0,
@@ -130,6 +137,10 @@ function loadTargets() {
         country: (typeof item === 'object' && item && item.country) || '',
         source: (typeof item === 'object' && item && item.source) || 'manual',
         roomId: (typeof item === 'object' && item && String(item.roomId || '')) || '',
+        // Kutu geçmişi dosyada kalır: yeni koşu yayıncıyı yine öncelikli izler.
+        boxEvents: (typeof item === 'object' && item && Number(item.boxEvents)) || 0,
+        lastBoxAt: (typeof item === 'object' && item && Number(item.lastBoxAt)) || 0,
+        lastWatchedAt: (typeof item === 'object' && item && Number(item.lastWatchedAt)) || 0,
         addedAt: (typeof item === 'object' && item && Number(item.addedAt)) || 0,
         lastSeenLiveAt: (typeof item === 'object' && item && Number(item.lastSeenLiveAt)) || 0
       });
@@ -139,6 +150,10 @@ function loadTargets() {
     log('havuz okunamadı:', error.message);
     return [];
   }
+}
+
+function targetFor(username) {
+  return state.targets.find((target) => target.username === username) || null;
 }
 
 function saveTargets() {
@@ -151,6 +166,9 @@ function saveTargets() {
       country: target.country || '',
       source: target.source || 'manual',
       roomId: target.roomId || '',
+      boxEvents: target.boxEvents || 0,
+      lastBoxAt: target.lastBoxAt || 0,
+      lastWatchedAt: target.lastWatchedAt || 0,
       addedAt: target.addedAt || 0,
       lastSeenLiveAt: target.lastSeenLiveAt || 0
     }))
@@ -557,6 +575,13 @@ function handleEnvelope(username, eventName, data) {
   const name = envelopeName(kind, info);
   const boxRecord = state.streamers.get(username);
   if (boxRecord) boxRecord.boxes = (Number(boxRecord.boxes) || 0) + 1;
+  // Kutu veren yayıncı havuzda işaretlenir: sonraki koşularda da önce o dinlenir.
+  const boxTarget = targetFor(username);
+  if (boxTarget) {
+    boxTarget.boxEvents = (Number(boxTarget.boxEvents) || 0) + 1;
+    boxTarget.lastBoxAt = Date.now();
+    state.targetsDirty = true;
+  }
   recordEvent(username, {
     kind,
     coins,
@@ -602,7 +627,7 @@ function handleConnectorGift(username, data) {
   });
 }
 
-async function openConnectorWatcher(username) {
+async function openConnectorWatcher(username, sessionSec) {
   const lib = loadConnector();
   if (!lib || !lib.TikTokLiveConnection) throw new Error('tiktok-live-connector yok');
 
@@ -611,7 +636,10 @@ async function openConnectorWatcher(username) {
     fetchRoomInfoOnConnect: true
   });
 
-  const watcher = { username, connection, startedAt: Date.now(), messages: 0, timer: null, kind: 'connector' };
+  const watcher = {
+    username, connection, startedAt: Date.now(), messages: 0, timer: null, kind: 'connector',
+    sessionSec: sessionSec || CONFIG.watchSec
+  };
   state.rooms.set(username, watcher);
 
   const bump = () => { watcher.messages += 1; };
@@ -631,14 +659,15 @@ async function openConnectorWatcher(username) {
   const liveRecord = state.streamers.get(username);
   if (liveRecord && connection.roomId) liveRecord.roomId = String(connection.roomId);
 
-  watcher.timer = setTimeout(() => { closeWatcher(username, 'süre doldu'); }, CONFIG.watchSec * 1000);
+  watcher.timer = setTimeout(() => { closeWatcher(username, 'süre doldu'); },
+    (watcher.sessionSec || CONFIG.watchSec) * 1000);
   log('dinleniyor', username);
 }
 
-async function openWatcher(username) {
+async function openWatcher(username, sessionSec) {
   if (CONFIG.connector) {
     try {
-      await openConnectorWatcher(username);
+      await openConnectorWatcher(username, sessionSec);
       return;
     } catch (error) {
       state.lastError = 'dinleme: ' + username + ' ' + error.message;
@@ -653,12 +682,15 @@ async function openWatcher(username) {
     }
   }
 
-  const token = await mintToken(username, Math.min(600, CONFIG.watchSec + 60));
+  const token = await mintToken(username, Math.min(900, (sessionSec || CONFIG.watchSec) + 60));
   const WS = wsFactory();
   const socket = new WS('wss://api.tik.tools?uniqueId=' + encodeURIComponent(username) +
     '&jwtKey=' + encodeURIComponent(token));
 
-  const watcher = { username, socket, startedAt: Date.now(), messages: 0, timer: null, kind: 'tiktools' };
+  const watcher = {
+    username, socket, startedAt: Date.now(), messages: 0, timer: null, kind: 'tiktools',
+    sessionSec: sessionSec || CONFIG.watchSec
+  };
   state.rooms.set(username, watcher);
 
   const onMessage = (raw) => {
@@ -681,7 +713,8 @@ async function openWatcher(username) {
     });
   }
 
-  watcher.timer = setTimeout(() => { closeWatcher(username, 'süre doldu'); }, CONFIG.watchSec * 1000);
+  watcher.timer = setTimeout(() => { closeWatcher(username, 'süre doldu'); },
+    (watcher.sessionSec || CONFIG.watchSec) * 1000);
   log('dinleniyor', username);
 }
 
@@ -690,7 +723,28 @@ async function openWatcher(username) {
 //   • odalar arası en az CONFIG.connectGapMs boşluk (ani bağlantı dalgası yok),
 //   • hız sınırı yiyince bütçe %25 düşer ve bekleme üstel artar (1→2→4→8 dk),
 //   • başarılı her bağlantıda bütçe yarım oda toparlanır (üst sınır watchRooms).
-// Böylece sınır yemeden mümkün olan en çok oda dinlenir.
+// Kutu paylaşan odalar kalıcı olarak önceliklidir (havuzdaki boxEvents) ve
+// normal odadan daha kısa arayla yeniden dinlenir; oturumları 1,5 kat uzundur.
+
+function boxPriority(record, now) {
+  const target = targetFor(record.username);
+  const history = Number(target && target.boxEvents) || 0;
+  const recentBox = target && Number(target.lastBoxAt) &&
+    (now - Number(target.lastBoxAt) < CONFIG.hotWindowMs);
+  return history + (recentBox ? 3 : 0) + (Number(record.boxes) || 0);
+}
+
+function isHotRoom(record, now) {
+  const target = targetFor(record.username);
+  if (!target || !Number(target.boxEvents)) return false;
+  return now - (Number(target.lastBoxAt) || 0) < CONFIG.hotWindowMs;
+}
+
+function lastWatchedAt(record) {
+  const target = targetFor(record.username);
+  return Number(target && target.lastWatchedAt) || 0;
+}
+
 async function maintainWatchers() {
   if (!CONFIG.watch) return;
 
@@ -699,33 +753,52 @@ async function maintainWatchers() {
   if (now - state.lastConnectAt < CONFIG.connectGapMs) return;
 
   for (const [username, watcher] of Array.from(state.rooms.entries())) {
-    if (now - watcher.startedAt >= CONFIG.watchSec * 1000) await closeWatcher(username, 'süre doldu');
+    const limit = (watcher.sessionSec || CONFIG.watchSec) * 1000;
+    if (now - watcher.startedAt >= limit) await closeWatcher(username, 'süre doldu');
   }
 
-  // Kutu paylaşan odalar önce dinlenir: aynı yayıncıda ikinci kutu gelme olasılığı
-  // daha yüksek. Sonra izleyici sayısı, sonra toplanan jeton gelir.
+  // Önce kutu vermiş odalar, sonra izleyici sayısı, sonra toplanan jeton.
   const live = Array.from(state.streamers.values())
     .filter((record) => record.live)
     .sort((a, b) =>
-      (Number(b.boxes) || 0) - (Number(a.boxes) || 0) ||
+      boxPriority(b, now) - boxPriority(a, now) ||
       (Number(b.viewers) || 0) - (Number(a.viewers) || 0) ||
       (Number(b.coins) || 0) - (Number(a.coins) || 0));
 
   if (!state.roomBudget) state.roomBudget = CONFIG.watchRooms;
-  const target = Math.min(Math.max(CONFIG.minRooms, Math.round(state.roomBudget)), CONFIG.watchRooms, live.length);
+  const target = Math.min(Math.max(CONFIG.minRooms, Math.round(state.roomBudget)),
+    CONFIG.watchRooms, live.length);
 
   while (state.rooms.size < target) {
-    const fresh = live.find((record) => !state.rooms.has(record.username) && !state.recent.includes(record.username));
-    const pick = fresh || live.find((record) => !state.rooms.has(record.username));
-    if (!pick) break;
     if (Date.now() - state.lastConnectAt < CONFIG.connectGapMs) break;
+
+    // Aynı odaya hemen geri dönülmez (en az 1 dk).
+    const free = live.filter((record) =>
+      !state.rooms.has(record.username) && Date.now() - lastWatchedAt(record) >= 60000);
+
+    const hot = free.find((record) =>
+      isHotRoom(record, now) && Date.now() - lastWatchedAt(record) >= CONFIG.hotRevisitMs);
+    const cold = free.find((record) => Date.now() - lastWatchedAt(record) >= CONFIG.revisitMs);
+    const pick = hot || cold || free.find((record) => !state.recent.includes(record.username)) || free[0];
+    if (!pick) break;
+
+    const hotSession = isHotRoom(pick, now);
+    const sessionSec = hotSession ? Math.round(CONFIG.watchSec * 1.5) : CONFIG.watchSec;
+
     state.recent.push(pick.username);
     if (state.recent.length > 200) state.recent.shift();
+
     try {
-      await openWatcher(pick.username);
+      await openWatcher(pick.username, sessionSec);
       state.lastConnectAt = Date.now();
       state.connectFailures = 0;
       state.roomBudget = Math.min(CONFIG.watchRooms, state.roomBudget + 0.5);
+      const watched = targetFor(pick.username);
+      if (watched) {
+        watched.lastWatchedAt = Date.now();
+        state.targetsDirty = true;
+      }
+      if (hotSession) log('sıcak oda (kutu geçmişi):', pick.username, sessionSec + ' sn');
     } catch (error) {
       state.lastError = 'dinleme: ' + pick.username + ' ' + error.message;
       log('dinleme hatası', pick.username, error.message);
@@ -824,7 +897,9 @@ function snapshot() {
       lastSeenLiveAt: record.lastSeenLiveAt || 0,
       reason: record.reason || '',
       checkedAt: record.checkedAt || 0,
-      roomId: record.roomId || ''
+      roomId: record.roomId || '',
+      boxes: Number(record.boxes) || 0,
+      lastBoxAt: Number((targetFor(record.username) || {}).lastBoxAt) || 0
     }));
 
   return {
@@ -851,6 +926,11 @@ function snapshot() {
 
 function flush(force) {
   const now = Date.now();
+  // Kutu geçmişi ve son izleme zamanı da diske yazılır (koşular arası kalıcı).
+  if (state.targetsDirty) {
+    state.targetsDirty = false;
+    saveTargets();
+  }
   if (!force && now - state.lastFlush < 20000) return;
   state.lastFlush = now;
   const data = snapshot();

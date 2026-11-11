@@ -262,6 +262,8 @@
         if (item.title) copy.liveTitle = item.title;
         if (item.viewers) copy.viewers = item.viewers;
         if (item.roomId) copy.roomId = String(item.roomId);
+        copy.boxes = Number(item.boxes) || 0;
+        if (item.lastBoxAt) copy.lastBoxAt = Number(item.lastBoxAt) || 0;
 
         if (item.live && startIso && existing.startedAt !== startIso) {
           // TikTok'un gerçek başlangıç saati: süre sıfırdan ve doğru sayılır.
@@ -297,6 +299,8 @@
         liveTitle: item.title || '',
         viewers: Number(item.viewers) || 0,
         roomId: item.roomId ? String(item.roomId) : '',
+        boxes: Number(item.boxes) || 0,
+        lastBoxAt: Number(item.lastBoxAt) || 0,
         source: 'scan'
       };
       byName[username] = created;
@@ -807,6 +811,9 @@
           : scannedOff
             ? '<span class="chip" title="Tarama bu hesabı canlı bulmadı">○ Yayında değil</span>'
             : '<button class="chip" data-toggle-live="' + streamer.id + '">Canlı yap</button>';
+      var boxNote = Number(streamer.boxes) > 0
+        ? ' <span class="chip chip-amber !py-0 !text-[10px]" title="Bu odada yakalanan kutu sayısı · öncelikli izlenir">🔥 ' + Number(streamer.boxes) + ' kutu</span>'
+        : '';
       var liveNote = streamer.scanLive
         ? '<div class="text-[10px] text-yellow-50/40 truncate max-w-[180px]">' + esc(streamer.liveTitle || 'yayında') + (streamer.viewers ? ' · ' + fmt(streamer.viewers) + ' kişi' : '') + '</div>'
         : '';
@@ -814,7 +821,7 @@
       return [
         '<tr>',
         '  <td class="min-w-[170px]">',
-        '    <a href="' + liveUrl(streamer.username) + '" target="_blank" rel="noopener" class="font-bold text-yellow-100 hover:text-yellow-300">@' + esc(streamer.username) + '</a>',
+        '    <a href="' + liveUrl(streamer.username) + '" target="_blank" rel="noopener" class="font-bold text-yellow-100 hover:text-yellow-300">@' + esc(streamer.username) + '</a>' + boxNote,
         '    <div class="text-[10px] text-yellow-50/40">' + (streamer.country ? flag(streamer.country) + ' ' + esc(countryName(streamer.country)) : '') + '</div>',
         '    ' + liveNote,
         '  </td>',
