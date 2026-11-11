@@ -1,4 +1,5 @@
 {
+<<<<<<< Updated upstream
  "scannedAt": "2026-11-11T18:29:44.566Z",
  "scanner": {
   "targetCount": 480,
@@ -13,6 +14,22 @@
   "probeStats": {
    "sessions": 14,
    "withBox": 1
+=======
+ "scannedAt": "2026-11-11T18:32:33.223Z",
+ "scanner": {
+  "targetCount": 476,
+  "liveCount": 162,
+  "discovered": 8,
+  "poolSize": 476,
+  "watching": 1,
+  "budget": 32,
+  "freshLive": 132,
+  "probes": 1,
+  "probeRatio": 0.4,
+  "probeStats": {
+   "sessions": 0,
+   "withBox": 0
+>>>>>>> Stashed changes
   },
   "probeHistory": [
    {
@@ -92,6 +109,7 @@
    "498450": 1
   },
   "connectFailures": 0,
+<<<<<<< Updated upstream
   "polls": 16,
   "minutesLeft": 201,
   "lastError": "keşif: The operation was aborted due to timeout",
@@ -151,15 +169,28 @@
     "secondsUntilOpen": 0
    }
   ],
+=======
+  "polls": 1,
+  "minutesLeft": 230,
+  "lastError": null,
+  "envelopes": {
+   "seen": 0,
+   "withCoins": 0,
+   "actions": {},
+   "boxTypes": {}
+  },
+  "envelopeSamples": [],
+>>>>>>> Stashed changes
   "version": 1
  },
  "streamers": [
   {
-   "username": "alejandrasosa913",
-   "country": "GT",
+   "username": "makh__music",
+   "country": "KG",
    "live": true,
-   "startTime": 1794416705000,
+   "startTime": 1794416984000,
    "title": "",
+<<<<<<< Updated upstream
    "viewers": 18174,
    "coins": 753,
    "gifts": 1,
@@ -179,20 +210,84 @@
    "startTime": 1794413945000,
    "title": "YUGTO EP",
    "viewers": 3076,
+=======
+   "viewers": 2638,
+>>>>>>> Stashed changes
    "coins": 0,
    "gifts": 0,
    "lastGiftAt": 0,
    "lastGiftName": "",
+<<<<<<< Updated upstream
    "lastSeenLiveAt": 1794421781411,
    "reason": "",
    "checkedAt": 1794421781411,
    "roomId": "",
+=======
+   "lastSeenLiveAt": 1794421949680,
+   "reason": "",
+   "checkedAt": 1794421949680,
+   "roomId": "7706962097397435137",
+>>>>>>> Stashed changes
    "boxes": 0,
    "lastBoxAt": 0
   },
   {
-   "username": "arvaamaton_fi",
-   "country": "GL",
+   "username": "garik.ugarik.de",
+   "country": "EE",
+   "live": true,
+   "startTime": 1794418274000,
+   "title": "",
+   "viewers": 14625,
+   "coins": 0,
+   "gifts": 0,
+   "lastGiftAt": 0,
+   "lastGiftName": "",
+   "lastSeenLiveAt": 1794421949680,
+   "reason": "",
+   "checkedAt": 1794421949680,
+   "roomId": "7706967607945038625",
+   "boxes": 0,
+   "lastBoxAt": 0
+  },
+  {
+   "username": "gogolidzea1",
+   "country": "GE",
+   "live": true,
+   "startTime": 1794412590000,
+   "title": "",
+   "viewers": 7993,
+   "coins": 0,
+   "gifts": 0,
+   "lastGiftAt": 0,
+   "lastGiftName": "",
+   "lastSeenLiveAt": 1794421949680,
+   "reason": "",
+   "checkedAt": 1794421949680,
+   "roomId": "7706943197259270933",
+   "boxes": 0,
+   "lastBoxAt": 0
+  },
+  {
+   "username": "patytody",
+   "country": "PT",
+   "live": true,
+   "startTime": 1794419293000,
+   "title": "Helloooo 🩷💙",
+   "viewers": 3152,
+   "coins": 0,
+   "gifts": 0,
+   "lastGiftAt": 0,
+   "lastGiftName": "",
+   "lastSeenLiveAt": 1794421949680,
+   "reason": "",
+   "checkedAt": 1794421949680,
+   "roomId": "7706972012283644694",
+   "boxes": 0,
+   "lastBoxAt": 0
+  },
+  {
+   "username": "carol_oficial_27",
+   "country": "PT",
    "live": true,
    "startTime": 0,
    "title": "",
@@ -201,10 +296,683 @@
    "gifts": 0,
    "lastGiftAt": 0,
    "lastGiftName": "",
+<<<<<<< Updated upstream
    "lastSeenLiveAt": 1794421781411,
    "reason": "",
    "checkedAt": 1794421781411,
    "roomId": "7706946537678523158",
+=======
+   "lastSeenLiveAt": 1794421949680,
+   "reason": "",
+   "checkedAt": 1794421949680,
+   "roomId": "7706962748122368801",
+   "boxes": 0,
+   "lastBoxAt": 0
+  },
+  {
+   "username": "tasmim2758",
+   "country": "BT",
+   "live": true,
+   "startTime": 1794415704000,
+   "title": "",
+   "viewers": 970,
+   "coins": 0,
+   "gifts": 0,
+   "lastGiftAt": 0,
+   "lastGiftName": "",
+   "lastSeenLiveAt": 1794421949680,
+   "reason": "",
+   "checkedAt": 1794421949680,
+   "roomId": "7706956620743445256",
+   "boxes": 0,
+   "lastBoxAt": 0
+  },
+  {
+   "username": "eltomboff",
+   "country": "DO",
+   "live": true,
+   "startTime": 1794400322000,
+   "title": "reinicio de temporada",
+   "viewers": 109242,
+   "coins": 0,
+   "gifts": 0,
+   "lastGiftAt": 0,
+   "lastGiftName": "",
+   "lastSeenLiveAt": 1794421949680,
+   "reason": "",
+   "checkedAt": 1794421949680,
+   "roomId": "7706890616315808518",
+   "boxes": 0,
+   "lastBoxAt": 0
+  },
+  {
+   "username": "mango__o2",
+   "country": "KG",
+   "live": true,
+   "startTime": 1794418624000,
+   "title": "",
+   "viewers": 427,
+   "coins": 0,
+   "gifts": 0,
+   "lastGiftAt": 0,
+   "lastGiftName": "",
+   "lastSeenLiveAt": 1794421949680,
+   "reason": "",
+   "checkedAt": 1794421949680,
+   "roomId": "7706969111577791253",
+   "boxes": 0,
+   "lastBoxAt": 0
+  },
+  {
+   "username": "sayatissembayev",
+   "country": "KZ",
+   "live": true,
+   "startTime": 1794412834000,
+   "title": "",
+   "viewers": 32335,
+   "coins": 0,
+   "gifts": 0,
+   "lastGiftAt": 0,
+   "lastGiftName": "",
+   "lastSeenLiveAt": 1794421949680,
+   "reason": "",
+   "checkedAt": 1794421949680,
+   "roomId": "7706944215966698260",
+   "boxes": 0,
+   "lastBoxAt": 0
+  },
+  {
+   "username": "rikkyy_torres",
+   "country": "SV",
+   "live": true,
+   "startTime": 1794420187000,
+   "title": "",
+   "viewers": 2928,
+   "coins": 0,
+   "gifts": 0,
+   "lastGiftAt": 0,
+   "lastGiftName": "",
+   "lastSeenLiveAt": 1794421949680,
+   "reason": "",
+   "checkedAt": 1794421949680,
+   "roomId": "7706975789245401908",
+   "boxes": 0,
+   "lastBoxAt": 0
+  },
+  {
+   "username": "ninika_live",
+   "country": "HR",
+   "live": true,
+   "startTime": 1794416277000,
+   "title": "Lets Go LIVE!",
+   "viewers": 93003,
+   "coins": 0,
+   "gifts": 0,
+   "lastGiftAt": 0,
+   "lastGiftName": "",
+   "lastSeenLiveAt": 1794421949680,
+   "reason": "",
+   "checkedAt": 1794421949680,
+   "roomId": "",
+   "boxes": 0,
+   "lastBoxAt": 0
+  },
+  {
+   "username": "_909_100_",
+   "country": "MD",
+   "live": true,
+   "startTime": 1794416224000,
+   "title": "",
+   "viewers": 3010,
+   "coins": 0,
+   "gifts": 0,
+   "lastGiftAt": 0,
+   "lastGiftName": "",
+   "lastSeenLiveAt": 1794421949680,
+   "reason": "",
+   "checkedAt": 1794421949680,
+   "roomId": "",
+   "boxes": 0,
+   "lastBoxAt": 0
+  },
+  {
+   "username": "coco_24035",
+   "country": "MX",
+   "live": true,
+   "startTime": 1794417306000,
+   "title": "BARRIENDO",
+   "viewers": 2038,
+   "coins": 0,
+   "gifts": 0,
+   "lastGiftAt": 0,
+   "lastGiftName": "",
+   "lastSeenLiveAt": 1794421949680,
+   "reason": "",
+   "checkedAt": 1794421949680,
+   "roomId": "",
+   "boxes": 0,
+   "lastBoxAt": 0
+  },
+  {
+   "username": "lilmachiatoo",
+   "country": "ME",
+   "live": true,
+   "startTime": 1794420561000,
+   "title": "",
+   "viewers": 1316,
+   "coins": 0,
+   "gifts": 0,
+   "lastGiftAt": 0,
+   "lastGiftName": "",
+   "lastSeenLiveAt": 1794421949680,
+   "reason": "",
+   "checkedAt": 1794421949680,
+   "roomId": "",
+   "boxes": 0,
+   "lastBoxAt": 0
+  },
+  {
+   "username": "okiemukrainki",
+   "country": "PL",
+   "live": true,
+   "startTime": 1794415233000,
+   "title": "",
+   "viewers": 12784,
+   "coins": 0,
+   "gifts": 0,
+   "lastGiftAt": 0,
+   "lastGiftName": "",
+   "lastSeenLiveAt": 1794421949680,
+   "reason": "",
+   "checkedAt": 1794421949680,
+   "roomId": "",
+   "boxes": 0,
+   "lastBoxAt": 0
+  },
+  {
+   "username": "ebithaj55",
+   "country": "LU",
+   "live": true,
+   "startTime": 0,
+   "title": "",
+   "viewers": 0,
+   "coins": 0,
+   "gifts": 0,
+   "lastGiftAt": 0,
+   "lastGiftName": "",
+   "lastSeenLiveAt": 1794421949680,
+   "reason": "",
+   "checkedAt": 1794421949680,
+   "roomId": "",
+   "boxes": 0,
+   "lastBoxAt": 0
+  },
+  {
+   "username": "afrinakter__9",
+   "country": "BT",
+   "live": true,
+   "startTime": 1794414695000,
+   "title": "",
+   "viewers": 527,
+   "coins": 0,
+   "gifts": 0,
+   "lastGiftAt": 0,
+   "lastGiftName": "",
+   "lastSeenLiveAt": 1794421949680,
+   "reason": "",
+   "checkedAt": 1794421949680,
+   "roomId": "",
+   "boxes": 0,
+   "lastBoxAt": 0
+  },
+  {
+   "username": "321__family",
+   "country": "TW",
+   "live": true,
+   "startTime": 1794409781000,
+   "title": "Lets Go LIVE!",
+   "viewers": 2139,
+   "coins": 0,
+   "gifts": 0,
+   "lastGiftAt": 0,
+   "lastGiftName": "",
+   "lastSeenLiveAt": 1794421949680,
+   "reason": "",
+   "checkedAt": 1794421949680,
+   "roomId": "",
+   "boxes": 0,
+   "lastBoxAt": 0
+  },
+  {
+   "username": "yethrolhamo749",
+   "country": "BD",
+   "live": true,
+   "startTime": 1794416884000,
+   "title": "",
+   "viewers": 88,
+   "coins": 0,
+   "gifts": 0,
+   "lastGiftAt": 0,
+   "lastGiftName": "",
+   "lastSeenLiveAt": 1794421949680,
+   "reason": "",
+   "checkedAt": 1794421949680,
+   "roomId": "",
+   "boxes": 0,
+   "lastBoxAt": 0
+  },
+  {
+   "username": "hojibonk5",
+   "country": "MD",
+   "live": true,
+   "startTime": 1794416859000,
+   "title": "",
+   "viewers": 30016,
+   "coins": 0,
+   "gifts": 0,
+   "lastGiftAt": 0,
+   "lastGiftName": "",
+   "lastSeenLiveAt": 1794421949680,
+   "reason": "",
+   "checkedAt": 1794421949680,
+   "roomId": "",
+   "boxes": 0,
+   "lastBoxAt": 0
+  },
+  {
+   "username": "diilloo_94",
+   "country": "DE",
+   "live": true,
+   "startTime": 0,
+   "title": "",
+   "viewers": 0,
+   "coins": 0,
+   "gifts": 0,
+   "lastGiftAt": 0,
+   "lastGiftName": "",
+   "lastSeenLiveAt": 1794421949680,
+   "reason": "",
+   "checkedAt": 1794421949680,
+   "roomId": "",
+   "boxes": 0,
+   "lastBoxAt": 0
+  },
+  {
+   "username": "merikokokaia",
+   "country": "CC",
+   "live": true,
+   "startTime": 1794412528000,
+   "title": "",
+   "viewers": 3063,
+   "coins": 0,
+   "gifts": 0,
+   "lastGiftAt": 0,
+   "lastGiftName": "",
+   "lastSeenLiveAt": 1794421949680,
+   "reason": "",
+   "checkedAt": 1794421949680,
+   "roomId": "",
+   "boxes": 0,
+   "lastBoxAt": 0
+  },
+  {
+   "username": "tinkershellu",
+   "country": "BD",
+   "live": true,
+   "startTime": 1794419175000,
+   "title": "",
+   "viewers": 121,
+   "coins": 0,
+   "gifts": 0,
+   "lastGiftAt": 0,
+   "lastGiftName": "",
+   "lastSeenLiveAt": 1794421949680,
+   "reason": "",
+   "checkedAt": 1794421949680,
+   "roomId": "",
+   "boxes": 0,
+   "lastBoxAt": 0
+  },
+  {
+   "username": "eternalnite3",
+   "country": "SG",
+   "live": true,
+   "startTime": 1794414324000,
+   "title": "lets go!!!",
+   "viewers": 1232,
+   "coins": 0,
+   "gifts": 0,
+   "lastGiftAt": 0,
+   "lastGiftName": "",
+   "lastSeenLiveAt": 1794421949680,
+   "reason": "",
+   "checkedAt": 1794421949680,
+   "roomId": "",
+   "boxes": 0,
+   "lastBoxAt": 0
+  },
+  {
+   "username": "vola_via_grazie",
+   "country": "IT",
+   "live": true,
+   "startTime": 1794420169000,
+   "title": "",
+   "viewers": 658,
+   "coins": 0,
+   "gifts": 0,
+   "lastGiftAt": 0,
+   "lastGiftName": "",
+   "lastSeenLiveAt": 1794421949680,
+   "reason": "",
+   "checkedAt": 1794421949680,
+   "roomId": "",
+   "boxes": 0,
+   "lastBoxAt": 0
+  },
+  {
+   "username": "soyinsano_h1",
+   "country": "MX",
+   "live": true,
+   "startTime": 1794417516000,
+   "title": "Humildad clave del exito",
+   "viewers": 3869,
+   "coins": 0,
+   "gifts": 0,
+   "lastGiftAt": 0,
+   "lastGiftName": "",
+   "lastSeenLiveAt": 1794421949680,
+   "reason": "",
+   "checkedAt": 1794421949680,
+   "roomId": "",
+   "boxes": 0,
+   "lastBoxAt": 0
+  },
+  {
+   "username": "leexiie666",
+   "country": "SE",
+   "live": true,
+   "startTime": 1794416225000,
+   "title": "",
+   "viewers": 1027,
+   "coins": 0,
+   "gifts": 0,
+   "lastGiftAt": 0,
+   "lastGiftName": "",
+   "lastSeenLiveAt": 1794421949680,
+   "reason": "",
+   "checkedAt": 1794421949680,
+   "roomId": "",
+   "boxes": 0,
+   "lastBoxAt": 0
+  },
+  {
+   "username": "rikichori916",
+   "country": "JP",
+   "live": true,
+   "startTime": 0,
+   "title": "",
+   "viewers": 0,
+   "coins": 0,
+   "gifts": 0,
+   "lastGiftAt": 0,
+   "lastGiftName": "",
+   "lastSeenLiveAt": 1794421949680,
+   "reason": "",
+   "checkedAt": 1794421949680,
+   "roomId": "",
+   "boxes": 0,
+   "lastBoxAt": 0
+  },
+  {
+   "username": "originalmumarich",
+   "country": "JM",
+   "live": true,
+   "startTime": 1794420486000,
+   "title": "",
+   "viewers": 3417,
+   "coins": 0,
+   "gifts": 0,
+   "lastGiftAt": 0,
+   "lastGiftName": "",
+   "lastSeenLiveAt": 1794421949680,
+   "reason": "",
+   "checkedAt": 1794421949680,
+   "roomId": "",
+   "boxes": 0,
+   "lastBoxAt": 0
+  },
+  {
+   "username": "riyamahmud.3",
+   "country": "MV",
+   "live": true,
+   "startTime": 1794419147000,
+   "title": "",
+   "viewers": 1534,
+   "coins": 0,
+   "gifts": 0,
+   "lastGiftAt": 0,
+   "lastGiftName": "",
+   "lastSeenLiveAt": 1794421949680,
+   "reason": "",
+   "checkedAt": 1794421949680,
+   "roomId": "",
+   "boxes": 0,
+   "lastBoxAt": 0
+  },
+  {
+   "username": "arisachan1112",
+   "country": "JP",
+   "live": true,
+   "startTime": 1794403716000,
+   "title": "",
+   "viewers": 2367,
+   "coins": 0,
+   "gifts": 0,
+   "lastGiftAt": 0,
+   "lastGiftName": "",
+   "lastSeenLiveAt": 1794421949680,
+   "reason": "",
+   "checkedAt": 1794421949680,
+   "roomId": "",
+   "boxes": 0,
+   "lastBoxAt": 0
+  },
+  {
+   "username": "kogyikyaw.bkk",
+   "country": "TH",
+   "live": true,
+   "startTime": 1794411947000,
+   "title": "",
+   "viewers": 1875,
+   "coins": 0,
+   "gifts": 0,
+   "lastGiftAt": 0,
+   "lastGiftName": "",
+   "lastSeenLiveAt": 1794421949680,
+   "reason": "",
+   "checkedAt": 1794421949680,
+   "roomId": "",
+   "boxes": 0,
+   "lastBoxAt": 0
+  },
+  {
+   "username": "alejandrasosa913",
+   "country": "GT",
+   "live": true,
+   "startTime": 1794416705000,
+   "title": "",
+   "viewers": 18607,
+   "coins": 0,
+   "gifts": 0,
+   "lastGiftAt": 0,
+   "lastGiftName": "",
+   "lastSeenLiveAt": 1794421949680,
+   "reason": "",
+   "checkedAt": 1794421949680,
+   "roomId": "",
+   "boxes": 0,
+   "lastBoxAt": 1794421053669
+  },
+  {
+   "username": "sebaiszymek",
+   "country": "PL",
+   "live": true,
+   "startTime": 1794410464000,
+   "title": "LIVE PRZEDŁUŻANY!!!",
+   "viewers": 4827,
+   "coins": 0,
+   "gifts": 0,
+   "lastGiftAt": 0,
+   "lastGiftName": "",
+   "lastSeenLiveAt": 1794421949680,
+   "reason": "",
+   "checkedAt": 1794421949680,
+   "roomId": "",
+   "boxes": 0,
+   "lastBoxAt": 0
+  },
+  {
+   "username": "marcod56",
+   "country": "IT",
+   "live": true,
+   "startTime": 1794412435000,
+   "title": "⚡💜™️",
+   "viewers": 1160,
+   "coins": 0,
+   "gifts": 0,
+   "lastGiftAt": 0,
+   "lastGiftName": "",
+   "lastSeenLiveAt": 1794421949680,
+   "reason": "",
+   "checkedAt": 1794421949680,
+   "roomId": "",
+   "boxes": 0,
+   "lastBoxAt": 0
+  },
+  {
+   "username": "realclintianoo",
+   "country": "NG",
+   "live": true,
+   "startTime": 1794411510000,
+   "title": "",
+   "viewers": 23802,
+   "coins": 0,
+   "gifts": 0,
+   "lastGiftAt": 0,
+   "lastGiftName": "",
+   "lastSeenLiveAt": 1794421949680,
+   "reason": "",
+   "checkedAt": 1794421949680,
+   "roomId": "",
+   "boxes": 0,
+   "lastBoxAt": 0
+  },
+  {
+   "username": "feier618",
+   "country": "SG",
+   "live": true,
+   "startTime": 1794403437000,
+   "title": "白茶清欢无别事，我在等风也等你",
+   "viewers": 1823,
+   "coins": 0,
+   "gifts": 0,
+   "lastGiftAt": 0,
+   "lastGiftName": "",
+   "lastSeenLiveAt": 1794421949680,
+   "reason": "",
+   "checkedAt": 1794421949680,
+   "roomId": "",
+   "boxes": 0,
+   "lastBoxAt": 0
+  },
+  {
+   "username": "xinxin.go",
+   "country": "ID",
+   "live": true,
+   "startTime": 1794409733000,
+   "title": "",
+   "viewers": 7897,
+   "coins": 0,
+   "gifts": 0,
+   "lastGiftAt": 0,
+   "lastGiftName": "",
+   "lastSeenLiveAt": 1794421949680,
+   "reason": "",
+   "checkedAt": 1794421949680,
+   "roomId": "",
+   "boxes": 0,
+   "lastBoxAt": 0
+  },
+  {
+   "username": "yethro.yethro1",
+   "country": "MV",
+   "live": true,
+   "startTime": 1794419422000,
+   "title": "",
+   "viewers": 193,
+   "coins": 0,
+   "gifts": 0,
+   "lastGiftAt": 0,
+   "lastGiftName": "",
+   "lastSeenLiveAt": 1794421949680,
+   "reason": "",
+   "checkedAt": 1794421949680,
+   "roomId": "",
+   "boxes": 0,
+   "lastBoxAt": 0
+  },
+  {
+   "username": "taeyleyax",
+   "country": "CA",
+   "live": true,
+   "startTime": 1794421759000,
+   "title": "Hey",
+   "viewers": 377,
+   "coins": 0,
+   "gifts": 0,
+   "lastGiftAt": 0,
+   "lastGiftName": "",
+   "lastSeenLiveAt": 1794421949680,
+   "reason": "",
+   "checkedAt": 1794421949680,
+   "roomId": "",
+   "boxes": 0,
+   "lastBoxAt": 0
+  },
+  {
+   "username": "kikialilbaddie",
+   "country": "NG",
+   "live": true,
+   "startTime": 1794420470000,
+   "title": "",
+   "viewers": 532,
+   "coins": 0,
+   "gifts": 0,
+   "lastGiftAt": 0,
+   "lastGiftName": "",
+   "lastSeenLiveAt": 1794421949680,
+   "reason": "",
+   "checkedAt": 1794421949680,
+   "roomId": "",
+   "boxes": 0,
+   "lastBoxAt": 0
+  },
+  {
+   "username": "chieaguilar04",
+   "country": "PH",
+   "live": true,
+   "startTime": 1794413945000,
+   "title": "YUGTO EP",
+   "viewers": 3153,
+   "coins": 0,
+   "gifts": 0,
+   "lastGiftAt": 0,
+   "lastGiftName": "",
+   "lastSeenLiveAt": 1794421949680,
+   "reason": "",
+   "checkedAt": 1794421949680,
+   "roomId": "",
+>>>>>>> Stashed changes
    "boxes": 0,
    "lastBoxAt": 0
   },
@@ -214,14 +982,24 @@
    "live": true,
    "startTime": 1794416381000,
    "title": "",
+<<<<<<< Updated upstream
    "viewers": 2078,
+=======
+   "viewers": 2136,
+>>>>>>> Stashed changes
    "coins": 0,
    "gifts": 0,
    "lastGiftAt": 0,
    "lastGiftName": "",
+<<<<<<< Updated upstream
    "lastSeenLiveAt": 1794421781411,
    "reason": "",
    "checkedAt": 1794421781411,
+=======
+   "lastSeenLiveAt": 1794421949680,
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -232,14 +1010,24 @@
    "live": true,
    "startTime": 1794415279000,
    "title": "",
+<<<<<<< Updated upstream
    "viewers": 1547,
+=======
+   "viewers": 1571,
+>>>>>>> Stashed changes
    "coins": 0,
    "gifts": 0,
    "lastGiftAt": 0,
    "lastGiftName": "",
+<<<<<<< Updated upstream
    "lastSeenLiveAt": 1794421781411,
    "reason": "",
    "checkedAt": 1794421781411,
+=======
+   "lastSeenLiveAt": 1794421949680,
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -250,14 +1038,24 @@
    "live": true,
    "startTime": 1794413535000,
    "title": "",
+<<<<<<< Updated upstream
    "viewers": 411,
+=======
+   "viewers": 414,
+>>>>>>> Stashed changes
    "coins": 0,
    "gifts": 0,
    "lastGiftAt": 0,
    "lastGiftName": "",
+<<<<<<< Updated upstream
    "lastSeenLiveAt": 1794421781411,
    "reason": "",
    "checkedAt": 1794421781411,
+=======
+   "lastSeenLiveAt": 1794421949680,
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -273,9 +1071,15 @@
    "gifts": 0,
    "lastGiftAt": 0,
    "lastGiftName": "",
+<<<<<<< Updated upstream
    "lastSeenLiveAt": 1794421781411,
    "reason": "",
    "checkedAt": 1794421781411,
+=======
+   "lastSeenLiveAt": 1794421949680,
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -286,14 +1090,24 @@
    "live": true,
    "startTime": 1794413457000,
    "title": "等你",
+<<<<<<< Updated upstream
    "viewers": 2468,
+=======
+   "viewers": 2524,
+>>>>>>> Stashed changes
    "coins": 0,
    "gifts": 0,
    "lastGiftAt": 0,
    "lastGiftName": "",
+<<<<<<< Updated upstream
    "lastSeenLiveAt": 1794421567874,
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781411,
+=======
+   "lastSeenLiveAt": 1794421949680,
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -304,14 +1118,24 @@
    "live": true,
    "startTime": 1794413747000,
    "title": "",
+<<<<<<< Updated upstream
    "viewers": 4464,
+=======
+   "viewers": 4590,
+>>>>>>> Stashed changes
    "coins": 0,
    "gifts": 0,
    "lastGiftAt": 0,
    "lastGiftName": "",
+<<<<<<< Updated upstream
    "lastSeenLiveAt": 1794421781411,
    "reason": "",
    "checkedAt": 1794421781411,
+=======
+   "lastSeenLiveAt": 1794421949680,
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -322,14 +1146,24 @@
    "live": true,
    "startTime": 1794410156000,
    "title": "watch me suffer",
+<<<<<<< Updated upstream
    "viewers": 837,
+=======
+   "viewers": 847,
+>>>>>>> Stashed changes
    "coins": 0,
    "gifts": 0,
    "lastGiftAt": 0,
    "lastGiftName": "",
+<<<<<<< Updated upstream
    "lastSeenLiveAt": 1794421567874,
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781411,
+=======
+   "lastSeenLiveAt": 1794421949680,
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -340,15 +1174,26 @@
    "live": true,
    "startTime": 1794413603000,
    "title": "Lets Go LIVE!",
+<<<<<<< Updated upstream
    "viewers": 10429,
+=======
+   "viewers": 10589,
+>>>>>>> Stashed changes
    "coins": 0,
    "gifts": 0,
    "lastGiftAt": 0,
    "lastGiftName": "",
+<<<<<<< Updated upstream
    "lastSeenLiveAt": 1794421781411,
    "reason": "",
    "checkedAt": 1794421781411,
    "roomId": "7706947610342361878",
+=======
+   "lastSeenLiveAt": 1794421949680,
+   "reason": "",
+   "checkedAt": 1794421949680,
+   "roomId": "",
+>>>>>>> Stashed changes
    "boxes": 0,
    "lastBoxAt": 0
   },
@@ -358,14 +1203,24 @@
    "live": true,
    "startTime": 1794404399000,
    "title": "RUMAH PUSAKA PULAI",
+<<<<<<< Updated upstream
    "viewers": 61851,
+=======
+   "viewers": 65568,
+>>>>>>> Stashed changes
    "coins": 0,
    "gifts": 0,
    "lastGiftAt": 0,
    "lastGiftName": "",
+<<<<<<< Updated upstream
    "lastSeenLiveAt": 1794421567874,
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781411,
+=======
+   "lastSeenLiveAt": 1794421949680,
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -376,14 +1231,24 @@
    "live": true,
    "startTime": 1794419275000,
    "title": "تعالوووو🙋‍♀️🙋‍♀️🙋‍♀️🙋‍♀️",
+<<<<<<< Updated upstream
    "viewers": 1101,
+=======
+   "viewers": 1195,
+>>>>>>> Stashed changes
    "coins": 0,
    "gifts": 0,
    "lastGiftAt": 0,
    "lastGiftName": "",
+<<<<<<< Updated upstream
    "lastSeenLiveAt": 1794421567874,
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781411,
+=======
+   "lastSeenLiveAt": 1794421949680,
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -394,14 +1259,20 @@
    "live": true,
    "startTime": 1794408179000,
    "title": "全网寻找大哥",
-   "viewers": 288,
+   "viewers": 292,
    "coins": 0,
    "gifts": 0,
    "lastGiftAt": 0,
    "lastGiftName": "",
+<<<<<<< Updated upstream
    "lastSeenLiveAt": 1794421567874,
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781411,
+=======
+   "lastSeenLiveAt": 1794421949680,
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -412,14 +1283,24 @@
    "live": true,
    "startTime": 1794418227000,
    "title": "",
+<<<<<<< Updated upstream
    "viewers": 2612,
+=======
+   "viewers": 2929,
+>>>>>>> Stashed changes
    "coins": 0,
    "gifts": 0,
    "lastGiftAt": 0,
    "lastGiftName": "",
+<<<<<<< Updated upstream
    "lastSeenLiveAt": 1794421567874,
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781411,
+=======
+   "lastSeenLiveAt": 1794421949680,
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -430,14 +1311,24 @@
    "live": true,
    "startTime": 1794410909000,
    "title": "🎵Leave with a smile💚",
+<<<<<<< Updated upstream
    "viewers": 1996,
+=======
+   "viewers": 2043,
+>>>>>>> Stashed changes
    "coins": 0,
    "gifts": 0,
    "lastGiftAt": 0,
    "lastGiftName": "",
+<<<<<<< Updated upstream
    "lastSeenLiveAt": 1794421567874,
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781411,
+=======
+   "lastSeenLiveAt": 1794421949680,
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -448,14 +1339,24 @@
    "live": true,
    "startTime": 1794420398000,
    "title": "Lets Go LIVE!",
+<<<<<<< Updated upstream
    "viewers": 705,
+=======
+   "viewers": 864,
+>>>>>>> Stashed changes
    "coins": 0,
    "gifts": 0,
    "lastGiftAt": 0,
    "lastGiftName": "",
+<<<<<<< Updated upstream
    "lastSeenLiveAt": 1794421567874,
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781411,
+=======
+   "lastSeenLiveAt": 1794421949680,
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -466,14 +1367,24 @@
    "live": true,
    "startTime": 1794414989000,
    "title": "Good vibez",
+<<<<<<< Updated upstream
    "viewers": 2194,
+=======
+   "viewers": 2250,
+>>>>>>> Stashed changes
    "coins": 0,
    "gifts": 0,
    "lastGiftAt": 0,
    "lastGiftName": "",
+<<<<<<< Updated upstream
    "lastSeenLiveAt": 1794421567874,
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781411,
+=======
+   "lastSeenLiveAt": 1794421949680,
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -484,14 +1395,24 @@
    "live": true,
    "startTime": 1794411376000,
    "title": "",
+<<<<<<< Updated upstream
    "viewers": 571,
+=======
+   "viewers": 578,
+>>>>>>> Stashed changes
    "coins": 0,
    "gifts": 0,
    "lastGiftAt": 0,
    "lastGiftName": "",
+<<<<<<< Updated upstream
    "lastSeenLiveAt": 1794421781411,
    "reason": "",
    "checkedAt": 1794421781411,
+=======
+   "lastSeenLiveAt": 1794421949680,
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -502,14 +1423,24 @@
    "live": true,
    "startTime": 1794421272000,
    "title": "",
+<<<<<<< Updated upstream
    "viewers": 78,
+=======
+   "viewers": 167,
+>>>>>>> Stashed changes
    "coins": 0,
    "gifts": 0,
    "lastGiftAt": 0,
    "lastGiftName": "",
+<<<<<<< Updated upstream
    "lastSeenLiveAt": 1794421673228,
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781411,
+=======
+   "lastSeenLiveAt": 1794421949680,
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -519,15 +1450,26 @@
    "country": "ID",
    "live": true,
    "startTime": 1794414598000,
+<<<<<<< Updated upstream
    "title": "Temenin aja gabut sambil ngbrl",
    "viewers": 1456,
+=======
+   "title": "",
+   "viewers": 1483,
+>>>>>>> Stashed changes
    "coins": 0,
    "gifts": 0,
    "lastGiftAt": 0,
    "lastGiftName": "",
+<<<<<<< Updated upstream
    "lastSeenLiveAt": 1794421567874,
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781411,
+=======
+   "lastSeenLiveAt": 1794421949680,
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -538,14 +1480,24 @@
    "live": true,
    "startTime": 1794419449000,
    "title": "",
+<<<<<<< Updated upstream
    "viewers": 75,
+=======
+   "viewers": 79,
+>>>>>>> Stashed changes
    "coins": 0,
    "gifts": 0,
    "lastGiftAt": 0,
    "lastGiftName": "",
+<<<<<<< Updated upstream
    "lastSeenLiveAt": 1794421781411,
    "reason": "",
    "checkedAt": 1794421781411,
+=======
+   "lastSeenLiveAt": 1794421949680,
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -556,14 +1508,24 @@
    "live": true,
    "startTime": 1794407995000,
    "title": "",
+<<<<<<< Updated upstream
    "viewers": 440,
+=======
+   "viewers": 453,
+>>>>>>> Stashed changes
    "coins": 0,
    "gifts": 0,
    "lastGiftAt": 0,
    "lastGiftName": "",
+<<<<<<< Updated upstream
    "lastSeenLiveAt": 1794421567874,
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781411,
+=======
+   "lastSeenLiveAt": 1794421949680,
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -574,11 +1536,16 @@
    "live": true,
    "startTime": 1794417761000,
    "title": "",
+<<<<<<< Updated upstream
    "viewers": 68,
+=======
+   "viewers": 73,
+>>>>>>> Stashed changes
    "coins": 0,
    "gifts": 0,
    "lastGiftAt": 0,
    "lastGiftName": "",
+<<<<<<< Updated upstream
    "lastSeenLiveAt": 1794421567874,
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781411,
@@ -600,6 +1567,29 @@
    "lastSeenLiveAt": 1794421781411,
    "reason": "",
    "checkedAt": 1794421781411,
+=======
+   "lastSeenLiveAt": 1794421949680,
+   "reason": "",
+   "checkedAt": 1794421949680,
+   "roomId": "",
+   "boxes": 0,
+   "lastBoxAt": 0
+  },
+  {
+   "username": "heldagjonaj",
+   "country": "AL",
+   "live": true,
+   "startTime": 1794421561000,
+   "title": "",
+   "viewers": 91,
+   "coins": 0,
+   "gifts": 0,
+   "lastGiftAt": 0,
+   "lastGiftName": "",
+   "lastSeenLiveAt": 1794421949680,
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -610,14 +1600,24 @@
    "live": true,
    "startTime": 1794418275000,
    "title": "大豬蹄子",
+<<<<<<< Updated upstream
    "viewers": 549,
+=======
+   "viewers": 594,
+>>>>>>> Stashed changes
    "coins": 0,
    "gifts": 0,
    "lastGiftAt": 0,
    "lastGiftName": "",
+<<<<<<< Updated upstream
    "lastSeenLiveAt": 1794421567874,
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781411,
+=======
+   "lastSeenLiveAt": 1794421949680,
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -633,10 +1633,17 @@
    "gifts": 0,
    "lastGiftAt": 0,
    "lastGiftName": "",
+<<<<<<< Updated upstream
    "lastSeenLiveAt": 1794421567874,
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781411,
    "roomId": "7706963964491598624",
+=======
+   "lastSeenLiveAt": 1794421949680,
+   "reason": "",
+   "checkedAt": 1794421949680,
+   "roomId": "",
+>>>>>>> Stashed changes
    "boxes": 0,
    "lastBoxAt": 0
   },
@@ -646,14 +1653,24 @@
    "live": true,
    "startTime": 1794408150000,
    "title": "Lets Go LIVE!",
+<<<<<<< Updated upstream
    "viewers": 1795,
+=======
+   "viewers": 1805,
+>>>>>>> Stashed changes
    "coins": 0,
    "gifts": 0,
    "lastGiftAt": 0,
    "lastGiftName": "",
+<<<<<<< Updated upstream
    "lastSeenLiveAt": 1794421781411,
    "reason": "",
    "checkedAt": 1794421781411,
+=======
+   "lastSeenLiveAt": 1794421949680,
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -664,14 +1681,24 @@
    "live": true,
    "startTime": 1794408523000,
    "title": "",
+<<<<<<< Updated upstream
    "viewers": 728,
+=======
+   "viewers": 733,
+>>>>>>> Stashed changes
    "coins": 0,
    "gifts": 0,
    "lastGiftAt": 0,
    "lastGiftName": "",
+<<<<<<< Updated upstream
    "lastSeenLiveAt": 1794421567874,
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781411,
+=======
+   "lastSeenLiveAt": 1794421949680,
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -681,15 +1708,26 @@
    "country": "ES",
    "live": true,
    "startTime": 1794421491000,
+<<<<<<< Updated upstream
    "title": "خير عليكم حبابنا 💕",
    "viewers": 1155,
+=======
+   "title": "",
+   "viewers": 2084,
+>>>>>>> Stashed changes
    "coins": 0,
    "gifts": 0,
    "lastGiftAt": 0,
    "lastGiftName": "",
+<<<<<<< Updated upstream
    "lastSeenLiveAt": 1794421781411,
    "reason": "",
    "checkedAt": 1794421781411,
+=======
+   "lastSeenLiveAt": 1794421949680,
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -705,9 +1743,15 @@
    "gifts": 0,
    "lastGiftAt": 0,
    "lastGiftName": "",
+<<<<<<< Updated upstream
    "lastSeenLiveAt": 1794421781411,
    "reason": "",
    "checkedAt": 1794421781411,
+=======
+   "lastSeenLiveAt": 1794421949680,
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -718,14 +1762,24 @@
    "live": true,
    "startTime": 1794409458000,
    "title": "",
+<<<<<<< Updated upstream
    "viewers": 6450,
+=======
+   "viewers": 6619,
+>>>>>>> Stashed changes
    "coins": 0,
    "gifts": 0,
    "lastGiftAt": 0,
    "lastGiftName": "",
+<<<<<<< Updated upstream
    "lastSeenLiveAt": 1794421567874,
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781411,
+=======
+   "lastSeenLiveAt": 1794421949680,
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -736,14 +1790,24 @@
    "live": true,
    "startTime": 1794413460000,
    "title": "",
+<<<<<<< Updated upstream
    "viewers": 6944,
+=======
+   "viewers": 7169,
+>>>>>>> Stashed changes
    "coins": 0,
    "gifts": 0,
    "lastGiftAt": 0,
    "lastGiftName": "",
+<<<<<<< Updated upstream
    "lastSeenLiveAt": 1794421567874,
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781411,
+=======
+   "lastSeenLiveAt": 1794421949680,
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -754,14 +1818,24 @@
    "live": true,
    "startTime": 1794412121000,
    "title": "",
+<<<<<<< Updated upstream
    "viewers": 34131,
+=======
+   "viewers": 34998,
+>>>>>>> Stashed changes
    "coins": 0,
    "gifts": 0,
    "lastGiftAt": 0,
    "lastGiftName": "",
+<<<<<<< Updated upstream
    "lastSeenLiveAt": 1794421567874,
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781411,
+=======
+   "lastSeenLiveAt": 1794421949680,
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -772,14 +1846,24 @@
    "live": true,
    "startTime": 1794403547000,
    "title": "BANGLO PULAI‼️",
+<<<<<<< Updated upstream
    "viewers": 39924,
+=======
+   "viewers": 40977,
+>>>>>>> Stashed changes
    "coins": 0,
    "gifts": 0,
    "lastGiftAt": 0,
    "lastGiftName": "",
+<<<<<<< Updated upstream
    "lastSeenLiveAt": 1794421567874,
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781411,
+=======
+   "lastSeenLiveAt": 1794421949680,
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -790,14 +1874,24 @@
    "live": true,
    "startTime": 1794411981000,
    "title": "",
+<<<<<<< Updated upstream
    "viewers": 4748,
+=======
+   "viewers": 4819,
+>>>>>>> Stashed changes
    "coins": 0,
    "gifts": 0,
    "lastGiftAt": 0,
    "lastGiftName": "",
+<<<<<<< Updated upstream
    "lastSeenLiveAt": 1794421673228,
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781411,
+=======
+   "lastSeenLiveAt": 1794421949680,
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -813,9 +1907,15 @@
    "gifts": 0,
    "lastGiftAt": 0,
    "lastGiftName": "",
+<<<<<<< Updated upstream
    "lastSeenLiveAt": 1794421781411,
    "reason": "",
    "checkedAt": 1794421781411,
+=======
+   "lastSeenLiveAt": 1794421949680,
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -826,15 +1926,26 @@
    "live": true,
    "startTime": 1794412588000,
    "title": "❤️ Am revenitttt",
+<<<<<<< Updated upstream
    "viewers": 13479,
+=======
+   "viewers": 13610,
+>>>>>>> Stashed changes
    "coins": 0,
    "gifts": 0,
    "lastGiftAt": 0,
    "lastGiftName": "",
+<<<<<<< Updated upstream
    "lastSeenLiveAt": 1794421567874,
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781411,
    "roomId": "7706943263353244438",
+=======
+   "lastSeenLiveAt": 1794421949680,
+   "reason": "",
+   "checkedAt": 1794421949680,
+   "roomId": "",
+>>>>>>> Stashed changes
    "boxes": 0,
    "lastBoxAt": 0
   },
@@ -844,14 +1955,24 @@
    "live": true,
    "startTime": 1794419381000,
    "title": "",
+<<<<<<< Updated upstream
    "viewers": 1397,
+=======
+   "viewers": 1478,
+>>>>>>> Stashed changes
    "coins": 0,
    "gifts": 0,
    "lastGiftAt": 0,
    "lastGiftName": "",
+<<<<<<< Updated upstream
    "lastSeenLiveAt": 1794421673228,
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781411,
+=======
+   "lastSeenLiveAt": 1794421949680,
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -862,14 +1983,24 @@
    "live": true,
    "startTime": 1794420516000,
    "title": "Ml live",
+<<<<<<< Updated upstream
    "viewers": 108,
+=======
+   "viewers": 172,
+>>>>>>> Stashed changes
    "coins": 0,
    "gifts": 0,
    "lastGiftAt": 0,
    "lastGiftName": "",
+<<<<<<< Updated upstream
    "lastSeenLiveAt": 1794421567874,
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781411,
+=======
+   "lastSeenLiveAt": 1794421949680,
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -880,15 +2011,26 @@
    "live": true,
    "startTime": 1794413945000,
    "title": "",
+<<<<<<< Updated upstream
    "viewers": 17429,
+=======
+   "viewers": 17916,
+>>>>>>> Stashed changes
    "coins": 0,
    "gifts": 0,
    "lastGiftAt": 0,
    "lastGiftName": "",
+<<<<<<< Updated upstream
    "lastSeenLiveAt": 1794421567874,
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781411,
    "roomId": "7706949093884529409",
+=======
+   "lastSeenLiveAt": 1794421949680,
+   "reason": "",
+   "checkedAt": 1794421949680,
+   "roomId": "",
+>>>>>>> Stashed changes
    "boxes": 0,
    "lastBoxAt": 0
   },
@@ -898,14 +2040,24 @@
    "live": true,
    "startTime": 1794417965000,
    "title": "",
+<<<<<<< Updated upstream
    "viewers": 753,
+=======
+   "viewers": 805,
+>>>>>>> Stashed changes
    "coins": 0,
    "gifts": 0,
    "lastGiftAt": 0,
    "lastGiftName": "",
+<<<<<<< Updated upstream
    "lastSeenLiveAt": 1794421567874,
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781411,
+=======
+   "lastSeenLiveAt": 1794421949680,
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -916,15 +2068,26 @@
    "live": true,
    "startTime": 1794411921000,
    "title": "",
+<<<<<<< Updated upstream
    "viewers": 16872,
+=======
+   "viewers": 17250,
+>>>>>>> Stashed changes
    "coins": 0,
    "gifts": 0,
    "lastGiftAt": 0,
    "lastGiftName": "",
+<<<<<<< Updated upstream
    "lastSeenLiveAt": 1794421767364,
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781411,
    "roomId": "7706940256243354389",
+=======
+   "lastSeenLiveAt": 1794421949680,
+   "reason": "",
+   "checkedAt": 1794421949680,
+   "roomId": "",
+>>>>>>> Stashed changes
    "boxes": 0,
    "lastBoxAt": 0
   },
@@ -934,14 +2097,24 @@
    "live": true,
    "startTime": 1794416598000,
    "title": "Bir Umuttur Yaşamak",
+<<<<<<< Updated upstream
    "viewers": 4145,
+=======
+   "viewers": 4310,
+>>>>>>> Stashed changes
    "coins": 0,
    "gifts": 0,
    "lastGiftAt": 0,
    "lastGiftName": "",
+<<<<<<< Updated upstream
    "lastSeenLiveAt": 1794421673228,
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781411,
+=======
+   "lastSeenLiveAt": 1794421949680,
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -957,9 +2130,15 @@
    "gifts": 0,
    "lastGiftAt": 0,
    "lastGiftName": "",
+<<<<<<< Updated upstream
    "lastSeenLiveAt": 1794421567874,
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781411,
+=======
+   "lastSeenLiveAt": 1794421949680,
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -970,14 +2149,24 @@
    "live": true,
    "startTime": 1794418173000,
    "title": "生誕🎂",
+<<<<<<< Updated upstream
    "viewers": 904,
+=======
+   "viewers": 918,
+>>>>>>> Stashed changes
    "coins": 0,
    "gifts": 0,
    "lastGiftAt": 0,
    "lastGiftName": "",
+<<<<<<< Updated upstream
    "lastSeenLiveAt": 1794421567874,
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781411,
+=======
+   "lastSeenLiveAt": 1794421949680,
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -988,14 +2177,24 @@
    "live": true,
    "startTime": 1794408634000,
    "title": "LẠI  GẦN HÔN EM",
+<<<<<<< Updated upstream
    "viewers": 6056,
+=======
+   "viewers": 6304,
+>>>>>>> Stashed changes
    "coins": 0,
    "gifts": 0,
    "lastGiftAt": 0,
    "lastGiftName": "",
+<<<<<<< Updated upstream
    "lastSeenLiveAt": 1794421567874,
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781411,
+=======
+   "lastSeenLiveAt": 1794421949680,
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -1006,14 +2205,24 @@
    "live": true,
    "startTime": 1794414655000,
    "title": "",
+<<<<<<< Updated upstream
    "viewers": 2948,
+=======
+   "viewers": 3041,
+>>>>>>> Stashed changes
    "coins": 0,
    "gifts": 0,
    "lastGiftAt": 0,
    "lastGiftName": "",
+<<<<<<< Updated upstream
    "lastSeenLiveAt": 1794421567874,
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781411,
+=======
+   "lastSeenLiveAt": 1794421949680,
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -1024,14 +2233,24 @@
    "live": true,
    "startTime": 1794404701000,
    "title": "Lets Go LIVE!",
+<<<<<<< Updated upstream
    "viewers": 1164,
+=======
+   "viewers": 1173,
+>>>>>>> Stashed changes
    "coins": 0,
    "gifts": 0,
    "lastGiftAt": 0,
    "lastGiftName": "",
+<<<<<<< Updated upstream
    "lastSeenLiveAt": 1794421673228,
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781411,
+=======
+   "lastSeenLiveAt": 1794421949680,
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -1042,14 +2261,24 @@
    "live": true,
    "startTime": 1794420494000,
    "title": "",
+<<<<<<< Updated upstream
    "viewers": 7082,
+=======
+   "viewers": 10821,
+>>>>>>> Stashed changes
    "coins": 0,
    "gifts": 0,
    "lastGiftAt": 0,
    "lastGiftName": "",
+<<<<<<< Updated upstream
    "lastSeenLiveAt": 1794421567874,
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781411,
+=======
+   "lastSeenLiveAt": 1794421949680,
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -1060,14 +2289,24 @@
    "live": true,
    "startTime": 1794407550000,
    "title": "生誕祭！初見さんもぜひ🧡",
+<<<<<<< Updated upstream
    "viewers": 2660,
+=======
+   "viewers": 2672,
+>>>>>>> Stashed changes
    "coins": 0,
    "gifts": 0,
    "lastGiftAt": 0,
    "lastGiftName": "",
+<<<<<<< Updated upstream
    "lastSeenLiveAt": 1794421673228,
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781411,
+=======
+   "lastSeenLiveAt": 1794421949680,
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -1083,9 +2322,15 @@
    "gifts": 0,
    "lastGiftAt": 0,
    "lastGiftName": "",
+<<<<<<< Updated upstream
    "lastSeenLiveAt": 1794421567874,
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781411,
+=======
+   "lastSeenLiveAt": 1794421949680,
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -1096,14 +2341,24 @@
    "live": true,
    "startTime": 1794412696000,
    "title": "con bò ti iu",
+<<<<<<< Updated upstream
    "viewers": 886,
+=======
+   "viewers": 899,
+>>>>>>> Stashed changes
    "coins": 0,
    "gifts": 0,
    "lastGiftAt": 0,
    "lastGiftName": "",
+<<<<<<< Updated upstream
    "lastSeenLiveAt": 1794421673228,
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781411,
+=======
+   "lastSeenLiveAt": 1794421949680,
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -1114,14 +2369,24 @@
    "live": true,
    "startTime": 1794414312000,
    "title": "",
+<<<<<<< Updated upstream
    "viewers": 292,
+=======
+   "viewers": 302,
+>>>>>>> Stashed changes
    "coins": 0,
    "gifts": 0,
    "lastGiftAt": 0,
    "lastGiftName": "",
+<<<<<<< Updated upstream
    "lastSeenLiveAt": 1794421567874,
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781411,
+=======
+   "lastSeenLiveAt": 1794421949680,
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -1132,11 +2397,16 @@
    "live": true,
    "startTime": 1794410378000,
    "title": "Lets Go LIVE!",
+<<<<<<< Updated upstream
    "viewers": 5930,
+=======
+   "viewers": 6054,
+>>>>>>> Stashed changes
    "coins": 0,
    "gifts": 0,
    "lastGiftAt": 0,
    "lastGiftName": "",
+<<<<<<< Updated upstream
    "lastSeenLiveAt": 1794421567874,
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781411,
@@ -1159,6 +2429,12 @@
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781411,
    "roomId": "7706890616315808518",
+=======
+   "lastSeenLiveAt": 1794421949680,
+   "reason": "",
+   "checkedAt": 1794421949680,
+   "roomId": "",
+>>>>>>> Stashed changes
    "boxes": 0,
    "lastBoxAt": 0
   },
@@ -1168,15 +2444,26 @@
    "live": true,
    "startTime": 1794419224000,
    "title": "",
+<<<<<<< Updated upstream
    "viewers": 486,
+=======
+   "viewers": 526,
+>>>>>>> Stashed changes
    "coins": 0,
    "gifts": 0,
    "lastGiftAt": 0,
    "lastGiftName": "",
+<<<<<<< Updated upstream
    "lastSeenLiveAt": 1794421567874,
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781411,
    "roomId": "7706971772050017026",
+=======
+   "lastSeenLiveAt": 1794421949680,
+   "reason": "",
+   "checkedAt": 1794421949680,
+   "roomId": "",
+>>>>>>> Stashed changes
    "boxes": 0,
    "lastBoxAt": 0
   },
@@ -1186,14 +2473,24 @@
    "live": true,
    "startTime": 1794414287000,
    "title": "Lets Go LIVE!",
+<<<<<<< Updated upstream
    "viewers": 1668,
+=======
+   "viewers": 1719,
+>>>>>>> Stashed changes
    "coins": 0,
    "gifts": 0,
    "lastGiftAt": 0,
    "lastGiftName": "",
+<<<<<<< Updated upstream
    "lastSeenLiveAt": 1794421567874,
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781411,
+=======
+   "lastSeenLiveAt": 1794421949680,
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -1204,14 +2501,24 @@
    "live": true,
    "startTime": 1794420699000,
    "title": "",
+<<<<<<< Updated upstream
    "viewers": 161,
+=======
+   "viewers": 176,
+>>>>>>> Stashed changes
    "coins": 0,
    "gifts": 0,
    "lastGiftAt": 0,
    "lastGiftName": "",
+<<<<<<< Updated upstream
    "lastSeenLiveAt": 1794421781411,
    "reason": "",
    "checkedAt": 1794421781411,
+=======
+   "lastSeenLiveAt": 1794421949680,
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -1222,14 +2529,24 @@
    "live": true,
    "startTime": 1794406778000,
    "title": "来了",
+<<<<<<< Updated upstream
    "viewers": 1427,
+=======
+   "viewers": 1433,
+>>>>>>> Stashed changes
    "coins": 0,
    "gifts": 0,
    "lastGiftAt": 0,
    "lastGiftName": "",
+<<<<<<< Updated upstream
    "lastSeenLiveAt": 1794421781411,
    "reason": "",
    "checkedAt": 1794421781411,
+=======
+   "lastSeenLiveAt": 1794421949680,
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -1240,14 +2557,24 @@
    "live": true,
    "startTime": 1794414451000,
    "title": "",
+<<<<<<< Updated upstream
    "viewers": 2121,
+=======
+   "viewers": 2206,
+>>>>>>> Stashed changes
    "coins": 0,
    "gifts": 0,
    "lastGiftAt": 0,
    "lastGiftName": "",
+<<<<<<< Updated upstream
    "lastSeenLiveAt": 1794421567874,
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781411,
+=======
+   "lastSeenLiveAt": 1794421949680,
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -1258,15 +2585,26 @@
    "live": true,
    "startTime": 1794404327000,
    "title": "生日快乐我对自己说",
+<<<<<<< Updated upstream
    "viewers": 954,
+=======
+   "viewers": 967,
+>>>>>>> Stashed changes
    "coins": 0,
    "gifts": 0,
    "lastGiftAt": 0,
    "lastGiftName": "",
+<<<<<<< Updated upstream
    "lastSeenLiveAt": 1794421767364,
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781411,
    "roomId": "7706907758130744084",
+=======
+   "lastSeenLiveAt": 1794421949680,
+   "reason": "",
+   "checkedAt": 1794421949680,
+   "roomId": "",
+>>>>>>> Stashed changes
    "boxes": 0,
    "lastBoxAt": 0
   },
@@ -1281,9 +2619,33 @@
    "gifts": 0,
    "lastGiftAt": 0,
    "lastGiftName": "",
+<<<<<<< Updated upstream
    "lastSeenLiveAt": 1794421567874,
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781411,
+=======
+   "lastSeenLiveAt": 1794421949680,
+   "reason": "",
+   "checkedAt": 1794421949680,
+   "roomId": "",
+   "boxes": 0,
+   "lastBoxAt": 0
+  },
+  {
+   "username": "mirthewillems",
+   "country": "BE",
+   "live": true,
+   "startTime": 0,
+   "title": "",
+   "viewers": 0,
+   "coins": 0,
+   "gifts": 0,
+   "lastGiftAt": 0,
+   "lastGiftName": "",
+   "lastSeenLiveAt": 1794421949680,
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -1294,14 +2656,24 @@
    "live": true,
    "startTime": 1794401425000,
    "title": "53일방송🤭다들 피요피요 수수방에 놀러왕🤍",
+<<<<<<< Updated upstream
    "viewers": 3272,
+=======
+   "viewers": 3305,
+>>>>>>> Stashed changes
    "coins": 0,
    "gifts": 0,
    "lastGiftAt": 0,
    "lastGiftName": "",
+<<<<<<< Updated upstream
    "lastSeenLiveAt": 1794421567874,
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781411,
+=======
+   "lastSeenLiveAt": 1794421949680,
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -1312,14 +2684,24 @@
    "live": true,
    "startTime": 1794413577000,
    "title": "Em 🐼 🐼 🐼",
+<<<<<<< Updated upstream
    "viewers": 977,
+=======
+   "viewers": 985,
+>>>>>>> Stashed changes
    "coins": 0,
    "gifts": 0,
    "lastGiftAt": 0,
    "lastGiftName": "",
+<<<<<<< Updated upstream
    "lastSeenLiveAt": 1794421673228,
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781411,
+=======
+   "lastSeenLiveAt": 1794421949680,
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -1330,15 +2712,44 @@
    "live": true,
    "startTime": 1794415517000,
    "title": "",
+<<<<<<< Updated upstream
    "viewers": 3662,
+=======
+   "viewers": 3727,
+>>>>>>> Stashed changes
    "coins": 0,
    "gifts": 0,
    "lastGiftAt": 0,
    "lastGiftName": "",
+<<<<<<< Updated upstream
    "lastSeenLiveAt": 1794421781411,
    "reason": "",
    "checkedAt": 1794421781411,
    "roomId": "7706955783334660872",
+=======
+   "lastSeenLiveAt": 1794421949680,
+   "reason": "",
+   "checkedAt": 1794421949680,
+   "roomId": "",
+   "boxes": 0,
+   "lastBoxAt": 0
+  },
+  {
+   "username": "_margo0702",
+   "country": "UZ",
+   "live": true,
+   "startTime": 1794421531000,
+   "title": "",
+   "viewers": 66,
+   "coins": 0,
+   "gifts": 0,
+   "lastGiftAt": 0,
+   "lastGiftName": "",
+   "lastSeenLiveAt": 1794421949680,
+   "reason": "",
+   "checkedAt": 1794421949680,
+   "roomId": "",
+>>>>>>> Stashed changes
    "boxes": 0,
    "lastBoxAt": 0
   },
@@ -1366,14 +2777,24 @@
    "live": true,
    "startTime": 1794419995000,
    "title": "",
+<<<<<<< Updated upstream
    "viewers": 53,
+=======
+   "viewers": 66,
+>>>>>>> Stashed changes
    "coins": 0,
    "gifts": 0,
    "lastGiftAt": 0,
    "lastGiftName": "",
+<<<<<<< Updated upstream
    "lastSeenLiveAt": 1794421567874,
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781411,
+=======
+   "lastSeenLiveAt": 1794421949680,
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -1384,14 +2805,24 @@
    "live": true,
    "startTime": 1794390580000,
    "title": "Welcome to my LIVE",
+<<<<<<< Updated upstream
    "viewers": 193499,
+=======
+   "viewers": 193837,
+>>>>>>> Stashed changes
    "coins": 0,
    "gifts": 0,
    "lastGiftAt": 0,
    "lastGiftName": "",
+<<<<<<< Updated upstream
    "lastSeenLiveAt": 1794421673228,
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781411,
+=======
+   "lastSeenLiveAt": 1794421949680,
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -1402,14 +2833,24 @@
    "live": true,
    "startTime": 1794417444000,
    "title": "",
+<<<<<<< Updated upstream
    "viewers": 7312,
+=======
+   "viewers": 7877,
+>>>>>>> Stashed changes
    "coins": 0,
    "gifts": 0,
    "lastGiftAt": 0,
    "lastGiftName": "",
+<<<<<<< Updated upstream
    "lastSeenLiveAt": 1794421567874,
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781411,
+=======
+   "lastSeenLiveAt": 1794421949680,
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -1420,14 +2861,24 @@
    "live": true,
    "startTime": 1794406858000,
    "title": "歡迎加入我的直播",
+<<<<<<< Updated upstream
    "viewers": 7527,
+=======
+   "viewers": 7540,
+>>>>>>> Stashed changes
    "coins": 0,
    "gifts": 0,
    "lastGiftAt": 0,
    "lastGiftName": "",
+<<<<<<< Updated upstream
    "lastSeenLiveAt": 1794421673228,
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781411,
+=======
+   "lastSeenLiveAt": 1794421949680,
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -1438,14 +2889,24 @@
    "live": true,
    "startTime": 1794416990000,
    "title": "Pushing top 20 today ⚜️",
+<<<<<<< Updated upstream
    "viewers": 169,
+=======
+   "viewers": 171,
+>>>>>>> Stashed changes
    "coins": 0,
    "gifts": 0,
    "lastGiftAt": 0,
    "lastGiftName": "",
+<<<<<<< Updated upstream
    "lastSeenLiveAt": 1794421781411,
    "reason": "",
    "checkedAt": 1794421781411,
+=======
+   "lastSeenLiveAt": 1794421949680,
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -1456,11 +2917,16 @@
    "live": true,
    "startTime": 1794404147000,
    "title": "双11回收落单大哥！！",
+<<<<<<< Updated upstream
    "viewers": 734,
+=======
+   "viewers": 737,
+>>>>>>> Stashed changes
    "coins": 0,
    "gifts": 0,
    "lastGiftAt": 0,
    "lastGiftName": "",
+<<<<<<< Updated upstream
    "lastSeenLiveAt": 1794421781411,
    "reason": "",
    "checkedAt": 1794421781411,
@@ -1482,6 +2948,11 @@
    "lastSeenLiveAt": 1794421567874,
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781411,
+=======
+   "lastSeenLiveAt": 1794421949680,
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -1497,9 +2968,15 @@
    "gifts": 0,
    "lastGiftAt": 0,
    "lastGiftName": "",
+<<<<<<< Updated upstream
    "lastSeenLiveAt": 1794421673228,
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781411,
+=======
+   "lastSeenLiveAt": 1794421949680,
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -1510,15 +2987,26 @@
    "live": true,
    "startTime": 1794416464000,
    "title": "",
+<<<<<<< Updated upstream
    "viewers": 408,
+=======
+   "viewers": 417,
+>>>>>>> Stashed changes
    "coins": 0,
    "gifts": 0,
    "lastGiftAt": 0,
    "lastGiftName": "",
+<<<<<<< Updated upstream
    "lastSeenLiveAt": 1794421781411,
    "reason": "",
    "checkedAt": 1794421781411,
    "roomId": "7706959762092542740",
+=======
+   "lastSeenLiveAt": 1794421949680,
+   "reason": "",
+   "checkedAt": 1794421949680,
+   "roomId": "",
+>>>>>>> Stashed changes
    "boxes": 0,
    "lastBoxAt": 0
   },
@@ -1528,15 +3016,26 @@
    "live": true,
    "startTime": 1794418289000,
    "title": "",
+<<<<<<< Updated upstream
    "viewers": 10023,
+=======
+   "viewers": 11369,
+>>>>>>> Stashed changes
    "coins": 0,
    "gifts": 0,
    "lastGiftAt": 0,
    "lastGiftName": "",
+<<<<<<< Updated upstream
    "lastSeenLiveAt": 1794421567874,
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781411,
    "roomId": "7706967652288482068",
+=======
+   "lastSeenLiveAt": 1794421949680,
+   "reason": "",
+   "checkedAt": 1794421949680,
+   "roomId": "",
+>>>>>>> Stashed changes
    "boxes": 0,
    "lastBoxAt": 0
   },
@@ -1546,15 +3045,26 @@
    "live": true,
    "startTime": 1794418263000,
    "title": "",
+<<<<<<< Updated upstream
    "viewers": 1429,
+=======
+   "viewers": 1525,
+>>>>>>> Stashed changes
    "coins": 0,
    "gifts": 0,
    "lastGiftAt": 0,
    "lastGiftName": "",
+<<<<<<< Updated upstream
    "lastSeenLiveAt": 1794421567874,
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781411,
    "roomId": "7706967627456908039",
+=======
+   "lastSeenLiveAt": 1794421949680,
+   "reason": "",
+   "checkedAt": 1794421949680,
+   "roomId": "",
+>>>>>>> Stashed changes
    "boxes": 0,
    "lastBoxAt": 0
   },
@@ -1564,14 +3074,24 @@
    "live": true,
    "startTime": 1794420510000,
    "title": "",
+<<<<<<< Updated upstream
    "viewers": 170,
+=======
+   "viewers": 212,
+>>>>>>> Stashed changes
    "coins": 0,
    "gifts": 0,
    "lastGiftAt": 0,
    "lastGiftName": "",
+<<<<<<< Updated upstream
    "lastSeenLiveAt": 1794421673228,
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781411,
+=======
+   "lastSeenLiveAt": 1794421949680,
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -1582,14 +3102,24 @@
    "live": true,
    "startTime": 1794414174000,
    "title": "Tarot, Música e Batalhas 🇵🇹",
+<<<<<<< Updated upstream
    "viewers": 2070,
+=======
+   "viewers": 2155,
+>>>>>>> Stashed changes
    "coins": 0,
    "gifts": 0,
    "lastGiftAt": 0,
    "lastGiftName": "",
+<<<<<<< Updated upstream
    "lastSeenLiveAt": 1794421567874,
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781411,
+=======
+   "lastSeenLiveAt": 1794421949680,
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -1598,16 +3128,22 @@
    "username": "diavip0612",
    "country": "VN",
    "live": true,
-   "startTime": 0,
+   "startTime": 1794421684000,
    "title": "",
-   "viewers": 0,
+   "viewers": 40,
    "coins": 0,
    "gifts": 0,
    "lastGiftAt": 0,
    "lastGiftName": "",
+<<<<<<< Updated upstream
    "lastSeenLiveAt": 1794421673228,
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781411,
+=======
+   "lastSeenLiveAt": 1794421949680,
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -1618,14 +3154,24 @@
    "live": true,
    "startTime": 1794419753000,
    "title": "",
+<<<<<<< Updated upstream
    "viewers": 30,
+=======
+   "viewers": 31,
+>>>>>>> Stashed changes
    "coins": 0,
    "gifts": 0,
    "lastGiftAt": 0,
    "lastGiftName": "",
+<<<<<<< Updated upstream
    "lastSeenLiveAt": 1794421781411,
    "reason": "",
    "checkedAt": 1794421781411,
+=======
+   "lastSeenLiveAt": 1794421949680,
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -1636,14 +3182,24 @@
    "live": true,
    "startTime": 1794411131000,
    "title": "",
+<<<<<<< Updated upstream
    "viewers": 6400,
+=======
+   "viewers": 6501,
+>>>>>>> Stashed changes
    "coins": 0,
    "gifts": 0,
    "lastGiftAt": 0,
    "lastGiftName": "",
+<<<<<<< Updated upstream
    "lastSeenLiveAt": 1794421673228,
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781411,
+=======
+   "lastSeenLiveAt": 1794421949680,
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -1654,14 +3210,24 @@
    "live": true,
    "startTime": 1794421364000,
    "title": "",
+<<<<<<< Updated upstream
    "viewers": 272,
+=======
+   "viewers": 923,
+>>>>>>> Stashed changes
    "coins": 0,
    "gifts": 0,
    "lastGiftAt": 0,
    "lastGiftName": "",
+<<<<<<< Updated upstream
    "lastSeenLiveAt": 1794421567874,
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781411,
+=======
+   "lastSeenLiveAt": 1794421949680,
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -1672,14 +3238,24 @@
    "live": true,
    "startTime": 1794417910000,
    "title": "",
+<<<<<<< Updated upstream
    "viewers": 5573,
+=======
+   "viewers": 5908,
+>>>>>>> Stashed changes
    "coins": 0,
    "gifts": 0,
    "lastGiftAt": 0,
    "lastGiftName": "",
+<<<<<<< Updated upstream
    "lastSeenLiveAt": 1794421567874,
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781411,
+=======
+   "lastSeenLiveAt": 1794421949680,
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -1695,9 +3271,15 @@
    "gifts": 0,
    "lastGiftAt": 0,
    "lastGiftName": "",
+<<<<<<< Updated upstream
    "lastSeenLiveAt": 1794421567874,
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781411,
+=======
+   "lastSeenLiveAt": 1794421949680,
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -1708,14 +3290,42 @@
    "live": true,
    "startTime": 1794420532000,
    "title": "OPENENING!!",
+<<<<<<< Updated upstream
    "viewers": 471,
+=======
+   "viewers": 633,
+>>>>>>> Stashed changes
    "coins": 0,
    "gifts": 0,
    "lastGiftAt": 0,
    "lastGiftName": "",
+<<<<<<< Updated upstream
    "lastSeenLiveAt": 1794421567874,
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781411,
+=======
+   "lastSeenLiveAt": 1794421949680,
+   "reason": "",
+   "checkedAt": 1794421949680,
+   "roomId": "",
+   "boxes": 0,
+   "lastBoxAt": 0
+  },
+  {
+   "username": "kobachka",
+   "country": "BY",
+   "live": true,
+   "startTime": 1794421936000,
+   "title": "Lets Go LIVE!",
+   "viewers": 1,
+   "coins": 0,
+   "gifts": 0,
+   "lastGiftAt": 0,
+   "lastGiftName": "",
+   "lastSeenLiveAt": 1794421949680,
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -1726,14 +3336,24 @@
    "live": true,
    "startTime": 1794420287000,
    "title": "",
+<<<<<<< Updated upstream
    "viewers": 661,
+=======
+   "viewers": 669,
+>>>>>>> Stashed changes
    "coins": 0,
    "gifts": 0,
    "lastGiftAt": 0,
    "lastGiftName": "",
+<<<<<<< Updated upstream
    "lastSeenLiveAt": 1794421781411,
    "reason": "",
    "checkedAt": 1794421781411,
+=======
+   "lastSeenLiveAt": 1794421949680,
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -1744,14 +3364,24 @@
    "live": true,
    "startTime": 1794402986000,
    "title": "Lets Go LIVE!",
+<<<<<<< Updated upstream
    "viewers": 3523,
+=======
+   "viewers": 3537,
+>>>>>>> Stashed changes
    "coins": 0,
    "gifts": 0,
    "lastGiftAt": 0,
    "lastGiftName": "",
+<<<<<<< Updated upstream
    "lastSeenLiveAt": 1794421781411,
    "reason": "",
    "checkedAt": 1794421781411,
+=======
+   "lastSeenLiveAt": 1794421949680,
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -1762,14 +3392,24 @@
    "live": true,
    "startTime": 1794419714000,
    "title": "",
+<<<<<<< Updated upstream
    "viewers": 102,
+=======
+   "viewers": 125,
+>>>>>>> Stashed changes
    "coins": 0,
    "gifts": 0,
    "lastGiftAt": 0,
    "lastGiftName": "",
+<<<<<<< Updated upstream
    "lastSeenLiveAt": 1794421567874,
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781411,
+=======
+   "lastSeenLiveAt": 1794421949680,
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -1780,14 +3420,24 @@
    "live": true,
    "startTime": 1794420984000,
    "title": "ilumina mi corazón de pollito",
+<<<<<<< Updated upstream
    "viewers": 166,
+=======
+   "viewers": 403,
+>>>>>>> Stashed changes
    "coins": 0,
    "gifts": 0,
    "lastGiftAt": 0,
    "lastGiftName": "",
+<<<<<<< Updated upstream
    "lastSeenLiveAt": 1794421567874,
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781411,
+=======
+   "lastSeenLiveAt": 1794421949680,
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -1798,15 +3448,26 @@
    "live": true,
    "startTime": 1794418118000,
    "title": "ja",
+<<<<<<< Updated upstream
    "viewers": 1071,
+=======
+   "viewers": 1127,
+>>>>>>> Stashed changes
    "coins": 0,
    "gifts": 0,
    "lastGiftAt": 0,
    "lastGiftName": "",
+<<<<<<< Updated upstream
    "lastSeenLiveAt": 1794421567874,
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781411,
    "roomId": "7706967027994413846",
+=======
+   "lastSeenLiveAt": 1794421949680,
+   "reason": "",
+   "checkedAt": 1794421949680,
+   "roomId": "",
+>>>>>>> Stashed changes
    "boxes": 0,
    "lastBoxAt": 0
   },
@@ -1816,14 +3477,24 @@
    "live": true,
    "startTime": 1794418581000,
    "title": "",
+<<<<<<< Updated upstream
    "viewers": 1766,
+=======
+   "viewers": 1805,
+>>>>>>> Stashed changes
    "coins": 0,
    "gifts": 0,
    "lastGiftAt": 0,
    "lastGiftName": "",
+<<<<<<< Updated upstream
    "lastSeenLiveAt": 1794421781411,
    "reason": "",
    "checkedAt": 1794421781411,
+=======
+   "lastSeenLiveAt": 1794421949680,
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -1839,9 +3510,15 @@
    "gifts": 0,
    "lastGiftAt": 0,
    "lastGiftName": "",
+<<<<<<< Updated upstream
    "lastSeenLiveAt": 1794421567874,
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781411,
+=======
+   "lastSeenLiveAt": 1794421949680,
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -1852,14 +3529,24 @@
    "live": true,
    "startTime": 1794420532000,
    "title": "",
+<<<<<<< Updated upstream
    "viewers": 2125,
+=======
+   "viewers": 3191,
+>>>>>>> Stashed changes
    "coins": 0,
    "gifts": 0,
    "lastGiftAt": 0,
    "lastGiftName": "",
+<<<<<<< Updated upstream
    "lastSeenLiveAt": 1794421567874,
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781411,
+=======
+   "lastSeenLiveAt": 1794421949680,
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -1870,14 +3557,24 @@
    "live": true,
    "startTime": 1794415714000,
    "title": "Lets Go LIVE!",
+<<<<<<< Updated upstream
    "viewers": 7238,
+=======
+   "viewers": 7637,
+>>>>>>> Stashed changes
    "coins": 0,
    "gifts": 0,
    "lastGiftAt": 0,
    "lastGiftName": "",
+<<<<<<< Updated upstream
    "lastSeenLiveAt": 1794421673228,
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781411,
+=======
+   "lastSeenLiveAt": 1794421949680,
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -1888,14 +3585,24 @@
    "live": true,
    "startTime": 1794416438000,
    "title": "⚔️ GOATS VS NULLOS",
+<<<<<<< Updated upstream
    "viewers": 2972,
+=======
+   "viewers": 3004,
+>>>>>>> Stashed changes
    "coins": 0,
    "gifts": 0,
    "lastGiftAt": 0,
    "lastGiftName": "",
+<<<<<<< Updated upstream
    "lastSeenLiveAt": 1794421781411,
    "reason": "",
    "checkedAt": 1794421781411,
+=======
+   "lastSeenLiveAt": 1794421949680,
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -1906,14 +3613,24 @@
    "live": true,
    "startTime": 1794421572000,
    "title": "",
+<<<<<<< Updated upstream
    "viewers": 3,
+=======
+   "viewers": 23,
+>>>>>>> Stashed changes
    "coins": 0,
    "gifts": 0,
    "lastGiftAt": 0,
    "lastGiftName": "",
+<<<<<<< Updated upstream
    "lastSeenLiveAt": 1794421673229,
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781411,
+=======
+   "lastSeenLiveAt": 1794421949680,
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -1929,9 +3646,15 @@
    "gifts": 0,
    "lastGiftAt": 0,
    "lastGiftName": "",
+<<<<<<< Updated upstream
    "lastSeenLiveAt": 1794421567874,
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781411,
+=======
+   "lastSeenLiveAt": 1794421949680,
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -1942,15 +3665,26 @@
    "live": true,
    "startTime": 1794410692000,
    "title": "bismalla kara 🥰",
+<<<<<<< Updated upstream
    "viewers": 21130,
+=======
+   "viewers": 21275,
+>>>>>>> Stashed changes
    "coins": 0,
    "gifts": 0,
    "lastGiftAt": 0,
    "lastGiftName": "",
+<<<<<<< Updated upstream
    "lastSeenLiveAt": 1794421781411,
    "reason": "",
    "checkedAt": 1794421781411,
    "roomId": "7706935087233567509",
+=======
+   "lastSeenLiveAt": 1794421949680,
+   "reason": "",
+   "checkedAt": 1794421949680,
+   "roomId": "",
+>>>>>>> Stashed changes
    "boxes": 0,
    "lastBoxAt": 0
   },
@@ -1960,14 +3694,24 @@
    "live": true,
    "startTime": 1794415491000,
    "title": "Lets Go LIVE!",
+<<<<<<< Updated upstream
    "viewers": 50394,
+=======
+   "viewers": 55411,
+>>>>>>> Stashed changes
    "coins": 0,
    "gifts": 0,
    "lastGiftAt": 0,
    "lastGiftName": "",
+<<<<<<< Updated upstream
    "lastSeenLiveAt": 1794421567874,
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781411,
+=======
+   "lastSeenLiveAt": 1794421949680,
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -1978,15 +3722,26 @@
    "live": true,
    "startTime": 1794419876000,
    "title": "NoHateOnlyLove",
+<<<<<<< Updated upstream
    "viewers": 738,
+=======
+   "viewers": 838,
+>>>>>>> Stashed changes
    "coins": 0,
    "gifts": 0,
    "lastGiftAt": 0,
    "lastGiftName": "",
+<<<<<<< Updated upstream
    "lastSeenLiveAt": 1794421673229,
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781411,
    "roomId": "7706974590349609750",
+=======
+   "lastSeenLiveAt": 1794421949680,
+   "reason": "",
+   "checkedAt": 1794421949680,
+   "roomId": "",
+>>>>>>> Stashed changes
    "boxes": 0,
    "lastBoxAt": 0
   },
@@ -1996,15 +3751,26 @@
    "live": true,
    "startTime": 1794417761000,
    "title": "Streameur vs viewers",
+<<<<<<< Updated upstream
    "viewers": 3094,
+=======
+   "viewers": 3331,
+>>>>>>> Stashed changes
    "coins": 0,
    "gifts": 0,
    "lastGiftAt": 0,
    "lastGiftName": "",
+<<<<<<< Updated upstream
    "lastSeenLiveAt": 1794421567874,
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781411,
    "roomId": "7706965514672671510",
+=======
+   "lastSeenLiveAt": 1794421949680,
+   "reason": "",
+   "checkedAt": 1794421949680,
+   "roomId": "",
+>>>>>>> Stashed changes
    "boxes": 0,
    "lastBoxAt": 0
   },
@@ -2019,9 +3785,15 @@
    "gifts": 0,
    "lastGiftAt": 0,
    "lastGiftName": "",
+<<<<<<< Updated upstream
    "lastSeenLiveAt": 1794421567874,
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781411,
+=======
+   "lastSeenLiveAt": 1794421949680,
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -2032,14 +3804,24 @@
    "live": true,
    "startTime": 1794411235000,
    "title": "",
+<<<<<<< Updated upstream
    "viewers": 28529,
+=======
+   "viewers": 28751,
+>>>>>>> Stashed changes
    "coins": 0,
    "gifts": 0,
    "lastGiftAt": 0,
    "lastGiftName": "",
+<<<<<<< Updated upstream
    "lastSeenLiveAt": 1794421673229,
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781411,
+=======
+   "lastSeenLiveAt": 1794421949680,
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -2050,14 +3832,24 @@
    "live": true,
    "startTime": 1794420547000,
    "title": "Lets Go LIVE!",
+<<<<<<< Updated upstream
    "viewers": 458,
+=======
+   "viewers": 510,
+>>>>>>> Stashed changes
    "coins": 0,
    "gifts": 0,
    "lastGiftAt": 0,
    "lastGiftName": "",
+<<<<<<< Updated upstream
    "lastSeenLiveAt": 1794421781411,
    "reason": "",
    "checkedAt": 1794421781411,
+=======
+   "lastSeenLiveAt": 1794421949680,
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -2068,14 +3860,24 @@
    "live": true,
    "startTime": 1794412708000,
    "title": "",
+<<<<<<< Updated upstream
    "viewers": 522,
+=======
+   "viewers": 527,
+>>>>>>> Stashed changes
    "coins": 0,
    "gifts": 0,
    "lastGiftAt": 0,
    "lastGiftName": "",
+<<<<<<< Updated upstream
    "lastSeenLiveAt": 1794421781411,
    "reason": "",
    "checkedAt": 1794421781411,
+=======
+   "lastSeenLiveAt": 1794421949680,
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -2086,14 +3888,24 @@
    "live": true,
    "startTime": 1794421460000,
    "title": "Playrooms",
+<<<<<<< Updated upstream
    "viewers": 13,
+=======
+   "viewers": 44,
+>>>>>>> Stashed changes
    "coins": 0,
    "gifts": 0,
    "lastGiftAt": 0,
    "lastGiftName": "",
+<<<<<<< Updated upstream
    "lastSeenLiveAt": 1794421567874,
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781411,
+=======
+   "lastSeenLiveAt": 1794421949680,
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -2104,14 +3916,24 @@
    "live": true,
    "startTime": 1794418265000,
    "title": "",
+<<<<<<< Updated upstream
    "viewers": 1994,
+=======
+   "viewers": 2070,
+>>>>>>> Stashed changes
    "coins": 0,
    "gifts": 0,
    "lastGiftAt": 0,
    "lastGiftName": "",
+<<<<<<< Updated upstream
    "lastSeenLiveAt": 1794421567874,
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781411,
+=======
+   "lastSeenLiveAt": 1794421949680,
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -2122,14 +3944,24 @@
    "live": true,
    "startTime": 1794420501000,
    "title": "Bienvenidos Familia 🥰",
+<<<<<<< Updated upstream
    "viewers": 1960,
+=======
+   "viewers": 2411,
+>>>>>>> Stashed changes
    "coins": 0,
    "gifts": 0,
    "lastGiftAt": 0,
    "lastGiftName": "",
+<<<<<<< Updated upstream
    "lastSeenLiveAt": 1794421567874,
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781411,
+=======
+   "lastSeenLiveAt": 1794421949680,
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -2145,9 +3977,15 @@
    "gifts": 0,
    "lastGiftAt": 0,
    "lastGiftName": "",
+<<<<<<< Updated upstream
    "lastSeenLiveAt": 1794421781411,
    "reason": "",
    "checkedAt": 1794421781411,
+=======
+   "lastSeenLiveAt": 1794421949680,
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -2158,14 +3996,24 @@
    "live": true,
    "startTime": 1794421538000,
    "title": "",
+<<<<<<< Updated upstream
    "viewers": 13,
+=======
+   "viewers": 239,
+>>>>>>> Stashed changes
    "coins": 0,
    "gifts": 0,
    "lastGiftAt": 0,
    "lastGiftName": "",
+<<<<<<< Updated upstream
    "lastSeenLiveAt": 1794421567874,
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781411,
+=======
+   "lastSeenLiveAt": 1794421949680,
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -2174,16 +4022,28 @@
    "username": "xmina_official8x",
    "country": "DE",
    "live": true,
+<<<<<<< Updated upstream
    "startTime": 1794413246000,
    "title": "Lets Go LIVE!",
    "viewers": 1882,
+=======
+   "startTime": 0,
+   "title": "",
+   "viewers": 0,
+>>>>>>> Stashed changes
    "coins": 0,
    "gifts": 0,
    "lastGiftAt": 0,
    "lastGiftName": "",
+<<<<<<< Updated upstream
    "lastSeenLiveAt": 1794421781411,
    "reason": "",
    "checkedAt": 1794421781411,
+=======
+   "lastSeenLiveAt": 1794421949680,
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -2194,14 +4054,24 @@
    "live": true,
    "startTime": 1794417914000,
    "title": "Morningggggg",
+<<<<<<< Updated upstream
    "viewers": 578,
+=======
+   "viewers": 630,
+>>>>>>> Stashed changes
    "coins": 0,
    "gifts": 0,
    "lastGiftAt": 0,
    "lastGiftName": "",
+<<<<<<< Updated upstream
    "lastSeenLiveAt": 1794421567874,
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781411,
+=======
+   "lastSeenLiveAt": 1794421949680,
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -2212,14 +4082,20 @@
    "live": true,
    "startTime": 1794411589000,
    "title": "",
-   "viewers": 112,
+   "viewers": 119,
    "coins": 0,
    "gifts": 0,
    "lastGiftAt": 0,
    "lastGiftName": "",
+<<<<<<< Updated upstream
    "lastSeenLiveAt": 1794421567874,
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781411,
+=======
+   "lastSeenLiveAt": 1794421949680,
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -2230,15 +4106,26 @@
    "live": true,
    "startTime": 1794417754000,
    "title": "Lets Go LIVE!",
+<<<<<<< Updated upstream
    "viewers": 1837,
+=======
+   "viewers": 1893,
+>>>>>>> Stashed changes
    "coins": 0,
    "gifts": 0,
    "lastGiftAt": 0,
    "lastGiftName": "",
+<<<<<<< Updated upstream
    "lastSeenLiveAt": 1794421781411,
    "reason": "",
    "checkedAt": 1794421781411,
    "roomId": "7706965318698273556",
+=======
+   "lastSeenLiveAt": 1794421949680,
+   "reason": "",
+   "checkedAt": 1794421949680,
+   "roomId": "",
+>>>>>>> Stashed changes
    "boxes": 0,
    "lastBoxAt": 0
   },
@@ -2248,15 +4135,26 @@
    "live": true,
    "startTime": 1794420897000,
    "title": "",
+<<<<<<< Updated upstream
    "viewers": 1680,
+=======
+   "viewers": 2918,
+>>>>>>> Stashed changes
    "coins": 0,
    "gifts": 0,
    "lastGiftAt": 0,
    "lastGiftName": "",
+<<<<<<< Updated upstream
    "lastSeenLiveAt": 1794421567874,
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781412,
    "roomId": "7706968677039557394",
+=======
+   "lastSeenLiveAt": 1794421949680,
+   "reason": "",
+   "checkedAt": 1794421949680,
+   "roomId": "",
+>>>>>>> Stashed changes
    "boxes": 0,
    "lastBoxAt": 0
   },
@@ -2266,14 +4164,24 @@
    "live": true,
    "startTime": 1794418552000,
    "title": "",
+<<<<<<< Updated upstream
    "viewers": 1296,
+=======
+   "viewers": 1420,
+>>>>>>> Stashed changes
    "coins": 0,
    "gifts": 0,
    "lastGiftAt": 0,
    "lastGiftName": "",
+<<<<<<< Updated upstream
    "lastSeenLiveAt": 1794421567874,
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781412,
+=======
+   "lastSeenLiveAt": 1794421949680,
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -2284,14 +4192,24 @@
    "live": true,
    "startTime": 1794414240000,
    "title": "",
+<<<<<<< Updated upstream
    "viewers": 1261,
+=======
+   "viewers": 1266,
+>>>>>>> Stashed changes
    "coins": 0,
    "gifts": 0,
    "lastGiftAt": 0,
    "lastGiftName": "",
+<<<<<<< Updated upstream
    "lastSeenLiveAt": 1794421781412,
    "reason": "",
    "checkedAt": 1794421781412,
+=======
+   "lastSeenLiveAt": 1794421949680,
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -2302,14 +4220,24 @@
    "live": true,
    "startTime": 1794414635000,
    "title": "",
+<<<<<<< Updated upstream
    "viewers": 14041,
+=======
+   "viewers": 14733,
+>>>>>>> Stashed changes
    "coins": 0,
    "gifts": 0,
    "lastGiftAt": 0,
    "lastGiftName": "",
+<<<<<<< Updated upstream
    "lastSeenLiveAt": 1794421673229,
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781412,
+=======
+   "lastSeenLiveAt": 1794421949680,
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -2325,9 +4253,15 @@
    "gifts": 0,
    "lastGiftAt": 0,
    "lastGiftName": "",
+<<<<<<< Updated upstream
    "lastSeenLiveAt": 1794421567874,
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781412,
+=======
+   "lastSeenLiveAt": 1794421949680,
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -2338,11 +4272,16 @@
    "live": true,
    "startTime": 1794418350000,
    "title": "",
+<<<<<<< Updated upstream
    "viewers": 107,
+=======
+   "viewers": 113,
+>>>>>>> Stashed changes
    "coins": 0,
    "gifts": 0,
    "lastGiftAt": 0,
    "lastGiftName": "",
+<<<<<<< Updated upstream
    "lastSeenLiveAt": 1794421781412,
    "reason": "",
    "checkedAt": 1794421781412,
@@ -2364,6 +4303,11 @@
    "lastSeenLiveAt": 1794421781412,
    "reason": "",
    "checkedAt": 1794421781412,
+=======
+   "lastSeenLiveAt": 1794421949680,
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -2374,19 +4318,30 @@
    "live": true,
    "startTime": 1794407579000,
    "title": "",
+<<<<<<< Updated upstream
    "viewers": 46730,
+=======
+   "viewers": 48040,
+>>>>>>> Stashed changes
    "coins": 0,
    "gifts": 0,
    "lastGiftAt": 0,
    "lastGiftName": "",
+<<<<<<< Updated upstream
    "lastSeenLiveAt": 1794421567874,
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781412,
+=======
+   "lastSeenLiveAt": 1794421949680,
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
   },
   {
+<<<<<<< Updated upstream
    "username": "xinxin.go",
    "country": "ID",
    "live": true,
@@ -2429,18 +4384,34 @@
    "startTime": 1794421759000,
    "title": "Hey",
    "viewers": 1,
+=======
+   "username": "sonamsomsanselma",
+   "country": "MV",
+   "live": false,
+   "startTime": 0,
+   "title": "",
+   "viewers": 0,
+>>>>>>> Stashed changes
    "coins": 0,
    "gifts": 0,
    "lastGiftAt": 0,
    "lastGiftName": "",
+<<<<<<< Updated upstream
    "lastSeenLiveAt": 1794421781411,
    "reason": "",
    "checkedAt": 1794421781411,
    "roomId": "7706969923600288533",
+=======
+   "lastSeenLiveAt": 0,
+   "reason": "",
+   "checkedAt": 1794421949680,
+   "roomId": "",
+>>>>>>> Stashed changes
    "boxes": 0,
    "lastBoxAt": 0
   },
   {
+<<<<<<< Updated upstream
    "username": "kikialilbaddie",
    "country": "NG",
    "live": true,
@@ -2552,6 +4523,11 @@
    "username": "rikichori916",
    "country": "JP",
    "live": true,
+=======
+   "username": "eduardaavx",
+   "country": "BR",
+   "live": false,
+>>>>>>> Stashed changes
    "startTime": 0,
    "title": "",
    "viewers": 0,
@@ -2559,24 +4535,36 @@
    "gifts": 0,
    "lastGiftAt": 0,
    "lastGiftName": "",
+<<<<<<< Updated upstream
    "lastSeenLiveAt": 1794421781411,
    "reason": "",
    "checkedAt": 1794421781411,
    "roomId": "7706945792258427669",
+=======
+   "lastSeenLiveAt": 0,
+   "reason": "",
+   "checkedAt": 1794421949680,
+   "roomId": "",
+>>>>>>> Stashed changes
    "boxes": 0,
    "lastBoxAt": 0
   },
   {
-   "username": "originalmumarich",
-   "country": "JM",
-   "live": true,
-   "startTime": 1794420486000,
+   "username": "skirkite_spalvas_tiktoke",
+   "country": "LT",
+   "live": false,
+   "startTime": 0,
    "title": "",
+<<<<<<< Updated upstream
    "viewers": 2940,
+=======
+   "viewers": 0,
+>>>>>>> Stashed changes
    "coins": 0,
    "gifts": 0,
    "lastGiftAt": 0,
    "lastGiftName": "",
+<<<<<<< Updated upstream
    "lastSeenLiveAt": 1794421781411,
    "reason": "",
    "checkedAt": 1794421781411,
@@ -2707,48 +4695,105 @@
    "reason": "",
    "checkedAt": 1794421781411,
    "roomId": "7706964433558670081",
+=======
+   "lastSeenLiveAt": 0,
+   "reason": "",
+   "checkedAt": 1794421949680,
+   "roomId": "",
+>>>>>>> Stashed changes
    "boxes": 0,
    "lastBoxAt": 0
   },
   {
+<<<<<<< Updated upstream
    "username": "afrinakter__9",
    "country": "BT",
    "live": true,
    "startTime": 1794414695000,
    "title": "",
    "viewers": 519,
+=======
+   "username": "tempodadas7",
+   "country": "MV",
+   "live": false,
+   "startTime": 0,
+   "title": "",
+   "viewers": 0,
    "coins": 0,
    "gifts": 0,
    "lastGiftAt": 0,
    "lastGiftName": "",
-   "lastSeenLiveAt": 1794421781411,
+   "lastSeenLiveAt": 0,
    "reason": "",
-   "checkedAt": 1794421781411,
-   "roomId": "7706952266420390676",
+   "checkedAt": 1794421949680,
+   "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
   },
   {
+   "username": "bazidlimuro",
+   "country": "TR",
+   "live": false,
+   "startTime": 0,
+   "title": "",
+   "viewers": 0,
+>>>>>>> Stashed changes
+   "coins": 0,
+   "gifts": 0,
+   "lastGiftAt": 0,
+   "lastGiftName": "",
+<<<<<<< Updated upstream
+   "lastSeenLiveAt": 1794421781411,
+   "reason": "",
+   "checkedAt": 1794421781411,
+   "roomId": "7706952266420390676",
+=======
+   "lastSeenLiveAt": 0,
+   "reason": "",
+   "checkedAt": 1794421949680,
+   "roomId": "",
+>>>>>>> Stashed changes
+   "boxes": 0,
+   "lastBoxAt": 0
+  },
+  {
+<<<<<<< Updated upstream
    "username": "321__family",
    "country": "TW",
    "live": true,
    "startTime": 1794409781000,
    "title": "Lets Go LIVE!",
    "viewers": 2127,
+=======
+   "username": "keighleypaige",
+   "country": "PH",
+   "live": false,
+   "startTime": 0,
+   "title": "",
+   "viewers": 0,
+>>>>>>> Stashed changes
    "coins": 0,
    "gifts": 0,
    "lastGiftAt": 0,
    "lastGiftName": "",
+<<<<<<< Updated upstream
    "lastSeenLiveAt": 1794421781411,
    "reason": "",
    "checkedAt": 1794421781411,
    "roomId": "7706931171379251975",
+=======
+   "lastSeenLiveAt": 0,
+   "reason": "",
+   "checkedAt": 1794421949680,
+   "roomId": "",
+>>>>>>> Stashed changes
    "boxes": 0,
    "lastBoxAt": 0
   },
   {
-   "username": "yethrolhamo749",
+   "username": "muktah123",
    "country": "BD",
+<<<<<<< Updated upstream
    "live": true,
    "startTime": 1794416884000,
    "title": "",
@@ -2786,6 +4831,9 @@
    "username": "diilloo_94",
    "country": "DE",
    "live": true,
+=======
+   "live": false,
+>>>>>>> Stashed changes
    "startTime": 0,
    "title": "",
    "viewers": 0,
@@ -2793,14 +4841,22 @@
    "gifts": 0,
    "lastGiftAt": 0,
    "lastGiftName": "",
+<<<<<<< Updated upstream
    "lastSeenLiveAt": 1794421781411,
    "reason": "",
    "checkedAt": 1794421781411,
    "roomId": "7706965790372760342",
+=======
+   "lastSeenLiveAt": 0,
+   "reason": "",
+   "checkedAt": 1794421949680,
+   "roomId": "",
+>>>>>>> Stashed changes
    "boxes": 0,
    "lastBoxAt": 0
   },
   {
+<<<<<<< Updated upstream
    "username": "merikokokaia",
    "country": "CC",
    "live": true,
@@ -2912,6 +4968,11 @@
    "username": "ebithaj55",
    "country": "LU",
    "live": true,
+=======
+   "username": "1__2ez____",
+   "country": "JM",
+   "live": false,
+>>>>>>> Stashed changes
    "startTime": 0,
    "title": "",
    "viewers": 0,
@@ -2919,10 +4980,89 @@
    "gifts": 0,
    "lastGiftAt": 0,
    "lastGiftName": "",
+<<<<<<< Updated upstream
    "lastSeenLiveAt": 1794421781411,
    "reason": "",
    "checkedAt": 1794421781411,
    "roomId": "7706938577787128598",
+=======
+   "lastSeenLiveAt": 0,
+   "reason": "",
+   "checkedAt": 1794421949680,
+   "roomId": "",
+   "boxes": 0,
+   "lastBoxAt": 0
+  },
+  {
+   "username": "doabia77",
+   "country": "IT",
+   "live": false,
+   "startTime": 0,
+   "title": "",
+   "viewers": 0,
+   "coins": 0,
+   "gifts": 0,
+   "lastGiftAt": 0,
+   "lastGiftName": "",
+   "lastSeenLiveAt": 0,
+   "reason": "",
+   "checkedAt": 1794421949680,
+   "roomId": "",
+   "boxes": 0,
+   "lastBoxAt": 0
+  },
+  {
+   "username": "criaholson",
+   "country": "PH",
+   "live": false,
+   "startTime": 0,
+   "title": "",
+   "viewers": 0,
+   "coins": 0,
+   "gifts": 0,
+   "lastGiftAt": 0,
+   "lastGiftName": "",
+   "lastSeenLiveAt": 0,
+   "reason": "",
+   "checkedAt": 1794421949680,
+   "roomId": "",
+   "boxes": 0,
+   "lastBoxAt": 0
+  },
+  {
+   "username": "zainaoficial",
+   "country": "VE",
+   "live": false,
+   "startTime": 0,
+   "title": "",
+   "viewers": 0,
+   "coins": 0,
+   "gifts": 0,
+   "lastGiftAt": 0,
+   "lastGiftName": "",
+   "lastSeenLiveAt": 0,
+   "reason": "",
+   "checkedAt": 1794421949680,
+   "roomId": "",
+   "boxes": 0,
+   "lastBoxAt": 0
+  },
+  {
+   "username": "_vegamaurii1",
+   "country": "PY",
+   "live": false,
+   "startTime": 0,
+   "title": "",
+   "viewers": 0,
+   "coins": 0,
+   "gifts": 0,
+   "lastGiftAt": 0,
+   "lastGiftName": "",
+   "lastSeenLiveAt": 0,
+   "reason": "",
+   "checkedAt": 1794421949680,
+   "roomId": "",
+>>>>>>> Stashed changes
    "boxes": 0,
    "lastBoxAt": 0
   },
@@ -3137,7 +5277,11 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
    "reason": "",
+<<<<<<< Updated upstream
    "checkedAt": 1794421781411,
+=======
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -3155,7 +5299,11 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
    "reason": "",
+<<<<<<< Updated upstream
    "checkedAt": 1794421781411,
+=======
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -3173,7 +5321,29 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
    "reason": "",
+<<<<<<< Updated upstream
    "checkedAt": 1794421781411,
+=======
+   "checkedAt": 1794421949680,
+   "roomId": "",
+   "boxes": 0,
+   "lastBoxAt": 0
+  },
+  {
+   "username": "arvaamaton_fi",
+   "country": "GL",
+   "live": false,
+   "startTime": 0,
+   "title": "",
+   "viewers": 0,
+   "coins": 0,
+   "gifts": 0,
+   "lastGiftAt": 0,
+   "lastGiftName": "",
+   "lastSeenLiveAt": 0,
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -3182,16 +5352,20 @@
    "username": "ali_hamdhoon",
    "country": "BD",
    "live": false,
-   "startTime": 1794414253000,
-   "title": "Lets Go LIVE!",
-   "viewers": 5380,
+   "startTime": 0,
+   "title": "",
+   "viewers": 0,
    "coins": 0,
    "gifts": 0,
    "lastGiftAt": 0,
    "lastGiftName": "",
-   "lastSeenLiveAt": 1794421336246,
+   "lastSeenLiveAt": 0,
    "reason": "",
+<<<<<<< Updated upstream
    "checkedAt": 1794421781411,
+=======
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -3200,16 +5374,20 @@
    "username": "alephant_0427",
    "country": "TW",
    "live": false,
-   "startTime": 1794409006000,
-   "title": "Lets Go LIVE!",
-   "viewers": 4570,
+   "startTime": 0,
+   "title": "",
+   "viewers": 0,
    "coins": 0,
    "gifts": 0,
    "lastGiftAt": 0,
    "lastGiftName": "",
-   "lastSeenLiveAt": 1794420532266,
+   "lastSeenLiveAt": 0,
    "reason": "",
+<<<<<<< Updated upstream
    "checkedAt": 1794421781411,
+=======
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -3227,7 +5405,11 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
    "reason": "",
+<<<<<<< Updated upstream
    "checkedAt": 1794421781411,
+=======
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -3236,16 +5418,20 @@
    "username": "nanaaa14060",
    "country": "ID",
    "live": false,
-   "startTime": 1794413693000,
-   "title": "alloooww",
-   "viewers": 4640,
+   "startTime": 0,
+   "title": "",
+   "viewers": 0,
    "coins": 0,
    "gifts": 0,
    "lastGiftAt": 0,
    "lastGiftName": "",
-   "lastSeenLiveAt": 1794421103586,
+   "lastSeenLiveAt": 0,
    "reason": "",
+<<<<<<< Updated upstream
    "checkedAt": 1794421781411,
+=======
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -3263,7 +5449,11 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
    "reason": "",
+<<<<<<< Updated upstream
    "checkedAt": 1794421781411,
+=======
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -3272,17 +5462,22 @@
    "username": "el_exoticoo",
    "country": "CO",
    "live": false,
-   "startTime": 1794413585000,
-   "title": "Miercoles de Bendiciones",
-   "viewers": 17737,
+   "startTime": 0,
+   "title": "",
+   "viewers": 0,
    "coins": 0,
    "gifts": 0,
    "lastGiftAt": 0,
    "lastGiftName": "",
-   "lastSeenLiveAt": 1794420875283,
+   "lastSeenLiveAt": 0,
    "reason": "",
+<<<<<<< Updated upstream
    "checkedAt": 1794421781411,
    "roomId": "7706947516083817223",
+=======
+   "checkedAt": 1794421949680,
+   "roomId": "",
+>>>>>>> Stashed changes
    "boxes": 0,
    "lastBoxAt": 0
   },
@@ -3290,16 +5485,20 @@
    "username": "xmnova3",
    "country": "SG",
    "live": false,
-   "startTime": 1794402982000,
-   "title": "新团开播第一天！！！",
-   "viewers": 668,
+   "startTime": 0,
+   "title": "",
+   "viewers": 0,
    "coins": 0,
    "gifts": 0,
    "lastGiftAt": 0,
    "lastGiftName": "",
-   "lastSeenLiveAt": 1794421336246,
+   "lastSeenLiveAt": 0,
    "reason": "",
+<<<<<<< Updated upstream
    "checkedAt": 1794421781411,
+=======
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -3317,7 +5516,11 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
    "reason": "",
+<<<<<<< Updated upstream
    "checkedAt": 1794421781411,
+=======
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -3335,7 +5538,11 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
    "reason": "",
+<<<<<<< Updated upstream
    "checkedAt": 1794421781411,
+=======
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -3344,16 +5551,28 @@
    "username": "mimouser00",
    "country": "ME",
    "live": false,
+<<<<<<< Updated upstream
    "startTime": 1794420201000,
    "title": "",
    "viewers": 1164,
+=======
+   "startTime": 0,
+   "title": "",
+   "viewers": 0,
+>>>>>>> Stashed changes
    "coins": 0,
    "gifts": 0,
    "lastGiftAt": 0,
    "lastGiftName": "",
+<<<<<<< Updated upstream
    "lastSeenLiveAt": 1794421567874,
    "reason": "",
    "checkedAt": 1794421781411,
+=======
+   "lastSeenLiveAt": 0,
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -3362,16 +5581,22 @@
    "username": "clarkgonzales002",
    "country": "PH",
    "live": false,
-   "startTime": 1794409880000,
+   "startTime": 0,
    "title": "",
-   "viewers": 1127,
+   "viewers": 0,
    "coins": 0,
    "gifts": 0,
    "lastGiftAt": 0,
    "lastGiftName": "",
+<<<<<<< Updated upstream
    "lastSeenLiveAt": 1794420304260,
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781411,
+=======
+   "lastSeenLiveAt": 0,
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -3388,8 +5613,13 @@
    "lastGiftAt": 0,
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
+<<<<<<< Updated upstream
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781411,
+=======
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -3406,8 +5636,13 @@
    "lastGiftAt": 0,
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
+<<<<<<< Updated upstream
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781411,
+=======
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -3424,8 +5659,13 @@
    "lastGiftAt": 0,
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
+<<<<<<< Updated upstream
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781411,
+=======
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -3434,16 +5674,22 @@
    "username": "trucphuong0403",
    "country": "VN",
    "live": false,
-   "startTime": 1794418011000,
+   "startTime": 0,
    "title": "",
-   "viewers": 710,
+   "viewers": 0,
    "coins": 0,
    "gifts": 0,
    "lastGiftAt": 0,
    "lastGiftName": "",
+<<<<<<< Updated upstream
    "lastSeenLiveAt": 1794421336246,
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781411,
+=======
+   "lastSeenLiveAt": 0,
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -3460,8 +5706,13 @@
    "lastGiftAt": 0,
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
+<<<<<<< Updated upstream
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781411,
+=======
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -3470,16 +5721,22 @@
    "username": "meliznaa_",
    "country": "FR",
    "live": false,
-   "startTime": 1794411271000,
-   "title": "Un ange ? MIAOU❤️",
-   "viewers": 3954,
+   "startTime": 0,
+   "title": "",
+   "viewers": 0,
    "coins": 0,
    "gifts": 0,
    "lastGiftAt": 0,
    "lastGiftName": "",
+<<<<<<< Updated upstream
    "lastSeenLiveAt": 1794420191564,
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781411,
+=======
+   "lastSeenLiveAt": 0,
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -3488,16 +5745,22 @@
    "username": "sophia_5049",
    "country": "MY",
    "live": false,
-   "startTime": 1794408730000,
-   "title": "新主播求守护",
-   "viewers": 730,
+   "startTime": 0,
+   "title": "",
+   "viewers": 0,
    "coins": 0,
    "gifts": 0,
    "lastGiftAt": 0,
    "lastGiftName": "",
+<<<<<<< Updated upstream
    "lastSeenLiveAt": 1794420989299,
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781411,
+=======
+   "lastSeenLiveAt": 0,
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -3514,8 +5777,13 @@
    "lastGiftAt": 0,
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
+<<<<<<< Updated upstream
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781411,
+=======
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -3524,16 +5792,20 @@
    "username": "exxoh2",
    "country": "AU",
    "live": false,
-   "startTime": 1794392991000,
-   "title": "Did you compare?….",
-   "viewers": 3963,
+   "startTime": 0,
+   "title": "",
+   "viewers": 0,
    "coins": 0,
    "gifts": 0,
    "lastGiftAt": 0,
    "lastGiftName": "",
-   "lastSeenLiveAt": 1794420416820,
+   "lastSeenLiveAt": 0,
    "reason": "",
+<<<<<<< Updated upstream
    "checkedAt": 1794421781411,
+=======
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -3542,16 +5814,22 @@
    "username": "t_ripl_e",
    "country": "ME",
    "live": false,
-   "startTime": 1794410905000,
+   "startTime": 0,
    "title": "",
-   "viewers": 5998,
+   "viewers": 0,
    "coins": 0,
    "gifts": 0,
    "lastGiftAt": 0,
    "lastGiftName": "",
+<<<<<<< Updated upstream
    "lastSeenLiveAt": 1794420076391,
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781411,
+=======
+   "lastSeenLiveAt": 0,
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -3568,8 +5846,13 @@
    "lastGiftAt": 0,
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
+<<<<<<< Updated upstream
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781411,
+=======
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -3587,7 +5870,11 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
    "reason": "",
+<<<<<<< Updated upstream
    "checkedAt": 1794421781411,
+=======
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -3596,16 +5883,22 @@
    "username": "mariana.30027",
    "country": "CO",
    "live": false,
-   "startTime": 1794409131000,
-   "title": "Lets Go LIVE!",
-   "viewers": 33362,
+   "startTime": 0,
+   "title": "",
+   "viewers": 0,
    "coins": 0,
    "gifts": 0,
    "lastGiftAt": 0,
    "lastGiftName": "",
+<<<<<<< Updated upstream
    "lastSeenLiveAt": 1794420076391,
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781411,
+=======
+   "lastSeenLiveAt": 0,
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -3614,16 +5907,22 @@
    "username": "tahliily",
    "country": "ME",
    "live": false,
-   "startTime": 1794409969000,
+   "startTime": 0,
    "title": "",
-   "viewers": 1420,
+   "viewers": 0,
    "coins": 0,
    "gifts": 0,
    "lastGiftAt": 0,
    "lastGiftName": "",
+<<<<<<< Updated upstream
    "lastSeenLiveAt": 1794421103586,
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781411,
+=======
+   "lastSeenLiveAt": 0,
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -3641,7 +5940,11 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
    "reason": "",
+<<<<<<< Updated upstream
    "checkedAt": 1794421781411,
+=======
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -3658,8 +5961,13 @@
    "lastGiftAt": 0,
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
+<<<<<<< Updated upstream
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781411,
+=======
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -3676,8 +5984,13 @@
    "lastGiftAt": 0,
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
+<<<<<<< Updated upstream
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781411,
+=======
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -3694,8 +6007,13 @@
    "lastGiftAt": 0,
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
+<<<<<<< Updated upstream
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781411,
+=======
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -3712,8 +6030,13 @@
    "lastGiftAt": 0,
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
+<<<<<<< Updated upstream
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781411,
+=======
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -3730,8 +6053,13 @@
    "lastGiftAt": 0,
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
+<<<<<<< Updated upstream
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781411,
+=======
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -3740,16 +6068,22 @@
    "username": "lamajamyang2",
    "country": "BD",
    "live": false,
-   "startTime": 1794406140000,
+   "startTime": 0,
    "title": "",
-   "viewers": 20278,
+   "viewers": 0,
    "coins": 0,
    "gifts": 0,
    "lastGiftAt": 0,
    "lastGiftName": "",
+<<<<<<< Updated upstream
    "lastSeenLiveAt": 1794421103586,
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781411,
+=======
+   "lastSeenLiveAt": 0,
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -3766,8 +6100,13 @@
    "lastGiftAt": 0,
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
+<<<<<<< Updated upstream
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781411,
+=======
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -3784,8 +6123,13 @@
    "lastGiftAt": 0,
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
+<<<<<<< Updated upstream
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781411,
+=======
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -3802,8 +6146,13 @@
    "lastGiftAt": 0,
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
+<<<<<<< Updated upstream
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781411,
+=======
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -3820,8 +6169,13 @@
    "lastGiftAt": 0,
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
+<<<<<<< Updated upstream
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781411,
+=======
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -3838,8 +6192,13 @@
    "lastGiftAt": 0,
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
+<<<<<<< Updated upstream
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781411,
+=======
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -3856,8 +6215,13 @@
    "lastGiftAt": 0,
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
+<<<<<<< Updated upstream
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781411,
+=======
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -3875,7 +6239,11 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
    "reason": "",
+<<<<<<< Updated upstream
    "checkedAt": 1794421781411,
+=======
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -3892,8 +6260,13 @@
    "lastGiftAt": 0,
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
+<<<<<<< Updated upstream
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781411,
+=======
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -3911,7 +6284,11 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
    "reason": "",
+<<<<<<< Updated upstream
    "checkedAt": 1794421781411,
+=======
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -3929,7 +6306,11 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
    "reason": "",
+<<<<<<< Updated upstream
    "checkedAt": 1794421781411,
+=======
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -3946,8 +6327,13 @@
    "lastGiftAt": 0,
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
+<<<<<<< Updated upstream
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781411,
+=======
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -3965,7 +6351,11 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
    "reason": "",
+<<<<<<< Updated upstream
    "checkedAt": 1794421781411,
+=======
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -3982,8 +6372,13 @@
    "lastGiftAt": 0,
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
+<<<<<<< Updated upstream
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781411,
+=======
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -4000,8 +6395,13 @@
    "lastGiftAt": 0,
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
+<<<<<<< Updated upstream
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781411,
+=======
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -4019,7 +6419,11 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
    "reason": "",
+<<<<<<< Updated upstream
    "checkedAt": 1794421781411,
+=======
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -4036,8 +6440,13 @@
    "lastGiftAt": 0,
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
+<<<<<<< Updated upstream
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781411,
+=======
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -4054,8 +6463,13 @@
    "lastGiftAt": 0,
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
+<<<<<<< Updated upstream
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781411,
+=======
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -4072,8 +6486,13 @@
    "lastGiftAt": 0,
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
+<<<<<<< Updated upstream
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781411,
+=======
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -4090,8 +6509,13 @@
    "lastGiftAt": 0,
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
+<<<<<<< Updated upstream
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781411,
+=======
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -4100,17 +6524,22 @@
    "username": "kimi7x",
    "country": "SG",
    "live": false,
-   "startTime": 1794406217000,
-   "title": "Lets Go LIVE!",
-   "viewers": 500,
+   "startTime": 0,
+   "title": "",
+   "viewers": 0,
    "coins": 0,
    "gifts": 0,
    "lastGiftAt": 0,
    "lastGiftName": "",
-   "lastSeenLiveAt": 1794421103586,
+   "lastSeenLiveAt": 0,
    "reason": "",
+<<<<<<< Updated upstream
    "checkedAt": 1794421781411,
    "roomId": "7706915841685654292",
+=======
+   "checkedAt": 1794421949680,
+   "roomId": "",
+>>>>>>> Stashed changes
    "boxes": 0,
    "lastBoxAt": 0
   },
@@ -4127,7 +6556,11 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
    "reason": "",
+<<<<<<< Updated upstream
    "checkedAt": 1794421781411,
+=======
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -4145,7 +6578,11 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
    "reason": "",
+<<<<<<< Updated upstream
    "checkedAt": 1794421781411,
+=======
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -4162,8 +6599,13 @@
    "lastGiftAt": 0,
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
+<<<<<<< Updated upstream
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781411,
+=======
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -4180,8 +6622,13 @@
    "lastGiftAt": 0,
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
+<<<<<<< Updated upstream
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781411,
+=======
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -4199,7 +6646,11 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
    "reason": "",
+<<<<<<< Updated upstream
    "checkedAt": 1794421781411,
+=======
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -4216,8 +6667,13 @@
    "lastGiftAt": 0,
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
+<<<<<<< Updated upstream
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781411,
+=======
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -4234,8 +6690,13 @@
    "lastGiftAt": 0,
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
+<<<<<<< Updated upstream
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781411,
+=======
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -4252,8 +6713,13 @@
    "lastGiftAt": 0,
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
+<<<<<<< Updated upstream
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781411,
+=======
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -4271,7 +6737,11 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
    "reason": "",
+<<<<<<< Updated upstream
    "checkedAt": 1794421781411,
+=======
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -4280,16 +6750,20 @@
    "username": "_xinnnxinnn_",
    "country": "MY",
    "live": false,
-   "startTime": 1794408293000,
-   "title": "祝我生日快乐",
-   "viewers": 2388,
+   "startTime": 0,
+   "title": "",
+   "viewers": 0,
    "coins": 0,
    "gifts": 0,
    "lastGiftAt": 0,
    "lastGiftName": "",
-   "lastSeenLiveAt": 1794420532266,
+   "lastSeenLiveAt": 0,
    "reason": "",
+<<<<<<< Updated upstream
    "checkedAt": 1794421781411,
+=======
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -4306,8 +6780,13 @@
    "lastGiftAt": 0,
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
+<<<<<<< Updated upstream
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781411,
+=======
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -4325,7 +6804,11 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
    "reason": "",
+<<<<<<< Updated upstream
    "checkedAt": 1794421781411,
+=======
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -4342,8 +6825,13 @@
    "lastGiftAt": 0,
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
+<<<<<<< Updated upstream
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781411,
+=======
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -4360,8 +6848,13 @@
    "lastGiftAt": 0,
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
+<<<<<<< Updated upstream
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781411,
+=======
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -4378,8 +6871,13 @@
    "lastGiftAt": 0,
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
+<<<<<<< Updated upstream
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781411,
+=======
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -4396,8 +6894,13 @@
    "lastGiftAt": 0,
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
+<<<<<<< Updated upstream
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781411,
+=======
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -4414,8 +6917,13 @@
    "lastGiftAt": 0,
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
+<<<<<<< Updated upstream
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781411,
+=======
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -4432,8 +6940,13 @@
    "lastGiftAt": 0,
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
+<<<<<<< Updated upstream
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781411,
+=======
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -4450,8 +6963,13 @@
    "lastGiftAt": 0,
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
+<<<<<<< Updated upstream
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781411,
+=======
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -4469,7 +6987,11 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
    "reason": "",
+<<<<<<< Updated upstream
    "checkedAt": 1794421781411,
+=======
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -4487,7 +7009,11 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
    "reason": "",
+<<<<<<< Updated upstream
    "checkedAt": 1794421781411,
+=======
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -4496,16 +7022,22 @@
    "username": "so_amoiii",
    "country": "MY",
    "live": false,
-   "startTime": 1794407096000,
-   "title": "i will always here for you ?",
-   "viewers": 4843,
+   "startTime": 0,
+   "title": "",
+   "viewers": 0,
    "coins": 0,
    "gifts": 0,
    "lastGiftAt": 0,
    "lastGiftName": "",
+<<<<<<< Updated upstream
    "lastSeenLiveAt": 1794420758511,
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781411,
+=======
+   "lastSeenLiveAt": 0,
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -4514,16 +7046,28 @@
    "username": "muneebrehman08",
    "country": "GL",
    "live": false,
+<<<<<<< Updated upstream
    "startTime": 1794404699000,
    "title": "Lets Go LIVE!",
    "viewers": 1143,
+=======
+   "startTime": 0,
+   "title": "",
+   "viewers": 0,
+>>>>>>> Stashed changes
    "coins": 0,
    "gifts": 0,
    "lastGiftAt": 0,
    "lastGiftName": "",
+<<<<<<< Updated upstream
    "lastSeenLiveAt": 1794421451074,
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781411,
+=======
+   "lastSeenLiveAt": 0,
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -4541,7 +7085,11 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
    "reason": "",
+<<<<<<< Updated upstream
    "checkedAt": 1794421781411,
+=======
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -4558,8 +7106,13 @@
    "lastGiftAt": 0,
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
+<<<<<<< Updated upstream
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781411,
+=======
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -4577,7 +7130,11 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
    "reason": "",
+<<<<<<< Updated upstream
    "checkedAt": 1794421781411,
+=======
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -4594,8 +7151,13 @@
    "lastGiftAt": 0,
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
+<<<<<<< Updated upstream
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781411,
+=======
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -4613,7 +7175,11 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
    "reason": "",
+<<<<<<< Updated upstream
    "checkedAt": 1794421781411,
+=======
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -4630,8 +7196,13 @@
    "lastGiftAt": 0,
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
+<<<<<<< Updated upstream
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781411,
+=======
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -4648,8 +7219,13 @@
    "lastGiftAt": 0,
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
+<<<<<<< Updated upstream
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781411,
+=======
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -4658,17 +7234,24 @@
    "username": "exceptionalbrian",
    "country": "NG",
    "live": false,
-   "startTime": 1794410579000,
+   "startTime": 0,
    "title": "",
-   "viewers": 16263,
+   "viewers": 0,
    "coins": 0,
    "gifts": 0,
    "lastGiftAt": 0,
    "lastGiftName": "",
+<<<<<<< Updated upstream
    "lastSeenLiveAt": 1794421103586,
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781411,
    "roomId": "7706934280114408222",
+=======
+   "lastSeenLiveAt": 0,
+   "reason": "",
+   "checkedAt": 1794421949680,
+   "roomId": "",
+>>>>>>> Stashed changes
    "boxes": 0,
    "lastBoxAt": 0
   },
@@ -4685,7 +7268,11 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
    "reason": "",
+<<<<<<< Updated upstream
    "checkedAt": 1794421781411,
+=======
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -4702,8 +7289,13 @@
    "lastGiftAt": 0,
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
+<<<<<<< Updated upstream
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781411,
+=======
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -4720,8 +7312,13 @@
    "lastGiftAt": 0,
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
+<<<<<<< Updated upstream
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781411,
+=======
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -4739,7 +7336,11 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
    "reason": "",
+<<<<<<< Updated upstream
    "checkedAt": 1794421781411,
+=======
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -4756,8 +7357,13 @@
    "lastGiftAt": 0,
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
+<<<<<<< Updated upstream
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781411,
+=======
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -4775,7 +7381,11 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
    "reason": "",
+<<<<<<< Updated upstream
    "checkedAt": 1794421781411,
+=======
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -4792,8 +7402,13 @@
    "lastGiftAt": 0,
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
+<<<<<<< Updated upstream
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781411,
+=======
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -4810,8 +7425,13 @@
    "lastGiftAt": 0,
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
+<<<<<<< Updated upstream
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781411,
+=======
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -4828,8 +7448,13 @@
    "lastGiftAt": 0,
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
+<<<<<<< Updated upstream
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781411,
+=======
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -4846,8 +7471,13 @@
    "lastGiftAt": 0,
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
+<<<<<<< Updated upstream
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781411,
+=======
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -4864,8 +7494,13 @@
    "lastGiftAt": 0,
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
+<<<<<<< Updated upstream
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781411,
+=======
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -4883,7 +7518,11 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
    "reason": "",
+<<<<<<< Updated upstream
    "checkedAt": 1794421781411,
+=======
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -4900,8 +7539,13 @@
    "lastGiftAt": 0,
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
+<<<<<<< Updated upstream
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781411,
+=======
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -4918,8 +7562,13 @@
    "lastGiftAt": 0,
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
+<<<<<<< Updated upstream
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781411,
+=======
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -4928,16 +7577,22 @@
    "username": "couchpotato850",
    "country": "BD",
    "live": false,
-   "startTime": 1794414190000,
+   "startTime": 0,
    "title": "",
-   "viewers": 4353,
+   "viewers": 0,
    "coins": 0,
    "gifts": 0,
    "lastGiftAt": 0,
    "lastGiftName": "",
+<<<<<<< Updated upstream
    "lastSeenLiveAt": 1794420191564,
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781411,
+=======
+   "lastSeenLiveAt": 0,
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -4955,7 +7610,11 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
    "reason": "",
+<<<<<<< Updated upstream
    "checkedAt": 1794421781411,
+=======
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -4973,7 +7632,11 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
    "reason": "",
+<<<<<<< Updated upstream
    "checkedAt": 1794421781411,
+=======
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -4990,8 +7653,13 @@
    "lastGiftAt": 0,
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
+<<<<<<< Updated upstream
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781411,
+=======
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -5008,8 +7676,13 @@
    "lastGiftAt": 0,
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
+<<<<<<< Updated upstream
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781411,
+=======
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -5026,8 +7699,13 @@
    "lastGiftAt": 0,
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
+<<<<<<< Updated upstream
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781411,
+=======
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -5044,8 +7722,13 @@
    "lastGiftAt": 0,
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
+<<<<<<< Updated upstream
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781411,
+=======
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -5062,8 +7745,13 @@
    "lastGiftAt": 0,
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
+<<<<<<< Updated upstream
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781411,
+=======
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -5080,8 +7768,13 @@
    "lastGiftAt": 0,
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
+<<<<<<< Updated upstream
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781411,
+=======
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -5098,8 +7791,13 @@
    "lastGiftAt": 0,
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
+<<<<<<< Updated upstream
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781411,
+=======
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -5116,8 +7814,13 @@
    "lastGiftAt": 0,
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
+<<<<<<< Updated upstream
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781411,
+=======
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -5135,7 +7838,11 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
    "reason": "",
+<<<<<<< Updated upstream
    "checkedAt": 1794421781411,
+=======
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -5144,16 +7851,20 @@
    "username": "lyc.150",
    "country": "JP",
    "live": false,
-   "startTime": 1794405730000,
-   "title": "生誕たん",
-   "viewers": 396,
+   "startTime": 0,
+   "title": "",
+   "viewers": 0,
    "coins": 0,
    "gifts": 0,
    "lastGiftAt": 0,
    "lastGiftName": "",
-   "lastSeenLiveAt": 1794420416821,
+   "lastSeenLiveAt": 0,
    "reason": "",
+<<<<<<< Updated upstream
    "checkedAt": 1794421781411,
+=======
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -5170,8 +7881,13 @@
    "lastGiftAt": 0,
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
+<<<<<<< Updated upstream
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781411,
+=======
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -5189,7 +7905,11 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
    "reason": "",
+<<<<<<< Updated upstream
    "checkedAt": 1794421781411,
+=======
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -5206,8 +7926,13 @@
    "lastGiftAt": 0,
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
+<<<<<<< Updated upstream
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781411,
+=======
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -5224,6 +7949,7 @@
    "lastGiftAt": 0,
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
+<<<<<<< Updated upstream
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781411,
    "roomId": "",
@@ -5244,6 +7970,10 @@
    "lastSeenLiveAt": 0,
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781411,
+=======
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -5260,8 +7990,13 @@
    "lastGiftAt": 0,
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
+<<<<<<< Updated upstream
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781411,
+=======
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -5279,7 +8014,11 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
    "reason": "",
+<<<<<<< Updated upstream
    "checkedAt": 1794421781411,
+=======
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -5296,8 +8035,13 @@
    "lastGiftAt": 0,
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
+<<<<<<< Updated upstream
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781411,
+=======
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -5315,7 +8059,11 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
    "reason": "",
+<<<<<<< Updated upstream
    "checkedAt": 1794421781411,
+=======
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -5324,16 +8072,28 @@
    "username": "gruxey.live",
    "country": "AU",
    "live": false,
+<<<<<<< Updated upstream
    "startTime": 1794417802000,
    "title": "",
    "viewers": 9703,
+=======
+   "startTime": 0,
+   "title": "",
+   "viewers": 0,
+>>>>>>> Stashed changes
    "coins": 0,
    "gifts": 0,
    "lastGiftAt": 0,
    "lastGiftName": "",
+<<<<<<< Updated upstream
    "lastSeenLiveAt": 1794421451074,
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781411,
+=======
+   "lastSeenLiveAt": 0,
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -5350,8 +8110,13 @@
    "lastGiftAt": 0,
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
+<<<<<<< Updated upstream
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781411,
+=======
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -5368,8 +8133,13 @@
    "lastGiftAt": 0,
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
+<<<<<<< Updated upstream
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781411,
+=======
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -5386,8 +8156,13 @@
    "lastGiftAt": 0,
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
+<<<<<<< Updated upstream
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781411,
+=======
+   "reason": "user_not_found",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -5404,8 +8179,13 @@
    "lastGiftAt": 0,
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
+<<<<<<< Updated upstream
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781411,
+=======
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -5422,8 +8202,13 @@
    "lastGiftAt": 0,
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
+<<<<<<< Updated upstream
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781411,
+=======
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -5440,8 +8225,13 @@
    "lastGiftAt": 0,
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
+<<<<<<< Updated upstream
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781411,
+=======
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -5458,8 +8248,13 @@
    "lastGiftAt": 0,
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
+<<<<<<< Updated upstream
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781411,
+=======
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -5477,7 +8272,11 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
    "reason": "",
+<<<<<<< Updated upstream
    "checkedAt": 1794421781411,
+=======
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -5494,8 +8293,31 @@
    "lastGiftAt": 0,
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
+<<<<<<< Updated upstream
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781411,
+=======
+   "reason": "",
+   "checkedAt": 1794421949680,
+   "roomId": "",
+   "boxes": 0,
+   "lastBoxAt": 0
+  },
+  {
+   "username": "laneyminnie",
+   "country": "SG",
+   "live": false,
+   "startTime": 0,
+   "title": "",
+   "viewers": 0,
+   "coins": 0,
+   "gifts": 0,
+   "lastGiftAt": 0,
+   "lastGiftName": "",
+   "lastSeenLiveAt": 0,
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -5530,8 +8352,13 @@
    "lastGiftAt": 0,
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
+<<<<<<< Updated upstream
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781411,
+=======
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -5548,8 +8375,13 @@
    "lastGiftAt": 0,
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
+<<<<<<< Updated upstream
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781411,
+=======
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -5566,8 +8398,13 @@
    "lastGiftAt": 0,
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
+<<<<<<< Updated upstream
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781411,
+=======
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -5584,8 +8421,13 @@
    "lastGiftAt": 0,
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
+<<<<<<< Updated upstream
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781411,
+=======
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -5602,8 +8444,13 @@
    "lastGiftAt": 0,
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
+<<<<<<< Updated upstream
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781411,
+=======
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -5620,8 +8467,13 @@
    "lastGiftAt": 0,
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
+<<<<<<< Updated upstream
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781411,
+=======
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -5638,8 +8490,13 @@
    "lastGiftAt": 0,
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
+<<<<<<< Updated upstream
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781411,
+=======
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -5656,8 +8513,13 @@
    "lastGiftAt": 0,
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
+<<<<<<< Updated upstream
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781411,
+=======
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -5674,8 +8536,13 @@
    "lastGiftAt": 0,
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
+<<<<<<< Updated upstream
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781411,
+=======
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -5692,8 +8559,13 @@
    "lastGiftAt": 0,
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
+<<<<<<< Updated upstream
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781411,
+=======
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -5710,8 +8582,13 @@
    "lastGiftAt": 0,
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
+<<<<<<< Updated upstream
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781411,
+=======
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -5728,8 +8605,13 @@
    "lastGiftAt": 0,
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
+<<<<<<< Updated upstream
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781411,
+=======
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -5746,8 +8628,13 @@
    "lastGiftAt": 0,
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
+<<<<<<< Updated upstream
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781411,
+=======
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -5756,17 +8643,22 @@
    "username": "moro_millonario._3r",
    "country": "SV",
    "live": false,
-   "startTime": 1794417677000,
+   "startTime": 0,
    "title": "",
-   "viewers": 15583,
+   "viewers": 0,
    "coins": 0,
    "gifts": 0,
    "lastGiftAt": 0,
    "lastGiftName": "",
-   "lastSeenLiveAt": 1794420304261,
+   "lastSeenLiveAt": 0,
    "reason": "",
+<<<<<<< Updated upstream
    "checkedAt": 1794421781411,
    "roomId": "7706964893249129230",
+=======
+   "checkedAt": 1794421949680,
+   "roomId": "",
+>>>>>>> Stashed changes
    "boxes": 0,
    "lastBoxAt": 0
   },
@@ -5782,8 +8674,13 @@
    "lastGiftAt": 0,
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
+<<<<<<< Updated upstream
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781411,
+=======
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -5800,8 +8697,13 @@
    "lastGiftAt": 0,
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
+<<<<<<< Updated upstream
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781411,
+=======
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -5819,7 +8721,29 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
    "reason": "",
+<<<<<<< Updated upstream
    "checkedAt": 1794421781411,
+=======
+   "checkedAt": 1794421949680,
+   "roomId": "",
+   "boxes": 0,
+   "lastBoxAt": 0
+  },
+  {
+   "username": "ashleyjudo",
+   "country": "NO",
+   "live": false,
+   "startTime": 0,
+   "title": "",
+   "viewers": 0,
+   "coins": 0,
+   "gifts": 0,
+   "lastGiftAt": 0,
+   "lastGiftName": "",
+   "lastSeenLiveAt": 0,
+   "reason": "user_not_found",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -5836,8 +8760,13 @@
    "lastGiftAt": 0,
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
+<<<<<<< Updated upstream
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781411,
+=======
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -5854,8 +8783,13 @@
    "lastGiftAt": 0,
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
+<<<<<<< Updated upstream
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781411,
+=======
+   "reason": "user_not_found",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -5872,8 +8806,13 @@
    "lastGiftAt": 0,
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
+<<<<<<< Updated upstream
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781411,
+=======
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -5890,8 +8829,13 @@
    "lastGiftAt": 0,
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
+<<<<<<< Updated upstream
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781411,
+=======
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -5909,7 +8853,11 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
    "reason": "",
+<<<<<<< Updated upstream
    "checkedAt": 1794421781411,
+=======
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -5927,7 +8875,11 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
    "reason": "",
+<<<<<<< Updated upstream
    "checkedAt": 1794421781411,
+=======
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -5944,8 +8896,13 @@
    "lastGiftAt": 0,
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
+<<<<<<< Updated upstream
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781411,
+=======
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -5954,16 +8911,22 @@
    "username": "sonamthai66",
    "country": "BT",
    "live": false,
-   "startTime": 1794414535000,
+   "startTime": 0,
    "title": "",
-   "viewers": 6095,
+   "viewers": 0,
    "coins": 0,
    "gifts": 0,
    "lastGiftAt": 0,
    "lastGiftName": "",
+<<<<<<< Updated upstream
    "lastSeenLiveAt": 1794420191564,
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781411,
+=======
+   "lastSeenLiveAt": 0,
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -5980,8 +8943,13 @@
    "lastGiftAt": 0,
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
+<<<<<<< Updated upstream
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781411,
+=======
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 1794408095761
@@ -5998,8 +8966,13 @@
    "lastGiftAt": 0,
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
+<<<<<<< Updated upstream
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781411,
+=======
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 1794407961654
@@ -6017,7 +8990,11 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
    "reason": "",
+<<<<<<< Updated upstream
    "checkedAt": 1794421781411,
+=======
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -6035,7 +9012,11 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
    "reason": "",
+<<<<<<< Updated upstream
    "checkedAt": 1794421781411,
+=======
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -6053,7 +9034,11 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
    "reason": "",
+<<<<<<< Updated upstream
    "checkedAt": 1794421781411,
+=======
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -6070,8 +9055,13 @@
    "lastGiftAt": 0,
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
+<<<<<<< Updated upstream
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781411,
+=======
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -6088,8 +9078,13 @@
    "lastGiftAt": 0,
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
+<<<<<<< Updated upstream
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781411,
+=======
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 1794407892988
@@ -6106,8 +9101,13 @@
    "lastGiftAt": 0,
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
+<<<<<<< Updated upstream
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781411,
+=======
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -6125,7 +9125,11 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
    "reason": "",
+<<<<<<< Updated upstream
    "checkedAt": 1794421781411,
+=======
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -6142,8 +9146,13 @@
    "lastGiftAt": 0,
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
+<<<<<<< Updated upstream
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781411,
+=======
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -6160,8 +9169,13 @@
    "lastGiftAt": 0,
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
+<<<<<<< Updated upstream
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781411,
+=======
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -6178,8 +9192,13 @@
    "lastGiftAt": 0,
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
+<<<<<<< Updated upstream
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781411,
+=======
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -6196,8 +9215,13 @@
    "lastGiftAt": 0,
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
+<<<<<<< Updated upstream
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781411,
+=======
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -6214,8 +9238,13 @@
    "lastGiftAt": 0,
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
+<<<<<<< Updated upstream
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781411,
+=======
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -6233,7 +9262,11 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
    "reason": "",
+<<<<<<< Updated upstream
    "checkedAt": 1794421781411,
+=======
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -6250,8 +9283,13 @@
    "lastGiftAt": 0,
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
+<<<<<<< Updated upstream
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781411,
+=======
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 1794408378309
@@ -6268,8 +9306,13 @@
    "lastGiftAt": 0,
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
+<<<<<<< Updated upstream
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781411,
+=======
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -6286,8 +9329,13 @@
    "lastGiftAt": 0,
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
+<<<<<<< Updated upstream
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781411,
+=======
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -6305,7 +9353,11 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
    "reason": "",
+<<<<<<< Updated upstream
    "checkedAt": 1794421781411,
+=======
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -6323,7 +9375,11 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
    "reason": "",
+<<<<<<< Updated upstream
    "checkedAt": 1794421781411,
+=======
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -6341,7 +9397,11 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
    "reason": "",
+<<<<<<< Updated upstream
    "checkedAt": 1794421781411,
+=======
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 1794406734140
@@ -6358,8 +9418,13 @@
    "lastGiftAt": 0,
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
+<<<<<<< Updated upstream
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781411,
+=======
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -6377,7 +9442,11 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
    "reason": "",
+<<<<<<< Updated upstream
    "checkedAt": 1794421781411,
+=======
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -6394,8 +9463,13 @@
    "lastGiftAt": 0,
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
+<<<<<<< Updated upstream
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781411,
+=======
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -6412,6 +9486,7 @@
    "lastGiftAt": 0,
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
+<<<<<<< Updated upstream
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781411,
    "roomId": "",
@@ -6432,6 +9507,10 @@
    "lastSeenLiveAt": 0,
    "reason": "",
    "checkedAt": 1794421781411,
+=======
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -6448,8 +9527,13 @@
    "lastGiftAt": 0,
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
+<<<<<<< Updated upstream
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781411,
+=======
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -6466,8 +9550,13 @@
    "lastGiftAt": 0,
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
+<<<<<<< Updated upstream
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781411,
+=======
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -6484,8 +9573,13 @@
    "lastGiftAt": 0,
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
+<<<<<<< Updated upstream
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781411,
+=======
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -6502,8 +9596,13 @@
    "lastGiftAt": 0,
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
+<<<<<<< Updated upstream
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781411,
+=======
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -6520,8 +9619,13 @@
    "lastGiftAt": 0,
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
+<<<<<<< Updated upstream
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781411,
+=======
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -6539,7 +9643,11 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
    "reason": "",
+<<<<<<< Updated upstream
    "checkedAt": 1794421781411,
+=======
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -6557,7 +9665,11 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
    "reason": "",
+<<<<<<< Updated upstream
    "checkedAt": 1794421781411,
+=======
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -6574,8 +9686,13 @@
    "lastGiftAt": 0,
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
+<<<<<<< Updated upstream
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781411,
+=======
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -6592,8 +9709,13 @@
    "lastGiftAt": 0,
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
+<<<<<<< Updated upstream
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781411,
+=======
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -6611,7 +9733,11 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
    "reason": "",
+<<<<<<< Updated upstream
    "checkedAt": 1794421781411,
+=======
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -6628,8 +9754,13 @@
    "lastGiftAt": 0,
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
+<<<<<<< Updated upstream
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781411,
+=======
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -6647,7 +9778,11 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
    "reason": "",
+<<<<<<< Updated upstream
    "checkedAt": 1794421781411,
+=======
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -6665,7 +9800,11 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
    "reason": "",
+<<<<<<< Updated upstream
    "checkedAt": 1794421781411,
+=======
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -6682,8 +9821,13 @@
    "lastGiftAt": 0,
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
+<<<<<<< Updated upstream
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781411,
+=======
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -6700,8 +9844,13 @@
    "lastGiftAt": 0,
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
+<<<<<<< Updated upstream
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781411,
+=======
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -6719,7 +9868,11 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
    "reason": "",
+<<<<<<< Updated upstream
    "checkedAt": 1794421781411,
+=======
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -6737,7 +9890,11 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
    "reason": "",
+<<<<<<< Updated upstream
    "checkedAt": 1794421781411,
+=======
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -6754,8 +9911,13 @@
    "lastGiftAt": 0,
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
+<<<<<<< Updated upstream
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781411,
+=======
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -6772,8 +9934,13 @@
    "lastGiftAt": 0,
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
+<<<<<<< Updated upstream
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781411,
+=======
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -6790,8 +9957,13 @@
    "lastGiftAt": 0,
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
+<<<<<<< Updated upstream
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781411,
+=======
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -6808,8 +9980,13 @@
    "lastGiftAt": 0,
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
+<<<<<<< Updated upstream
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781411,
+=======
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -6825,10 +10002,17 @@
    "gifts": 0,
    "lastGiftAt": 0,
    "lastGiftName": "",
+<<<<<<< Updated upstream
    "lastSeenLiveAt": 1794420397375,
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781411,
    "roomId": "7706878266015615762",
+=======
+   "lastSeenLiveAt": 0,
+   "reason": "",
+   "checkedAt": 1794421949680,
+   "roomId": "",
+>>>>>>> Stashed changes
    "boxes": 0,
    "lastBoxAt": 0
   },
@@ -6844,8 +10028,13 @@
    "lastGiftAt": 0,
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
+<<<<<<< Updated upstream
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781411,
+=======
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 1794405716865
@@ -6862,8 +10051,13 @@
    "lastGiftAt": 0,
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
+<<<<<<< Updated upstream
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781411,
+=======
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -6872,16 +10066,22 @@
    "username": "cduffy101",
    "country": "LV",
    "live": false,
-   "startTime": 1794412990000,
-   "title": "Gift Gallery❤️",
-   "viewers": 19202,
+   "startTime": 0,
+   "title": "",
+   "viewers": 0,
    "coins": 0,
    "gifts": 0,
    "lastGiftAt": 0,
    "lastGiftName": "",
+<<<<<<< Updated upstream
    "lastSeenLiveAt": 1794420304261,
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781411,
+=======
+   "lastSeenLiveAt": 0,
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -6899,7 +10099,11 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
    "reason": "",
+<<<<<<< Updated upstream
    "checkedAt": 1794421781411,
+=======
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -6917,7 +10121,11 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
    "reason": "",
+<<<<<<< Updated upstream
    "checkedAt": 1794421781411,
+=======
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -6926,16 +10134,20 @@
    "username": "merimabdulilkizi",
    "country": "KG",
    "live": false,
-   "startTime": 1794418558000,
+   "startTime": 0,
    "title": "",
-   "viewers": 62,
+   "viewers": 0,
    "coins": 0,
    "gifts": 0,
    "lastGiftAt": 0,
    "lastGiftName": "",
-   "lastSeenLiveAt": 1794420191564,
+   "lastSeenLiveAt": 0,
    "reason": "",
+<<<<<<< Updated upstream
    "checkedAt": 1794421781411,
+=======
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -6952,8 +10164,13 @@
    "lastGiftAt": 0,
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
+<<<<<<< Updated upstream
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781411,
+=======
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -6970,8 +10187,13 @@
    "lastGiftAt": 0,
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
+<<<<<<< Updated upstream
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781411,
+=======
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -6980,16 +10202,22 @@
    "username": "arzum904",
    "country": "AZ",
    "live": false,
-   "startTime": 1794412910000,
+   "startTime": 0,
    "title": "",
-   "viewers": 1877,
+   "viewers": 0,
    "coins": 0,
    "gifts": 0,
    "lastGiftAt": 0,
    "lastGiftName": "",
+<<<<<<< Updated upstream
    "lastSeenLiveAt": 1794420989299,
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781411,
+=======
+   "lastSeenLiveAt": 0,
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -7006,8 +10234,13 @@
    "lastGiftAt": 0,
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
+<<<<<<< Updated upstream
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781411,
+=======
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -7024,8 +10257,13 @@
    "lastGiftAt": 0,
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
+<<<<<<< Updated upstream
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781411,
+=======
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -7043,7 +10281,11 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
    "reason": "",
+<<<<<<< Updated upstream
    "checkedAt": 1794421781411,
+=======
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -7060,8 +10302,13 @@
    "lastGiftAt": 0,
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
+<<<<<<< Updated upstream
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781411,
+=======
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -7078,8 +10325,13 @@
    "lastGiftAt": 0,
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
+<<<<<<< Updated upstream
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781411,
+=======
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -7088,16 +10340,22 @@
    "username": "sheeshable016",
    "country": "PH",
    "live": false,
-   "startTime": 1794418600000,
-   "title": "Pasok po",
-   "viewers": 39,
+   "startTime": 0,
+   "title": "",
+   "viewers": 0,
    "coins": 0,
    "gifts": 0,
    "lastGiftAt": 0,
    "lastGiftName": "",
+<<<<<<< Updated upstream
    "lastSeenLiveAt": 1794420191564,
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781411,
+=======
+   "lastSeenLiveAt": 0,
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -7114,8 +10372,13 @@
    "lastGiftAt": 0,
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
+<<<<<<< Updated upstream
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781411,
+=======
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -7133,7 +10396,11 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
    "reason": "",
+<<<<<<< Updated upstream
    "checkedAt": 1794421781411,
+=======
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -7150,8 +10417,13 @@
    "lastGiftAt": 0,
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
+<<<<<<< Updated upstream
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781411,
+=======
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 1794406251465
@@ -7169,7 +10441,11 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
    "reason": "",
+<<<<<<< Updated upstream
    "checkedAt": 1794421781411,
+=======
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -7187,7 +10463,11 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
    "reason": "",
+<<<<<<< Updated upstream
    "checkedAt": 1794421781411,
+=======
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -7204,8 +10484,13 @@
    "lastGiftAt": 0,
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
+<<<<<<< Updated upstream
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781411,
+=======
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -7222,8 +10507,13 @@
    "lastGiftAt": 0,
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
+<<<<<<< Updated upstream
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781411,
+=======
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -7241,7 +10531,11 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
    "reason": "",
+<<<<<<< Updated upstream
    "checkedAt": 1794421781411,
+=======
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -7258,8 +10552,13 @@
    "lastGiftAt": 0,
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
+<<<<<<< Updated upstream
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781411,
+=======
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 1794404768499
@@ -7276,8 +10575,13 @@
    "lastGiftAt": 0,
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
+<<<<<<< Updated upstream
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781411,
+=======
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -7294,8 +10598,13 @@
    "lastGiftAt": 0,
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
+<<<<<<< Updated upstream
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781411,
+=======
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -7312,8 +10621,13 @@
    "lastGiftAt": 0,
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
+<<<<<<< Updated upstream
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781411,
+=======
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -7330,8 +10644,13 @@
    "lastGiftAt": 0,
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
+<<<<<<< Updated upstream
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781411,
+=======
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -7348,8 +10667,13 @@
    "lastGiftAt": 0,
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
+<<<<<<< Updated upstream
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781411,
+=======
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -7367,7 +10691,11 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
    "reason": "",
+<<<<<<< Updated upstream
    "checkedAt": 1794421781411,
+=======
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -7384,8 +10712,13 @@
    "lastGiftAt": 0,
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
+<<<<<<< Updated upstream
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781411,
+=======
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -7402,8 +10735,13 @@
    "lastGiftAt": 0,
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
+<<<<<<< Updated upstream
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781411,
+=======
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -7420,8 +10758,13 @@
    "lastGiftAt": 0,
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
+<<<<<<< Updated upstream
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781411,
+=======
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -7438,8 +10781,13 @@
    "lastGiftAt": 0,
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
+<<<<<<< Updated upstream
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781411,
+=======
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -7456,8 +10804,13 @@
    "lastGiftAt": 0,
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
+<<<<<<< Updated upstream
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781411,
+=======
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -7474,8 +10827,13 @@
    "lastGiftAt": 0,
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
+<<<<<<< Updated upstream
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781411,
+=======
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -7492,8 +10850,13 @@
    "lastGiftAt": 0,
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
+<<<<<<< Updated upstream
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781411,
+=======
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -7510,8 +10873,13 @@
    "lastGiftAt": 0,
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
+<<<<<<< Updated upstream
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781411,
+=======
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -7528,8 +10896,13 @@
    "lastGiftAt": 0,
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
+<<<<<<< Updated upstream
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781411,
+=======
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -7546,8 +10919,13 @@
    "lastGiftAt": 0,
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
+<<<<<<< Updated upstream
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781411,
+=======
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -7564,8 +10942,13 @@
    "lastGiftAt": 0,
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
+<<<<<<< Updated upstream
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781411,
+=======
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 1794408664392
@@ -7582,8 +10965,13 @@
    "lastGiftAt": 0,
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
+<<<<<<< Updated upstream
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781411,
+=======
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -7601,7 +10989,11 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
    "reason": "",
+<<<<<<< Updated upstream
    "checkedAt": 1794421781411,
+=======
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -7618,8 +11010,13 @@
    "lastGiftAt": 0,
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
+<<<<<<< Updated upstream
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781411,
+=======
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -7636,8 +11033,13 @@
    "lastGiftAt": 0,
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
+<<<<<<< Updated upstream
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781411,
+=======
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -7654,8 +11056,13 @@
    "lastGiftAt": 0,
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
+<<<<<<< Updated upstream
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781411,
+=======
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -7672,8 +11079,13 @@
    "lastGiftAt": 0,
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
+<<<<<<< Updated upstream
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781411,
+=======
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -7690,8 +11102,13 @@
    "lastGiftAt": 0,
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
+<<<<<<< Updated upstream
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781411,
+=======
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -7709,7 +11126,11 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
    "reason": "",
+<<<<<<< Updated upstream
    "checkedAt": 1794421781411,
+=======
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 1794405867405
@@ -7726,8 +11147,13 @@
    "lastGiftAt": 0,
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
+<<<<<<< Updated upstream
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781411,
+=======
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -7744,8 +11170,13 @@
    "lastGiftAt": 0,
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
+<<<<<<< Updated upstream
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781411,
+=======
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -7762,8 +11193,13 @@
    "lastGiftAt": 0,
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
+<<<<<<< Updated upstream
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781411,
+=======
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -7780,8 +11216,13 @@
    "lastGiftAt": 0,
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
+<<<<<<< Updated upstream
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781411,
+=======
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -7790,16 +11231,20 @@
    "username": "pemachoden78",
    "country": "BT",
    "live": false,
-   "startTime": 1794397690000,
+   "startTime": 0,
    "title": "",
-   "viewers": 9548,
+   "viewers": 0,
    "coins": 0,
    "gifts": 0,
    "lastGiftAt": 0,
    "lastGiftName": "",
-   "lastSeenLiveAt": 1794420645292,
+   "lastSeenLiveAt": 0,
    "reason": "",
+<<<<<<< Updated upstream
    "checkedAt": 1794421781411,
+=======
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 1794405141316
@@ -7816,8 +11261,13 @@
    "lastGiftAt": 0,
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
+<<<<<<< Updated upstream
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781411,
+=======
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -7835,7 +11285,11 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
    "reason": "",
+<<<<<<< Updated upstream
    "checkedAt": 1794421781411,
+=======
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -7852,8 +11306,13 @@
    "lastGiftAt": 0,
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
+<<<<<<< Updated upstream
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781411,
+=======
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -7871,7 +11330,11 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
    "reason": "",
+<<<<<<< Updated upstream
    "checkedAt": 1794421781411,
+=======
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -7888,8 +11351,13 @@
    "lastGiftAt": 0,
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
+<<<<<<< Updated upstream
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781411,
+=======
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -7906,8 +11374,13 @@
    "lastGiftAt": 0,
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
+<<<<<<< Updated upstream
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781411,
+=======
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -7924,8 +11397,13 @@
    "lastGiftAt": 0,
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
+<<<<<<< Updated upstream
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781411,
+=======
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -7943,7 +11421,11 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
    "reason": "",
+<<<<<<< Updated upstream
    "checkedAt": 1794421781411,
+=======
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -7960,8 +11442,13 @@
    "lastGiftAt": 0,
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
+<<<<<<< Updated upstream
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781412,
+=======
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -7979,7 +11466,11 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
    "reason": "",
+<<<<<<< Updated upstream
    "checkedAt": 1794421781412,
+=======
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -7996,8 +11487,13 @@
    "lastGiftAt": 0,
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
+<<<<<<< Updated upstream
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781412,
+=======
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -8006,16 +11502,20 @@
    "username": "jc__2525",
    "country": "TW",
    "live": false,
-   "startTime": 1794404712000,
-   "title": "Lets Go LIVE!",
-   "viewers": 668,
+   "startTime": 0,
+   "title": "",
+   "viewers": 0,
    "coins": 0,
    "gifts": 0,
    "lastGiftAt": 0,
    "lastGiftName": "",
-   "lastSeenLiveAt": 1794420645292,
+   "lastSeenLiveAt": 0,
    "reason": "",
+<<<<<<< Updated upstream
    "checkedAt": 1794421781412,
+=======
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -8032,8 +11532,13 @@
    "lastGiftAt": 0,
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
+<<<<<<< Updated upstream
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781412,
+=======
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -8050,8 +11555,13 @@
    "lastGiftAt": 0,
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
+<<<<<<< Updated upstream
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781412,
+=======
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -8068,8 +11578,13 @@
    "lastGiftAt": 0,
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
+<<<<<<< Updated upstream
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781412,
+=======
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -8078,16 +11593,20 @@
    "username": "munkobaoo",
    "country": "VN",
    "live": false,
-   "startTime": 1794403997000,
+   "startTime": 0,
    "title": "",
-   "viewers": 3914,
+   "viewers": 0,
    "coins": 0,
    "gifts": 0,
    "lastGiftAt": 0,
    "lastGiftName": "",
-   "lastSeenLiveAt": 1794421103587,
+   "lastSeenLiveAt": 0,
    "reason": "",
+<<<<<<< Updated upstream
    "checkedAt": 1794421781412,
+=======
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -8104,8 +11623,13 @@
    "lastGiftAt": 0,
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
+<<<<<<< Updated upstream
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781412,
+=======
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -8122,8 +11646,13 @@
    "lastGiftAt": 0,
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
+<<<<<<< Updated upstream
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781412,
+=======
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -8140,8 +11669,13 @@
    "lastGiftAt": 0,
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
+<<<<<<< Updated upstream
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781412,
+=======
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -8158,8 +11692,13 @@
    "lastGiftAt": 0,
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
+<<<<<<< Updated upstream
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781412,
+=======
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -8168,16 +11707,22 @@
    "username": "bedetozjadl",
    "country": "PL",
    "live": false,
-   "startTime": 1794417299000,
-   "title": "B2?",
-   "viewers": 121,
+   "startTime": 0,
+   "title": "",
+   "viewers": 0,
    "coins": 0,
    "gifts": 0,
    "lastGiftAt": 0,
    "lastGiftName": "",
+<<<<<<< Updated upstream
    "lastSeenLiveAt": 1794420532266,
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781412,
+=======
+   "lastSeenLiveAt": 0,
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -8194,8 +11739,13 @@
    "lastGiftAt": 0,
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
+<<<<<<< Updated upstream
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781412,
+=======
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -8212,8 +11762,13 @@
    "lastGiftAt": 0,
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
+<<<<<<< Updated upstream
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781412,
+=======
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -8231,7 +11786,11 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
    "reason": "",
+<<<<<<< Updated upstream
    "checkedAt": 1794421781412,
+=======
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -8249,7 +11808,11 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
    "reason": "",
+<<<<<<< Updated upstream
    "checkedAt": 1794421781412,
+=======
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -8266,8 +11829,13 @@
    "lastGiftAt": 0,
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
+<<<<<<< Updated upstream
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781412,
+=======
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -8284,8 +11852,13 @@
    "lastGiftAt": 0,
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
+<<<<<<< Updated upstream
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781412,
+=======
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -8302,8 +11875,13 @@
    "lastGiftAt": 0,
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
+<<<<<<< Updated upstream
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781412,
+=======
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -8320,8 +11898,13 @@
    "lastGiftAt": 0,
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
+<<<<<<< Updated upstream
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781412,
+=======
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -8338,8 +11921,13 @@
    "lastGiftAt": 0,
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
+<<<<<<< Updated upstream
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781412,
+=======
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -8357,7 +11945,11 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
    "reason": "user_not_found",
+<<<<<<< Updated upstream
    "checkedAt": 1794421781412,
+=======
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -8374,8 +11966,13 @@
    "lastGiftAt": 0,
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
+<<<<<<< Updated upstream
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781412,
+=======
+   "reason": "user_not_found",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -8392,8 +11989,13 @@
    "lastGiftAt": 0,
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
+<<<<<<< Updated upstream
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781412,
+=======
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -8410,8 +12012,13 @@
    "lastGiftAt": 0,
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
+<<<<<<< Updated upstream
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781412,
+=======
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -8429,7 +12036,11 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
    "reason": "user_not_found",
+<<<<<<< Updated upstream
    "checkedAt": 1794421781412,
+=======
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -8446,8 +12057,13 @@
    "lastGiftAt": 0,
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
+<<<<<<< Updated upstream
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781412,
+=======
+   "reason": "user_not_found",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -8464,8 +12080,13 @@
    "lastGiftAt": 0,
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
+<<<<<<< Updated upstream
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781412,
+=======
+   "reason": "user_not_found",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -8482,8 +12103,13 @@
    "lastGiftAt": 0,
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
+<<<<<<< Updated upstream
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781412,
+=======
+   "reason": "user_not_found",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -8501,7 +12127,11 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
    "reason": "user_not_found",
+<<<<<<< Updated upstream
    "checkedAt": 1794421781412,
+=======
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -8518,8 +12148,13 @@
    "lastGiftAt": 0,
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
+<<<<<<< Updated upstream
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781412,
+=======
+   "reason": "",
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -8537,7 +12172,11 @@
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
    "reason": "",
+<<<<<<< Updated upstream
    "checkedAt": 1794421781412,
+=======
+   "checkedAt": 1794421949680,
+>>>>>>> Stashed changes
    "roomId": "",
    "boxes": 0,
    "lastBoxAt": 0
@@ -8554,6 +12193,7 @@
    "lastGiftAt": 0,
    "lastGiftName": "",
    "lastSeenLiveAt": 0,
+<<<<<<< Updated upstream
    "reason": "boş yanıt (doğrulanamadı)",
    "checkedAt": 1794421781412,
    "roomId": "",
@@ -8793,26 +12433,14 @@
    "roomId": "7706951949494782741",
    "boxes": 0,
    "lastBoxAt": 0
+=======
+   "reason": "",
+   "checkedAt": 1794421949680,
+   "roomId": "",
+   "boxes": 0,
+   "lastBoxAt": 0
+>>>>>>> Stashed changes
   }
  ],
- "events": [
-  {
-   "id": "alejandrasosa913-1794421053-dlebv",
-   "t": 1794421053669,
-   "username": "alejandrasosa913",
-   "kind": "chest",
-   "coins": 753,
-   "diamonds": 0,
-   "giftName": "Sandık",
-   "boxName": "Sandık",
-   "businessType": 20,
-   "boxType": "",
-   "sender": "alejandrasosa913",
-   "senderName": "alejandrasosa913",
-   "shared": 483,
-   "durationSec": 0,
-   "availableAt": 1794421053669,
-   "source": "scan"
-  }
- ]
+ "events": []
 }
