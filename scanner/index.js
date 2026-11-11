@@ -1291,6 +1291,8 @@ function snapshot() {
   return {
     scannedAt: new Date().toISOString(),
     scanner: {
+      // Koşu kimliği: panel yeni koşuda Fırsatlar'ı sıfırdan başlatır.
+      runId: startedAtMs,
       targetCount: state.targets.length,
       liveCount: streamers.filter((item) => item.live).length,
       discovered: state.discoveredTotal,

@@ -341,6 +341,20 @@
     }
 
     var events = state.events.slice();
+
+    // Yeni tarama koşulu: Fırsatlar sıfırdan başlar. Önceki koşuların bekleyen
+    // otomatik kayıtları düşürülür; topladıkların geçmişte kalır.
+    var runId = Number((data.scanner && data.scanner.runId) || 0);
+    var settings = Object.assign({}, state.settings || {});
+    if (runId && Number(settings.scanRunId) !== runId) {
+      var beforeReset = events.length;
+      events = events.filter(function (event) {
+        return !(event.auto && event.status === 'pending');
+      });
+      settings.scanRunId = runId;
+      if (events.length !== beforeReset) changed = true;
+    }
+
     var known = {};
     events.forEach(function (event) { if (event.scanId) known[event.scanId] = true; });
 
@@ -382,7 +396,7 @@
     });
 
     if (changed) {
-      Store.set({ streamers: streamers, events: events });
+      Store.set({ streamers: streamers, events: events, settings: settings });
       state = Store.get();
     }
     return changed;
@@ -671,7 +685,8 @@
 
   // Süresi dolan fırsat kendiliğinden düşer; "Kaçtı"ya basmak gerekmez.
   // Sandık pencere bitince hemen silinmez, kısa süre "beklemede" kalır.
-  var CHEST_GRACE_MS = 15 * 60 * 1000;
+  // Kök paneldeki davranış: sandık süresi dolunca 3 dk "KONTROL ET!" olarak kalır.
+  var CHEST_GRACE_MS = 3 * 60 * 1000;
   var UNKNOWN_WINDOW_MS = 30 * 60 * 1000;
 
   function isExpired(event) {
@@ -1156,9 +1171,14 @@
           ? 'jeton geri dönüyor: ' + clock(opensIn)
           : 'açılışa ' + clock(opensIn);
       } else if (opensIn !== null) {
-        timeText = event.kind === 'chest'
-          ? 'açıldı · süre doldu, beklemede'
-          : 'süre doldu';
+        if (event.kind === 'chest') {
+          // Kök paneldeki gibi: süre bitti ama hemen silinmez, kısa süre
+          // "KONTROL ET!" olarak kalır, sonra düşer.
+          var graceLeft = Math.max(0, Math.round((endAt + CHEST_GRACE_MS - Date.now()) / 1000));
+          timeText = 'açıldı · süre doldu, beklemede · ' + clock(graceLeft) + ' sonra düşer';
+        } else {
+          timeText = 'süre doldu';
+        }
       } else {
         timeText = event.auto ? 'tarayıcı yakaladı · süre bildirilmedi' : 'hemen açıldı · kaybolmaz';
       }
@@ -1168,7 +1188,11 @@
       return [
         '<div class="opp-card ' + (urgent ? 'opp-urgent' : '') + '">',
         '  <div class="flex items-center justify-between mb-2">',
-        '    <span class="flex items-center gap-1"><span class="kind-badge ' + meta.cls + '">' + meta.icon + ' ' + meta.label + '</span>' + (event.auto ? '<span class="kind-badge kind-live">CANLI</span>' : '') + '</span>',
+        '    <span class="flex items-center gap-1"><span class="kind-badge ' + meta.cls + '">' + meta.icon + ' ' + meta.label + '</span>' +
+          (event.auto ? '<span class="kind-badge kind-live">CANLI</span>' : '') +
+          (event.kind === 'chest' && opensIn !== null && opensIn <= 0
+            ? '<span class="chip chip-danger !py-0 !text-[10px]">KONTROL ET</span>' : '') +
+          '</span>',
         '    <span class="font-black text-amber-400" title="Kutunun toplam jeton değeri (TikTok bildirimi). Açan kişi başına düşen pay daha azdır.">' + fmt(event.coins) + ' <span class="text-[10px] font-normal text-yellow-50/40">jeton · kutu değeri</span></span>',
         '  </div>',
         '  <div class="text-[10px] mb-1"><span class="chip !py-0 !text-[10px]" title="aciliyet + jeton + paylaşım + tür + tazelik">Puan ' + scored.score + ' · ' + esc(scored.reason) + '</span></div>',
