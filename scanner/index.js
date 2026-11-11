@@ -902,6 +902,39 @@ function handleConnectorGift(username, data) {
   });
 }
 
+// TikTok canlı sayfasından oda kimliğini kendimiz kazırız. Bağlayıcı (connector)
+// da aynı şeyi yapar, ama bu IP'lerde sık sık boş dönüyor; bizim kazıma daha
+// güvenilir (UA + SIGI_STATE). Kimlik 6 saat geçerli kabul edilir.
+async function scrapeRoomId(username) {
+  const url = 'https://www.tiktok.com/@' + encodeURIComponent(username) + '/live';
+  let html = '';
+  try {
+    const res = await fetch(url, {
+      headers: { 'User-Agent': UA, 'Accept-Language': 'en-US,en;q=0.9' },
+      signal: AbortSignal.timeout(12000)
+    });
+    if (!res.ok) return '';
+    html = await res.text();
+  } catch (error) {
+    return '';
+  }
+  // 1) SIGI_STATE JSON içinden.
+  const sigi = html.match(/<script id="SIGI_STATE" type="application\/json">(.*?)<\/script>/s);
+  if (sigi && sigi[1]) {
+    try {
+      const parsed = JSON.parse(sigi[1]);
+      const roomId = parsed && parsed.LiveRoom && parsed.LiveRoom.liveRoomUserInfo && parsed.LiveRoom.liveRoomUserInfo.roomId;
+      if (roomId) return String(roomId);
+    } catch (error) { /* fall through */ }
+  }
+  // 2) Yedek: universal data.
+  const uni = html.match(/"roomId"\s*:\s*"(\d+)"/);
+  if (uni && uni[1]) return uni[1];
+  // Canlı değilse oda kimliği yok.
+  if (!/"status"\s*:\s*4/.test(html) && !html.includes('LIVE')) return '';
+  return '';
+}
+
 async function openConnectorWatcher(username, sessionSec) {
   const lib = loadConnector();
   if (!lib || !lib.TikTokLiveConnection) throw new Error('tiktok-live-connector yok');
@@ -914,9 +947,25 @@ async function openConnectorWatcher(username, sessionSec) {
   const recordInfo = state.streamers.get(username) || {};
   const rawRoomId = String(targetInfo.roomId || recordInfo.roomId || '').trim();
   const roomIdAt = Number(targetInfo.roomIdAt || recordInfo.roomIdAt || 0);
-  const knownRoomId = rawRoomId && roomIdAt && (Date.now() - roomIdAt < 6 * 3600000)
+  let knownRoomId = rawRoomId && roomIdAt && (Date.now() - roomIdAt < 6 * 3600000)
     ? rawRoomId
     : '';
+
+  // Oda kimliği yoksa sayfayı kendimiz kazırız (bağlayıcının iç kazıması bu
+  // IP'lerde sık sık boş dönüyor). Bulunursa hemen bağlanır ve kimlik havuza
+  // yazılır; bulunamazsa (yayın bitmiş olabilir) bağlayıcı kendi kazımasını
+  // deneyecek.
+  if (!knownRoomId) {
+    const scraped = await scrapeRoomId(username);
+    if (scraped) {
+      knownRoomId = scraped;
+      const targetInfo2 = targetFor(username);
+      if (targetInfo2) { targetInfo2.roomId = scraped; targetInfo2.roomIdAt = Date.now(); targetInfo2.roomIdMiss = 0; }
+      const recordInfo2 = state.streamers.get(username);
+      if (recordInfo2) { recordInfo2.roomId = scraped; recordInfo2.roomIdAt = Date.now(); }
+      state.targetsDirty = true;
+    }
+  }
 
   const connection = new lib.TikTokLiveConnection(username, {
     processInitialData: false,
