@@ -672,13 +672,17 @@
   }
 
   // Fırsatın kapanış anı: önce TikTok'un bildirdiği açılış anı (unpackAt),
-  // yoksa zarfın bitişi, yoksa yakalama anı + pencere süresi.
+  // yoksa zarfın bitişi. Süre hiç bildirilmemiş sandıkta kök paneldeki gibi
+  // 3 dk (180 sn) tahmini pencere kullanılır (uydurma değil, "tahmini" etiketiyle).
   function eventEndAt(event) {
     var end = Number(event.unpackAt) || Number(event.expiresAt) || 0;
     if (end > 0) return end;
-    // Tarayıcı pencere bildirdiyse yakalama anı + süre yerine onun verdiği an.
     if (Number(event.availableAt) > 0 && (event.hasWindow || Number(event.durationSec) > 0)) {
       return Number(event.availableAt);
+    }
+    if (event.kind === 'chest') {
+      var created = Number(event.createdAt) || Number(event.t) || 0;
+      if (created > 0) return created + 3 * 60 * 1000;
     }
     return 0;
   }
@@ -746,9 +750,11 @@
     if (event.kind === 'letter' && Number(event.expiresAt) > 0) {
       return Math.max(0, (Number(event.expiresAt) - now) / 1000);
     }
-    if (Number(event.durationSec) > 0 && Number(event.availableAt) > 0) {
+    if (Number(event.availableAt) > 0) {
       return Math.max(0, (Number(event.availableAt) - now) / 1000);
     }
+    var end = eventEndAt(event);
+    if (end > 0) return Math.max(0, (end - now) / 1000);
     return null;
   }
 
@@ -1164,12 +1170,15 @@
       var timeText = '';
       var endAt = eventEndAt(event);
       var opensIn = endAt ? Math.round((endAt - Date.now()) / 1000) : null;
+      // Kök panelde süre gelmezse 3 dk tahmini pencere kullanılıyor;
+      // kullanıcıya "tahmini" olarak işaretlenir (uydurma değil).
+      var estimated = event.kind === 'chest' && !(Number(event.unpackAt) || Number(event.availableAt));
 
       if (opensIn !== null && opensIn > 0) {
         urgent = opensIn <= 60;
         timeText = event.kind === 'letter'
           ? 'jeton geri dönüyor: ' + clock(opensIn)
-          : 'açılışa ' + clock(opensIn);
+          : 'açılışa ' + clock(opensIn) + (estimated ? ' (tahmini)' : '');
       } else if (opensIn !== null) {
         if (event.kind === 'chest') {
           // Kök paneldeki gibi: süre bitti ama hemen silinmez, kısa süre
