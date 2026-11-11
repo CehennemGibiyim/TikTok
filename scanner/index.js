@@ -146,6 +146,23 @@ function loadTargets() {
     if (Number.isFinite(savedRatio) && savedRatio > 0) {
       state.savedRatio = Math.min(0.6, Math.max(0.1, savedRatio));
     }
+
+    // Önceki koşuların oran kararları: panel son 24 saati bunlardan çizer.
+    const savedHistory = Array.isArray(parsed && parsed.probeHistory) ? parsed.probeHistory : [];
+    const keepAfter = Date.now() - 7 * 86400000;
+    state.probeHistory = savedHistory
+      .filter((item) => item && Number(item.at) >= keepAfter)
+      .slice(-40)
+      .map((item) => ({
+        at: Number(item.at) || 0,
+        from: Math.round(Number(item.from) || 0),
+        to: Math.round(Number(item.to) || 0),
+        probeRate: Math.round(Number(item.probeRate) || 0),
+        hotRate: item.hotRate === null || item.hotRate === undefined
+          ? null : Math.round(Number(item.hotRate) || 0),
+        sessions: Number(item.sessions) || 0,
+        boxSessions: Number(item.boxSessions) || 0
+      }));
     const seen = new Set();
     const out = [];
     list.forEach((item) => {
@@ -187,6 +204,8 @@ function saveTargets() {
       sessions: state.probe.sessions,
       withBox: state.probe.withBox
     },
+    // Kararlar koşular arasında da korunur (panel 24 saatlik geçmişi gösterir).
+    probeHistory: state.probeHistory,
     updatedAt: new Date().toISOString(),
     targets: state.targets.map((target) => ({
       username: target.username,
@@ -553,7 +572,11 @@ function adaptProbeRatio() {
     sessions: pSessions,
     boxSessions: pBox
   });
-  if (state.probeHistory.length > 5) state.probeHistory.shift();
+  // 7 günden eski kararlar düşer, en fazla 40 kayıt tutulur (24 saat için fazlasıyla yeter).
+  const keepAfter = Date.now() - 7 * 86400000;
+  state.probeHistory = state.probeHistory
+    .filter((item) => Number(item && item.at) >= keepAfter)
+    .slice(-40);
 
   state.probe.winSessions = 0;
   state.probe.winBoxSessions = 0;

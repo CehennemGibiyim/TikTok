@@ -885,7 +885,11 @@
     var sessions = Number(stats.sessions) || 0;
     var withBox = Number(stats.withBox) || 0;
     var rate = sessions ? Math.round((withBox / sessions) * 100) : 0;
-    var history = Array.isArray(scanInfo.probeHistory) ? scanInfo.probeHistory : [];
+    var dayAgo = Date.now() - 24 * 3600 * 1000;
+    var allHistory = Array.isArray(scanInfo.probeHistory) ? scanInfo.probeHistory : [];
+    var history = allHistory.filter(function (item) {
+      return Number(item && item.at) >= dayAgo;
+    });
 
     var chips = '<span class="chip chip-amber" title="Deneme odalarına ayrılan pay">🔎 Keşif oranı %' + ratio + '</span>' +
       '<span class="chip" title="Deneme oturumlarında kutu yakalama">Kutulu deneme ' +
@@ -895,11 +899,11 @@
 
     if (!history.length) {
       el.innerHTML = chips + '<div class="w-full mt-1 text-[10px] text-yellow-50/40">' +
-        'Henüz oran kararı yok — 8 deneme oturumu dolunca ilk karar buraya yazılır.</div>';
+        'Son 24 saatte oran kararı yok — 8 deneme oturumu dolunca ilk karar buraya yazılır.</div>';
       return;
     }
 
-    var rows = history.slice(-3).reverse().map(function (item) {
+    var rows = history.slice(-5).reverse().map(function (item) {
       var time = new Date(Number(item.at) || Date.now()).toLocaleTimeString('tr-TR',
         { hour: '2-digit', minute: '2-digit' });
       var text = time + ' · %' + item.from + ' → %' + item.to;
@@ -908,7 +912,10 @@
       return '<div class="text-[10px] text-yellow-50/50">' + esc(text) + '</div>';
     }).join('');
 
-    el.innerHTML = chips + '<div class="w-full mt-1 space-y-0.5">' + rows + '</div>';
+    el.innerHTML = chips +
+      '<div class="w-full mt-1 text-[10px] text-yellow-50/40">Son 24 saat · ' +
+        history.length + ' karar</div>' +
+      '<div class="w-full space-y-0.5">' + rows + '</div>';
   }
 
   // Tarayıcının yakaladığı son kutu bildirimleri: hangi tür kod geldiyse görünür.
