@@ -231,7 +231,12 @@ function loadTargets() {
         country: (typeof item === 'object' && item && item.country) || '',
         source: (typeof item === 'object' && item && item.source) || 'manual',
         roomId: (typeof item === 'object' && item && String(item.roomId || '')) || '',
-        roomIdAt: (typeof item === 'object' && item && Number(item.roomIdAt)) || 0,
+        // Eski kayıtlarda tarih yok: kimlik zaten canlı durumdan/keşiften gelmiş,
+        // "şimdi doğrulanmış" sayılır. İki boş oturumda yine silinir.
+        roomIdAt: (typeof item === 'object' && item && Number(item.roomIdAt)) ||
+          ((typeof item === 'object' && item && item.roomId)
+            ? (Number(item.lastSeenLiveAt) || Date.now())
+            : 0),
         roomIdMiss: (typeof item === 'object' && item && Number(item.roomIdMiss)) || 0,
         // Kutu geçmişi dosyada kalır: yeni koşu yayıncıyı yine öncelikli izler.
         boxEvents: (typeof item === 'object' && item && Number(item.boxEvents)) || 0,
@@ -1089,6 +1094,8 @@ async function maintainWatchers() {
     .filter((record) => record.live)
     .sort((a, b) =>
       boxPriority(b, now) - boxPriority(a, now) ||
+      // Oda kimliği bilinen oda bağlanabiliyor: onu öne al.
+      (b.roomId ? 1 : 0) - (a.roomId ? 1 : 0) ||
       (Number(b.viewers) || 0) - (Number(a.viewers) || 0) ||
       (Number(b.coins) || 0) - (Number(a.coins) || 0));
 
