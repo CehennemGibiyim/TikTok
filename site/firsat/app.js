@@ -696,14 +696,16 @@
   function isExpired(event) {
     var now = Date.now();
     var end = eventEndAt(event);
+    // Sandık: kullanıcı toplamayı deneyebilsin diye süresi geçse bile listede
+    // kalır (beklemede). Toplanan/toplanamayan sandık ancak "Topladım" ile
+    // veya yeni tarama koşusunda düşer. Paylaşılan kişi sayısı (shared) yüksek
+    // olup toplayıcı gelmediği durumlarda sandık beklemede kalabiliyor.
+    if (event.kind === 'chest') return false;
     if (!end) {
-      // Süresi hiç bildirilmemiş zarf/portal: liste sonsuza kadar birikmesin.
-      if (event.kind === 'chest') return false;
       var created = Number(event.createdAt) || 0;
       return created > 0 && now - created > UNKNOWN_WINDOW_MS;
     }
-    var grace = event.kind === 'chest' ? CHEST_GRACE_MS : 0;
-    return now >= end + grace;
+    return now >= end;
   }
 
   // Fırsatlar yalnızca toplanabilir kazanç olaylarını gösterir:
@@ -1184,7 +1186,9 @@
           // Kök paneldeki gibi: süre bitti ama hemen silinmez, kısa süre
           // "KONTROL ET!" olarak kalır, sonra düşer.
           var graceLeft = Math.max(0, Math.round((endAt + CHEST_GRACE_MS - Date.now()) / 1000));
-          timeText = 'açıldı · süre doldu, beklemede · ' + clock(graceLeft) + ' sonra düşer';
+          timeText = graceLeft > 0
+            ? 'açıldı · süre doldu, beklemede · ' + clock(graceLeft) + ' sonra düşer'
+            : 'açıldı · süre doldu, beklemede · ' + (Number(event.shared) > 0 ? (event.shared + ' kişiye paylaşıldı · ') : '') + 'toplanmayı dene';
         } else {
           timeText = 'süre doldu';
         }
