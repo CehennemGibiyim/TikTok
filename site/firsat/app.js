@@ -874,11 +874,46 @@
     }).join('');
   }
 
-  // Son 24 saatteki oran kararlarını küçük bir çizgi grafik olarak çizer.
-  // Dikey ölçek sabit %10-%60 (uyarlamanın alt/üst sınırı): böylece değişim
-  // gerçekten görünür, grafik kendi kendine "süs" gibi düzleşmez.
-  function probeChart(history, now) {
-    var width = 240, height = 62, padX = 6, padY = 8;
+  // Son 24 saatin saatlik kutu sayıları. Tarayıcı saatlik sayacı (boxHourly)
+  // koşular arasında kalıcıdır; eski veride sayaç yoksa yalnızca o an eldeki
+  // kutu olaylarının zaman damgaları sayılır.
+  function boxHourBuckets(info, now) {
+    var hour = 3600 * 1000;
+    var start = Math.floor((now - 24 * hour) / hour) * hour;
+    var buckets = [];
+    var hourCount = 25;
+    for (var i = 0; i < hourCount; i += 1) buckets.push({ at: start + i * hour, count: 0 });
+
+    var hourly = info && info.boxHourly;
+    if (hourly && typeof hourly === 'object') {
+      Object.keys(hourly).forEach(function (key) {
+        var count = Number(hourly[key]) || 0;
+        var at = Number(key) * hour;
+        if (!count || !at || at < start) return;
+        var index = Math.floor((at - start) / hour);
+        if (index >= 0 && index < buckets.length) buckets[index].count += count;
+      });
+      return buckets;
+    }
+
+    var events = info && Array.isArray(info.events) ? info.events : [];
+    events.forEach(function (event) {
+      if (!event) return;
+      if (event.kind !== 'chest' && event.kind !== 'letter' && event.kind !== 'portal') return;
+      var at = Number(event.t) || 0;
+      if (!at || at < start) return;
+      var index = Math.floor((at - start) / hour);
+      if (index >= 0 && index < buckets.length) buckets[index].count += 1;
+    });
+    return buckets;
+  }
+
+  // Son 24 saatteki oran kararlarını ve saatlik kutu sayısını tek grafikte çizer.
+  // Oran çizgisi sabit %10-%60 ölçeğinde (uyarlamanın alt/üst sınırı); kutu
+  // sütunları kendi en yüksek saatine göre ölçeklenir, bu yüzden sağ üstte
+  // "en çok N" etiketi durur.
+  function probeChart(history, now, buckets) {
+    var width = 240, height = 74, padX = 6, padTop = 10, padBottom = 13;
     var lo = 10, hi = 60;
     var points = history.map(function (item) {
       var value = Number(item.to);
@@ -887,16 +922,42 @@
         value: Math.max(lo, Math.min(hi, Number.isFinite(value) ? value : lo))
       };
     }).sort(function (a, b) { return a.at - b.at; });
-    if (!points.length) return '';
+
+    var bars = Array.isArray(buckets) ? buckets : [];
+    var maxBox = 0;
+    bars.forEach(function (bar) {
+      maxBox = Math.max(maxBox, Number(bar && bar.count) || 0);
+    });
+    if (!points.length && !maxBox) return '';
 
     var from = now - 24 * 3600 * 1000;
     var span = Math.max(1, now - from);
-    function x(time) { return padX + ((time - from) / span) * (width - padX * 2); }
-    function y(value) { return height - padY - ((value - lo) / (hi - lo)) * (height - padY * 2); }
+    var innerW = width - padX * 2;
+    var innerH = height - padTop - padBottom;
+    var floorY = height - padBottom;
+    function x(time) { return padX + ((time - from) / span) * innerW; }
+    function y(value) { return padTop + innerH - ((value - lo) / (hi - lo)) * innerH; }
 
-    var line = points.map(function (item) {
+    var step = innerW / Math.max(1, bars.length || 24);
+    var barW = Math.max(2, step * 0.55);
+    // Sütunlar grafiğin alt yarısında kalır: sarı oran çizgisi üstte okunur.
+    var barMaxH = innerH * 0.55;
+    var columns = bars.map(function (bar) {
+      var count = Number(bar && bar.count) || 0;
+      if (!count || !maxBox) return '';
+      var at = Number(bar && bar.at) || from;
+      var h = Math.max(1.5, (count / maxBox) * barMaxH);
+      var time = new Date(at).toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' });
+      return '<rect x="' + (x(at) - barW / 2).toFixed(1) + '" y="' + (floorY - h).toFixed(1) +
+        '" width="' + barW.toFixed(1) + '" height="' + h.toFixed(1) + '" rx="1" ' +
+        'fill="rgba(52,211,153,0.55)"><title>' +
+        esc(time + ' · ' + count + ' kutu') + '</title></rect>';
+    }).join('');
+
+    var line = points.length > 1 ? '<polyline points="' + points.map(function (item) {
       return x(item.at).toFixed(1) + ',' + y(item.value).toFixed(1);
-    }).join(' ');
+    }).join(' ') + '" fill="none" stroke="#facc15" stroke-width="1.5" ' +
+      'stroke-linejoin="round" stroke-linecap="round"/>' : '';
 
     var dots = points.map(function (item) {
       var time = new Date(item.at).toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' });
@@ -904,15 +965,16 @@
         '" r="2.5" fill="#facc15"><title>' + esc(time + ' · %' + item.value) + '</title></circle>';
     }).join('');
 
-    return '<svg viewBox="0 0 ' + width + ' ' + height + '" class="w-full" height="62" role="img" ' +
-      'aria-label="Keşif oranının son 24 saatteki değişimi">' +
-      '<line x1="' + padX + '" y1="' + y(lo).toFixed(1) + '" x2="' + (width - padX) +
-        '" y2="' + y(lo).toFixed(1) + '" stroke="rgba(255,255,255,0.14)" stroke-width="1"/>' +
+    return '<svg viewBox="0 0 ' + width + ' ' + height + '" class="w-full" height="74" role="img" ' +
+      'aria-label="Keşif oranının ve saatlik kutu sayısının son 24 saatteki değişimi">' +
       '<line x1="' + padX + '" y1="' + y(hi).toFixed(1) + '" x2="' + (width - padX) +
         '" y2="' + y(hi).toFixed(1) + '" stroke="rgba(255,255,255,0.14)" stroke-width="1"/>' +
-      '<polyline points="' + line + '" fill="none" stroke="#facc15" stroke-width="1.5" ' +
-        'stroke-linejoin="round" stroke-linecap="round"/>' +
-      dots +
+      '<line x1="' + padX + '" y1="' + floorY + '" x2="' + (width - padX) +
+        '" y2="' + floorY + '" stroke="rgba(255,255,255,0.14)" stroke-width="1"/>' +
+      columns +
+      line + dots +
+      (maxBox ? '<text x="' + (width - padX) + '" y="' + (floorY - barMaxH - 2).toFixed(1) +
+        '" font-size="7" text-anchor="end" fill="rgba(52,211,153,0.7)">en çok ' + maxBox + '/sa</text>' : '') +
       '<text x="' + padX + '" y="' + (height - 1) + '" font-size="7" fill="rgba(255,255,255,0.4)">24 sa önce</text>' +
       '<text x="' + (width - padX) + '" y="' + (height - 1) + '" font-size="7" text-anchor="end" ' +
         'fill="rgba(255,255,255,0.4)">şimdi</text>' +
@@ -946,11 +1008,24 @@
       '<span class="chip" title="O an dinlenen yeni aday sayısı">Aday odada ' +
         (Number(scanInfo.probes) || 0) + '</span>';
 
-    if (!history.length) {
+    var buckets = boxHourBuckets(scanInfo, Date.now());
+    var boxTotal = buckets.reduce(function (sum, bucket) {
+      return sum + (Number(bucket.count) || 0);
+    }, 0);
+    var chart = probeChart(history, Date.now(), buckets);
+    if (!chart) {
       el.innerHTML = chips + '<div class="w-full mt-1 text-[10px] text-yellow-50/40">' +
-        'Son 24 saatte oran kararı yok — 8 deneme oturumu dolunca ilk karar buraya yazılır.</div>';
+        'Son 24 saatte oran kararı ve kutu kaydı yok — 8 deneme oturumu dolunca ilk karar, ' +
+        'ilk kutu yakalanınca da kutu sütunu buraya yazılır.</div>';
       return;
     }
+
+    // Grafiğin ne olduğunu renklerle söyle: sarı çizgi oran, yeşil sütun kutu.
+    var legend = '<div class="w-full mt-1 flex items-center gap-2 text-[10px] text-yellow-50/45">' +
+      '<span class="inline-flex items-center gap-1"><span style="display:inline-block;width:10px;height:2px;background:#facc15"></span>oran</span>' +
+      '<span class="inline-flex items-center gap-1"><span style="display:inline-block;width:6px;height:6px;background:rgba(52,211,153,0.7)"></span>kutu/saat</span>' +
+      '<span class="ml-auto">Son 24 sa · ' + history.length + ' karar · ' + boxTotal + ' kutu</span>' +
+      '</div>';
 
     var rows = history.slice(-5).reverse().map(function (item) {
       var time = new Date(Number(item.at) || Date.now()).toLocaleTimeString('tr-TR',
@@ -961,10 +1036,10 @@
       return '<div class="text-[10px] text-yellow-50/50">' + esc(text) + '</div>';
     }).join('');
 
-    el.innerHTML = chips +
-      '<div class="w-full mt-1 text-[10px] text-yellow-50/40">Son 24 saat · ' +
-        history.length + ' karar · oran değişimi</div>' +
-      '<div class="w-full mt-1">' + probeChart(history, Date.now()) + '</div>' +
+    el.innerHTML = chips + legend +
+      '<div class="w-full mt-1">' + chart + '</div>' +
+      (history.length ? '' : '<div class="w-full text-[10px] text-yellow-50/40">' +
+        'Son 24 saatte oran kararı yok — 8 deneme oturumu dolunca ilk karar buraya yazılır.</div>') +
       '<div class="w-full space-y-0.5">' + rows + '</div>';
   }
 

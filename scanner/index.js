@@ -109,6 +109,9 @@ const state = {
   savedRatio: 0,
   // Oran uyarlamasının son kararları (panelde gösterilir, en fazla 5).
   probeHistory: [],
+  // Saatlik kutu sayacı {saat: sayı}: panel kutu serisini bundan çizer.
+  // Koşular arasında targets.json'da kalır, 48 saatten eskisi atılır.
+  boxHourly: {},
   lastFlush: 0,
   lastCommit: 0,
   lastDiscover: 0,
@@ -145,6 +148,18 @@ function loadTargets() {
     const savedRatio = Number(parsed && parsed.probeRatio);
     if (Number.isFinite(savedRatio) && savedRatio > 0) {
       state.savedRatio = Math.min(0.6, Math.max(0.1, savedRatio));
+    }
+
+    // Önceki koşuların saatlik kutu sayıları: kutu serisi koşu bitince sıfırlanmasın.
+    const savedHourly = parsed && parsed.boxHourly;
+    if (savedHourly && typeof savedHourly === 'object') {
+      const keepFrom = Math.floor(Date.now() / 3600000) - 48;
+      Object.keys(savedHourly).forEach((key) => {
+        const hour = Number(key);
+        const count = Number(savedHourly[key]);
+        if (!Number.isFinite(hour) || !count || hour < keepFrom) return;
+        state.boxHourly[hour] = count;
+      });
     }
 
     // Önceki koşuların oran kararları: panel son 24 saati bunlardan çizer.
@@ -206,6 +221,8 @@ function saveTargets() {
     },
     // Kararlar koşular arasında da korunur (panel 24 saatlik geçmişi gösterir).
     probeHistory: state.probeHistory,
+    // Saatlik kutu sayıları: panel 24 saatlik kutu serisini bundan çizer.
+    boxHourly: state.boxHourly,
     updatedAt: new Date().toISOString(),
     targets: state.targets.map((target) => ({
       username: target.username,
@@ -688,6 +705,7 @@ function handleEnvelope(username, eventName, data) {
 
   const kind = envelopeKind(eventName, info);
   const name = envelopeName(kind, info);
+  countBoxHour(Date.now());
   const boxRecord = state.streamers.get(username);
   if (boxRecord) boxRecord.boxes = (Number(boxRecord.boxes) || 0) + 1;
   // Kutu veren yayıncı havuzda işaretlenir: sonraki koşularda da önce o dinlenir.
@@ -713,6 +731,17 @@ function handleEnvelope(username, eventName, data) {
     sender: info.sendUserName || '',
     senderName: info.sendUserName || info.senderName || ''
   });
+}
+
+// Kutu yakalamayı saatlik sayaca yazar; 48 saatten eski kovalar silinir.
+function countBoxHour(now) {
+  const hour = Math.floor(now / 3600000);
+  state.boxHourly[hour] = (Number(state.boxHourly[hour]) || 0) + 1;
+  const keepFrom = hour - 48;
+  Object.keys(state.boxHourly).forEach((key) => {
+    if ((Number(key) || 0) < keepFrom) delete state.boxHourly[key];
+  });
+  state.targetsDirty = true;
 }
 
 function handleConnectorGift(username, data) {
@@ -1075,6 +1104,7 @@ function snapshot() {
         withBox: state.probe.withBox
       },
       probeHistory: state.probeHistory,
+      boxHourly: state.boxHourly,
       connectFailures: state.connectFailures,
       polls: state.polls,
       minutesLeft: CONFIG.minutes > 0 ? Math.max(0, Math.round((deadline - Date.now()) / 60000)) : null,
@@ -1244,6 +1274,15 @@ if (process.env.SCANNER_SELFTEST === '1') {
 
   console.log('KARAR geçmişi →', state.probeHistory.map((item) =>
     item.from + '->' + item.to).join(' '));
+
+  // Saatlik kutu sayacı: her kutu sayılır, 48 saatten eski kova atılır.
+  state.boxHourly = {};
+  state.boxHourly[Math.floor(Date.now() / 3600000) - 60] = 7;
+  countBoxHour(Date.now());
+  countBoxHour(Date.now());
+  const nowHour = Math.floor(Date.now() / 3600000);
+  console.log('KUTU saatlik →', Object.keys(state.boxHourly).length, 'kova ·',
+    Number(state.boxHourly[nowHour]) || 0, '(beklenen 1 kova · 2)');
 
   frames.forEach(([label, frame]) => {
     const before = state.events.length;
