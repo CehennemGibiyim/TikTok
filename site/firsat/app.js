@@ -97,6 +97,81 @@
     return 'https://www.tiktok.com/@' + encodeURIComponent(username) + '/live';
   }
 
+  // ---------- Telefonda uygulamayı açma ----------
+  // Web adresi her cihazda açılır ama tarayıcıda açılır. Uygulamada açmak için
+  // TikTok'un kendi bağlantı şemaları kullanılır:
+  //   Android: snssdk1128://live?room_id=…   (paket: com.zhiliaoapp.musically)
+  //   iOS    : snssdk1233://live?room_id=…
+  // Oda kimliği (room_id) taramadan gelir; yoksa uydurulmaz, web açılır.
+
+  function deviceKind() {
+    var ua = navigator.userAgent || '';
+    if (/Android/i.test(ua)) return 'android';
+    if (/iPhone|iPad|iPod/i.test(ua)) return 'ios';
+    if (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1) return 'ios';
+    return 'desktop';
+  }
+
+  function roomIdOf(value) {
+    return String(value || '').replace(/[^0-9]/g, '');
+  }
+
+  function appSchemeUrl(roomId, platform) {
+    var id = roomIdOf(roomId);
+    if (!id) return '';
+    var scheme = platform === 'ios' ? 'snssdk1233' : 'snssdk1128';
+    return scheme + '://live?room_id=' + id + '&from=webview&refer=web';
+  }
+
+  function androidIntentUrl(roomId, fallbackUrl) {
+    var id = roomIdOf(roomId);
+    if (!id) return '';
+    return 'intent://live?room_id=' + id + '&from=webview&refer=web#Intent;' +
+      'package=com.zhiliaoapp.musically;scheme=snssdk1128;' +
+      'S.browser_fallback_url=' + encodeURIComponent(fallbackUrl) + ';end';
+  }
+
+  // Telefonda: uygulama kuruluysa doğrudan yayın açılır, değilse web'e düşer.
+  // Masaüstünde: normal web yayını açılır.
+  function openInApp(username, roomId) {
+    var web = liveUrl(username);
+    var id = roomIdOf(roomId);
+    var platform = deviceKind();
+    if (!id) {
+      window.open(web, '_blank', 'noopener');
+      return 'no-room-id';
+    }
+    if (platform === 'android') {
+      location.href = androidIntentUrl(id, web);
+      return 'android';
+    }
+    if (platform === 'ios') {
+      var startedAt = Date.now();
+      location.href = appSchemeUrl(id, 'ios');
+      // Uygulama açılmadıysa (sayfa hâlâ görünür) web'e düş.
+      setTimeout(function () {
+        if (document.visibilityState === 'visible' && Date.now() - startedAt < 2500) {
+          window.open(web, '_blank', 'noopener');
+        }
+      }, 1500);
+      return 'ios';
+    }
+    window.open(web, '_blank', 'noopener');
+    return 'desktop';
+  }
+
+  function roomIdForStreamer(streamerId) {
+    var streamer = state.streamers.find(function (item) { return item.id === streamerId; });
+    return streamer ? String(streamer.roomId || '') : '';
+  }
+
+  // Tarayıcı testinde bağlantı şemasını görebilmek için küçük bir pencere.
+  window.JetonPanelLinks = {
+    deviceKind: deviceKind,
+    appSchemeUrl: appSchemeUrl,
+    androidIntentUrl: androidIntentUrl
+  };
+
   function uid(prefix) {
     return prefix + '-' + Date.now().toString(36) + '-' + Math.random().toString(36).slice(2, 6);
   }
@@ -186,6 +261,7 @@
         });
         if (item.title) copy.liveTitle = item.title;
         if (item.viewers) copy.viewers = item.viewers;
+        if (item.roomId) copy.roomId = String(item.roomId);
 
         if (item.live && startIso && existing.startedAt !== startIso) {
           // TikTok'un gerçek başlangıç saati: süre sıfırdan ve doğru sayılır.
@@ -220,6 +296,7 @@
         scanLive: Boolean(item.live),
         liveTitle: item.title || '',
         viewers: Number(item.viewers) || 0,
+        roomId: item.roomId ? String(item.roomId) : '',
         source: 'scan'
       };
       byName[username] = created;
@@ -314,10 +391,15 @@
       return;
     }
     var live = Number(scanInfo.liveCount) || 0;
+    var countries = {};
+    state.streamers.forEach(function (streamer) {
+      if (streamer.scanLive && streamer.country) countries[streamer.country] = true;
+    });
     var parts = [
       'Tarama: ' + ago(new Date(scanInfo.scannedAt || Date.now()).getTime()),
       live + ' canlı',
       (Number(scanInfo.targetCount) || 0) + ' adres',
+      Object.keys(countries).length + ' ülke',
       (Number(scanInfo.watching) || 0) + ' oda dinleniyor'
     ];
     el.innerHTML = '<span class="chip chip-green">● ' + esc(parts.join(' · ')) + '</span>';
@@ -421,6 +503,7 @@
           scanLive: true,
           source: 'discover',
           foundLiveAt: now,
+          roomId: String((channel && channel.roomId) || ''),
           viewers: Number((channel && channel.viewerCount) || 0) || 0,
           liveTitle: String((channel && channel.displayName) || '')
         });
@@ -521,9 +604,11 @@
   function migrateEvents() {
     var settings = Object.assign({}, state.settings || {});
     if (Number(settings.eventsSchema) >= 3) return;
-    // Eski kurallarla yazılmış tarayıcı kayıtları (sıradan hediyeler) atılır;
-    // elle girilen kayıtlara dokunulmaz.
-    var kept = state.events.filter(function (event) { return !event.auto; });
+    // Eski kurallarla yazılan yalnızca sıradan hediye kayıtları atılır.
+    // Sandık/zarf/portal kayıtları KORUNUR (asıl toplanabilir kazanç onlar).
+    var kept = state.events.filter(function (event) {
+      return !event.auto || (event.kind !== 'gift' && event.kind !== undefined);
+    });
     settings.eventsSchema = 3;
     Store.set({ events: kept, settings: settings });
     state = Store.get();
@@ -715,7 +800,8 @@
         '    <button class="chip chip-amber" data-add-event="' + streamer.id + '" data-kind="chest">+ Sandık</button>',
         '    <button class="chip chip-pink" data-add-event="' + streamer.id + '" data-kind="letter">+ Zarf</button>',
         '    <button class="chip chip-purple" data-add-event="' + streamer.id + '" data-kind="portal">+ Portal</button>',
-        '    <button class="chip" data-qr="' + esc(streamer.username) + '">QR</button>',
+        '    <button class="chip chip-green" data-open-app="' + esc(streamer.username) + '" data-room-id="' + esc(streamer.roomId || '') + '">📱 Uygulamada</button>',
+        '    <button class="chip" data-qr="' + esc(streamer.username) + '" data-room-id="' + esc(streamer.roomId || '') + '">QR</button>',
         '    <button class="chip chip-danger" data-remove-streamer="' + streamer.id + '">×</button>',
         '  </div></td>',
         '</tr>'
@@ -769,7 +855,8 @@
         '  <div class="text-[10px] text-yellow-50/40">' + (event.country ? flag(event.country) + ' ' + esc(countryName(event.country)) + ' · ' : '') + new Date(event.createdAt).toLocaleTimeString('tr-TR') + (shared > 1 ? ' · ' + shared + ' kişiye' : '') + (event.giftName ? ' · ' + esc(event.giftName) : '') + '</div>',
         '  <div class="text-[11px] mt-1 ' + (urgent ? 'text-red-300 font-bold' : 'text-yellow-50/60') + '" data-countdown="' + (event.kind === 'letter' ? event.expiresAt : event.availableAt) + '" data-kind="' + event.kind + '" data-duration="' + (Number(event.durationSec) || 0) + '">' + timeText + '</div>',
         '  <div class="flex gap-2 mt-3">',
-        '    <button class="chip chip-amber" data-qr="' + esc(event.username) + '">QR / Yayına git</button>',
+        '    <button class="chip chip-green" data-open-app="' + esc(event.username) + '" data-room-id="' + esc(roomIdForStreamer(event.streamerId)) + '">📱 Uygulamada</button>',
+        '    <button class="chip chip-amber" data-qr="' + esc(event.username) + '" data-room-id="' + esc(roomIdForStreamer(event.streamerId)) + '">QR / Yayına git</button>',
         '    <button class="chip chip-green" data-collect="' + event.id + '">Topladım</button>',
         '    <button class="chip chip-danger" data-miss="' + event.id + '">Kaçtı</button>',
         '  </div>',
@@ -1254,8 +1341,9 @@
 
   // ---------- QR ----------
 
-  function openQr(username) {
+  function openQr(username, roomId) {
     var url = liveUrl(username);
+    var id = roomIdOf(roomId);
     $('qrTitle').textContent = '@' + username + ' · canlı yayın';
     $('qrBox').innerHTML = '';
     $('qrLink').href = url;
@@ -1269,6 +1357,17 @@
       });
     } else {
       $('qrBox').innerHTML = '<p class="text-black text-xs">QR kitaplığı yüklenemedi.</p>';
+    }
+    var apps = $('qrApps');
+    if (apps) {
+      apps.innerHTML = id
+        ? '<div class="flex flex-col gap-1">' +
+            '<a class="chip" href="' + esc(appSchemeUrl(id, 'android')) + '">🤖 Android uygulamada aç</a>' +
+            '<a class="chip" href="' + esc(appSchemeUrl(id, 'ios')) + '">🍏 iPhone/iPad uygulamada aç</a>' +
+            '<a class="chip" href="' + esc(androidIntentUrl(id, url)) + '">🤖 Android (uygulama yoksa web&#39;e düşer)</a>' +
+            '<p class="hint">Oda kimliği: ' + esc(id) + ' · bağlantılar uygulamayı doğrudan açar.</p>' +
+          '</div>'
+        : '<p class="hint">Bu kayıt için oda kimliği (room_id) henüz yok. Tarama onu bulunca uygulama bağlantıları burada görünür; şimdilik web açılır.</p>';
     }
     openModal('qrModal');
   }
@@ -1458,7 +1557,8 @@
 
       if (target.dataset.toggleLive) return toggleLive(target.dataset.toggleLive);
       if (target.dataset.addEvent) return openEventModal(target.dataset.addEvent, target.dataset.kind);
-      if (target.dataset.qr) return openQr(target.dataset.qr);
+      if (target.dataset.openApp) return openInApp(target.dataset.openApp, target.dataset.roomId);
+      if (target.dataset.qr) return openQr(target.dataset.qr, target.dataset.roomId);
       if (target.dataset.removeStreamer) return removeStreamer(target.dataset.removeStreamer);
     });
 
@@ -1472,7 +1572,8 @@
       if (!target) return;
       if (target.dataset.collect) return collectEvent(target.dataset.collect, 'collected');
       if (target.dataset.miss) return collectEvent(target.dataset.miss, 'missed');
-      if (target.dataset.qr) return openQr(target.dataset.qr);
+      if (target.dataset.openApp) return openInApp(target.dataset.openApp, target.dataset.roomId);
+      if (target.dataset.qr) return openQr(target.dataset.qr, target.dataset.roomId);
     });
 
     $('clearOpportunities').addEventListener('click', function () {

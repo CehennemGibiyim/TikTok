@@ -5,8 +5,9 @@ name: 📡 Canlı Tarayıcı
 
 on:
   schedule:
-    # Her 3 saatte bir uzun tur; 185 dk sürdüğü için turlar birbirine değer (gapsız).
-    - cron: '0 */3 * * *'
+    # 24 saate yakın kesintisiz tarama: her 4 saatte bir 230 dk.
+    # (GitHub tek işi en fazla 6 saat çalıştırır; 4 saatlik tur + kısa boşluk.)
+    - cron: '0 */4 * * *'
   workflow_dispatch:
 
 permissions:
@@ -40,4 +41,6 @@ jobs:
           git config user.email "actions@users.noreply.github.com"
 
       - name: 🔍 Tara ve dinle
-        run: node scanner/index.js --minutes=185 --commit=600 --watch=1 --watch-rooms=20 --watch-sec=600 --discover-sec=300
+        # Havuz büyük: keşif her 2 dakikada 10 yeni kanal ekler (tüm ülkelerden).
+        # Daha çok oda dinlenir; bağlantı hızı sınırına takılınca tarayıcı kendi bekler.
+        run: node scanner/index.js --minutes=230 --commit=300 --watch=1 --watch-rooms=24 --watch-sec=900 --discover-sec=120 --max-pool=1500 --concurrency=10 --poll=90

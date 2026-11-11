@@ -121,6 +121,7 @@ function loadTargets() {
         username,
         country: (typeof item === 'object' && item && item.country) || '',
         source: (typeof item === 'object' && item && item.source) || 'manual',
+        roomId: (typeof item === 'object' && item && String(item.roomId || '')) || '',
         addedAt: (typeof item === 'object' && item && Number(item.addedAt)) || 0,
         lastSeenLiveAt: (typeof item === 'object' && item && Number(item.lastSeenLiveAt)) || 0
       });
@@ -141,6 +142,7 @@ function saveTargets() {
       username: target.username,
       country: target.country || '',
       source: target.source || 'manual',
+      roomId: target.roomId || '',
       addedAt: target.addedAt || 0,
       lastSeenLiveAt: target.lastSeenLiveAt || 0
     }))
@@ -178,6 +180,7 @@ async function discoverLive() {
         username,
         country: String((channel && channel.region) || '').replace(/[^A-Za-z]/g, '').slice(0, 2).toUpperCase(),
         source: 'discovery',
+        roomId: String((channel && channel.roomId) || ''),
         addedAt: Date.now(),
         lastSeenLiveAt: 0
       });
@@ -213,6 +216,8 @@ async function discoverLive() {
       record.lastSeenLiveAt = Date.now();
       record.checkedAt = Date.now();
       record.viewers = Number((channel && channel.viewerCount) || 0) || record.viewers || 0;
+      // Oda kimliği uygulamada doğrudan yayına gitmek için gerekli.
+      if (channel && channel.roomId) record.roomId = String(channel.roomId);
       state.streamers.set(username, record);
     });
 
@@ -252,6 +257,8 @@ async function fetchLiveStatus(uniqueId) {
     const startTime = rawStart > 0 && rawStart < 1e12 ? rawStart * 1000 : rawStart;
     return {
       live,
+      // Uygulama içi yayın bağlantısı (snssdk…) bu kimlikle açılır.
+      roomId: String(room.id || room.roomId || room.roomID || ''),
       startTime,
       title: room.title || '',
       viewers: (room.liveRoomStats && Number(room.liveRoomStats.enterCount)) || 0
@@ -584,6 +591,9 @@ async function openConnectorWatcher(username) {
 
   await connection.connect();
 
+  const liveRecord = state.streamers.get(username);
+  if (liveRecord && connection.roomId) liveRecord.roomId = String(connection.roomId);
+
   watcher.timer = setTimeout(() => { closeWatcher(username, 'süre doldu'); }, CONFIG.watchSec * 1000);
   log('dinleniyor', username);
 }
@@ -715,6 +725,7 @@ async function pollTargets() {
       record.live = true;
       record.lastSeenLiveAt = Date.now();
       if (!target.lastSeenLiveAt) target.lastSeenLiveAt = Date.now();
+      if (status.roomId) record.roomId = String(status.roomId);
       if (status.startTime) record.startTime = status.startTime;
       if (status.title) record.title = status.title;
       if (status.viewers) record.viewers = status.viewers;
@@ -756,7 +767,8 @@ function snapshot() {
       lastGiftName: record.lastGiftName || '',
       lastSeenLiveAt: record.lastSeenLiveAt || 0,
       reason: record.reason || '',
-      checkedAt: record.checkedAt || 0
+      checkedAt: record.checkedAt || 0,
+      roomId: record.roomId || ''
     }));
 
   return {
