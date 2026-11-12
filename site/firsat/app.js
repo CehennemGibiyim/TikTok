@@ -1797,7 +1797,8 @@
     var info = Store.storageInfo();
     $('storageInfo').textContent = info.engine + ' · ' + (info.bytes / 1024).toFixed(1) + ' KB · ' +
       info.streamers + ' yayıncı, ' + info.events + ' olay, ' + info.accounts + ' hesap, ' + info.agencies + ' ajans' +
-      (info.updatedAt ? ' · son kayıt ' + new Date(info.updatedAt).toLocaleString('tr-TR') : '');
+      (info.updatedAt ? ' · son kayıt ' + new Date(info.updatedAt).toLocaleString('tr-TR') : '') +
+      ' · yedek biçimi v' + (window.Store.backupFormat || 1);
     renderAppSettings();
     renderKeyState();
   }
@@ -2488,14 +2489,22 @@
       var reader = new FileReader();
       reader.onload = function () {
         try {
-          Store.importJson(String(reader.result || ''));
+          var result = Store.importJson(String(reader.result || ''));
           state = Store.get();
           // Yedekteki görünüm tercihleri de geri gelir (filtre, arama, sıralama).
           if (applyViewPrefs(true)) saveViewPrefs();
           renderAll();
-          alert('Yedek yüklendi.');
+          var when = '';
+          if (result && result.exportedAt) {
+            var stamp = new Date(result.exportedAt);
+            if (!isNaN(stamp.getTime())) when = ' · ' + stamp.toLocaleString('tr-TR') + ' tarihli';
+          }
+          var format = (result && result.formatVersion)
+            ? 'biçim v' + result.formatVersion
+            : 'eski biçim (sürüm bilgisi yok)';
+          alert('Yedek yüklendi · ' + format + when + '.');
         } catch (error) {
-          alert('Yedek okunamadı: ' + error.message);
+          alert('Yedek yüklenmedi: ' + error.message);
         }
       };
       reader.readAsText(file);

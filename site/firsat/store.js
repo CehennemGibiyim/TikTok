@@ -16,6 +16,9 @@
   var OBJECT_STORE = 'kv';
   var STATE_KEY = 'state';
   var LS_KEY = 'tiktok-panel-state';
+  // Yedek dosyası kimliği ve biçim sürümü: uyumsuz yedek sessizce yüklenmesin.
+  var BACKUP_APP = 'tiktok-jeton-paneli';
+  var BACKUP_VERSION = 2;
 
   function emptyState() {
     return {
@@ -173,7 +176,8 @@
 
   function exportJson() {
     return JSON.stringify({
-      app: 'tiktok-jeton-paneli',
+      app: BACKUP_APP,
+      formatVersion: BACKUP_VERSION,
       exportedAt: new Date().toISOString(),
       data: state
     }, null, 2);
@@ -181,12 +185,31 @@
 
   function importJson(text) {
     var parsed = JSON.parse(text);
+
+    // Başka uygulamanın dosyası: sessizce içe alınmaz.
+    if (parsed && parsed.app && parsed.app !== BACKUP_APP) {
+      throw new Error('Bu dosya bu panelin yedeği değil (uygulama: ' +
+        String(parsed.app).slice(0, 40) + ').');
+    }
+    // Daha yeni biçim: bilinmeyen alanlar sessizce düşmesin, açıkça reddedilsin.
+    var formatVersion = Number(parsed && parsed.formatVersion) || 0;
+    if (formatVersion > BACKUP_VERSION) {
+      throw new Error('Yedek daha yeni bir sürümle oluşturulmuş (biçim v' + formatVersion +
+        '). Bu panel en fazla v' + BACKUP_VERSION + ' okuyabiliyor; paneli güncelle.');
+    }
+
     var data = parsed && parsed.data ? parsed.data : parsed;
     if (!data || typeof data !== 'object') throw new Error('Geçersiz yedek dosyası.');
+
     state = normalize(data);
     saveNow();
     notify();
-    return state;
+    return {
+      state: state,
+      // 0 = sürüm alanı olmayan eski yedek.
+      formatVersion: formatVersion,
+      exportedAt: (parsed && parsed.exportedAt) || ''
+    };
   }
 
   function clearAll() {
@@ -209,6 +232,8 @@
   }
 
   window.Store = {
+    // Yedek biçimi sürümü (panel bunu bilgi olarak gösterir).
+    backupFormat: BACKUP_VERSION,
     ready: ready,
     get: get,
     set: set,
