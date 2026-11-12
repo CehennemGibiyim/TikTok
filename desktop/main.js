@@ -171,7 +171,7 @@ function startScanner() {
     // Süresiz çalışır: uygulama açık kaldıkça tarama sürer.
     '--minutes=0', '--watch=1', '--watch-rooms=32', '--watch-sec=600',
     '--connect-gap=4000', '--min-rooms=8', '--discover-sec=60',
-    '--max-pool=1500', '--concurrency=10', '--poll=90',
+    '--max-pool=6000', '--concurrency=12', '--poll=120',
     // Yerelde git yok: commit kapalı.
     '--commit=0'
   ];

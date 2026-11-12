@@ -54,7 +54,9 @@ const CONFIG = {
   discover: readArg('discover', 1) ? true : false,
   discoverSec: Number(readArg('discover-sec', 300)),
 
-  maxPool: Number(readArg('max-pool', 250)),
+  // Havuz sınırı büyük tutulur: bulunan yayıncı listede kalır, her taramada
+  // 10 kişi eklenip 10 kişi düşmez.
+  maxPool: Number(readArg('max-pool', 6000)),
   watch: readArg('watch', readArg('once', 0) ? 0 : 1) ? true : false,
   // tiktok-live-connector ile dinle (anahtarsız).
   connector: readArg('connector', 1) ? true : false,
@@ -132,6 +134,7 @@ const state = {
   lastFlush: 0,
   lastCommit: 0,
   lastDiscover: 0,
+  lastRegionDiscover: 0,
   discoveredTotal: 0,
   lastError: null,
   polls: 0
@@ -314,6 +317,90 @@ async function fetchDiscoveryPage() {
   return (payload && payload.channels) || [];
 }
 
+// Havuz sınırı aşılırsa en eski, hiç canlı görülmemiş keşif kayıtları düşer;
+// elle eklenenler ve kutu vermiş odalar kalır.
+function trimPool() {
+  if (state.targets.length <= CONFIG.maxPool) return 0;
+  const overflow = state.targets.length - CONFIG.maxPool;
+  let dropped = 0;
+  state.targets = state.targets.filter((target) => {
+    if (dropped >= overflow) return true;
+    if (target.lastSeenLiveAt || target.boxEvents) return true;
+    if (target.source !== 'discovery' && target.source !== 'board') return true;
+    dropped += 1;
+    return false;
+  });
+  return dropped;
+}
+
+// Bölge liderlik tabloları (tik.tools /webcast/leaderboard): her bölge ~100
+// yayıncı döndürüyor. Anahtar yoksa atlanır — o zaman keşif 10'luk listede kalır.
+// Anahtar: TIKTOOLS_KEY ortam değişkeni (veya --api-key).
+const REGION_BOARDS = [
+  'TR', 'US+', 'DE+', 'BR', 'JP', 'KR', 'TW', 'ID', 'MY', 'PH', 'AZ', 'KZ',
+  'BY', 'UA', 'TH', 'VN', 'ES+', 'HU+', 'PT+', 'FR+', 'BK', 'PL', 'UK+', 'IT+',
+  'SE+', 'NL', 'RO', 'MENA', 'LATAM', 'CCA', 'AU+', 'CA'
+];
+let regionBoardCursor = 0;
+
+function boardCountry(region) {
+  return String(region || '').replace(/[^A-Za-z]/g, '').slice(0, 2).toUpperCase();
+}
+
+async function discoverRegionBoard() {
+  const key = String(process.env.TIKTOOLS_KEY || '').trim();
+  if (!key) return 0;
+  // Tablolar 5 dakikada bir tazeleniyor: daha sık sormak boşuna.
+  if (Date.now() - state.lastRegionDiscover < 5 * 60000) return 0;
+  state.lastRegionDiscover = Date.now();
+
+  const region = REGION_BOARDS[regionBoardCursor % REGION_BOARDS.length];
+  regionBoardCursor += 1;
+
+  let entries;
+  try {
+    const response = await fetch(
+      'https://api.tik.tools/webcast/leaderboard?region=' + encodeURIComponent(region),
+      {
+        headers: { 'x-api-key': key, Accept: 'application/json' },
+        signal: AbortSignal.timeout(20000)
+      }
+    );
+    if (!response.ok) throw new Error('http ' + response.status);
+    const payload = await response.json();
+    entries = Array.isArray(payload && payload.entries) ? payload.entries : [];
+  } catch (error) {
+    log('bölge tablosu hatası', region, error.message);
+    return 0;
+  }
+
+  const known = new Set(state.targets.map((target) => target.username));
+  const fresh = [];
+  entries.forEach((entry) => {
+    const username = cleanUsername(entry && entry.uniqueId);
+    if (!username || known.has(username)) return;
+    known.add(username);
+    fresh.push({
+      username,
+      country: boardCountry(region),
+      source: 'board',
+      roomId: '',
+      roomIdAt: 0,
+      addedAt: Date.now(),
+      lastSeenLiveAt: 0
+    });
+  });
+
+  if (fresh.length) {
+    state.targets = fresh.concat(state.targets);
+    state.discoveredTotal += fresh.length;
+    trimPool();
+    saveTargets();
+    log('bölge keşfi', region, '+' + fresh.length, '· havuz', state.targets.length);
+  }
+  return fresh.length;
+}
+
 async function discoverLive() {
   if (!CONFIG.discover) return 0;
   if (Date.now() - state.lastDiscover < CONFIG.discoverSec * 1000) return 0;
@@ -345,19 +432,12 @@ async function discoverLive() {
     if (fresh.length) {
       state.targets = fresh.concat(state.targets);
       state.discoveredTotal += fresh.length;
-      // Havuz sınırı: en eski, canlı görülmemiş keşif kayıtları düşer; elle eklenenler kalır.
-      if (state.targets.length > CONFIG.maxPool) {
-        const overflow = state.targets.length - CONFIG.maxPool;
-        let dropped = 0;
-        state.targets = state.targets.filter((target) => {
-          if (dropped >= overflow) return true;
-          if (target.source !== 'discovery' || target.lastSeenLiveAt) return true;
-          dropped += 1;
-          return false;
-        });
-      }
+      trimPool();
       saveTargets();
     }
+
+    // Bölge tabloları: anahtar varsa her ülkeden ~100 yayıncı havuza girer.
+    await discoverRegionBoard();
 
     // Bu uç yalnızca yayında olan kanalları döndürür: bulunanlar canlıdır.
     // Başlangıç saati verilmezse uydurulmaz; panel süreyi "—" gösterir.

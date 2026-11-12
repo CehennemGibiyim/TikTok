@@ -36,6 +36,10 @@
   var sortDir = 1;
   var oppSort = 'score';
   var searchTerm = '';
+  var streamerSearch = '';
+  // Liste binlerce yayıncıya çıkabiliyor: tabloda bu kadar satır çizilir,
+  // kalanı aramayla bulunur (hepsi kayıtlı ve taranıyor).
+  var STREAMER_ROW_LIMIT = 400;
   var eventTarget = { streamerId: null, kind: 'chest' };
   var notified = {};
   var audioCtx = null;
@@ -285,8 +289,8 @@
         return;
       }
 
-      if (!item.live) return;
-
+      // Yayında olmasa da taranan adres listeye eklenir: havuz büyüdükçe
+      // liste de büyür, yayın açtığında tarama onu kendiliğinden yakalar.
       var created = {
         id: uid('st'),
         username: username,
@@ -901,7 +905,13 @@
     var rows = $('streamerRows');
     $('streamerEmpty').classList.toggle('hidden', state.streamers.length > 0);
 
-    var list = state.streamers.slice().sort(function (a, b) {
+    var filter = streamerSearch.trim().toLowerCase().replace(/^@/, '');
+    var list = state.streamers.filter(function (streamer) {
+      if (!filter) return true;
+      return streamer.username.toLowerCase().indexOf(filter) >= 0 ||
+        countryName(streamer.country).toLowerCase().indexOf(filter) >= 0 ||
+        String(streamer.country || '').toLowerCase() === filter;
+    }).sort(function (a, b) {
       var va = sortValue(a);
       var vb = sortValue(b);
       if (typeof va === 'string') return va.localeCompare(vb, 'tr') * sortDir;
@@ -913,6 +923,9 @@
       th.classList.toggle('sorted', active);
       th.setAttribute('data-dir', active ? (sortDir > 0 ? 'asc' : 'desc') : '');
     });
+
+    var total = list.length;
+    if (total > STREAMER_ROW_LIMIT) list = list.slice(0, STREAMER_ROW_LIMIT);
 
     rows.innerHTML = list.map(function (streamer) {
       var metrics = streamerMetrics(streamer);
@@ -959,6 +972,12 @@
         '</tr>'
       ].join('');
     }).join('');
+
+    if (total > STREAMER_ROW_LIMIT) {
+      rows.innerHTML += '<tr><td colspan="10" class="text-[11px] text-yellow-50/40 pt-3">' +
+        (total - STREAMER_ROW_LIMIT) + ' yayıncı daha listede (hepsi kayıtlı ve taranıyor). ' +
+        'İlk ' + STREAMER_ROW_LIMIT + ' satır gösteriliyor; yukarıdaki aramayla diğerlerini bul.</td></tr>';
+    }
 
     if (window.lucide) lucide.createIcons();
   }
@@ -2090,6 +2109,11 @@
     });
     $('eventSave').addEventListener('click', saveEvent);
     $('eventCoins').addEventListener('keydown', function (event) { if (event.key === 'Enter') saveEvent(); });
+
+    $('streamerSearch').addEventListener('input', function () {
+      streamerSearch = $('streamerSearch').value;
+      renderStreamers();
+    });
 
     $('addAccount').addEventListener('click', addAccount);
     $('accSearch').addEventListener('input', function () { searchTerm = $('accSearch').value.trim().toLowerCase(); renderInventory(); });
