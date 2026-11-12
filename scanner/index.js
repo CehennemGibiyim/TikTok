@@ -82,6 +82,8 @@ const CONFIG = {
   probeRatio: Math.min(0.6, Math.max(0, Number(readArg('probe-ratio', 0.4)))),
   // Yeni adayı kaç saniye dinleyip karar veririz (kutu düşerse sıcağa geçer).
   probeSec: Number(readArg('probe-sec', 180)),
+  // Ülke tablolarının taranma aralığı (saat): günde bir.
+  sweepHours: Math.max(1, Number(readArg('sweep-hours', 24))),
   // Oran uyarlaması: kaç deneme sonrası karar verilir ve eşikler.
   probeWindow: Math.max(4, Number(readArg('probe-window', 8))),
   probeUpRate: Number(readArg('probe-up-rate', 0.25)),
@@ -134,7 +136,9 @@ const state = {
   lastFlush: 0,
   lastCommit: 0,
   lastDiscover: 0,
-  lastRegionDiscover: 0,
+  // Günlük ülke taraması raporu (panelde gösterilir, koşular arası korunur).
+  regionSweep: { at: 0, added: 0, regions: {}, failed: [] },
+  regionSweepRunning: false,
   discoveredTotal: 0,
   lastError: null,
   polls: 0
@@ -213,6 +217,17 @@ function loadTargets() {
         if (!Number.isFinite(hour) || !count || hour < keepFrom) return;
         state.boxHourly[hour] = count;
       });
+    }
+
+    // Son ülke taraması raporu: günde bir çalışsın diye zamanı korunur.
+    const savedSweep = parsed && parsed.regionSweep;
+    if (savedSweep && Number(savedSweep.at)) {
+      state.regionSweep = {
+        at: Number(savedSweep.at) || 0,
+        added: Number(savedSweep.added) || 0,
+        regions: (savedSweep.regions && typeof savedSweep.regions === 'object') ? savedSweep.regions : {},
+        failed: Array.isArray(savedSweep.failed) ? savedSweep.failed : []
+      };
     }
 
     // Önceki koşuların oran kararları: panel son 24 saati bunlardan çizer.
@@ -312,6 +327,8 @@ function saveTargets() {
     probeHistory: state.probeHistory,
     // Saatlik kutu sayıları: panel 24 saatlik kutu serisini bundan çizer.
     boxHourly: state.boxHourly,
+    // Günlük ülke taraması: zamanı ve sonucu koşular arasında korunur.
+    regionSweep: state.regionSweep,
     updatedAt: new Date().toISOString(),
     targets: state.targets.map((target) => ({
       username: target.username,
@@ -364,45 +381,31 @@ function trimPool() {
 
 // Bölge liderlik tabloları (tik.tools /webcast/leaderboard): her bölge ~100
 // yayıncı döndürüyor. Anahtar yoksa atlanır — o zaman keşif 10'luk listede kalır.
-// Anahtar: TIKTOOLS_KEY ortam değişkeni (veya --api-key).
+// Anahtar: TIKTOOLS_KEY ortam değişkeni (veya panelden girilen anahtar).
 const REGION_BOARDS = [
   'TR', 'US+', 'DE+', 'BR', 'JP', 'KR', 'TW', 'ID', 'MY', 'PH', 'AZ', 'KZ',
   'BY', 'UA', 'TH', 'VN', 'ES+', 'HU+', 'PT+', 'FR+', 'BK', 'PL', 'UK+', 'IT+',
   'SE+', 'NL', 'RO', 'MENA', 'LATAM', 'CCA', 'AU+', 'CA'
 ];
-let regionBoardCursor = 0;
-
 function boardCountry(region) {
   return String(region || '').replace(/[^A-Za-z]/g, '').slice(0, 2).toUpperCase();
 }
 
-async function discoverRegionBoard() {
-  const key = String(process.env.TIKTOOLS_KEY || '').trim();
-  if (!key) return 0;
-  // Tablolar 5 dakikada bir tazeleniyor: daha sık sormak boşuna.
-  if (Date.now() - state.lastRegionDiscover < 5 * 60000) return 0;
-  state.lastRegionDiscover = Date.now();
+async function fetchBoardEntries(region, key) {
+  const response = await fetch(
+    'https://api.tik.tools/webcast/leaderboard?region=' + encodeURIComponent(region),
+    {
+      headers: { 'x-api-key': key, Accept: 'application/json' },
+      signal: AbortSignal.timeout(20000)
+    }
+  );
+  if (!response.ok) throw new Error('http ' + response.status);
+  const payload = await response.json();
+  return Array.isArray(payload && payload.entries) ? payload.entries : [];
+}
 
-  const region = REGION_BOARDS[regionBoardCursor % REGION_BOARDS.length];
-  regionBoardCursor += 1;
-
-  let entries;
-  try {
-    const response = await fetch(
-      'https://api.tik.tools/webcast/leaderboard?region=' + encodeURIComponent(region),
-      {
-        headers: { 'x-api-key': key, Accept: 'application/json' },
-        signal: AbortSignal.timeout(20000)
-      }
-    );
-    if (!response.ok) throw new Error('http ' + response.status);
-    const payload = await response.json();
-    entries = Array.isArray(payload && payload.entries) ? payload.entries : [];
-  } catch (error) {
-    log('bölge tablosu hatası', region, error.message);
-    return 0;
-  }
-
+// Tablodan gelen yayıncıları havuza ekler (yayında olmasalar da listede kalır).
+function addBoardTargets(region, entries) {
   const known = new Set(state.targets.map((target) => target.username));
   const fresh = [];
   entries.forEach((entry) => {
@@ -419,15 +422,50 @@ async function discoverRegionBoard() {
       lastSeenLiveAt: 0
     });
   });
-
-  if (fresh.length) {
-    state.targets = fresh.concat(state.targets);
-    state.discoveredTotal += fresh.length;
-    trimPool();
-    saveTargets();
-    log('bölge keşfi', region, '+' + fresh.length, '· havuz', state.targets.length);
-  }
+  if (!fresh.length) return 0;
+  state.targets = fresh.concat(state.targets);
+  state.discoveredTotal += fresh.length;
+  trimPool();
   return fresh.length;
+}
+
+// Günde bir kez bütün bölge tabloları okunur (32 istek). Sonuç panele raporlanır:
+// hangi bölgeden kaç yeni yayıncı geldi, hangileri hata verdi.
+async function sweepRegionBoards(options) {
+  const key = String(process.env.TIKTOOLS_KEY || '').trim();
+  if (!key) return 0;
+  if (state.regionSweepRunning) return 0;
+  const lastAt = Number(state.regionSweep && state.regionSweep.at) || 0;
+  if (lastAt && Date.now() - lastAt < CONFIG.sweepHours * 3600000) return 0;
+
+  state.regionSweepRunning = true;
+  const summary = { at: Date.now(), added: 0, regions: {}, failed: [] };
+  try {
+    for (let i = 0; i < REGION_BOARDS.length; i += 1) {
+      const region = REGION_BOARDS[i];
+      try {
+        const entries = await fetchBoardEntries(region, key);
+        const added = addBoardTargets(region, entries);
+        summary.regions[region] = added;
+        summary.added += added;
+      } catch (error) {
+        summary.failed.push(region);
+        log('bölge tablosu hatası', region, error.message);
+      }
+      await sleep(400);
+    }
+  } finally {
+    state.regionSweepRunning = false;
+    state.regionSweep = summary;
+  }
+
+  if (!(options && options.dryRun)) {
+    state.targetsDirty = true;
+    saveTargets();
+  }
+  log('ülke taraması:', summary.added, 'yeni ·',
+    REGION_BOARDS.length - summary.failed.length + '/' + REGION_BOARDS.length, 'bölge · havuz', state.targets.length);
+  return summary.added;
 }
 
 async function discoverLive() {
@@ -465,8 +503,8 @@ async function discoverLive() {
       saveTargets();
     }
 
-    // Bölge tabloları: anahtar varsa her ülkeden ~100 yayıncı havuza girer.
-    await discoverRegionBoard();
+    // Bölge tabloları: anahtar varsa günde bir kez tüm ülkelerden ~100 yayıncı.
+    await sweepRegionBoards();
 
     // Bu uç yalnızca yayında olan kanalları döndürür: bulunanlar canlıdır.
     // Başlangıç saati verilmezse uydurulmaz; panel süreyi "—" gösterir.
@@ -1530,6 +1568,14 @@ function snapshot() {
       lastError: state.lastError,
       envelopes: state.envelopeStats,
       envelopeSamples: state.envelopeSamples,
+      // Günlük ülke taraması raporu (panel Ayarlar kartında gösterir).
+      regionSweep: {
+        at: Number(state.regionSweep && state.regionSweep.at) || 0,
+        added: Number(state.regionSweep && state.regionSweep.added) || 0,
+        regions: (state.regionSweep && state.regionSweep.regions) || {},
+        failed: (state.regionSweep && state.regionSweep.failed) || [],
+        running: Boolean(state.regionSweepRunning)
+      },
       version: 1
     },
     streamers,
@@ -1759,10 +1805,40 @@ if (process.env.SCANNER_SELFTEST === '1') {
         ` · kutu: ${added.boxName || '-'} (tür ${added.businessType || 0})`
       : `ATLADI ${label}`);
   });
-  process.exit(0);
+
+  // Günlük ülke taraması: sahte yanıtla, ağa ve diske dokunmadan denenir.
+  (async () => {
+    const realFetch = global.fetch;
+    const realKey = process.env.TIKTOOLS_KEY;
+    let calls = 0;
+    global.fetch = async () => {
+      calls += 1;
+      return {
+        ok: true,
+        json: async () => ({
+          entries: [{ uniqueId: 'sweep_' + calls + '_a' }, { uniqueId: 'sweep_' + calls + '_b' }]
+        })
+      };
+    };
+    process.env.TIKTOOLS_KEY = 'test-key';
+    state.targets = [];
+    state.regionSweep = { at: 0, added: 0, regions: {}, failed: [] };
+    const added = await sweepRegionBoards({ dryRun: true });
+    // İkinci çağrı 24 saat dolmadığı için hemen dönmeli.
+    const again = await sweepRegionBoards({ dryRun: true });
+    global.fetch = realFetch;
+    if (realKey === undefined) delete process.env.TIKTOOLS_KEY;
+    else process.env.TIKTOOLS_KEY = realKey;
+    console.log('ÜLKE TARAMASI →', added, 'yeni ·', Object.keys(state.regionSweep.regions).length,
+      'bölge ·', calls, 'istek · ikinci çağrı', again, '(beklenen 24 saat içinde 0)');
+    process.exit(0);
+  })();
 }
 
-main().catch((error) => {
-  console.error(error);
-  process.exit(1);
-});
+// Sınama modunda ağa çıkılmaz: ana döngü hiç başlamaz.
+if (process.env.SCANNER_SELFTEST !== '1') {
+  main().catch((error) => {
+    console.error(error);
+    process.exit(1);
+  });
+}

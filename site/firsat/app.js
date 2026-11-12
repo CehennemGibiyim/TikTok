@@ -407,6 +407,7 @@
   }
 
   function renderScanStatus(error) {
+    renderSweepReport();
     renderBoxDiag();
     renderProbeSummary();
     var el = $('scanStatus');
@@ -1819,6 +1820,29 @@
         (desktopApi ? ' Yerel tarayıcı bu anahtarı kullanır.'
           : ' Tarayıcı sürümünde bulunanlar yalnızca listeye eklenir; GitHub taraması için depoya TIKTOOLS_KEY ekle ve “Tarama listesi indir” ile havuzu yükle.')
       : 'Anahtar yok: bölge tabloları kullanılmıyor, keşif 10\'luk canlı listesinde kalır.';
+    renderSweepReport();
+  }
+
+  // Tarayıcının günlük ülke taraması raporu (scanInfo.scanner.regionSweep).
+  function renderSweepReport() {
+    var el = $('sweepReport');
+    if (!el) return;
+    var sweep = (scanInfo && scanInfo.regionSweep) || null;
+    if (!sweep || !Number(sweep.at)) {
+      el.textContent = 'Otomatik ülke taraması henüz yapılmadı (günde bir çalışır).';
+      return;
+    }
+    var regions = sweep.regions || {};
+    var failed = Array.isArray(sweep.failed) ? sweep.failed : [];
+    var detail = Object.keys(regions)
+      .filter(function (key) { return Number(regions[key]) > 0; })
+      .map(function (key) { return key + ' +' + regions[key]; })
+      .join(' · ');
+    el.innerHTML = '<b>Son ülke taraması:</b> ' + esc(ago(Number(sweep.at))) + ' · ' +
+      Object.keys(regions).length + ' bölge okundu · <b>+' + fmt(Number(sweep.added) || 0) + ' yeni yayıncı</b>' +
+      (sweep.running ? ' · şu an çalışıyor…' : '') +
+      (failed.length ? ' · hata: ' + esc(failed.join(', ')) : '') +
+      (detail ? '<div class="text-[10px] text-yellow-50/40 mt-1">' + esc(detail) + '</div>' : '');
   }
 
   async function fetchBoard(region, key) {
