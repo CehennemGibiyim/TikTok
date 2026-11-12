@@ -1815,7 +1815,9 @@
     var key = savedKey();
     input.value = key;
     $('keyState').textContent = key
-      ? 'Anahtar kayıtlı (' + key.slice(0, 3) + '…' + key.slice(-4) + ') · yalnızca bu cihazda saklanır.'
+      ? 'Anahtar kayıtlı (' + key.slice(0, 3) + '…' + key.slice(-4) + ') · yalnızca bu cihazda saklanır.' +
+        (desktopApi ? ' Yerel tarayıcı bu anahtarı kullanır.'
+          : ' Tarayıcı sürümünde bulunanlar yalnızca listeye eklenir; GitHub taraması için depoya TIKTOOLS_KEY ekle ve “Tarama listesi indir” ile havuzu yükle.')
       : 'Anahtar yok: bölge tabloları kullanılmıyor, keşif 10\'luk canlı listesinde kalır.';
   }
 
