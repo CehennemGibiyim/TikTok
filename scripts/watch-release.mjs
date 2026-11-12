@@ -69,6 +69,50 @@ async function apiPatch(api, path, token, payload) {
   return { status: response.status, ok: response.ok, body };
 }
 
+/**
+ * Var olan bir GitHub sürümünün notlarını (body) verilen metinle değiştirir.
+ * Yazma yetkisi gerektirir: GITHUB_TOKEN ya da GH_TOKEN.
+ */
+export async function updateReleaseNotes({
+  repo,
+  tag,
+  notes,
+  api = process.env.RELEASE_WATCH_API || DEFAULT_API,
+  token = process.env.GITHUB_TOKEN || process.env.GH_TOKEN || '',
+  log = console.log
+} = {}) {
+  if (!notes) return { ok: false, message: 'Sürüm notu metni boş.' };
+  if (!token) {
+    return {
+      ok: false,
+      message: 'Sürüm notlarını yazmak için GITHUB_TOKEN ya da GH_TOKEN gerekli (yazma yetkisi).'
+    };
+  }
+
+  const apiBase = api.replace(/\/$/, '');
+  const version = String(tag).replace(/^v/, '');
+  const found = await apiGet(apiBase, '/repos/' + repo + '/releases/tags/' + tag, token);
+
+  if (found.status === 403 || found.status === 429) {
+    return { ok: false, message: rateLimitMessage(found, 'https://github.com/' + repo + '/releases/tag/' + tag) };
+  }
+  if (found.status === 404) {
+    return { ok: false, message: 'GitHub\'ta v' + version + ' sürümü yok; önce sürümü yayınla.' };
+  }
+  if (!found.ok || !found.body || !found.body.id) {
+    return { ok: false, message: 'Sürüm okunamadı (HTTP ' + found.status + ').' };
+  }
+
+  const patched = await apiPatch(apiBase, '/repos/' + repo + '/releases/' + found.body.id, token, { body: notes });
+  if (!patched.ok) {
+    return { ok: false, message: 'Sürüm notları yazılamadı (HTTP ' + patched.status + ').' };
+  }
+
+  const url = (patched.body && patched.body.html_url) || found.body.html_url || tag;
+  log('✓ Sürüm notları güncellendi: ' + url);
+  return { ok: true, releaseUrl: url, id: found.body.id };
+}
+
 function rateLimitMessage(result, api) {
   const resetAt = result.reset ? new Date(Number(result.reset) * 1000) : null;
   const when = resetAt ? resetAt.toLocaleString('tr-TR') : 'bir süre sonra';
@@ -171,17 +215,10 @@ export async function watchRelease({
           if (notes) {
             if (!token) {
               log('Sürüm notları yazılmadı: GITHUB_TOKEN/GH_TOKEN yok (salt-okunur istek).');
-            } else if (release.body.id) {
-              const patched = await apiPatch(
-                apiBase,
-                '/repos/' + repo + '/releases/' + release.body.id,
-                token,
-                { body: notes }
-              );
-              notesUpdated = patched.ok;
-              log(patched.ok
-                ? '✓ Sürüm notları CHANGE_LOG maddeleriyle dolduruldu.'
-                : 'Sürüm notları yazılamadı (HTTP ' + patched.status + ').');
+            } else {
+              const wrote = await updateReleaseNotes({ repo, tag, notes, api: apiBase, token, log });
+              notesUpdated = wrote.ok;
+              if (!wrote.ok && wrote.message) log(wrote.message);
             }
           }
 

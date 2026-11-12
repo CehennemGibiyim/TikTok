@@ -181,6 +181,7 @@ node scripts/release.mjs 1.0.1 "Kısa madde" --push               # dalı ve eti
 node scripts/release.mjs 1.0.1 "Kısa madde" --push --watch       # + Windows paketinin bitmesini bekle
 node scripts/release.mjs 1.0.1 "Kısa madde" --dry-run            # hiçbir şeyi değiştirmeden göster
 node scripts/release.mjs 1.0.1 --bump-backup "Yedek biçimi değişti" --push
+node scripts/release.mjs --notes 1.0.1                          # sadece GitHub sürüm notlarını CHANGE_LOG'dan yaz
 ```
 
 Betik sırasıyla: sürümü **iki yerde eşitler** (`desktop/package.json` + `store.js` `APP_VERSION`),
@@ -197,6 +198,7 @@ Sürüm düşükse, çalışma ağacı kirliyse, etiket zaten varsa ya da kontro
 | `--bump-backup` | `BACKUP_VERSION` değerini 1 artırır (yedek biçimi değiştiyse) |
 | `--allow-dirty` | Çalışma ağacı temiz değilken de çalışır |
 | `--item="Madde"` | Değişiklik maddesini argüman yerine bayrakla verir |
+| `--notes [X.Y.Z]` | Sürüm artırmadan/commit etmeden, `CHANGE_LOG`'daki o sürümün maddeleriyle GitHub sürüm notlarını yazar (sürüm verilmezse panel sürümü). `GITHUB_TOKEN`/`GH_TOKEN` gerekir |
 
 > Not: bir sürümü yalnızca **bir** yol tetiklemeli. Etiket göndermek (`git push origin vX.Y.Z`) ya da GitHub’da
 > etiket oluşturmak workflow’u zaten başlatır; aynı sürüm için ayrıca “Run workflow”a basmak **yinelenen**

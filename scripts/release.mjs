@@ -6,6 +6,7 @@
  *   node scripts/release.mjs 1.0.1 "Kısa madde" "İkinci madde"
  *   node scripts/release.mjs 1.0.1 --item="Madde" --push
  *   node scripts/release.mjs 1.0.1 "Madde" --push --watch
+ *   node scripts/release.mjs --notes 1.1.0    # sadece GitHub sürüm notlarını CHANGE_LOG'dan yaz
  *
  * Yaptıkları:
  *   1. Sürüm numarasını desktop/package.json ve site/firsat/store.js içinde eşitler,
@@ -24,7 +25,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { execFileSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
-import { watchRelease } from './watch-release.mjs';
+import { watchRelease, updateReleaseNotes } from './watch-release.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const STORE_FILE = path.join(ROOT, 'site', 'firsat', 'store.js');
@@ -82,6 +83,7 @@ const watchTimeoutArg = argv.find((arg) => arg.startsWith('--watch-timeout='));
 const WATCH_TIMEOUT = Math.max(30, (Number(watchTimeoutArg && watchTimeoutArg.split('=')[1]) || 1200)) * 1000;
 const ALLOW_DIRTY = flags.has('--allow-dirty');
 const BUMP_BACKUP = flags.has('--bump-backup');
+const NOTES = flags.has('--notes');
 
 function fail(message) {
   console.error('✖ ' + message);
@@ -138,6 +140,41 @@ function compareVersions(a, b) {
     if ((left[i] || 0) !== (right[i] || 0)) return (left[i] || 0) - (right[i] || 0);
   }
   return 0;
+}
+
+// ---------- 0) yalnız sürüm notları (--notes) ----------
+// Sürüm artırımı, commit veya push yapmaz; CHANGE_LOG maddelerini var olan GitHub sürümüne yazar.
+if (NOTES) {
+  const storeSource = fs.readFileSync(STORE_FILE, 'utf8');
+  const panelVersion = (storeSource.match(/var APP_VERSION = '([^']+)'/) || [])[1] || '';
+  const notesVersion = version || panelVersion;
+
+  if (!notesVersion) {
+    fail('Sürüm numarası bulunamadı. Örnek: node scripts/release.mjs --notes 1.1.0');
+  }
+  if (!/^\d+\.\d+\.\d+$/.test(notesVersion)) {
+    fail('Sürüm numarası X.Y.Z biçiminde olmalı (örn. 1.1.0).');
+  }
+
+  const slug = repoSlug();
+  if (!slug) {
+    fail('origin bir GitHub deposu değil; sürüm notlarının yazılacağı depo bulunamadı.');
+  }
+
+  const entries = changeItemsFor(notesVersion);
+  if (!entries.length) {
+    fail('CHANGE_LOG içinde v' + notesVersion + ' kaydı (maddeler) bulunamadı.');
+  }
+
+  console.log('v' + notesVersion + ' sürüm notları yazılıyor (' + entries.length + ' madde)…');
+  const result = await updateReleaseNotes({
+    repo: slug,
+    tag: 'v' + notesVersion,
+    notes: buildReleaseNotes(notesVersion, entries)
+  });
+  if (!result.ok) fail(result.message || 'Sürüm notları yazılamadı.');
+  console.log('GitHub sürümü: https://github.com/' + slug + '/releases/tag/v' + notesVersion);
+  process.exit(0);
 }
 
 // ---------- 1) doğrulama ----------
