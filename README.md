@@ -71,6 +71,13 @@ WebSocket açarak yapılır — TikTok'un oda kimliği arama ucu bulut IP'lerind
   (panelde `backoffRooms` olarak görünür).
 - Bağlanan odada `gift`, `envelope` ve `superFanBox` olayları dinlenir; gelen kutu jeton alanı boş gelse bile
   yazılır (panel "jeton bilinmiyor" der) ve türü `businessType` ile belirlenir.
+- **Aday süzgeci (`--room-id-only=1`):** doğrulanamayan odaya yalnızca taze oda kimliği varsa bağlanılır.
+  Keşif ucu yalnızca gerçekten yayında olan kanalları döndürdüğü için bu, boşa bağlantı ve kota harcamayı keser.
+- **"Canlı" etiketi tazelik ister (`--live-stale-sec=900`):** api-live bulut IP'lerinde sürekli boş döndüğü için
+  eski kayıtlar yayında sanılıyordu. Artık 15 dakikadır doğrulanmayan ve dinlenmeyen oda "canlı" sayılmaz;
+  panel "○ Yayında değil" yazar. Panel tarafında da aynı 15 dakikalık kural uygulanır.
+- **Kota koruması:** bir koşuda hız sınırı (`rateLimited`) 2'yi geçerse dakikalık başlatma yarıya iner,
+  bağlantı aralığı iki katına çıkar (`scanner.tuningGuard` olarak panelde görünür).
 
 Teşhis: `live.json → scanner.connectStats` (deneme/başarılı/hata/hız sınırı) ve `closeReasons`
 (`süre doldu`, `bağlantı düştü`, `yayın bitti`, `bağlanamadı`).
@@ -101,6 +108,19 @@ node index.js --once             # tek tur (deneme)
 | `--room-id-fresh-sec` | 900 | Oda kimliği bu yaştan sonra güvenilmez sayılır; bağlanmadan önce tazelenir |
 | `--fail-backoff-sec` | 600 | Bağlanılamayan oda için ilk bekleme; her hatada ikiye katlanır (üst 60 dk) |
 | `--probe-ratio` | 0.4 | Bütçenin ne kadarı hiç dinlenmemiş adaylara ayrılır |
+| `--room-id-only` | 1 | Doğrulanamayan odaya yalnızca taze oda kimliği varsa bağlan |
+| `--live-stale-sec` | 900 | Bu süredir doğrulanmayan oda "canlı" sayılmaz |
+| `--starts-per-min` | 8 | Dakikada en fazla kaç yeni bağlantı başlatılır |
+| `--hot-revisit-sec` | 720 | Kutu vermiş odaya en erken bu kadar sonra dönülür |
+
+### Çok odalı dinleme (chat reader sorusu)
+
+`https://tiktok-chat-reader.zerody.one/` bizim kullandığımız kütüphanenin (**tiktok-live-connector**)
+üstüne kurulmuş bir demo: tek soket = tek oda. Birden fazla oda dinlemek için **oda başına bir bağlantı**
+açmak gerekir; bu tarayıcı da öyle yapıyor (bütçe 32 oda). Demo sunucusunun kendi sınırı var
+(IP başına 10 bağlantı, dakikada 5 istek) ve README'si "çok bağlantı için kendi sunucunu kur" diyor.
+O yüzden demo sunucusuna yüklenilmez; sınır bizim TikTok bağlantı kotamız ve keşif ucunun dakikada
+verdiği 10 canlı kanaldır.
 
 ### Sınırlar
 

@@ -220,12 +220,24 @@
     return state.events.filter(function (event) { return event.streamerId === streamerId; });
   }
 
+  // "Canlı" etiketi tazelik ister: tarama yayında olduğunu 15 dakikadan uzun
+  // süredir doğrulayamadıysa CANLI yazılmaz (api-live bulut IP'lerinde boş
+  // döndüğü için eski kayıtlar yayında sanılıyordu).
+  var LIVE_STALE_MS = 15 * 60 * 1000;
+
+  function isLiveNow(streamer) {
+    if (!streamer) return false;
+    if (streamer.startedAt) return true;
+    if (!streamer.scanLive) return false;
+    return Date.now() - (Number(streamer.lastLiveAt) || 0) < LIVE_STALE_MS;
+  }
+
   function streamerMetrics(streamer) {
     var events = eventsOf(streamer.id);
     var metrics = {
       chest: 0, letter: 0, portal: 0, coins: 0, collected: 0, collectedCount: 0,
       shared: 0,      lastSeen: Number(streamer.lastLiveAt) || 0,
-      live: Boolean(streamer.startedAt || streamer.scanLive)
+      live: Boolean(streamer.startedAt) || isLiveNow(streamer)
     };
     events.forEach(function (event) {
       if (metrics[event.kind] !== undefined) metrics[event.kind] += 1;
@@ -268,6 +280,8 @@
           scanReason: item.reason || '',
           scanCheckedAt: Number(item.checkedAt) || Date.now()
         });
+        // Canlı bilgisi tazelendikçe etiketin süresi de yenilenir.
+        if (item.live) copy.lastLiveAt = Number(item.lastSeenLiveAt) || Date.now();
         if (item.title) copy.liveTitle = item.title;
         if (item.viewers) copy.viewers = item.viewers;
         if (item.roomId) copy.roomId = String(item.roomId);
@@ -483,6 +497,13 @@
       hints.push('bağlantı ' + okCount + '/' + attempts + ' başarılı' +
         (failedCount ? ' · ' + failedCount + ' hata' : ''));
     }
+    var guard = scanInfo.tuningGuard;
+    if (guard) {
+      hints.push('🛡 kota koruması: dakikada ' + guard.startsPerMin + ' bağlantı · ' +
+        Math.round(guard.connectGapMs / 1000) + ' sn ara');
+    }
+    var unknownCount = Number(scanInfo.liveUnknownCount) || 0;
+    if (unknownCount > 0) hints.push(unknownCount + ' oda doğrulanamadı');
     var offlineCount = Number(stats.offline) || 0;
     if (offlineCount > 0) hints.push(offlineCount + ' biten yayın atlandı');
     var withRoomId = Number(scanInfo.liveWithRoomId) || 0;
@@ -696,9 +717,7 @@
   function toggleScan() {
     scanPaused = !scanPaused;
     localStorage.setItem('tiktok-scan-paused', scanPaused ? '1' : '0');
-    if (scanPaused) {
-      stopDiscovery('Tarama durduruldu · canlı arama da kapalı');
-    }
+    // "Canlı yayınları bul" taramadan bağımsızdır: duraklatma onu durdurmaz.
     renderScanToggle();
     renderScanStatus();
     if (!scanPaused) refreshScan();

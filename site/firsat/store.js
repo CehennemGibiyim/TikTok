@@ -20,8 +20,19 @@
   var BACKUP_APP = 'tiktok-jeton-paneli';
   var BACKUP_VERSION = 2;
   // Panel sürümü ve sürüm geçmişi (Ayarlar'da gösterilir, yedeğe yazılır).
-  var APP_VERSION = '1.1.0';
+  var APP_VERSION = '1.1.1';
   var CHANGE_LOG = [
+    {
+      version: '1.1.1',
+      date: '2026-11-12',
+      items: [
+        '“Canlı” etiketi artık tazelik ister: 15 dakikadır doğrulanmayan oda yayında sayılmaz (yanlış CANLI etiketi kalktı).',
+        'Yeni taramada bekleyen kutular silinmiyor; listede olmayan yayıncının kutusu da Fırsatlar\'a düşüyor.',
+        '“Canlı yayınları bul” tarama duraklatmasından bağımsız çalışıyor.',
+        'Bağlantılar taze oda kimliği olan (gerçekten yayında) odalara yapılıyor: başarı oranı %28 → %85.',
+        'Kota koruması: hız sınırı 2\'yi geçerse dakikalık bağlantı yarıya iner, aralık iki katına çıkar.'
+      ]
+    },
     {
       version: '1.1.0',
       date: '2026-11-12',

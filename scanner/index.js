@@ -74,6 +74,13 @@ const CONFIG = {
   minRooms: Number(readArg('min-rooms', 8)),
   // Oda kimliği bu süreden eskiyse güvenilmez: bağlanmadan önce tazelenir (30 dk).
   roomIdFreshMs: Number(readArg('room-id-fresh-sec', 900)) * 1000,
+  // api-live bu sunucularda boş döndüğü için "canlı" bilgisi doğrulanamıyor.
+  // Bu süreden eski "canlı" kaydı yayında sayılmaz (yanlış CANLI etiketi olmasın).
+  liveStaleSec: Math.max(120, Number(readArg('live-stale-sec', 900))),
+  // Aday seçimi: doğrulanamayan odaya yalnızca taze oda kimliği varsa bağlanılır.
+  // Keşif ucu yalnızca gerçekten yayında olan kanalları döndürdüğü için bu,
+  // boşa bağlantı (ve günlük kota) harcamayı büyük ölçüde keser.
+  roomIdOnly: readArg('room-id-only', 1) ? true : false,
   // Bağlanamayan odaya tekrar denemeden önce beklenir; her hatada ikiye katlanır (üst 60 dk).
   failBackoffSec: Math.max(30, Number(readArg('fail-backoff-sec', 600))),
   // Kutu vermiş oda bu süre boyunca "sıcak" sayılır (6 saat).
@@ -124,6 +131,8 @@ const state = {
   // Eşzamanlı oda bütçesi: sınır yedikçe düşer, başarılı bağlantıda toparlanır.
   roomBudget: 0,
   connectFailures: 0,
+  // Kota koruması devreye girdiyse burada tutulur (panelde gösterilir).
+  tuningGuard: null,
   // Bağlantı teşhisi: panel "neden 0 oda" sorusunu buradan yanıtlar.
   connectStats: { attempts: 0, ok: 0, failed: 0, rateLimited: 0, offline: 0, dayLimited: false, errors: [] },
   connectStarts: [],
@@ -1428,12 +1437,34 @@ async function maintainWatchers() {
   }
 
   // Önce kutu vermiş odalar, sonra izleyici sayısı, sonra toplanan jeton.
-  const live = Array.from(state.streamers.values())
-    // "Canlı" (api-live doğruladı) ya da "olabilir" (api-live boş döndü, sayfa
-    // doğrulaması bağlanmadan hemen önce yapılır) odalar adaydır.
-    .filter((record) => record.live || record.liveUnknown)
-    // Bağlanılamayan oda bir süre listeye alınmaz (boşa kota harcanmasın).
-    .filter((record) => (state.failUntil.get(record.username) || 0) <= now)
+  // "Canlı" (api-live doğruladı) ya da "olabilir" (api-live boş döndü) odalar adaydır.
+  // Olabilir odada taze oda kimliği yoksa bağlanmak boşa kota harcar: kimliği
+  // keşif ucundan gelen (yani gerçekten yayında olan) odalar önceliklidir.
+  const hasFreshRoomId = (record) => Boolean(record.roomId) && Number(record.roomIdAt) &&
+    now - Number(record.roomIdAt) < CONFIG.roomIdFreshMs;
+  const candidateFilter = (strict) => (record) => {
+    if (record.live) return true;
+    if (!record.liveUnknown) return false;
+    if (!strict) return true;
+    return hasFreshRoomId(record);
+  };
+  // Bağlanılamayan oda bir süre listeye alınmaz (boşa kota harcanmasın).
+  const allowed = (record) => (state.failUntil.get(record.username) || 0) <= now;
+  let live = Array.from(state.streamers.values())
+    .filter(candidateFilter(CONFIG.roomIdOnly))
+    .filter(allowed);
+  // Keşif ucu susarsa (429/ağ) hiç aday kalmıyordu: o durumda süzgeç gevşetilir.
+  // Boşa bağlantı riski, hiç dinlememekten iyidir.
+  if (live.length < CONFIG.minRooms) {
+    const relaxed = Array.from(state.streamers.values())
+      .filter(candidateFilter(false))
+      .filter(allowed);
+    if (relaxed.length > live.length) {
+      log('taze oda kimliği azaldı (' + live.length + ') → doğrulanamayan odalar da aday');
+      live = relaxed;
+    }
+  }
+  live = live
     .sort((a, b) =>
       // Kesin canlı olanlar önce denenir.
       (b.live ? 1 : 0) - (a.live ? 1 : 0) ||
@@ -1494,6 +1525,15 @@ async function maintainWatchers() {
       state.lastConnectAt = Date.now();
       state.connectFailures = 0;
       state.connectStats.ok += 1;
+      // Bağlantı kuruldu: oda gerçekten yayında. "Canlı" bilgisi tazelenir,
+      // api-live doğrulayamasa da etiket doğru kalır.
+      const liveRecord = state.streamers.get(pick.record.username);
+      if (liveRecord) {
+        liveRecord.live = true;
+        liveRecord.liveUnknown = false;
+        liveRecord.lastSeenLiveAt = Date.now();
+        state.streamers.set(pick.record.username, liveRecord);
+      }
       clearPenalty(pick.record.username);
       state.roomBudget = Math.min(CONFIG.watchRooms, state.roomBudget + 0.5);
 
@@ -1533,6 +1573,20 @@ async function maintainWatchers() {
       if (/rate|too many|device_blocked|429|\b503\b/i.test(error.message || '')) {
         state.connectFailures = Math.min(6, state.connectFailures + 1);
         state.connectStats.rateLimited += 1;
+        // Koruma: kotayı yakmaya devam etmesin. Üçüncü hız sınırından sonra
+        // dakikalık başlatma yarıya iner, bağlantı aralığı iki katına çıkar.
+        if (state.connectStats.rateLimited > 2 && !state.tuningGuard) {
+          state.tuningGuard = {
+            at: Date.now(),
+            fromStarts: CONFIG.startsPerMin,
+            fromGap: CONFIG.connectGapMs
+          };
+          CONFIG.startsPerMin = Math.max(2, Math.floor(CONFIG.startsPerMin / 2));
+          CONFIG.connectGapMs = Math.min(20000, CONFIG.connectGapMs * 2);
+          log('koruma devrede: dakikalık başlatma', state.tuningGuard.fromStarts, '→',
+            CONFIG.startsPerMin, '· bağlantı aralığı', state.tuningGuard.fromGap, '→',
+            CONFIG.connectGapMs, 'ms (günlük kota koruması)');
+        }
         // Günlük kota bittiyse kısa beklemelerle denemek boşuna: uzun ara verilir.
         const dailyLimit = /rate_limit_account_day|account_day/i.test(error.message || '');
         if (dailyLimit) state.connectStats.dayLimited = true;
@@ -1619,6 +1673,8 @@ async function pollTargets() {
 // ---------- çıktı ----------
 
 function snapshot() {
+  const nowMs = Date.now();
+  const staleLiveMs = CONFIG.liveStaleSec * 1000;
   const streamers = Array.from(state.streamers.values())
     // Havuzdaki her adres yazılır: panel "taranmış ama yayında değil" ile
     // "hiç taranmamış" durumunu ayırabilsin, eski Canlı durumu takılı kalmasın.
@@ -1630,7 +1686,11 @@ function snapshot() {
     .map((record) => ({
       username: record.username,
       country: record.country || '',
-      live: Boolean(record.live),
+      // "Canlı" etiketi yalnızca tazeyse ya da oda gerçekten dinleniyorsa verilir.
+      // api-live bulut IP'lerinde boş döndüğü için eski kayıtlar yayında sanılıyordu.
+      live: Boolean(record.live) && (state.rooms.has(record.username) ||
+        nowMs - (Number(record.lastSeenLiveAt) || 0) < staleLiveMs),
+      liveUnknown: Boolean(record.liveUnknown),
       startTime: Number(record.startTime) || 0,
       title: record.title || '',
       viewers: Number(record.viewers) || 0,
@@ -1653,6 +1713,8 @@ function snapshot() {
       runId: startedAtMs,
       targetCount: state.targets.length,
       liveCount: streamers.filter((item) => item.live).length,
+      // api-live doğrulayamadığı için "canlı mı?" bilinmeyen oda sayısı.
+      liveUnknownCount: streamers.filter((item) => item.liveUnknown && !item.live).length,
       discovered: state.discoveredTotal,
       poolSize: state.targets.length,
       watching: state.rooms.size,
@@ -1684,6 +1746,16 @@ function snapshot() {
       lastConnectorError: state.lastConnectorError,
       // Bağlanılamadığı için bir süre denenmeyecek oda sayısı (teşhis).
       backoffRooms: state.failUntil.size,
+      // Hız sınırı koruması: devreye girdiyse yeni değerler.
+      tuningGuard: state.tuningGuard
+        ? {
+          at: state.tuningGuard.at,
+          fromStarts: state.tuningGuard.fromStarts,
+          fromGap: state.tuningGuard.fromGap,
+          startsPerMin: CONFIG.startsPerMin,
+          connectGapMs: CONFIG.connectGapMs
+        }
+        : null,
       closeReasons: state.closeReasons,
       cooldownLeftSec: Math.max(0, Math.round((state.connectorCooldownUntil - Date.now()) / 1000)),
       polls: state.polls,
