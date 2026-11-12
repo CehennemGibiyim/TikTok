@@ -178,6 +178,7 @@ ve dışa aktarılan yedek dosyasında (`appVersion`) görünür.
 ```bash
 node scripts/release.mjs 1.0.1 "Kısa madde" "İkinci madde"        # sürümü yaz, kontrol et, commit + etiket
 node scripts/release.mjs 1.0.1 "Kısa madde" --push               # dalı ve etiketi de gönder
+node scripts/release.mjs 1.0.1 "Kısa madde" --push --watch       # + Windows paketinin bitmesini bekle
 node scripts/release.mjs 1.0.1 "Kısa madde" --dry-run            # hiçbir şeyi değiştirmeden göster
 node scripts/release.mjs 1.0.1 --bump-backup "Yedek biçimi değişti" --push
 ```
@@ -191,6 +192,8 @@ Sürüm düşükse, çalışma ağacı kirliyse, etiket zaten varsa ya da kontro
 |---|---|
 | `--dry-run` | Dosyaya yazmaz, commit/etiket oluşturmaz; yapılacak değişiklikleri gösterir |
 | `--push` | Dalı ve etiketi **tek atomik push** ile gönderir; ikisinden biri reddedilirse ikisi de gitmez. Etiket zaten uzaktaysa yeniden göndermez (yinelenen sürüm oluşmaz) |
+| `--watch` | Push’tan sonra “🖥️ Windows Kurulum Paketi” çalışmasını izler; bitince `.exe` + `latest.yml` dosyalarını ve sürüm bağlantısını yazar (başarısızsa günlük bağlantısıyla çıkar) |
+| `--watch-timeout=1200` | İzleme üst sınırı, saniye (varsayılan 20 dk) |
 | `--bump-backup` | `BACKUP_VERSION` değerini 1 artırır (yedek biçimi değiştiyse) |
 | `--allow-dirty` | Çalışma ağacı temiz değilken de çalışır |
 | `--item="Madde"` | Değişiklik maddesini argüman yerine bayrakla verir |
@@ -205,6 +208,16 @@ Sürüm düşükse, çalışma ağacı kirliyse, etiket zaten varsa ya da kontro
 2. **Kurulum paketi:** Actions → 🖥️ Windows Kurulum Paketi yeşil mi, Releases’te `.exe` + `latest.yml` var mı.
 3. **Güncelleme:** Kurulu uygulamada Ayarlar → Uygulama ve güncellemeler → “Güncellemeleri denetle”;
    yeni sürüm inince “İndir ve kur” ile kurulur (veya uygulama kapanırken otomatik).
+
+`--watch` bu üç adımın ilkini kendisi yapar; tek başına da çalışır:
+
+```bash
+node scripts/watch-release.mjs --repo CehennemGibiyim/TikTok --tag v1.1.0
+node scripts/watch-release.mjs --repo CehennemGibiyim/TikTok --tag v1.1.0 --sha <commit> --timeout 600
+```
+
+GitHub API anahtarsız saatte 60 istekle sınırlı; uzun beklemelerde `GITHUB_TOKEN` (ya da `GH_TOKEN`)
+ortam değişkeni ver — sınır dolduğunda betik sıfırlanma saatini söyleyip durur.
 
 Adımları elle yapmak istersen sırası: sürümü iki yerde eşitle → `CHANGE_LOG`’a madde ekle →
 (yedek biçimi değiştiyse `BACKUP_VERSION` artır) → `node --check` + `SCANNER_SELFTEST=1 node scanner/index.js` →

@@ -5,6 +5,7 @@
  *
  *   node scripts/release.mjs 1.0.1 "Kısa madde" "İkinci madde"
  *   node scripts/release.mjs 1.0.1 --item="Madde" --push
+ *   node scripts/release.mjs 1.0.1 "Madde" --push --watch
  *
  * Yaptıkları:
  *   1. Sürüm numarasını desktop/package.json ve site/firsat/store.js içinde eşitler,
@@ -12,7 +13,9 @@
  *   3. (isteğe bağlı) --bump-backup ile yedek biçimi sürümünü artırır,
  *   4. node --check + tarayıcı selftest çalıştırır,
  *   5. değişiklikleri commit'ler ve vX.Y.Z etiketini oluşturur,
- *   6. --push verilirse dalı ve etiketi gönderir (Actions paketi üretir).
+ *   6. --push verilirse dalı ve etiketi gönderir (Actions paketi üretir),
+ *   7. --watch verilirse paketin Actions'ta bitmesini bekleyip sonucu yazar
+ *      (izleme mantığı: scripts/watch-release.mjs).
  *
  * --dry-run: hiçbir dosyaya yazmaz, commit/etiket oluşturmaz; ne yapacağını yazar.
  */
@@ -21,6 +24,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { execFileSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
+import { watchRelease } from './watch-release.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const STORE_FILE = path.join(ROOT, 'site', 'firsat', 'store.js');
@@ -48,6 +52,9 @@ const items = positional.slice(1).concat(inlineItems).map((item) => String(item)
 
 const DRY = flags.has('--dry-run');
 const PUSH = flags.has('--push');
+const WATCH = flags.has('--watch');
+const watchTimeoutArg = argv.find((arg) => arg.startsWith('--watch-timeout='));
+const WATCH_TIMEOUT = Math.max(30, (Number(watchTimeoutArg && watchTimeoutArg.split('=')[1]) || 1200)) * 1000;
 const ALLOW_DIRTY = flags.has('--allow-dirty');
 const BUMP_BACKUP = flags.has('--bump-backup');
 
@@ -85,7 +92,15 @@ function currentBranch() {
 }
 
 function repoSlug() {
-  const url = git(['remote', 'get-url', 'origin'], { quiet: true }).trim();
+  // `git config --get` yazılan adresi döndürür; `remote get-url` insteadOf kurallarını uygulayıp
+  // GitHub adresini yerel bir yola çevirebilir.
+  let url = '';
+  try {
+    url = git(['config', '--get', 'remote.origin.url'], { quiet: true }).trim();
+  } catch (error) {
+    url = '';
+  }
+  if (!url) url = git(['remote', 'get-url', 'origin'], { quiet: true }).trim();
   const match = url.match(/github\.com[:/]([^/]+\/[^/.]+)/);
   return match ? match[1].replace(/\.git$/, '') : '';
 }
@@ -272,5 +287,33 @@ if (PUSH) {
   console.log('\nGöndermek için:');
   console.log('  git push && git push origin v' + version);
   console.log('Ya da tek komutta: node scripts/release.mjs ' + version + ' ' +
-    items.map((item) => JSON.stringify(item)).join(' ') + ' --push');
+    items.map((item) => JSON.stringify(item)).join(' ') + ' --push --watch');
+}
+
+// ---------- 6) izleme (--watch) ----------
+
+if (WATCH) {
+  if (!PUSH) {
+    info('--watch yalnızca --push ile anlamlı; izleme atlandı.');
+  } else {
+    const slug = repoSlug();
+    if (!slug) {
+      info('origin bir GitHub deposu değil, izleme atlandı.');
+    } else {
+      const watchedSha = git(['rev-parse', 'HEAD'], { quiet: true }).trim();
+      console.log('\nPaket izleniyor (en fazla ' + Math.round(WATCH_TIMEOUT / 60000) + ' dk)…');
+      const result = await watchRelease({
+        repo: slug,
+        tag: 'v' + version,
+        sha: watchedSha,
+        timeoutMs: WATCH_TIMEOUT
+      });
+      if (result.ok) {
+        console.log('✓ Sürüm yayında: ' + result.releaseUrl);
+      } else {
+        if (result.message) console.error('✖ ' + result.message);
+        process.exitCode = result.reason === 'timeout' ? 0 : 1;
+      }
+    }
+  }
 }
