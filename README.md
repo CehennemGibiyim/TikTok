@@ -16,7 +16,10 @@ Sunucu, Docker, API anahtarı gerekmez: her şey GitHub Pages üzerinde statik �
 - [Arka plan tarayıcısı](#arka-plan-tarayıcısı-gerçek-süre--otomatik-dinleme)
 - [Veri dosyaları](#veri-dosyaları)
 - [Yerelde çalıştırma](#yerelde-çalıştırma)
+- [Windows uygulaması](#windows-uygulaması-kurulum--güncelleme)
 - [Dosya düzeni](#dosya-düzeni)
+- [Sürüm geçmişi](#sürüm-geçmişi)
+- [Yeni sürüm çıkarma (kontrol listesi)](#yeni-sürüm-çıkarma-kontrol-listesi)
 - [Sık sorunlar](#sık-sorunlar)
 
 ## Panel sekmeleri
@@ -136,9 +139,9 @@ python3 -m http.server 8080
   `%APPDATA%\TikTok Sandık Radarı\data` klasörüne yazar. GitHub Actions sırası ve paylaşılan IP sınırı yoktur.
 - **Güncelleme:** **Ayarlar → Uygulama ve güncellemeler** kartı. "Güncellemeleri denetle" yeni sürümü
   indirir, uygulama kapanırken (veya "İndir ve kur" ile hemen) kurar. Açılışta denetim varsayılan olarak açıktır.
-- **Yeni sürüm yayınlama:** `desktop/package.json` içindeki `version` değerini artır, `v1.0.1` gibi bir etiket
-  push et (`git tag v1.0.1 && git push origin v1.0.1`). `.github/workflows/release.yml` windows-latest üzerinde
-  kurulum paketini ve `latest.yml` dosyasını üretip Releases'e yükler; kurulu uygulamalar oradan güncellenir.
+- **Yeni sürüm yayınlama:** adım adım kontrol listesi → [Yeni sürüm çıkarma](#yeni-sürüm-çıkarma-kontrol-listesi).
+  Kısaca: iki yerde sürüm numarasını eşitle, `CHANGE_LOG`’a madde ekle, `main`’e push et, `vX.Y.Z` etiketi at;
+  workflow kurulum paketini ve `latest.yml` dosyasını Releases’e yükler, kurulu uygulamalar oradan güncellenir.
 
 ## Dosya düzeni
 
@@ -156,6 +159,31 @@ scanner/                 Node tarayıcı (TikTok canlı dinleme)
 desktop/                 Windows uygulaması (Electron + NSIS kurulum + otomatik güncelleme)
 .github/workflows/       pages.yml (yayın), scan.yml (tarama turu), release.yml (kurulum paketi)
 ```
+
+## Sürüm geçmişi
+
+Panel sürümü `site/firsat/store.js` içindeki `APP_VERSION` değeridir; Ayarlar → Panel sürümü kartında
+ve dışa aktarılan yedek dosyasında (`appVersion`) görünür.
+
+| Sürüm | Tarih | Öne çıkanlar |
+|---|---|---|
+| **1.0.0** | 2026-11-12 | Süper fan kutusu (jeton alanı boş) ve mükerrer kutu kaydı düzeltildi; zarf/portal 15 dk “KONTROL ET” olarak kalıyor. Ülke tablosu keşfi (tik.tools anahtarı) ve günde bir otomatik ülke taraması + raporu. Av listesinde ülke rozeti filtresi, arama ve sıralama kalıcı; havuz 6000 adres. Görünüm tercihleri yedeğe dahil, yedek biçim sürümü ve uyumsuz yedek reddi. |
+| **0.9.0** | 2026-11-11 | Sandık süresi dolsa da beklemede kalıyor, eski “kaçtı” kayıtları geri alınıyor. TikTok günlük bağlantı sınırında 3 saat bekleme ve panelde sebep gösterimi. |
+| **0.8.0** | 2026-11-11 | Windows kurulum paketi (Electron + NSIS), GitHub Releases üzerinden otomatik güncelleme, Ayarlar’da uygulama/güncelleme ve yerel tarayıcı kartı. |
+
+## Yeni sürüm çıkarma (kontrol listesi)
+
+1. **Sürüm numarasını iki yerde eşitle:** `desktop/package.json` → `version`, `site/firsat/store.js` → `APP_VERSION`.
+2. **`site/firsat/store.js` → `CHANGE_LOG`** listesinin başına yeni sürümü tarih ve maddeleriyle ekle (Ayarlar’daki geçmiş buradan okunur).
+3. **Yedek biçimi değiştiyse** `BACKUP_VERSION` değerini artır; değişmediyse dokunma.
+4. **Kontrol:** `node --check scanner/index.js site/firsat/app.js site/firsat/store.js desktop/main.js desktop/preload.js`
+   ve `SCANNER_SELFTEST=1 node scanner/index.js` (ağa çıkmaz).
+5. **Push:** `main`’e push → Pages paneli yayınlar (`pages.yml`).
+6. **Etiket:** `git tag v1.0.1 && git push origin v1.0.1` → `.github/workflows/release.yml`
+   windows-latest üzerinde kurulum paketini ve `latest.yml` dosyasını üretip Releases’e yükler.
+7. **Kurulum paketini doğrula:** Actions → 🖥️ Windows Kurulum Paketi yeşil mi, Releases’te `.exe` + `latest.yml` var mı.
+8. **Güncellemeyi dene:** Kurulu uygulamada Ayarlar → Uygulama ve güncellemeler → “Güncellemeleri denetle”;
+   yeni sürüm inince “İndir ve kur” ile kurulur (veya uygulama kapanırken otomatik).
 
 ## Sık sorunlar
 
