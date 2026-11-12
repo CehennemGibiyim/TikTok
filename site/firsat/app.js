@@ -353,15 +353,20 @@
 
     // Yeni tarama koşulu: Fırsatlar sıfırdan başlar. Önceki koşuların bekleyen
     // otomatik kayıtları düşürülür; topladıkların geçmişte kalır.
+    // Yeni tarama koşusu: eski bekleyen kutular ARTIK SİLİNMEZ (her 3 saatte bir
+    // Fırsatlar sıfırlanıyordu). Yalnızca 12 saatten eski otomatik kayıtlar düşer;
+    // süresi dolanlar zaten "KONTROL ET"/bitti olarak ayrı işaretleniyor.
     var runId = Number((data.scanner && data.scanner.runId) || 0);
     var settings = Object.assign({}, state.settings || {});
     if (runId && Number(settings.scanRunId) !== runId) {
-      var beforeReset = events.length;
+      var staleBefore = Date.now() - 12 * 3600000;
+      var beforeClean = events.length;
       events = events.filter(function (event) {
-        return !(event.auto && event.status === 'pending');
+        return !(event.auto && event.status === 'pending' &&
+          Number(event.createdAt || 0) > 0 && Number(event.createdAt) < staleBefore);
       });
       settings.scanRunId = runId;
-      if (events.length !== beforeReset) changed = true;
+      if (events.length !== beforeClean) changed = true;
     }
 
     var known = {};
@@ -372,7 +377,21 @@
       // Tarayıcı yalnızca sandık/portal/zarf yazar; hediye türü artık kabul edilmez.
       if (item.kind && !['chest', 'portal', 'letter'].includes(item.kind)) return;
       var owner = byName[cleanUsername(item.username)];
-      if (!owner) return;
+      if (!owner) {
+        // Kutu veren yayıncı panelin listesinde yoksa da kutu kaybolmaz:
+        // kayıt yerinde oluşturulur (Fırsatlar'a her durumda düşer).
+        owner = {
+          id: uid('st'),
+          username: cleanUsername(item.username),
+          country: String(item.country || '').toUpperCase().slice(0, 2),
+          createdAt: Date.now(),
+          scanLive: true,
+          scanCheckedAt: Date.now()
+        };
+        streamers.push(owner);
+        byName[cleanUsername(item.username)] = owner;
+        changed = true;
+      }
       known[item.id] = true;
       events.unshift({
         id: uid('ev'),
