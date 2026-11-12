@@ -441,6 +441,9 @@
     var watching = Number(scanInfo.watching) || 0;
     var errors = Array.isArray(stats.errors) ? stats.errors : [];
     var hints = [];
+    if (stats.dayLimited) {
+      hints.push('⛔ TikTok günlük bağlantı sınırı doldu — masaüstü uygulamasında kendi IP\'nde taranır');
+    }
     if (watching === 0 && live > 0) {
       hints.push(cooldown > 0
         ? '⏳ hız sınırı soğuması ' + clock(cooldown) + ' — yeni bağlantı kurulmuyor'

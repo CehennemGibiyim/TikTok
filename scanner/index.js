@@ -112,7 +112,7 @@ const state = {
   roomBudget: 0,
   connectFailures: 0,
   // Bağlantı teşhisi: panel "neden 0 oda" sorusunu buradan yanıtlar.
-  connectStats: { attempts: 0, ok: 0, failed: 0, rateLimited: 0, offline: 0, errors: [] },
+  connectStats: { attempts: 0, ok: 0, failed: 0, rateLimited: 0, offline: 0, dayLimited: false, errors: [] },
   connectStarts: [],
   lastConnectorError: null,
   closeReasons: {},
@@ -1270,11 +1270,17 @@ async function maintainWatchers() {
       if (/rate|too many|device_blocked|429|\b503\b/i.test(error.message || '')) {
         state.connectFailures = Math.min(6, state.connectFailures + 1);
         state.connectStats.rateLimited += 1;
-        const waitMs = Math.min(8 * 60000, 60000 * Math.pow(2, state.connectFailures - 1));
+        // Günlük kota bittiyse kısa beklemelerle denemek boşuna: uzun ara verilir.
+        const dailyLimit = /rate_limit_account_day|account_day/i.test(error.message || '');
+        if (dailyLimit) state.connectStats.dayLimited = true;
+        const waitMs = dailyLimit
+          ? 3 * 3600000
+          : Math.min(8 * 60000, 60000 * Math.pow(2, state.connectFailures - 1));
         state.connectorCooldownUntil = Date.now() + waitMs;
         state.roomBudget = Math.max(CONFIG.minRooms, Math.round(state.roomBudget * 0.75));
-        log('hız sınırı: bütçe ' + Math.round(state.roomBudget) + ' oda · ' +
-          Math.round(waitMs / 1000) + ' sn yeni bağlantı yok');
+        log(dailyLimit ? 'günlük bağlantı sınırı doldu (TikTok): 3 saat yeni bağlantı yok'
+          : 'hız sınırı: bütçe ' + Math.round(state.roomBudget) + ' oda · ' +
+            Math.round(waitMs / 1000) + ' sn yeni bağlantı yok');
         break;
       }
       // Hız sınırı değilse sıradaki oda denenir: tek bozuk oda turu kilitlemesin.
@@ -1403,6 +1409,8 @@ function snapshot() {
         failed: state.connectStats.failed,
         rateLimited: state.connectStats.rateLimited,
         offline: state.connectStats.offline,
+        // TikTok günlük bağlantı kotası bitti mi (panelde sebep olarak yazılır).
+        dayLimited: Boolean(state.connectStats.dayLimited),
         errors: state.connectStats.errors.slice(-3)
       },
       lastConnectorError: state.lastConnectorError,
