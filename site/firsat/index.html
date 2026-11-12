@@ -243,6 +243,21 @@
         </label>
         <p id="appHint" class="hint mt-3"></p>
       </div>
+
+      <div class="card p-5 lg:col-span-2">
+        <h2 class="section-title mb-4"><i data-lucide="globe" class="w-5 h-5 text-yellow-400"></i> Keşif kaynağı (tik.tools)</h2>
+        <p class="hint mb-3">Anahtar girilince tik.tools'un bölge tablolarından <b>her ülke için ~100 yayıncı</b> çekilir ve listeye eklenir.
+          Anahtar yalnızca bu cihazda saklanır, sadece api.tik.tools'a gönderilir. Masaüstü uygulamasında yerel tarayıcı da bu anahtarı kullanır.</p>
+        <label class="label">API anahtarı</label>
+        <input id="tikToolsKey" type="password" class="input mb-3" placeholder="tk_..." autocomplete="off" spellcheck="false">
+        <div class="flex flex-col sm:flex-row gap-2 mb-3">
+          <select id="boardRegion" class="input"></select>
+          <button id="saveKey" class="btn-primary">Anahtarı kaydet ve çek</button>
+          <button id="fetchAllRegions" class="btn-ghost">Tüm ülkeleri çek</button>
+        </div>
+        <div id="boardStatus" class="text-[11px] text-yellow-300 mb-2"></div>
+        <div id="keyState" class="hint"></div>
+      </div>
     </div>
   </section>
 

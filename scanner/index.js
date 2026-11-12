@@ -270,6 +270,35 @@ function targetFor(username) {
 }
 
 function saveTargets() {
+  // Dışarıdan eklenenler korunur: dosyada olup bellekte olmayan adresler
+  // (masaüstü uygulamasında panelin bölge keşfi) havuza alınır.
+  try {
+    const parsed = JSON.parse(fs.readFileSync(TARGETS_FILE, 'utf8'));
+    const list = Array.isArray(parsed) ? parsed : parsed.targets || [];
+    const known = new Set(state.targets.map((target) => target.username.toLowerCase()));
+    list.forEach((item) => {
+      const username = cleanUsername(typeof item === 'string' ? item : item && item.username);
+      if (!username || known.has(username.toLowerCase())) return;
+      known.add(username.toLowerCase());
+      state.targets.push({
+        username,
+        country: (item && item.country) || '',
+        source: (item && item.source) || 'manual',
+        roomId: '',
+        roomIdAt: 0,
+        roomIdMiss: 0,
+        boxEvents: 0,
+        lastBoxAt: 0,
+        lastWatchedAt: 0,
+        addedAt: Number(item && item.addedAt) || Date.now(),
+        lastSeenLiveAt: Number(item && item.lastSeenLiveAt) || 0
+      });
+    });
+    trimPool();
+  } catch (error) {
+    // Dosya henüz yoksa sorun değil.
+  }
+
   // Keşifle bulunanlar eklenir, kullanıcının kendi ekledikleri korunur.
   const body = {
     note: 'Taranacak adresler. Keşif kendi bulduklarını buraya ekler; elle eklenenler korunur.',

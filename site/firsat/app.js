@@ -1713,6 +1713,7 @@
       info.streamers + ' yayıncı, ' + info.events + ' olay, ' + info.accounts + ' hesap, ' + info.agencies + ' ajans' +
       (info.updatedAt ? ' · son kayıt ' + new Date(info.updatedAt).toLocaleString('tr-TR') : '');
     renderAppSettings();
+    renderKeyState();
   }
 
   // ---------- Masaüstü uygulaması ve güncellemeler ----------
@@ -1777,6 +1778,159 @@
     hintEl.textContent = 'Güncelleme GitHub sürümlerinden gelir; uygulama kapanırken kurulur. ' +
       'Yerel tarayıcı bu bilgisayarda çalışır: GitHub sırası beklemez, veriyi kendi klasörüne yazar.';
     refreshScanState();
+  }
+
+  // ---------- Keşif kaynağı: tik.tools bölge tabloları ----------
+  // Her bölge tablosu ~100 yayıncı döndürür (yaşayan sıralama). Anahtar
+  // girilmezse kullanılmaz; o zaman keşif 10'luk canlı listesinde kalır.
+  var BOARDS = [
+    ['TR', 'Türkiye'], ['US+', 'ABD'], ['DE+', 'Almanya'], ['BR', 'Brezilya'],
+    ['JP', 'Japonya'], ['KR', 'Güney Kore'], ['TW', 'Tayvan'], ['ID', 'Endonezya'],
+    ['MY', 'Malezya'], ['PH', 'Filipinler'], ['AZ', 'Azerbaycan'], ['KZ', 'Kazakistan'],
+    ['BY', 'Belarus'], ['UA', 'Ukrayna'], ['TH', 'Tayland'], ['VN', 'Vietnam'],
+    ['ES+', 'İspanya'], ['HU+', 'Macaristan'], ['PT+', 'Portekiz'], ['FR+', 'Fransa'],
+    ['BK', 'Balkanlar'], ['PL', 'Polonya'], ['UK+', 'İngiltere'], ['IT+', 'İtalya'],
+    ['SE+', 'İsveç'], ['NL', 'Hollanda'], ['RO', 'Romanya'], ['MENA', 'MENA'],
+    ['LATAM', 'LATAM'], ['CCA', 'Orta Asya'], ['AU+', 'Avustralya'], ['CA', 'Kanada']
+  ];
+
+  function boardCountry(region) {
+    return String(region || '').replace(/[^A-Za-z]/g, '').slice(0, 2).toUpperCase();
+  }
+
+  function savedKey() {
+    return String((state.settings || {}).tikToolsKey || '').trim();
+  }
+
+  function setBoardStatus(text, danger) {
+    var el = $('boardStatus');
+    if (!el) return;
+    el.innerHTML = esc(text);
+    el.className = 'text-[11px] mb-2 ' + (danger ? 'text-red-300' : 'text-yellow-300');
+  }
+
+  function renderKeyState() {
+    var input = $('tikToolsKey');
+    if (!input) return;
+    var key = savedKey();
+    input.value = key;
+    $('keyState').textContent = key
+      ? 'Anahtar kayıtlı (' + key.slice(0, 3) + '…' + key.slice(-4) + ') · yalnızca bu cihazda saklanır.'
+      : 'Anahtar yok: bölge tabloları kullanılmıyor, keşif 10\'luk canlı listesinde kalır.';
+  }
+
+  async function fetchBoard(region, key) {
+    var response = await fetch(
+      'https://api.tik.tools/webcast/leaderboard?region=' + encodeURIComponent(region),
+      { headers: { 'x-api-key': key, Accept: 'application/json' } }
+    );
+    if (!response.ok) throw new Error('HTTP ' + response.status);
+    var payload = await response.json();
+    return (payload && (payload.entries || payload.ranks)) || [];
+  }
+
+  // Gelen yayıncıları Av listesine ekler; yayında olmayanlar da listede kalır.
+  function addBoardCreators(entries, region) {
+    var country = boardCountry(region);
+    var known = {};
+    state.streamers.forEach(function (streamer) { known[streamer.username.toLowerCase()] = true; });
+    var added = [];
+    (entries || []).forEach(function (entry) {
+      var name = cleanUsername(entry && (entry.uniqueId || entry.unique_id));
+      if (!name || known[name.toLowerCase()]) return;
+      known[name.toLowerCase()] = true;
+      added.push({
+        id: uid('st'),
+        username: name,
+        country: country,
+        startedAt: null,
+        accumulatedMs: 0,
+        createdAt: Date.now(),
+        lastLiveAt: 0,
+        scanLive: Boolean(entry && entry.isLive),
+        viewers: 0,
+        roomId: '',
+        boxes: 0,
+        lastBoxAt: 0,
+        source: 'board'
+      });
+    });
+    if (added.length) {
+      Store.set({ streamers: state.streamers.concat(added) });
+      state = Store.get();
+    }
+    return added.map(function (item) { return { username: item.username, country: item.country }; });
+  }
+
+  async function pullBoard(region) {
+    var key = savedKey();
+    if (!key) throw new Error('önce API anahtarını kaydet');
+    var entries = await fetchBoard(region, key);
+    var added = addBoardCreators(entries, region);
+    // Masaüstünde aynı adresler yerel tarayıcının havuzuna da yazılır:
+    // yayın açtıklarında sessizce izlenirler.
+    if (added.length && desktopApi && desktopApi.addTargets) {
+      desktopApi.addTargets(added).catch(function () { /* köprü yoksa yoksay */ });
+    }
+    return { entries: entries.length, added: added.length };
+  }
+
+  async function saveKeyAndPull() {
+    var key = String($('tikToolsKey').value || '').trim();
+    Store.set({ settings: Object.assign({}, state.settings, { tikToolsKey: key }) });
+    state = Store.get();
+    renderKeyState();
+    if (desktopApi && desktopApi.setSettings) {
+      // Yerel tarayıcı bu anahtarla yeniden başlar.
+      desktopApi.setSettings({ tikToolsKey: key }).catch(function () { /* yoksay */ });
+    }
+    if (!key) {
+      setBoardStatus('Anahtar silindi; bölge keşfi kapalı.', false);
+      return;
+    }
+    var region = $('boardRegion').value || 'TR';
+    setBoardStatus(region + ' tablosu çekiliyor…');
+    try {
+      var result = await pullBoard(region);
+      renderAll();
+      setBoardStatus(region + ': ' + result.entries + ' yayıncı geldi, ' + result.added + ' yenisi listeye eklendi.');
+    } catch (error) {
+      setBoardStatus('Tablo alınamadı: ' + error.message, true);
+    }
+  }
+
+  async function pullAllBoards() {
+    if (!savedKey()) {
+      setBoardStatus('Önce API anahtarını kaydet.', true);
+      return;
+    }
+    var totalAdded = 0;
+    var failed = [];
+    for (var i = 0; i < BOARDS.length; i += 1) {
+      var region = BOARDS[i][0];
+      setBoardStatus('Tüm ülkeler: ' + (i + 1) + '/' + BOARDS.length + ' · ' + region + '…');
+      try {
+        var result = await pullBoard(region);
+        totalAdded += result.added;
+      } catch (error) {
+        failed.push(region);
+      }
+      await new Promise(function (resolve) { setTimeout(resolve, 400); });
+    }
+    renderAll();
+    setBoardStatus(totalAdded + ' yeni yayıncı eklendi · ' + (BOARDS.length - failed.length) + '/' + BOARDS.length +
+      ' bölge okundu' + (failed.length ? ' · hata: ' + failed.join(', ') : '') + '.');
+  }
+
+  function bindKeySettings() {
+    var select = $('boardRegion');
+    if (select && !select.options.length) {
+      select.innerHTML = BOARDS.map(function (board) {
+        return '<option value="' + board[0] + '">' + esc(board[1]) + ' (' + board[0] + ')</option>';
+      }).join('');
+    }
+    $('saveKey').addEventListener('click', saveKeyAndPull);
+    $('fetchAllRegions').addEventListener('click', pullAllBoards);
   }
 
   function bindAppSettings() {
@@ -2149,6 +2303,7 @@
       saveSettings();
     });
     bindAppSettings();
+    bindKeySettings();
     $('exportBackup').addEventListener('click', exportBackup);
     $('importBackupBtn').addEventListener('click', function () { $('importBackup').click(); });
     $('importBackup').addEventListener('change', function (event) {

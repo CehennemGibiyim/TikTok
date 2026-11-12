@@ -58,7 +58,8 @@ const scan = {
 // ---------- ayarlar ----------
 
 function readSettings() {
-  const fallback = { autoUpdate: true, scanOnStart: true };
+  // tikToolsKey: panelden girilen keşif anahtarı (yalnızca bu cihazda durur).
+  const fallback = { autoUpdate: true, scanOnStart: true, tikToolsKey: '' };
   try {
     return Object.assign({}, fallback, JSON.parse(fs.readFileSync(SETTINGS_FILE, 'utf8')));
   } catch (error) {
@@ -182,7 +183,9 @@ function startScanner() {
       cwd: SCANNER_DIR,
       env: Object.assign({}, process.env, {
         ELECTRON_RUN_AS_NODE: '1',
-        SCANNER_DATA_DIR: DATA_DIR
+        SCANNER_DATA_DIR: DATA_DIR,
+        // Panelden anahtar girildiyse tarayıcı bölge tablolarını da kullanır.
+        TIKTOOLS_KEY: readSettings().tikToolsKey || process.env.TIKTOOLS_KEY || ''
       }),
       windowsHide: true,
       stdio: ['ignore', 'pipe', 'pipe']
@@ -207,6 +210,8 @@ function startScanner() {
   });
 
   child.on('exit', (code) => {
+    // Yeniden başlatmada eski sürecin kapanışı yeni süreci silmesin.
+    if (scan.child !== child) return;
     scan.child = null;
     scan.since = 0;
     if (scan.stopping) {
@@ -227,6 +232,56 @@ function startScanner() {
   });
 
   sendScan();
+  return scannerStatus();
+}
+
+// Panelden eklenen adresler yerel tarayıcı havuzuna yazılır: yayın açtıklarında
+// sessizce izlenirler. Tarayıcı kendi listesini yazarken bunları korur (merge).
+function addTargets(list) {
+  const file = path.join(DATA_DIR, 'targets.json');
+  let payload = { targets: [] };
+  try {
+    payload = JSON.parse(fs.readFileSync(file, 'utf8'));
+  } catch (error) {
+    // Dosya yoksa yenisi yazılır.
+  }
+  const targets = Array.isArray(payload)
+    ? payload.slice()
+    : (Array.isArray(payload.targets) ? payload.targets.slice() : []);
+  const known = new Set(targets.map((item) => String((item && item.username) || item).toLowerCase()));
+  let added = 0;
+  (Array.isArray(list) ? list : []).forEach((item) => {
+    const username = String((item && item.username) || item || '').trim().replace(/^@/, '');
+    if (!username) return;
+    if (known.has(username.toLowerCase())) return;
+    known.add(username.toLowerCase());
+    targets.push({
+      username,
+      country: String((item && item.country) || ''),
+      source: 'board',
+      addedAt: Date.now(),
+      lastSeenLiveAt: 0
+    });
+    added += 1;
+  });
+  if (added) {
+    const body = Array.isArray(payload)
+      ? { targets }
+      : Object.assign({}, payload, { targets, updatedAt: new Date().toISOString() });
+    fs.mkdirSync(DATA_DIR, { recursive: true });
+    fs.writeFileSync(file, JSON.stringify(body, null, 1) + '\n');
+  }
+  return { added, total: targets.length };
+}
+
+// Anahtar değişince tarayıcı yeni anahtarla yeniden başlar.
+function restartScanner() {
+  const wasRunning = Boolean(scan.child) || Boolean(scan.timer);
+  stopScanner();
+  if (!wasRunning && !readSettings().scanOnStart) return scannerStatus();
+  setTimeout(() => {
+    if (!scan.child) startScanner();
+  }, 800);
   return scannerStatus();
 }
 
@@ -321,7 +376,16 @@ function registerIpc() {
     dataDir: DATA_DIR
   }));
   ipcMain.handle('settings:get', () => readSettings());
-  ipcMain.handle('settings:set', (_event, patch) => writeSettings(patch));
+  ipcMain.handle('settings:set', (_event, patch) => {
+    const before = readSettings();
+    const next = writeSettings(patch);
+    if (patch && Object.prototype.hasOwnProperty.call(patch, 'tikToolsKey') &&
+        before.tikToolsKey !== next.tikToolsKey) {
+      restartScanner();
+    }
+    return next;
+  });
+  ipcMain.handle('targets:add', (_event, list) => addTargets(list));
   ipcMain.handle('scan:status', () => scannerStatus());
   ipcMain.handle('scan:start', () => startScanner());
   ipcMain.handle('scan:stop', () => stopScanner());

@@ -11,6 +11,8 @@ contextBridge.exposeInMainWorld('desktop', {
   scanStatus: () => ipcRenderer.invoke('scan:status'),
   scanStart: () => ipcRenderer.invoke('scan:start'),
   scanStop: () => ipcRenderer.invoke('scan:stop'),
+  // Panelden bulunan adresleri yerel tarayıcı havuzuna ekler.
+  addTargets: (list) => ipcRenderer.invoke('targets:add', list),
   openDataFolder: () => ipcRenderer.invoke('app:open-data'),
   checkUpdates: () => ipcRenderer.invoke('update:check'),
   installUpdate: () => ipcRenderer.invoke('update:install'),
