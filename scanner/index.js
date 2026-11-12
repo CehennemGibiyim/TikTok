@@ -816,7 +816,7 @@ function adaptProbeRatio() {
     state.probe.ratio -= 0.05;
   }
 
-  state.probe.ratio = Math.min(0.6, Math.max(0.1, state.probe.ratio));
+  state.probe.ratio = Math.min(0.6, Math.max(0.2, state.probe.ratio));
 
   // Karar geçmişi: panel "neden değişti" sorusunu buradan yanıtlar.
   state.probeHistory.push({
