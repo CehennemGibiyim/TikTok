@@ -37,6 +37,8 @@
   var oppSort = 'score';
   var searchTerm = '';
   var streamerSearch = '';
+  // Ülke rozetinden gelen filtre (boş = tüm ülkeler).
+  var countryFilter = '';
   // Liste binlerce yayıncıya çıkabiliyor: tabloda bu kadar satır çizilir,
   // kalanı aramayla bulunur (hepsi kayıtlı ve taranıyor).
   var STREAMER_ROW_LIMIT = 400;
@@ -883,7 +885,11 @@
     $('navOppCount').textContent = pending.length;
     $('opportunityCount').textContent = pending.length;
     $('pendingCoinsBig').textContent = fmt(pending.reduce(function (sum, event) { return sum + Number(event.coins); }, 0)) + ' jeton';
-    $('streamerCount').textContent = state.streamers.length;
+    $('streamerCount').textContent = countryFilter
+      ? state.streamers.filter(function (streamer) {
+        return String(streamer.country || '').toUpperCase() === countryFilter;
+      }).length
+      : state.streamers.length;
   }
 
   // ---------- Yayın tablosu ----------
@@ -910,6 +916,7 @@
 
     var filter = streamerSearch.trim().toLowerCase().replace(/^@/, '');
     var list = state.streamers.filter(function (streamer) {
+      if (countryFilter && String(streamer.country || '').toUpperCase() !== countryFilter) return false;
       if (!filter) return true;
       return streamer.username.toLowerCase().indexOf(filter) >= 0 ||
         countryName(streamer.country).toLowerCase().indexOf(filter) >= 0 ||
@@ -928,7 +935,21 @@
     });
 
     var total = list.length;
+    // Rozet, süzülmüş listenin sayısını yazar; ipucunda toplam durur.
+    $('streamerCount').textContent = total;
+    $('streamerCount').title = countryFilter
+      ? countryFilter + ' · toplam ' + state.streamers.length + ' yayıncı'
+      : 'Toplam ' + state.streamers.length + ' yayıncı';
     if (total > STREAMER_ROW_LIMIT) list = list.slice(0, STREAMER_ROW_LIMIT);
+
+    if (!total) {
+      rows.innerHTML = '<tr><td colspan="10" class="text-[11px] text-yellow-50/40 pt-3">' +
+        (countryFilter
+          ? esc(countryFilter + ' (' + countryName(countryFilter) + ') için listede yayıncı yok. Rozete tekrar basınca filtre kalkar.')
+          : 'Aramayla eşleşen yayıncı yok.') + '</td></tr>';
+      if (window.lucide) lucide.createIcons();
+      return;
+    }
 
     rows.innerHTML = list.map(function (streamer) {
       var metrics = streamerMetrics(streamer);
@@ -1143,6 +1164,10 @@
     });
     var codes = Object.keys(totals).sort(function (a, b) { return totals[b] - totals[a]; });
 
+    var clearChip = countryFilter
+      ? '<button class="chip chip-amber" data-country="" title="Ülke filtresini kaldır">✕ Tüm ülkeler</button>'
+      : '';
+
     var head = (!sweep || !Number(sweep.at))
       ? '<span class="chip" title="Tarayıcı anahtarla günde bir tüm bölgeleri okur">🌍 Ülke taraması henüz yapılmadı</span>'
       : '<span class="chip chip-green" title="Günde bir tüm bölgeler okunur">🌍 Son ülke taraması ' +
@@ -1156,9 +1181,12 @@
 
     var shown = codes.slice(0, 30).map(function (code) {
       var added = Number(addedByCountry[code]) || 0;
-      return '<span class="chip" title="' + esc(countryName(code)) + ' · listede ' + totals[code] + ' yayıncı' +
-        (added ? ' · son taramada +' + added : '') + '">' +
-        flag(code) + ' ' + esc(code) + ' <b>' + fmt(totals[code]) + '</b></span>';
+      var active = countryFilter === code;
+      return '<button class="chip ' + (active ? 'chip-green' : '') + '" data-country="' + esc(code) + '" title="' +
+        esc(active
+          ? 'Filtreyi kaldır'
+          : countryName(code) + ' · listede ' + totals[code] + ' yayıncı' + (added ? ' · son taramada +' + added : '')) + '">' +
+        flag(code) + ' ' + esc(code) + ' <b>' + fmt(totals[code]) + '</b></button>';
     }).join('');
 
     var rest = codes.length > 30
@@ -1169,7 +1197,7 @@
       ? ''
       : '<span class="text-[10px] text-yellow-50/40">Listede henüz ülke bilgisi yok — tarama ülke kodlarını doldurunca burada görünür.</span>';
 
-    el.innerHTML = head + failChip + shown + rest + empty;
+    el.innerHTML = clearChip + head + failChip + shown + rest + empty;
   }
 
   function renderProbeSummary() {
@@ -2347,6 +2375,16 @@
     $('streamerSearch').addEventListener('input', function () {
       streamerSearch = $('streamerSearch').value;
       renderStreamers();
+    });
+
+    // Ülke rozetine tıkla → listeyi o ülkeye süz; tekrar tıkla → filtre kalksın.
+    $('sweepSummary').addEventListener('click', function (event) {
+      var chip = event.target.closest('[data-country]');
+      if (!chip) return;
+      var code = chip.getAttribute('data-country') || '';
+      countryFilter = (countryFilter && countryFilter === code) ? '' : code;
+      renderStreamers();
+      renderSweepSummary();
     });
 
     $('addAccount').addEventListener('click', addAccount);
