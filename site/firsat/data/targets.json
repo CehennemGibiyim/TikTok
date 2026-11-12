@@ -2,8 +2,8 @@
  "note": "Taranacak adresler. Keşif kendi bulduklarını buraya ekler; elle eklenenler korunur.",
  "probeRatio": 0.1,
  "probeStats": {
-  "sessions": 30,
-  "withBox": 5
+  "sessions": 33,
+  "withBox": 6
  },
  "probeHistory": [
   {
@@ -347,6 +347,15 @@
    "hotRate": null,
    "sessions": 8,
    "boxSessions": 1
+  },
+  {
+   "at": 1794516940846,
+   "from": 10,
+   "to": 10,
+   "probeRate": 0,
+   "hotRate": null,
+   "sessions": 8,
+   "boxSessions": 0
   }
  ],
  "boxHourly": {
@@ -369,7 +378,8 @@
   "498472": 15,
   "498473": 6,
   "498474": 4,
-  "498475": 3
+  "498475": 3,
+  "498476": 1
  },
  "regionSweep": {
   "at": 0,
@@ -377,8 +387,60 @@
   "regions": {},
   "failed": []
  },
- "updatedAt": "2026-11-12T20:55:06.666Z",
+ "updatedAt": "2026-11-12T20:59:42.902Z",
  "targets": [
+  {
+   "username": "dj_sofi_official",
+   "country": "PL",
+   "source": "discovery",
+   "roomId": "7707372605109340961",
+   "roomIdAt": 1794517182896,
+   "roomIdMiss": 0,
+   "boxEvents": 0,
+   "lastBoxAt": 0,
+   "lastWatchedAt": 0,
+   "addedAt": 1794517182896,
+   "lastSeenLiveAt": 0
+  },
+  {
+   "username": "tamara1228",
+   "country": "TW",
+   "source": "discovery",
+   "roomId": "7707339652037954324",
+   "roomIdAt": 1794517182896,
+   "roomIdMiss": 0,
+   "boxEvents": 0,
+   "lastBoxAt": 0,
+   "lastWatchedAt": 0,
+   "addedAt": 1794517182896,
+   "lastSeenLiveAt": 0
+  },
+  {
+   "username": "gardianka",
+   "country": "PL",
+   "source": "discovery",
+   "roomId": "7707361679750794016",
+   "roomIdAt": 1794517028650,
+   "roomIdMiss": 0,
+   "boxEvents": 0,
+   "lastBoxAt": 0,
+   "lastWatchedAt": 0,
+   "addedAt": 1794517028650,
+   "lastSeenLiveAt": 0
+  },
+  {
+   "username": "stoixofficial",
+   "country": "CA",
+   "source": "discovery",
+   "roomId": "7707354984339802901",
+   "roomIdAt": 1794517028650,
+   "roomIdMiss": 0,
+   "boxEvents": 0,
+   "lastBoxAt": 0,
+   "lastWatchedAt": 0,
+   "addedAt": 1794517028650,
+   "lastSeenLiveAt": 0
+  },
   {
    "username": "aahmad_61",
    "country": "ME",
@@ -20003,9 +20065,9 @@
    "roomId": "",
    "roomIdAt": 0,
    "roomIdMiss": 0,
-   "boxEvents": 0,
-   "lastBoxAt": 0,
-   "lastWatchedAt": 0,
+   "boxEvents": 1,
+   "lastBoxAt": 1794516982950,
+   "lastWatchedAt": 1794516936608,
    "addedAt": 1794421926744,
    "lastSeenLiveAt": 1794421949680
   },
