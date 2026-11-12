@@ -173,17 +173,38 @@ ve dışa aktarılan yedek dosyasında (`appVersion`) görünür.
 
 ## Yeni sürüm çıkarma (kontrol listesi)
 
-1. **Sürüm numarasını iki yerde eşitle:** `desktop/package.json` → `version`, `site/firsat/store.js` → `APP_VERSION`.
-2. **`site/firsat/store.js` → `CHANGE_LOG`** listesinin başına yeni sürümü tarih ve maddeleriyle ekle (Ayarlar’daki geçmiş buradan okunur).
-3. **Yedek biçimi değiştiyse** `BACKUP_VERSION` değerini artır; değişmediyse dokunma.
-4. **Kontrol:** `node --check scanner/index.js site/firsat/app.js site/firsat/store.js desktop/main.js desktop/preload.js`
-   ve `SCANNER_SELFTEST=1 node scanner/index.js` (ağa çıkmaz).
-5. **Push:** `main`’e push → Pages paneli yayınlar (`pages.yml`).
-6. **Etiket:** `git tag v1.0.1 && git push origin v1.0.1` → `.github/workflows/release.yml`
-   windows-latest üzerinde kurulum paketini ve `latest.yml` dosyasını üretip Releases’e yükler.
-7. **Kurulum paketini doğrula:** Actions → 🖥️ Windows Kurulum Paketi yeşil mi, Releases’te `.exe` + `latest.yml` var mı.
-8. **Güncellemeyi dene:** Kurulu uygulamada Ayarlar → Uygulama ve güncellemeler → “Güncellemeleri denetle”;
+**Tek komut (önerilen):**
+
+```bash
+node scripts/release.mjs 1.0.1 "Kısa madde" "İkinci madde"        # sürümü yaz, kontrol et, commit + etiket
+node scripts/release.mjs 1.0.1 "Kısa madde" --push               # dalı ve etiketi de gönder
+node scripts/release.mjs 1.0.1 "Kısa madde" --dry-run            # hiçbir şeyi değiştirmeden göster
+node scripts/release.mjs 1.0.1 --bump-backup "Yedek biçimi değişti" --push
+```
+
+Betik sırasıyla: sürümü **iki yerde eşitler** (`desktop/package.json` + `store.js` `APP_VERSION`),
+`CHANGE_LOG` listesinin başına bugünün tarihiyle madde ekler, `node --check` + tarayıcı selftest
+(ağa çıkmaz) çalıştırır, commit’ler ve `vX.Y.Z` etiketini atar; `--push` verilirse dalı ve etiketi gönderir.
+Sürüm düşükse, çalışma ağacı kirliyse, etiket zaten varsa ya da kontroller geçmezse hiçbir şeyi commit’lemez.
+
+| Bayrak | Ne yapar |
+|---|---|
+| `--dry-run` | Dosyaya yazmaz, commit/etiket oluşturmaz; yapılacak değişiklikleri gösterir |
+| `--push` | Commit’ten sonra `git push` + `git push origin vX.Y.Z` |
+| `--bump-backup` | `BACKUP_VERSION` değerini 1 artırır (yedek biçimi değiştiyse) |
+| `--allow-dirty` | Çalışma ağacı temiz değilken de çalışır |
+| `--item="Madde"` | Değişiklik maddesini argüman yerine bayrakla verir |
+
+**Yayından sonra kontrol:**
+
+1. **Panel:** `main` push edilince Pages yayınlar (`pages.yml`); Ayarlar → Panel sürümü yeni numarayı göstermeli.
+2. **Kurulum paketi:** Actions → 🖥️ Windows Kurulum Paketi yeşil mi, Releases’te `.exe` + `latest.yml` var mı.
+3. **Güncelleme:** Kurulu uygulamada Ayarlar → Uygulama ve güncellemeler → “Güncellemeleri denetle”;
    yeni sürüm inince “İndir ve kur” ile kurulur (veya uygulama kapanırken otomatik).
+
+Adımları elle yapmak istersen sırası: sürümü iki yerde eşitle → `CHANGE_LOG`’a madde ekle →
+(yedek biçimi değiştiyse `BACKUP_VERSION` artır) → `node --check` + `SCANNER_SELFTEST=1 node scanner/index.js` →
+commit → `git tag vX.Y.Z` → `git push && git push origin vX.Y.Z`.
 
 ## Sık sorunlar
 
