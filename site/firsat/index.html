@@ -101,7 +101,7 @@
       <div class="flex items-start justify-between gap-3 mb-4 flex-wrap">
         <div>
           <h2 class="section-title"><i data-lucide="gift" class="w-5 h-5 text-amber-400"></i> Fırsatlar <span id="opportunityCount" class="badge ml-2">0</span></h2>
-          <p class="hint mt-1">Yalnızca toplanabilir kazanç olayları: sandık, portal, zarf. Yayıncıya atılan sıradan hediyeler buraya yazılmaz. Sandık süresi dolsa da bekler; zarf/mektup süresi dolunca jeton yayıncıya döner ve düşer.</p>
+          <p class="hint mt-1">Yalnızca toplanabilir kazanç olayları: sandık, portal, zarf. Yayıncıya atılan sıradan hediyeler buraya yazılmaz. Sandık süresi dolsa da bekler; zarf ve portal süresi dolunca "KONTROL ET" olarak 15 dakika daha listede kalır.</p>
           <div id="oppFilters" class="flex flex-wrap gap-1 mt-2"></div>
           <div id="boxDiag" class="hint mt-2"></div>
         </div>
@@ -222,8 +222,25 @@
         <div id="storageInfo" class="text-[11px] text-yellow-50/40 mt-4"></div>
         <div class="note-box mt-4">
           <b>Otomatik tarama hakkında:</b> TikTok canlı olaylarını tarayıcı okuyamaz (imzalı soket + CORS).
-          Bu yüzden canlı durumu, sandık/zarf düşüşünü tek dokunuşla sen işaretliyorsun; panel süre ve toplamları kendisi yönetiyor.
+          Tarama, Windows uygulamasında bu bilgisayarda çalışır; tarayıcıda açtığında ise depodaki son tarama verisi okunur.
         </div>
+      </div>
+
+      <div class="card p-5 lg:col-span-2">
+        <h2 class="section-title mb-4"><i data-lucide="monitor-down" class="w-5 h-5 text-yellow-400"></i> Uygulama ve güncellemeler</h2>
+        <div id="appVersion" class="text-sm mb-3"></div>
+        <div class="flex flex-wrap gap-2">
+          <button id="checkUpdates" class="btn-primary">Güncellemeleri denetle</button>
+          <button id="installUpdate" class="btn-primary hidden">İndir ve kur</button>
+          <button id="scanBtn" class="btn-ghost">Yerel tarayıcıyı başlat</button>
+        </div>
+        <div id="scanState" class="mt-3"></div>
+        <div id="updateStatus" class="hint mt-3"></div>
+        <label class="flex items-center gap-2 text-sm text-yellow-50/70 mt-3">
+          <input id="autoUpdateToggle" type="checkbox" class="w-4 h-4 accent-yellow-500">
+          Açılışta güncellemeleri denetle ve indir
+        </label>
+        <p id="appHint" class="hint mt-3"></p>
       </div>
     </div>
   </section>

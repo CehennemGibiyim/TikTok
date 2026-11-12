@@ -126,6 +126,20 @@ python3 -m http.server 8080
 # http://localhost:8080/firsat/ av aracı
 ```
 
+## Windows uygulaması (kurulum + güncelleme)
+
+`desktop/` altındaki Electron kabuğu paneli ve tarayıcıyı tek kurulumda toplar.
+
+- **Kurulum:** GitHub **Releases** → `TikTok-Sandik-Radari-<sürüm>-x64.exe`. Kurulum imzasız olduğu için
+  Windows SmartScreen "bilinmeyen yayıncı" uyarısı gösterebilir (Ek bilgi → Yine de çalıştır).
+- **Tarama bu bilgisayarda:** uygulama açıkken tarayıcı sürekli çalışır, veriyi
+  `%APPDATA%\TikTok Sandık Radarı\data` klasörüne yazar. GitHub Actions sırası ve paylaşılan IP sınırı yoktur.
+- **Güncelleme:** **Ayarlar → Uygulama ve güncellemeler** kartı. "Güncellemeleri denetle" yeni sürümü
+  indirir, uygulama kapanırken (veya "İndir ve kur" ile hemen) kurar. Açılışta denetim varsayılan olarak açıktır.
+- **Yeni sürüm yayınlama:** `desktop/package.json` içindeki `version` değerini artır, `v1.0.1` gibi bir etiket
+  push et (`git tag v1.0.1 && git push origin v1.0.1`). `.github/workflows/release.yml` windows-latest üzerinde
+  kurulum paketini ve `latest.yml` dosyasını üretip Releases'e yükler; kurulu uygulamalar oradan güncellenir.
+
 ## Dosya düzeni
 
 ```
@@ -139,7 +153,8 @@ site/                    panel (GitHub Pages kökü)
     data/targets.json    tarama havuzu
     data/live.json       tarayıcı çıktısı (otomatik commit edilir)
 scanner/                 Node tarayıcı (TikTok canlı dinleme)
-.github/workflows/       pages.yml (yayın), scan.yml (3 saatlik tarama turu)
+desktop/                 Windows uygulaması (Electron + NSIS kurulum + otomatik güncelleme)
+.github/workflows/       pages.yml (yayın), scan.yml (tarama turu), release.yml (kurulum paketi)
 ```
 
 ## Sık sorunlar

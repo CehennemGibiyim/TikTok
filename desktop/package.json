@@ -1,0 +1,25 @@
+{
+  "name": "tiktok-sandik-radari",
+  "productName": "TikTok Sandık Radarı",
+  "version": "1.0.0",
+  "description": "TikTok canlı yayın sandık / zarf / portal radarı — Windows masaüstü sürümü",
+  "main": "main.js",
+  "author": "CehennemGibiyim",
+  "license": "MIT",
+  "private": true,
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/CehennemGibiyim/TikTok.git"
+  },
+  "scripts": {
+    "start": "electron .",
+    "dist": "electron-builder --win nsis"
+  },
+  "dependencies": {
+    "electron-updater": "^6.8.11"
+  },
+  "devDependencies": {
+    "electron": "^45.3.1",
+    "electron-builder": "^26.18.0"
+  }
+}

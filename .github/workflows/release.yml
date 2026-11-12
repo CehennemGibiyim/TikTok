@@ -1,0 +1,51 @@
+name: 🖥️ Windows Kurulum Paketi
+
+# Windows için NSIS kurulum dosyası + otomatik güncelleme dosyalarını üretir.
+# Etiket (v1.0.0) atınca ya da elle çalıştırınca GitHub sürümüne yükler:
+# kurulu uygulama güncellemeyi buradan alır.
+
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - name: 📥 Checkout
+        uses: actions/checkout@v4
+
+      - name: 🟢 Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: |
+            scanner/package-lock.json
+            desktop/package-lock.json
+
+      - name: 🔍 Tarayıcı bağımlılıkları
+        run: npm ci --prefix scanner --no-audit --no-fund
+
+      - name: 🖥️ Masaüstü bağımlılıkları
+        run: npm ci --prefix desktop --no-audit --no-fund
+
+      - name: 📦 Kurulum paketi
+        # --publish always: kurulum dosyası + latest.yml GitHub sürümüne yazılır.
+        run: npm run dist --prefix desktop -- --publish always
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: 📤 Yedek (artifact)
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows-kurulum
+          path: |
+            desktop/dist/*.exe
+            desktop/dist/latest.yml
+          if-no-files-found: error

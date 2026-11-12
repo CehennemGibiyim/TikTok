@@ -693,21 +693,22 @@
   var CHEST_GRACE_MS = 3 * 60 * 1000;
   var UNKNOWN_WINDOW_MS = 30 * 60 * 1000;
 
+  // Zarf ve portalda da pencere bitince kutu hemen düşmez: kullanıcı
+  // toplayabilsin diye pay bırakılır, sonra listeden çıkar.
+  var COLLECT_GRACE_MS = 15 * 60 * 1000;
+
   function isExpired(event) {
     // Sandık asla kaçmaz: süre dolsa bile beklemede kalır ("KONTROL ET!").
+    // Toplanan/toplanamayan sandık ancak "Topladım" ile veya yeni tarama
+    // koşusunda düşer.
     if (event && event.kind === 'chest') return false;
     var now = Date.now();
     var end = eventEndAt(event);
-    // Sandık: kullanıcı toplamayı deneyebilsin diye süresi geçse bile listede
-    // kalır (beklemede). Toplanan/toplanamayan sandık ancak "Topladım" ile
-    // veya yeni tarama koşusunda düşer. Paylaşılan kişi sayısı (shared) yüksek
-    // olup toplayıcı gelmediği durumlarda sandık beklemede kalabiliyor.
-    if (event.kind === 'chest') return false;
     if (!end) {
       var created = Number(event.createdAt) || 0;
       return created > 0 && now - created > UNKNOWN_WINDOW_MS;
     }
-    return now >= end;
+    return now >= end + COLLECT_GRACE_MS;
   }
 
   // Fırsatlar yalnızca toplanabilir kazanç olaylarını gösterir:
@@ -718,8 +719,9 @@
 
   function pendingEvents() {
     return state.events.filter(function (event) {
-      return isOpportunity(event) && event.status === 'pending' &&
-        !isExpired(event) && Number(event.coins) >= 1;
+      // Jeton alanı boş gelen kutu (süper fan kutusu) da listede görünür:
+      // "jeton bilinmiyor" yazılır, uydurma değer gösterilmez.
+      return isOpportunity(event) && event.status === 'pending' && !isExpired(event);
     });
   }
 
@@ -1207,7 +1209,7 @@
             ? 'açıldı · süre doldu, beklemede · ' + clock(graceLeft) + ' sonra düşer'
             : 'açıldı · süre doldu, beklemede · ' + (Number(event.shared) > 0 ? (event.shared + ' kişiye paylaşıldı · ') : '') + 'toplanmayı dene';
         } else {
-          timeText = 'süre doldu';
+          timeText = 'açıldı · süre doldu, toplamayı dene';
         }
       } else {
         timeText = event.auto ? 'tarayıcı yakaladı · süre bildirilmedi' : 'hemen açıldı · kaybolmaz';
@@ -1220,10 +1222,13 @@
         '  <div class="flex items-center justify-between mb-2">',
         '    <span class="flex items-center gap-1"><span class="kind-badge ' + meta.cls + '">' + meta.icon + ' ' + meta.label + '</span>' +
           (event.auto ? '<span class="kind-badge kind-live">CANLI</span>' : '') +
-          (event.kind === 'chest' && opensIn !== null && opensIn <= 0
+          (opensIn !== null && opensIn <= 0
             ? '<span class="chip chip-danger !py-0 !text-[10px]">KONTROL ET</span>' : '') +
           '</span>',
-        '    <span class="font-black text-amber-400" title="Kutunun toplam jeton değeri (TikTok bildirimi). Açan kişi başına düşen pay daha azdır.">' + fmt(event.coins) + ' <span class="text-[10px] font-normal text-yellow-50/40">jeton · kutu değeri</span></span>',
+        '    <span class="font-black text-amber-400" title="Kutunun toplam jeton değeri (TikTok bildirimi). Açan kişi başına düşen pay daha azdır.">' +
+          (Number(event.coins) > 0
+            ? fmt(event.coins) + ' <span class="text-[10px] font-normal text-yellow-50/40">jeton · kutu değeri</span>'
+            : '<span class="text-[11px] font-normal text-yellow-50/40">jeton bilinmiyor</span>') + '</span>',
         '  </div>',
         '  <div class="text-[10px] mb-1"><span class="chip !py-0 !text-[10px]" title="aciliyet + jeton + paylaşım + tür + tazelik">Puan ' + scored.score + ' · ' + esc(scored.reason) + '</span></div>',
         '  <a href="' + liveUrl(event.username) + '" target="_blank" rel="noopener" class="font-semibold text-yellow-100 hover:text-yellow-300 truncate block">@' + esc(event.username) + '</a>',
@@ -1685,6 +1690,107 @@
     $('storageInfo').textContent = info.engine + ' · ' + (info.bytes / 1024).toFixed(1) + ' KB · ' +
       info.streamers + ' yayıncı, ' + info.events + ' olay, ' + info.accounts + ' hesap, ' + info.agencies + ' ajans' +
       (info.updatedAt ? ' · son kayıt ' + new Date(info.updatedAt).toLocaleString('tr-TR') : '');
+    renderAppSettings();
+  }
+
+  // ---------- Masaüstü uygulaması ve güncellemeler ----------
+  // Kurulum paketinde (desktop/) preload bu köprüyü açar. Tarayıcıda yoktur:
+  // o zaman kart yol gösterir, sahte "güncel" bilgisi yazmaz.
+  var desktopApi = window.desktop || null;
+
+  function setUpdateStatus(text, danger) {
+    var el = $('updateStatus');
+    if (!el) return;
+    el.innerHTML = text;
+    el.className = 'hint mt-3 ' + (danger ? 'text-red-300' : 'text-yellow-50/60');
+  }
+
+  function renderScanState(info) {
+    var el = $('scanState');
+    if (!el || !desktopApi) return;
+    var running = info && info.running;
+    el.innerHTML = running
+      ? '<span class="chip chip-green">● Yerel tarayıcı çalışıyor</span>' +
+        (info.since ? ' <span class="text-[10px]">' + clock((Date.now() - info.since) / 1000) + '</span>' : '')
+      : '<span class="chip">⏸ Yerel tarayıcı kapalı</span>' +
+        (info && info.lastError ? ' <span class="text-[10px] text-red-300">' + esc(info.lastError) + '</span>' : '');
+    var btn = $('scanBtn');
+    if (btn) btn.textContent = running ? 'Yerel tarayıcıyı durdur' : 'Yerel tarayıcıyı başlat';
+  }
+
+  function refreshScanState() {
+    if (!desktopApi) return;
+    desktopApi.scanStatus().then(renderScanState).catch(function () { /* yoksay */ });
+  }
+
+  function toggleLocalScan() {
+    if (!desktopApi) return;
+    var page = $('scanBtn').textContent.indexOf('durdur') >= 0
+      ? desktopApi.scanStop()
+      : desktopApi.scanStart();
+    page.then(renderScanState).catch(function (error) {
+      setUpdateStatus('Tarayıcı değiştirilemedi: ' + esc(error.message), true);
+    });
+  }
+
+  function renderAppSettings() {
+    var versionEl = $('appVersion');
+    if (!versionEl) return;
+    var hintEl = $('appHint');
+    if (!desktopApi) {
+      versionEl.innerHTML = '<span class="chip">🌐 Tarayıcı sürümü · otomatik güncelleme yok</span>';
+      hintEl.innerHTML = 'Kurulum paketiyle güncelleme kendiliğinden gelir. ' +
+        '<a class="underline text-yellow-300" href="https://github.com/CehennemGibiyim/TikTok/releases/latest" target="_blank" rel="noopener">En son Windows kurulum paketini indir</a>.';
+      ['checkUpdates', 'scanBtn', 'autoUpdateToggle'].forEach(function (id) {
+        if ($(id)) $(id).disabled = true;
+      });
+      return;
+    }
+    desktopApi.versions().then(function (info) {
+      versionEl.innerHTML = '<span class="chip chip-green">● Masaüstü sürüm ' + esc(info.version) + '</span>';
+    });
+    desktopApi.getSettings().then(function (settings) {
+      $('autoUpdateToggle').checked = Boolean(settings.autoUpdate);
+    });
+    hintEl.textContent = 'Güncelleme GitHub sürümlerinden gelir; uygulama kapanırken kurulur. ' +
+      'Yerel tarayıcı bu bilgisayarda çalışır: GitHub sırası beklemez, veriyi kendi klasörüne yazar.';
+    refreshScanState();
+  }
+
+  function bindAppSettings() {
+    if (!desktopApi) return;
+    $('checkUpdates').addEventListener('click', function () {
+      setUpdateStatus('Güncelleme denetleniyor…');
+      desktopApi.checkUpdates().catch(function (error) {
+        setUpdateStatus('Denetlenemedi: ' + esc(error.message), true);
+      });
+    });
+    $('installUpdate').addEventListener('click', function () {
+      setUpdateStatus('Güncelleme kuruluyor, uygulama yeniden başlayacak…');
+      desktopApi.installUpdate();
+    });
+    $('autoUpdateToggle').addEventListener('change', function () {
+      desktopApi.setSettings({ autoUpdate: $('autoUpdateToggle').checked });
+    });
+    $('scanBtn').addEventListener('click', toggleLocalScan);
+    desktopApi.onUpdate(function (data) {
+      var info = data || {};
+      var version = info.version ? ' (v' + esc(info.version) + ')' : '';
+      if (info.state === 'checking') setUpdateStatus('Güncelleme denetleniyor…');
+      else if (info.state === 'available') {
+        setUpdateStatus('Yeni sürüm bulundu' + version + ' — indiriliyor…');
+      } else if (info.state === 'downloading') {
+        setUpdateStatus('İndiriliyor' + version + ' · %' + (Number(info.percent) || 0));
+      } else if (info.state === 'downloaded') {
+        setUpdateStatus('Sürüm' + version + ' indirildi. Kapatınca kurulacak ya da hemen kurabilirsin.');
+        $('installUpdate').classList.remove('hidden');
+      } else if (info.state === 'not-available') {
+        setUpdateStatus('Uygulama güncel (v' + esc(info.version || '') + ').');
+      } else if (info.state === 'error') {
+        setUpdateStatus('Güncelleme hatası: ' + esc(info.message || 'bilinmeyen'), true);
+      }
+    });
+    desktopApi.onScan(function (info) { renderScanState(info); });
   }
 
   function saveSettings() {
@@ -2015,6 +2121,7 @@
       }
       saveSettings();
     });
+    bindAppSettings();
     $('exportBackup').addEventListener('click', exportBackup);
     $('importBackupBtn').addEventListener('click', function () { $('importBackup').click(); });
     $('importBackup').addEventListener('change', function (event) {

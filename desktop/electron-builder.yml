@@ -1,0 +1,49 @@
+appId: com.cehennemgibiyim.tiktoksandikradari
+productName: TikTok Sandık Radarı
+copyright: CehennemGibiyim
+
+directories:
+  output: dist
+  buildResources: build
+
+files:
+  - main.js
+  - preload.js
+  - package.json
+  - "!dist/**"
+
+# Panel ve tarayıcı uygulamanın yanına kopyalanır (asar dışında: tarayıcı
+# node_modules ve veri dosyalarına doğrudan erişir).
+extraResources:
+  - from: ../site
+    to: site
+    filter:
+      - "**/*"
+      - "!**/*.map"
+  - from: ../scanner
+    to: scanner
+    filter:
+      - "**/*"
+
+win:
+  target:
+    - target: nsis
+      arch:
+        - x64
+  artifactName: TikTok-Sandik-Radari-${version}-${arch}.${ext}
+
+nsis:
+  oneClick: false
+  perMachine: false
+  allowToChangeInstallationDirectory: true
+  createDesktopShortcut: true
+  createStartMenuShortcut: true
+  shortcutName: TikTok Sandık Radarı
+  deleteAppDataOnUninstall: false
+
+# Otomatik güncelleme: kurulum paketi ve latest.yml GitHub sürümlerine yazılır.
+publish:
+  provider: github
+  owner: CehennemGibiyim
+  repo: TikTok
+  releaseType: release

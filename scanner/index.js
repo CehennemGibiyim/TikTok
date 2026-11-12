@@ -22,7 +22,10 @@ const path = require('path');
 const { execFileSync } = require('child_process');
 
 const ROOT = path.resolve(__dirname, '..');
-const DATA_DIR = path.join(ROOT, 'site', 'firsat', 'data');
+// Masaüstü uygulaması veriyi kendi klasörüne yazar (kurulum dizini salt okunur).
+const DATA_DIR = process.env.SCANNER_DATA_DIR
+  ? path.resolve(process.env.SCANNER_DATA_DIR)
+  : path.join(ROOT, 'site', 'firsat', 'data');
 const TARGETS_FILE = path.join(DATA_DIR, 'targets.json');
 const LIVE_FILE = path.join(DATA_DIR, 'live.json');
 
@@ -100,8 +103,10 @@ const state = {
   recent: [],
   combos: new Map(),
   seenMessages: new Set(),
-  envelopeStats: { seen: 0, withCoins: 0, actions: {}, boxTypes: {} },
+  envelopeStats: { seen: 0, withCoins: 0, recorded: 0, skipped: 0, duplicate: 0, actions: {}, boxTypes: {} },
   envelopeSamples: [],
+  // Aynı kutu iki olayla geliyor (envelope + superFanBox): kimlikle tekilleştirilir.
+  envelopeSeen: new Set(),
   connectorCooldownUntil: 0,
   // Eşzamanlı oda bütçesi: sınır yedikçe düşer, başarılı bağlantıda toparlanır.
   roomBudget: 0,
@@ -441,9 +446,14 @@ async function mapLimit(items, limit, worker) {
 
 function recordEvent(username, data) {
   const coins = Math.max(0, Math.round(Number(data.coins) || 0));
-  if (coins < CONFIG.minCoins) return;
+  // Sandık/zarf/portal jeton alanı boş gelebiliyor (özellikle süper fan kutusu).
+  // Kutu yine de gerçektir: allowZero olan olaylar 0 jetonla yazılır.
+  if (!data.allowZero && coins < CONFIG.minCoins) return;
   const flatten = Math.floor(Date.now() / 1000);
-  const id = username + '-' + flatten + '-' + Math.random().toString(36).slice(2, 7);
+  // Kutu kimliği varsa olay kimliği de sabittir: aynı kutu iki kez yazılmaz.
+  const id = data.envelopeId
+    ? username + '-env-' + data.envelopeId
+    : username + '-' + flatten + '-' + Math.random().toString(36).slice(2, 7);
   if (state.seenEvents.has(id)) return;
   state.seenEvents.add(id);
   if (state.seenEvents.size > 5000) state.seenEvents.clear();
@@ -593,7 +603,7 @@ function handleStreamMessage(username, raw) {
   }
 
   // Zarf / sandık / portal: ortak ayrıştırıcı (handleEnvelope) kullanılır.
-  if (/envelope|zarf|letter|portal/i.test(event)) {
+  if (/envelope|zarf|letter|portal|superfanbox/i.test(event)) {
     handleEnvelope(username, event, data);
     return;
   }
@@ -803,6 +813,20 @@ function handleEnvelope(username, eventName, data) {
   const box = (data && data.treasureBoxData) || info.treasureBoxData || {};
 
   state.envelopeStats.seen += 1;
+
+  // Bağlayıcı aynı kutuyu hem `envelope` hem `superFanBox` olayıyla bildiriyor.
+  // Kimlik yoksa tekilleştirme yapılmaz (uydurma kimlik üretilmez).
+  const envelopeId = String(info.envelopeId || '').trim();
+  if (envelopeId) {
+    const key = envelopeId + '|' + (Number(info.businessType) || 0);
+    if (state.envelopeSeen.has(key)) {
+      state.envelopeStats.duplicate += 1;
+      return;
+    }
+    state.envelopeSeen.add(key);
+    if (state.envelopeSeen.size > 3000) state.envelopeSeen.clear();
+  }
+
   const act = String(info.action || 'yok');
   const boxType = String(info.boxType || info.displayKey || 'yok');
   state.envelopeStats.actions[act] = (state.envelopeStats.actions[act] || 0) + 1;
@@ -824,8 +848,15 @@ function handleEnvelope(username, eventName, data) {
   });
   if (state.envelopeSamples.length > 5) state.envelopeSamples.shift();
 
-  // İçi boş bildirim fırsat değildir.
-  if (coins <= 0 && people <= 0) return;
+  // TikTok'un bildirdiği kutu türleri. Jeton alanı boş gelse bile kutu gerçektir
+  // (süper fan kutusu 0 jeton / 0 kişi bildiriyor): bunlar yazılır.
+  const bt = Number(info.businessType) || 0;
+  const knownBox = bt === 1 || bt === 4 || bt === 9 || bt === 19 || bt === 20 || bt === 21;
+  // İçi boş bildirim (tür de yok, jeton da yok) fırsat değildir.
+  if (coins <= 0 && people <= 0 && !knownBox) {
+    state.envelopeStats.skipped += 1;
+    return;
+  }
 
   const kind = envelopeKind(eventName, info);
   const name = envelopeName(kind, info);
@@ -843,9 +874,13 @@ function handleEnvelope(username, eventName, data) {
     boxTarget.lastBoxAt = Date.now();
     state.targetsDirty = true;
   }
+  state.envelopeStats.recorded += 1;
   recordEvent(username, {
     kind,
     coins,
+    // Kutu: jeton bildirilmemişse 0 ile yazılır, panel "bilinmiyor" der.
+    allowZero: true,
+    envelopeId,
     shared: people,
     // Açılış anı ve pencere süresi TikTok'un kendi mesajından gelir.
     durationSec: timing.durationSec,
@@ -1518,6 +1553,14 @@ if (process.env.SCANNER_SELFTEST === '1') {
       envelopeId: 'e5', businessType: 9, diamondCount: 300, peopleCount: 40,
       createAt: String(Math.floor(Date.now() / 1000) - 20),
       unpackAt: Math.floor(Date.now() / 1000) + 70
+    } } }],
+    ['süper fan kutusu (businessType 19, jeton bildirilmemiş)', { event: 'superFanBox', data: { envelopeInfo: {
+      envelopeId: 'e6', businessType: 19, diamondCount: 0, peopleCount: 0,
+      createAt: String(Math.floor(Date.now() / 1000)), unpackAt: Math.floor(Date.now() / 1000) + 60
+    } } }],
+    ['aynı süper fan kutusu (envelope olayı, mükerrer)', { event: 'envelope', data: { envelopeInfo: {
+      envelopeId: 'e6', businessType: 19, diamondCount: 0, peopleCount: 0,
+      createAt: String(Math.floor(Date.now() / 1000)), unpackAt: Math.floor(Date.now() / 1000) + 60
     } } }],
     ['boş zarf bildirimi', { event: 'envelope', data: { envelopeInfo: { envelopeId: 'e3', action: 'hide', boxType: 'spark_box', coins: null, recipientCount: null } } }]
   ];
