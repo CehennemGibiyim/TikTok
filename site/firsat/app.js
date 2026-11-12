@@ -36,7 +36,8 @@
   var sortDir = 1;
   var oppSort = 'score';
   var searchTerm = '';
-  var streamerSearch = '';
+  // Arama metni de sayfa yenilenince korunur.
+  var streamerSearch = String(localStorage.getItem('tiktok-streamer-search') || '');
   // Ülke rozetinden gelen filtre (boş = tüm ülkeler). Sayfa yenilenince
   // son seçili ülke hatırlanır.
   var countryFilter = String(localStorage.getItem('tiktok-country-filter') || '').toUpperCase();
@@ -2373,8 +2374,14 @@
     $('eventSave').addEventListener('click', saveEvent);
     $('eventCoins').addEventListener('keydown', function (event) { if (event.key === 'Enter') saveEvent(); });
 
+    // Son arama kutuda ve tarayıcı deposunda durur.
+    $('streamerSearch').value = streamerSearch;
     $('streamerSearch').addEventListener('input', function () {
       streamerSearch = $('streamerSearch').value;
+      try {
+        if (streamerSearch) localStorage.setItem('tiktok-streamer-search', streamerSearch);
+        else localStorage.removeItem('tiktok-streamer-search');
+      } catch (error) { /* depo kapalı */ }
       renderStreamers();
     });
 
