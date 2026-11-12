@@ -408,6 +408,7 @@
 
   function renderScanStatus(error) {
     renderSweepReport();
+    renderSweepSummary();
     renderBoxDiag();
     renderProbeSummary();
     var el = $('scanStatus');
@@ -903,6 +904,7 @@
   }
 
   function renderStreamers() {
+    renderSweepSummary();
     var rows = $('streamerRows');
     $('streamerEmpty').classList.toggle('hidden', state.streamers.length > 0);
 
@@ -1118,6 +1120,58 @@
   }
 
   // Keşif oranı özeti: mevcut oran, kutu başarısı ve son kararlar.
+  // Av sekmesindeki ülke raporu: son ülke taraması + listede ülke başına kaç yayıncı.
+  function renderSweepSummary() {
+    var el = $('sweepSummary');
+    if (!el) return;
+
+    var sweep = (scanInfo && scanInfo.regionSweep) || null;
+    var regionAdded = (sweep && sweep.regions) || {};
+    // Bölge kodları havuz kodu olabilir (US+): ülke koduna indirgenir.
+    var addedByCountry = {};
+    Object.keys(regionAdded).forEach(function (region) {
+      var code = boardCountry(region);
+      if (!code) return;
+      addedByCountry[code] = (addedByCountry[code] || 0) + (Number(regionAdded[region]) || 0);
+    });
+
+    var totals = {};
+    state.streamers.forEach(function (streamer) {
+      var code = String(streamer.country || '').toUpperCase();
+      if (!code) return;
+      totals[code] = (totals[code] || 0) + 1;
+    });
+    var codes = Object.keys(totals).sort(function (a, b) { return totals[b] - totals[a]; });
+
+    var head = (!sweep || !Number(sweep.at))
+      ? '<span class="chip" title="Tarayıcı anahtarla günde bir tüm bölgeleri okur">🌍 Ülke taraması henüz yapılmadı</span>'
+      : '<span class="chip chip-green" title="Günde bir tüm bölgeler okunur">🌍 Son ülke taraması ' +
+        esc(ago(Number(sweep.at))) + ' · ' + Object.keys(regionAdded).length + ' bölge · +' +
+        fmt(Number(sweep.added) || 0) + ' yeni</span>';
+
+    var failed = (sweep && Array.isArray(sweep.failed)) ? sweep.failed : [];
+    var failChip = failed.length
+      ? '<span class="chip chip-danger" title="Bu bölgeler okunamadı">hata: ' + esc(failed.join(', ')) + '</span>'
+      : '';
+
+    var shown = codes.slice(0, 30).map(function (code) {
+      var added = Number(addedByCountry[code]) || 0;
+      return '<span class="chip" title="' + esc(countryName(code)) + ' · listede ' + totals[code] + ' yayıncı' +
+        (added ? ' · son taramada +' + added : '') + '">' +
+        flag(code) + ' ' + esc(code) + ' <b>' + fmt(totals[code]) + '</b></span>';
+    }).join('');
+
+    var rest = codes.length > 30
+      ? '<span class="chip">+' + (codes.length - 30) + ' ülke daha</span>'
+      : '';
+
+    var empty = codes.length
+      ? ''
+      : '<span class="text-[10px] text-yellow-50/40">Listede henüz ülke bilgisi yok — tarama ülke kodlarını doldurunca burada görünür.</span>';
+
+    el.innerHTML = head + failChip + shown + rest + empty;
+  }
+
   function renderProbeSummary() {
     var el = $('probeSummary');
     if (!el) return;
