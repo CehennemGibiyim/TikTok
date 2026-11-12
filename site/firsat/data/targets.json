@@ -1,20 +1,11 @@
 {
  "note": "Taranacak adresler. Keşif kendi bulduklarını buraya ekler; elle eklenenler korunur.",
- "probeRatio": 0.2,
+ "probeRatio": 0.25,
  "probeStats": {
-  "sessions": 7,
-  "withBox": 1
+  "sessions": 10,
+  "withBox": 3
  },
  "probeHistory": [
-  {
-   "at": 1794405568044,
-   "from": 35,
-   "to": 40,
-   "probeRate": 25,
-   "hotRate": null,
-   "sessions": 8,
-   "boxSessions": 2
-  },
   {
    "at": 1794406385723,
    "from": 40,
@@ -365,6 +356,15 @@
    "hotRate": null,
    "sessions": 8,
    "boxSessions": 1
+  },
+  {
+   "at": 1794520374807,
+   "from": 20,
+   "to": 25,
+   "probeRate": 25,
+   "hotRate": null,
+   "sessions": 8,
+   "boxSessions": 2
   }
  ],
  "boxHourly": {
@@ -389,7 +389,7 @@
   "498474": 4,
   "498475": 3,
   "498476": 1,
-  "498477": 16
+  "498477": 18
  },
  "regionSweep": {
   "at": 0,
@@ -397,8 +397,21 @@
   "regions": {},
   "failed": []
  },
- "updatedAt": "2026-11-12T21:50:50.634Z",
+ "updatedAt": "2026-11-12T21:57:29.775Z",
  "targets": [
+  {
+   "username": "yaaaaaankaaa",
+   "country": "BY",
+   "source": "discovery",
+   "roomId": "7707393166948911893",
+   "roomIdAt": 1794520372691,
+   "roomIdMiss": 0,
+   "boxEvents": 0,
+   "lastBoxAt": 0,
+   "lastWatchedAt": 1794520428234,
+   "addedAt": 1794520372691,
+   "lastSeenLiveAt": 1794520451501
+  },
   {
    "username": "imilanies",
    "country": "MD",
@@ -406,8 +419,8 @@
    "roomId": "7707392270533790472",
    "roomIdAt": 1794520172922,
    "roomIdMiss": 0,
-   "boxEvents": 0,
-   "lastBoxAt": 0,
+   "boxEvents": 1,
+   "lastBoxAt": 1794520368945,
    "lastWatchedAt": 1794520197440,
    "addedAt": 1794520172922,
    "lastSeenLiveAt": 1794520250629
@@ -419,8 +432,8 @@
    "roomId": "7707390819889826580",
    "roomIdAt": 1794520172922,
    "roomIdMiss": 0,
-   "boxEvents": 0,
-   "lastBoxAt": 0,
+   "boxEvents": 1,
+   "lastBoxAt": 1794520306812,
    "lastWatchedAt": 1794520201891,
    "addedAt": 1794520172922,
    "lastSeenLiveAt": 1794520250629
@@ -3348,7 +3361,7 @@
    "lastBoxAt": 0,
    "lastWatchedAt": 0,
    "addedAt": 1794508030972,
-   "lastSeenLiveAt": 0
+   "lastSeenLiveAt": 1794520649771
   },
   {
    "username": "soniya505050",
@@ -9198,7 +9211,7 @@
    "lastBoxAt": 0,
    "lastWatchedAt": 1794464013180,
    "addedAt": 1794458008157,
-   "lastSeenLiveAt": 0
+   "lastSeenLiveAt": 1794520649771
   },
   {
    "username": "ahmad_alawfi2",
