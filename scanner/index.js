@@ -72,6 +72,10 @@ const CONFIG = {
   startsPerMin: Math.max(1, Number(readArg('starts-per-min', 8))),
   // Sınır yediğimizde inilebilecek en düşük eşzamanlı oda sayısı.
   minRooms: Number(readArg('min-rooms', 8)),
+  // Oda kimliği bu süreden eskiyse güvenilmez: bağlanmadan önce tazelenir (30 dk).
+  roomIdFreshMs: Number(readArg('room-id-fresh-sec', 900)) * 1000,
+  // Bağlanamayan odaya tekrar denemeden önce beklenir; her hatada ikiye katlanır (üst 60 dk).
+  failBackoffSec: Math.max(30, Number(readArg('fail-backoff-sec', 600))),
   // Kutu vermiş oda bu süre boyunca "sıcak" sayılır (6 saat).
   hotWindowMs: Number(readArg('hot-window-sec', 21600)) * 1000,
   // Sıcak odaya en erken bu kadar sonra geri dönülür (12 dk).
@@ -112,6 +116,11 @@ const state = {
   // Aynı kutu iki olayla geliyor (envelope + superFanBox): kimlikle tekilleştirilir.
   envelopeSeen: new Set(),
   connectorCooldownUntil: 0,
+  // Bağlanılamayan odalara tekrar deneme zamanı (username -> ms) ve hata sayısı.
+  // Bu olmadan aynı ölü oda dakikada birkaç kez deneniyor ve TikTok'un günlük
+  // bağlantı kotası (rate_limit_account_day) boşa yanıyordu.
+  failUntil: new Map(),
+  failCounts: new Map(),
   // Eşzamanlı oda bütçesi: sınır yedikçe düşer, başarılı bağlantıda toparlanır.
   roomBudget: 0,
   connectFailures: 0,
@@ -570,7 +579,8 @@ async function fetchLiveStatus(uniqueId) {
       viewers: (room.liveRoomStats && Number(room.liveRoomStats.enterCount)) || 0
     };
   } catch (error) {
-    return { live: false, reason: error.message };
+    // Ağ hatası "yayında değil" demek değildir: durum bilinmiyor sayılır.
+    return { unknown: true, reason: error.message };
   }
 }
 
@@ -775,7 +785,9 @@ function handleStreamMessage(username, raw) {
 // bir sonraki turda kendiliğinden yeniden dinlenir.
 function markOffline(username) {
   const record = state.streamers.get(username);
-  if (!record || !record.live) return;
+  if (!record) return;
+  record.liveUnknown = false;
+  if (!record.live) return;
   record.live = false;
   record.endedAt = Date.now();
 }
@@ -1117,6 +1129,74 @@ async function scrapeRoomId(username) {
   return '';
 }
 
+// Canlı sayfayı bir kez okuyup "yayında mı + taze oda kimliği" çıkarır.
+// TikTok'un api-live ucu bu IP'lerde 200 + boş gövde döndürdüğü için tek
+// güvenilir kaynak sayfa; bağlanmadan önce buradan doğrulanır.
+// known=false → sayfa okunamadı (karar verilmez, bilinmiyor sayılır).
+async function scrapeLiveInfo(username) {
+  const url = 'https://www.tiktok.com/@' + encodeURIComponent(username) + '/live';
+  let html = '';
+  try {
+    const res = await fetch(url, {
+      headers: { 'User-Agent': UA, 'Accept-Language': 'en-US,en;q=0.9' },
+      signal: AbortSignal.timeout(12000)
+    });
+    if (!res.ok) return { known: false, live: false, roomId: '', status: res.status };
+    html = await res.text();
+  } catch (error) {
+    return { known: false, live: false, roomId: '', status: 0 };
+  }
+
+  // 1) SIGI_STATE: yayındaysa LiveRoom.liveRoomUserInfo dolu gelir.
+  const sigi = html.match(/<script id="SIGI_STATE" type="application\/json">(.*?)<\/script>/s);
+  if (sigi && sigi[1]) {
+    try {
+      const parsed = JSON.parse(sigi[1]);
+      const info = parsed && parsed.LiveRoom && parsed.LiveRoom.liveRoomUserInfo;
+      if (info && info.roomId) {
+        return {
+          known: true,
+          live: true,
+          roomId: String(info.roomId),
+          title: String(info.title || ''),
+          viewers: Number(info.stats && info.stats.totalUser) || 0
+        };
+      }
+      // Sayfa okundu, canlı oda bilgisi yok: yayın kapalı.
+      return { known: true, live: false, roomId: '' };
+    } catch (error) { /* JSON bozuksa aşağıdaki yedeklere geç */ }
+  }
+
+  // 2) Yedek: sayfada roomId geçiyorsa yayın vardır.
+  const embed = (html.match(/"roomId"\s*:\s*"(\d{6,})"/) || [])[1];
+  if (embed) return { known: true, live: true, roomId: embed };
+
+  // SIGI_STATE var ama oda yok → yayın kapalı. Hiçbiri yoksa doğrulanamadı
+  // (captcha/boş sayfa): yayın durumu değiştirilmez.
+  if (/id="SIGI_STATE"/.test(html) || /__UNIVERSAL_DATA_FOR_REHYDRATION__/.test(html)) {
+    return { known: true, live: false, roomId: '' };
+  }
+  return { known: false, live: false, roomId: '' };
+}
+
+// Taze oda kimliğini hem hedefe hem kayda yazar; sonraki bağlantılar doğrudan
+// bu kimlikle açılır (oda kimliği aramanın kendisi sınır yiyor).
+function storeRoomId(username, roomId) {
+  const now = Date.now();
+  const target = targetFor(username);
+  if (target) {
+    target.roomId = String(roomId);
+    target.roomIdAt = now;
+    target.roomIdMiss = 0;
+    state.targetsDirty = true;
+  }
+  const record = state.streamers.get(username);
+  if (record) {
+    record.roomId = String(roomId);
+    record.roomIdAt = now;
+  }
+}
+
 async function openConnectorWatcher(username, sessionSec) {
   const lib = loadConnector();
   if (!lib || !lib.TikTokLiveConnection) throw new Error('tiktok-live-connector yok');
@@ -1129,24 +1209,32 @@ async function openConnectorWatcher(username, sessionSec) {
   const recordInfo = state.streamers.get(username) || {};
   const rawRoomId = String(targetInfo.roomId || recordInfo.roomId || '').trim();
   const roomIdAt = Number(targetInfo.roomIdAt || recordInfo.roomIdAt || 0);
-  let knownRoomId = rawRoomId && roomIdAt && (Date.now() - roomIdAt < 6 * 3600000)
+
+  // 1) Keşiften gelen TAZE oda kimliği varsa doğrudan bağlanılır. Keşif ucu
+  //    (tik.tools top-channels) yalnızca yayındaki odaları taze kimlikleriyle
+  //    veriyor; bu yüzden sayfa/API doğrulamasına gerek yok — o yollar bulut
+  //    IP'lerinde zaten kapalı dönüyor.
+  const freshRoomId = rawRoomId && roomIdAt && (Date.now() - roomIdAt < CONFIG.roomIdFreshMs)
     ? rawRoomId
     : '';
+  let knownRoomId = freshRoomId;
 
-  // Oda kimliği yoksa sayfayı kendimiz kazırız (bağlayıcının iç kazıması bu
-  // IP'lerde sık sık boş dönüyor). Bulunursa hemen bağlanır ve kimlik havuza
-  // yazılır; bulunamazsa (yayın bitmiş olabilir) bağlayıcı kendi kazımasını
-  // deneyecek.
+  // 2) Kimlik yoksa/eskimişse sayfadan doğrula: yayın kapalıysa hiç bağlanmayız,
+  //    böylece günlük bağlantı kotası ölü odalara yanmaz.
   if (!knownRoomId) {
-    const scraped = await scrapeRoomId(username);
-    if (scraped) {
-      knownRoomId = scraped;
-      const targetInfo2 = targetFor(username);
-      if (targetInfo2) { targetInfo2.roomId = scraped; targetInfo2.roomIdAt = Date.now(); targetInfo2.roomIdMiss = 0; }
-      const recordInfo2 = state.streamers.get(username);
-      if (recordInfo2) { recordInfo2.roomId = scraped; recordInfo2.roomIdAt = Date.now(); }
-      state.targetsDirty = true;
+    const page = await scrapeLiveInfo(username);
+    if (!page.known) {
+      // Sayfa okunamadı (captcha/boş yanıt): oda kimliği yok, bağlayıcının kendi
+      // kazıması da bu IP'lerde hep boş dönüyor — denemek kotayı boşa yakıyordu.
+      throw new Error('sayfa doğrulanamadı' + (page.status ? ' (HTTP ' + page.status + ')' : ''));
     }
+    if (!page.live) {
+      const offlineError = new Error('sayfada canlı oda yok');
+      offlineError.offline = true;
+      throw offlineError;
+    }
+    knownRoomId = page.roomId || '';
+    if (knownRoomId) storeRoomId(username, knownRoomId);
   }
 
   const connection = new lib.TikTokLiveConnection(username, {
@@ -1287,6 +1375,21 @@ function lastWatchedAt(record) {
   return Number(target && target.lastWatchedAt) || 0;
 }
 
+// Bağlanılamayan odaya tekrar deneme zamanı üstel artar (10 dk → 20 → 40 → 60).
+// Aynı ölü odaya arka arkaya bağlanmak TikTok'un günlük kotasını yakıyordu.
+function penalizeRoom(username) {
+  const count = Math.min(6, (state.failCounts.get(username) || 0) + 1);
+  state.failCounts.set(username, count);
+  const waitMs = Math.min(60 * 60000, CONFIG.failBackoffSec * 1000 * Math.pow(2, count - 1));
+  state.failUntil.set(username, Date.now() + waitMs);
+  return waitMs;
+}
+
+function clearPenalty(username) {
+  state.failCounts.delete(username);
+  state.failUntil.delete(username);
+}
+
 // Sıradaki odayı seçer (ağa çıkmaz, saf fonksiyon → test edilebilir).
 function pickRoom(options) {
   const {
@@ -1326,8 +1429,14 @@ async function maintainWatchers() {
 
   // Önce kutu vermiş odalar, sonra izleyici sayısı, sonra toplanan jeton.
   const live = Array.from(state.streamers.values())
-    .filter((record) => record.live)
+    // "Canlı" (api-live doğruladı) ya da "olabilir" (api-live boş döndü, sayfa
+    // doğrulaması bağlanmadan hemen önce yapılır) odalar adaydır.
+    .filter((record) => record.live || record.liveUnknown)
+    // Bağlanılamayan oda bir süre listeye alınmaz (boşa kota harcanmasın).
+    .filter((record) => (state.failUntil.get(record.username) || 0) <= now)
     .sort((a, b) =>
+      // Kesin canlı olanlar önce denenir.
+      (b.live ? 1 : 0) - (a.live ? 1 : 0) ||
       boxPriority(b, now) - boxPriority(a, now) ||
       // Oda kimliği bilinen oda bağlanabiliyor: onu öne al.
       (b.roomId ? 1 : 0) - (a.roomId ? 1 : 0) ||
@@ -1385,6 +1494,7 @@ async function maintainWatchers() {
       state.lastConnectAt = Date.now();
       state.connectFailures = 0;
       state.connectStats.ok += 1;
+      clearPenalty(pick.record.username);
       state.roomBudget = Math.min(CONFIG.watchRooms, state.roomBudget + 0.5);
 
       const watcher = state.rooms.get(pick.record.username);
@@ -1401,6 +1511,7 @@ async function maintainWatchers() {
       // Yayın bitmişse hata değil, bayat kayıt: sıradaki odaya geçilir.
       if (error.offline) {
         state.connectStats.offline += 1;
+        penalizeRoom(pick.record.username);
         const index = live.indexOf(pick.record);
         if (index >= 0) live.splice(index, 1);
         tries += 1;
@@ -1409,7 +1520,12 @@ async function maintainWatchers() {
       }
       state.connectStats.failed += 1;
       if (!error.noted) noteConnect(pick.record.username, 'watcher', error);
-      log('dinleme hatası', pick.record.username, error.message);
+      // Aynı tur içinde tekrar seçilmesin: listeden düşür, ceza bir sonraki turda geçerli.
+      const failedIndex = live.indexOf(pick.record);
+      if (failedIndex >= 0) live.splice(failedIndex, 1);
+      const retryWaitMs = penalizeRoom(pick.record.username);
+      log('dinleme hatası', pick.record.username, error.message,
+        '→ ' + Math.round(retryWaitMs / 60000) + ' dk ara');
       // Bağlantı aralığı hatadan sonra da korunur: istek yağmuru olmasın.
       state.lastConnectAt = Date.now();
       tries += 1;
@@ -1462,8 +1578,11 @@ async function pollTargets() {
     record.checkedAt = Date.now();
     record.reason = status.live ? '' : (status.reason || '');
     if (status.unknown) {
-      // Doğrulanamadı: canlı/offline bilgisi değiştirilmez.
+      // Doğrulanamadı: canlı/offline bilgisi değiştirilmez, ama "olabilir"
+      // olarak işaretlenir. TikTok'un api-live ucu bulut IP'lerinde sürekli boş
+      // dönüyor; bu işaret olmadan hiçbir oda dinlenmeye aday olmuyordu.
       record.reason = status.reason || 'doğrulanamadı';
+      record.liveUnknown = true;
       state.streamers.set(username, record);
       return;
     }
@@ -1472,6 +1591,7 @@ async function pollTargets() {
       // Daha önce taranmış ama yayında değilken yeniden canlıya geçen oda.
       if (seenBefore && !record.live) log('yeniden canlı:', username);
       record.live = true;
+      record.liveUnknown = false;
       record.lastSeenLiveAt = Date.now();
       if (!target.lastSeenLiveAt) target.lastSeenLiveAt = Date.now();
       if (status.roomId) {
@@ -1483,6 +1603,7 @@ async function pollTargets() {
       if (status.viewers) record.viewers = status.viewers;
       state.streamers.set(username, record);
     } else {
+      record.liveUnknown = false;
       if (record.live) {
         record.endedAt = Date.now();
         record.live = false;
@@ -1561,6 +1682,8 @@ function snapshot() {
         errors: state.connectStats.errors.slice(-3)
       },
       lastConnectorError: state.lastConnectorError,
+      // Bağlanılamadığı için bir süre denenmeyecek oda sayısı (teşhis).
+      backoffRooms: state.failUntil.size,
       closeReasons: state.closeReasons,
       cooldownLeftSec: Math.max(0, Math.round((state.connectorCooldownUntil - Date.now()) / 1000)),
       polls: state.polls,

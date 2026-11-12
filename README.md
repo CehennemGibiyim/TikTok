@@ -59,6 +59,22 @@ Sunucu, Docker, API anahtarı gerekmez: her şey GitHub Pages üzerinde statik �
 Yayıncı canlıysa panel kendiliğinden **Canlı · tarama** yazar, süreyi sen sıfırlamadan TikTok'un gerçek
 başlangıç saatinden sayar ve yayında paylaşılan jetonlar **(CANLI)** etiketiyle Fırsatlar'a düşer.
 
+### Sandık / zarf / portal nasıl yakalanıyor
+
+Dinleme, keşif ucunun (`api.tik.tools/api/live/top-channels`) verdiği **taze oda kimliğiyle** doğrudan
+WebSocket açarak yapılır — TikTok'un oda kimliği arama ucu bulut IP'lerinde boş döndüğü için bu şart.
+
+- Keşiften gelen kimlik 15 dakikadan tazeyse **doğrulama yapılmadan** bağlanılır (yayın zaten keşifte canlıydı).
+- Kimlik yoksa/eskimişse canlı sayfası okunur; sayfa "yayın kapalı" diyorsa **bağlanılmaz** — böylece TikTok'un
+  günlük bağlantı kotası (`rate_limit_account_day`) ölü odalara yanmaz.
+- Bağlanılamayan oda ceza alır: 10 dk → 20 → 40 → 60 dk. Aynı ölü oda arka arkaya denenmez
+  (panelde `backoffRooms` olarak görünür).
+- Bağlanan odada `gift`, `envelope` ve `superFanBox` olayları dinlenir; gelen kutu jeton alanı boş gelse bile
+  yazılır (panel "jeton bilinmiyor" der) ve türü `businessType` ile belirlenir.
+
+Teşhis: `live.json → scanner.connectStats` (deneme/başarılı/hata/hız sınırı) ve `closeReasons`
+(`süre doldu`, `bağlantı düştü`, `yayın bitti`, `bağlanamadı`).
+
 ### Havuzu doldurmak
 
 Panelde **Tarama listesi indir** → inen `targets.json` dosyasını depoya `site/firsat/data/targets.json`
@@ -81,6 +97,10 @@ node index.js --once             # tek tur (deneme)
 | `--min-coins` | 1 | Bu jeton değerinin altındaki olaylar yazılmaz |
 | `--commit` | 0 | Veri commit aralığı, saniye (`0` = commit yok; Actions 600 kullanır) |
 | `--once` | — | Tek tur çalış ve çık |
+| `--discover-sec` | 300 | Keşif ucunun kaç saniyede bir yoklanacağı (her çağrı 10 canlı kanal + oda kimliği) |
+| `--room-id-fresh-sec` | 900 | Oda kimliği bu yaştan sonra güvenilmez sayılır; bağlanmadan önce tazelenir |
+| `--fail-backoff-sec` | 600 | Bağlanılamayan oda için ilk bekleme; her hatada ikiye katlanır (üst 60 dk) |
+| `--probe-ratio` | 0.4 | Bütçenin ne kadarı hiç dinlenmemiş adaylara ayrılır |
 
 ### Sınırlar
 
