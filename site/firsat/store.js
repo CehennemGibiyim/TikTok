@@ -19,6 +19,37 @@
   // Yedek dosyası kimliği ve biçim sürümü: uyumsuz yedek sessizce yüklenmesin.
   var BACKUP_APP = 'tiktok-jeton-paneli';
   var BACKUP_VERSION = 2;
+  // Panel sürümü ve sürüm geçmişi (Ayarlar'da gösterilir, yedeğe yazılır).
+  var APP_VERSION = '1.0.0';
+  var CHANGE_LOG = [
+    {
+      version: '1.0.0',
+      date: '2026-11-12',
+      items: [
+        'Sandık/zarf/portal yakalama: jeton alanı boş gelen süper fan kutusu da yazılıyor, aynı kutu iki kez kaydedilmiyor.',
+        'Zarf ve portal süresi dolunca 15 dakika “KONTROL ET” olarak listede kalıyor.',
+        'Ülke tablolarından keşif (tik.tools anahtarı) ve günde bir otomatik ülke taraması + raporu.',
+        'Av listesi: ülke rozetiyle filtreleme, arama ve sıralama kalıcı; havuz 6000 adres.',
+        'Görünüm tercihleri yedeğe dahil; yedek biçim sürümü ve uyumsuz yedek reddi.'
+      ]
+    },
+    {
+      version: '0.9.0',
+      date: '2026-11-11',
+      items: [
+        'Sandık süresi dolsa da beklemede kalıyor; eski “kaçtı” kayıtları geri alınıyor.',
+        'TikTok günlük bağlantı sınırında 3 saat bekleme, panelde sebep gösterimi.'
+      ]
+    },
+    {
+      version: '0.8.0',
+      date: '2026-11-11',
+      items: [
+        'Windows kurulum paketi (Electron + NSIS) ve GitHub Releases üzerinden otomatik güncelleme.',
+        'Ayarlar’da uygulama/güncelleme ve yerel tarayıcı kartı.'
+      ]
+    }
+  ];
 
   function emptyState() {
     return {
@@ -177,6 +208,7 @@
   function exportJson() {
     return JSON.stringify({
       app: BACKUP_APP,
+      appVersion: APP_VERSION,
       formatVersion: BACKUP_VERSION,
       exportedAt: new Date().toISOString(),
       data: state
@@ -208,6 +240,7 @@
       state: state,
       // 0 = sürüm alanı olmayan eski yedek.
       formatVersion: formatVersion,
+      appVersion: (parsed && parsed.appVersion) || '',
       exportedAt: (parsed && parsed.exportedAt) || ''
     };
   }
@@ -234,6 +267,9 @@
   window.Store = {
     // Yedek biçimi sürümü (panel bunu bilgi olarak gösterir).
     backupFormat: BACKUP_VERSION,
+    // Panel sürümü + sürüm geçmişi.
+    appVersion: APP_VERSION,
+    changeLog: CHANGE_LOG,
     ready: ready,
     get: get,
     set: set,

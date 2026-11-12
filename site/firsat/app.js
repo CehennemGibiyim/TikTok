@@ -1801,6 +1801,29 @@
       ' · yedek biçimi v' + (window.Store.backupFormat || 1);
     renderAppSettings();
     renderKeyState();
+    renderVersionHistory();
+  }
+
+  // Panel sürümü + sürüm geçmişi (store.js'teki CHANGE_LOG).
+  function renderVersionHistory() {
+    var el = $('versionHistory');
+    if (!el) return;
+    var version = window.Store.appVersion || '1.0.0';
+    $('panelVersion').innerHTML = '<span class="chip chip-green">● Panel sürüm ' + esc(version) + '</span>' +
+      (desktopApi ? ' <span class="chip">Masaüstü uygulaması ayrıca güncellenir</span>' : '') +
+      ' <span class="chip">Yedek biçimi v' + esc(window.Store.backupFormat || 1) + '</span>';
+
+    el.innerHTML = (window.Store.changeLog || []).map(function (entry) {
+      var items = Array.isArray(entry.items) ? entry.items : [];
+      return '<div class="border-l-2 border-yellow-500/40 pl-3">' +
+        '<div class="text-xs"><b class="text-yellow-200">v' + esc(entry.version) + '</b>' +
+        (entry.date ? ' <span class="text-yellow-50/40">· ' + esc(entry.date) + '</span>' : '') + '</div>' +
+        (items.length
+          ? '<ul class="list-disc list-inside text-[11px] text-yellow-50/55 mt-1 space-y-0.5">' +
+            items.map(function (item) { return '<li>' + esc(item) + '</li>'; }).join('') + '</ul>'
+          : '') +
+        '</div>';
+    }).join('');
   }
 
   // ---------- Masaüstü uygulaması ve güncellemeler ----------
@@ -2502,7 +2525,8 @@
           var format = (result && result.formatVersion)
             ? 'biçim v' + result.formatVersion
             : 'eski biçim (sürüm bilgisi yok)';
-          alert('Yedek yüklendi · ' + format + when + '.');
+          alert('Yedek yüklendi · ' + format +
+            (result && result.appVersion ? ' · panel v' + result.appVersion : '') + when + '.');
         } catch (error) {
           alert('Yedek yüklenmedi: ' + error.message);
         }
