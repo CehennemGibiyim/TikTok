@@ -32,8 +32,9 @@
   };
 
   var state = null;
-  var sortKey = 'name';
-  var sortDir = 1;
+  // Sıralama seçimi de sayfa yenilenince korunur.
+  var sortKey = String(localStorage.getItem('tiktok-streamer-sort') || 'name');
+  var sortDir = Number(localStorage.getItem('tiktok-streamer-sort-dir')) === -1 ? -1 : 1;
   var oppSort = 'score';
   var searchTerm = '';
   // Arama metni de sayfa yenilenince korunur.
@@ -2317,6 +2318,10 @@
       th.addEventListener('click', function () {
         var key = th.getAttribute('data-sort');
         if (sortKey === key) sortDir *= -1; else { sortKey = key; sortDir = 1; }
+        try {
+          localStorage.setItem('tiktok-streamer-sort', sortKey);
+          localStorage.setItem('tiktok-streamer-sort-dir', String(sortDir));
+        } catch (error) { /* depo kapalı */ }
         renderStreamers();
       });
     });
