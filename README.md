@@ -195,6 +195,10 @@ Sürüm düşükse, çalışma ağacı kirliyse, etiket zaten varsa ya da kontro
 | `--allow-dirty` | Çalışma ağacı temiz değilken de çalışır |
 | `--item="Madde"` | Değişiklik maddesini argüman yerine bayrakla verir |
 
+> Not: bir sürümü yalnızca **bir** yol tetiklemeli. Etiket göndermek (`git push origin vX.Y.Z`) ya da GitHub’da
+> etiket oluşturmak workflow’u zaten başlatır; aynı sürüm için ayrıca “Run workflow”a basmak **yinelenen**
+> GitHub sürümü oluşturur (biri silinmeli).
+
 **Yayından sonra kontrol:**
 
 1. **Panel:** `main` push edilince Pages yayınlar (`pages.yml`); Ayarlar → Panel sürümü yeni numarayı göstermeli.
