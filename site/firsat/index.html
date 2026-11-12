@@ -209,7 +209,11 @@
           <input id="notifyToggle" type="checkbox" class="w-4 h-4 accent-yellow-500">
           Zarfın süresi dolmadan tarayıcı bildirimi göster
         </label>
-        <button id="saveSettings" class="btn-primary">Kaydet</button>
+        <div class="flex flex-wrap gap-2">
+          <button id="saveSettings" class="btn-primary">Kaydet</button>
+          <button id="resetView" class="btn-ghost" title="Kayıtlı ülke filtresi, arama ve sıralama temizlenir">Görünümü sıfırla</button>
+        </div>
+        <div id="viewResetStatus" class="hint mt-2"></div>
       </div>
 
       <div class="card p-5">

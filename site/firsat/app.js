@@ -2436,6 +2436,24 @@
     });
     bindAppSettings();
     bindKeySettings();
+
+    // Kayıtlı görünüm tercihleri (ülke filtresi, arama, sıralama) tek tuşla silinir.
+    $('resetView').addEventListener('click', function () {
+      countryFilter = '';
+      streamerSearch = '';
+      sortKey = 'name';
+      sortDir = 1;
+      try {
+        localStorage.removeItem('tiktok-country-filter');
+        localStorage.removeItem('tiktok-streamer-search');
+        localStorage.removeItem('tiktok-streamer-sort');
+        localStorage.removeItem('tiktok-streamer-sort-dir');
+      } catch (error) { /* depo kapalı */ }
+      $('streamerSearch').value = '';
+      renderStreamers();
+      renderSweepSummary();
+      $('viewResetStatus').textContent = 'Görünüm sıfırlandı: ülke filtresi, arama ve sıralama temizlendi.';
+    });
     $('exportBackup').addEventListener('click', exportBackup);
     $('importBackupBtn').addEventListener('click', function () { $('importBackup').click(); });
     $('importBackup').addEventListener('change', function (event) {
