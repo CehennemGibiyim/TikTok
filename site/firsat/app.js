@@ -37,8 +37,9 @@
   var oppSort = 'score';
   var searchTerm = '';
   var streamerSearch = '';
-  // Ülke rozetinden gelen filtre (boş = tüm ülkeler).
-  var countryFilter = '';
+  // Ülke rozetinden gelen filtre (boş = tüm ülkeler). Sayfa yenilenince
+  // son seçili ülke hatırlanır.
+  var countryFilter = String(localStorage.getItem('tiktok-country-filter') || '').toUpperCase();
   // Liste binlerce yayıncıya çıkabiliyor: tabloda bu kadar satır çizilir,
   // kalanı aramayla bulunur (hepsi kayıtlı ve taranıyor).
   var STREAMER_ROW_LIMIT = 400;
@@ -2383,6 +2384,7 @@
       if (!chip) return;
       var code = chip.getAttribute('data-country') || '';
       countryFilter = (countryFilter && countryFilter === code) ? '' : code;
+      try { localStorage.setItem('tiktok-country-filter', countryFilter); } catch (error) { /* depo kapalı */ }
       renderStreamers();
       renderSweepSummary();
     });
