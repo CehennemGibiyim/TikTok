@@ -68,6 +68,28 @@ function git(args, options = {}) {
   });
 }
 
+// Uzaktaki etiketin commit'i (yoksa boş dize).
+function remoteTagSha(tag) {
+  const out = git(['ls-remote', '--tags', 'origin', 'refs/tags/' + tag], { quiet: true }).trim();
+  return out ? out.split(/\s+/)[0] : '';
+}
+
+function currentBranch() {
+  try {
+    return git(['rev-parse', '--abbrev-ref', '--symbolic-full-name', '@{u}'], { quiet: true })
+      .trim()
+      .replace(/^[^/]+\//, '');
+  } catch (error) {
+    return git(['rev-parse', '--abbrev-ref', 'HEAD'], { quiet: true }).trim();
+  }
+}
+
+function repoSlug() {
+  const url = git(['remote', 'get-url', 'origin'], { quiet: true }).trim();
+  const match = url.match(/github\.com[:/]([^/]+\/[^/.]+)/);
+  return match ? match[1].replace(/\.git$/, '') : '';
+}
+
 function compareVersions(a, b) {
   const parse = (value) => String(value).split('.').map((part) => Number(part) || 0);
   const left = parse(a);
@@ -119,7 +141,12 @@ if (!DRY) {
   } catch (error) {
     tagExists = false;
   }
-  if (tagExists) fail('v' + version + ' etiketi zaten var.');
+  if (tagExists) {
+    const branch = currentBranch();
+    fail('v' + version + ' etiketi yerelde zaten var. Sadece gönderim kaldıysa:\n' +
+      '  git push --atomic origin HEAD:' + branch + ' refs/tags/v' + version + '\n' +
+      '(Etiket push\'u workflow\'u tetikler; ayrıca “Run workflow” başlatma, yinelenen sürüm oluşur.)');
+  }
 }
 
 // ---------- 2) dosyaları hazırla ----------
@@ -204,10 +231,43 @@ info('Commit ve v' + version + ' etiketi hazır');
 // ---------- 5) gönderim ----------
 
 if (PUSH) {
-  info('Dal ve etiket gönderiliyor…');
-  git(['push']);
-  git(['push', 'origin', 'v' + version]);
-  info('Gönderildi · Actions → 🖥️ Windows Kurulum Paketi paketi üretip Releases’e yükleyecek');
+  const headSha = git(['rev-parse', 'HEAD'], { quiet: true }).trim();
+  const remoteSha = remoteTagSha('v' + version);
+  const releaseUrl = repoSlug() ? 'https://github.com/' + repoSlug() + '/releases/tag/v' + version : 'Releases sayfası';
+
+  if (remoteSha && remoteSha !== headSha) {
+    fail('Uzakta v' + version + ' etiketi başka bir commit\'e (' + remoteSha.slice(0, 7) +
+      ') işaret ediyor. Yeni bir sürüm numarasıyla çalıştır.');
+  }
+
+  if (remoteSha) {
+    // Etiket zaten uzakta: push workflow'u daha önce tetiklendi. Yeniden göndermek ya da
+    // elle “Run workflow” başlatmak yinelenen GitHub sürümü üretir — sadece dal gönderilir.
+    info('v' + version + ' etiketi zaten uzakta (' + remoteSha.slice(0, 7) + '): paket workflow\'u daha önce tetiklenmiş.');
+    info('Yinelenen sürüm oluşmaması için etiket yeniden gönderilmiyor; yalnızca dal gönderiliyor.');
+    git(['push']);
+    console.log('\nActions → 🖥️ Windows Kurulum Paketi çalışmasını “Run workflow” ile YENİDEN BAŞLATMA.');
+    console.log('Paketi buradan doğrula: ' + releaseUrl);
+  } else {
+    // Dal ve etiket tek atomik push ile gider: biri reddedilirse ikisi de gitmez,
+    // böylece “dal gitti, etiket gitmedi” durumunda elle tetikleme ihtiyacı doğmaz.
+    info('Dal ve etiket birlikte gönderiliyor…');
+    const branch = currentBranch();
+    try {
+      git(['push', '--atomic', 'origin', 'HEAD:' + branch, 'refs/tags/v' + version]);
+    } catch (error) {
+      fail(
+        'Gönderim başarısız (atomik push reddedildi); hiçbir şey gitmedi. Commit ve etiket yerelde hazır.\n' +
+          'Göndermek için: git push --atomic origin HEAD:' + branch + ' refs/tags/v' + version + '\n' +
+          'Etiketi ayrıca gönderme ve Actions\'ta “Run workflow” başlatma — yinelenen sürüm oluşur.\n' +
+          String(error.stderr || error.message)
+      );
+    }
+    info('Gönderildi · Actions → 🖥️ Windows Kurulum Paketi paketi üretip Releases’e yükleyecek');
+    console.log('\nNot: etiket gönderimi workflow’u zaten tetikledi.');
+    console.log('Actions’ta ayrıca “Run workflow”a basma — aynı etiket için yinelenen GitHub sürümü oluşur.');
+    console.log('Paket hazır olunca: ' + releaseUrl);
+  }
 } else {
   console.log('\nGöndermek için:');
   console.log('  git push && git push origin v' + version);

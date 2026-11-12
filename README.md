@@ -190,7 +190,7 @@ Sürüm düşükse, çalışma ağacı kirliyse, etiket zaten varsa ya da kontro
 | Bayrak | Ne yapar |
 |---|---|
 | `--dry-run` | Dosyaya yazmaz, commit/etiket oluşturmaz; yapılacak değişiklikleri gösterir |
-| `--push` | Commit’ten sonra `git push` + `git push origin vX.Y.Z` |
+| `--push` | Dalı ve etiketi **tek atomik push** ile gönderir; ikisinden biri reddedilirse ikisi de gitmez. Etiket zaten uzaktaysa yeniden göndermez (yinelenen sürüm oluşmaz) |
 | `--bump-backup` | `BACKUP_VERSION` değerini 1 artırır (yedek biçimi değiştiyse) |
 | `--allow-dirty` | Çalışma ağacı temiz değilken de çalışır |
 | `--item="Madde"` | Değişiklik maddesini argüman yerine bayrakla verir |
