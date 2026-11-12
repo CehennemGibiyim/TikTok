@@ -192,7 +192,7 @@ Sürüm düşükse, çalışma ağacı kirliyse, etiket zaten varsa ya da kontro
 |---|---|
 | `--dry-run` | Dosyaya yazmaz, commit/etiket oluşturmaz; yapılacak değişiklikleri gösterir |
 | `--push` | Dalı ve etiketi **tek atomik push** ile gönderir; ikisinden biri reddedilirse ikisi de gitmez. Etiket zaten uzaktaysa yeniden göndermez (yinelenen sürüm oluşmaz) |
-| `--watch` | Push’tan sonra “🖥️ Windows Kurulum Paketi” çalışmasını izler; bitince `.exe` + `latest.yml` dosyalarını ve sürüm bağlantısını yazar (başarısızsa günlük bağlantısıyla çıkar) |
+| `--watch` | Push’tan sonra “🖥️ Windows Kurulum Paketi” çalışmasını izler; bitince `.exe` + `latest.yml` dosyalarını ve sürüm bağlantısını yazar (başarısızsa günlük bağlantısıyla çıkar). `GITHUB_TOKEN`/`GH_TOKEN` varsa **GitHub sürüm notlarını CHANGE_LOG maddeleriyle doldurur** |
 | `--watch-timeout=1200` | İzleme üst sınırı, saniye (varsayılan 20 dk) |
 | `--bump-backup` | `BACKUP_VERSION` değerini 1 artırır (yedek biçimi değiştiyse) |
 | `--allow-dirty` | Çalışma ağacı temiz değilken de çalışır |
@@ -214,6 +214,7 @@ Sürüm düşükse, çalışma ağacı kirliyse, etiket zaten varsa ya da kontro
 ```bash
 node scripts/watch-release.mjs --repo CehennemGibiyim/TikTok --tag v1.1.0
 node scripts/watch-release.mjs --repo CehennemGibiyim/TikTok --tag v1.1.0 --sha <commit> --timeout 600
+node scripts/watch-release.mjs --repo CehennemGibiyim/TikTok --tag v1.1.0 --notes-file surum-notlari.md
 ```
 
 GitHub API anahtarsız saatte 60 istekle sınırlı; uzun beklemelerde `GITHUB_TOKEN` (ya da `GH_TOKEN`)

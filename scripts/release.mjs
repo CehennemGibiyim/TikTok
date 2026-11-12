@@ -29,6 +29,31 @@ import { watchRelease } from './watch-release.mjs';
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const STORE_FILE = path.join(ROOT, 'site', 'firsat', 'store.js');
 const DESKTOP_FILE = path.join(ROOT, 'desktop', 'package.json');
+// CHANGE_LOG'daki bir sürümün maddelerini store.js kaynagindan okur.
+function changeItemsFor(version) {
+  const source = fs.readFileSync(STORE_FILE, 'utf8');
+  const escaped = version.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  const block = source.match(new RegExp("version: '" + escaped + "'[\\s\\S]*?items: \\[([\\s\\S]*?)\\]"));
+  if (!block) return [];
+  return (block[1].match(/"(?:[^"\\]|\\.)*"|'(?:[^'\\]|\\.)*'/g) || []).map((literal) =>
+    literal.startsWith('"') ? JSON.parse(literal) : literal.slice(1, -1).replace(/\\'/g, "'")
+  );
+}
+
+// GitHub sürüm notları: panel sürümü + CHANGE_LOG maddeleri + indirme bilgisi.
+function buildReleaseNotes(version, entries) {
+  return [
+    '## Panel v' + version,
+    '',
+    '### Değişiklikler',
+    entries.map((entry) => '- ' + entry).join('\n'),
+    '',
+    '**Windows kurulum:** `TikTok-Sandik-Radari-' + version + '-x64.exe` dosyasını indirip çalıştır; ' +
+      'kurulu sürüm kendini otomatik günceller.',
+    '**Panel:** https://cehennemgibiyim.github.io/TikTok/firsat/'
+  ].join('\n');
+}
+
 const CHECK_FILES = [
   'scanner/index.js',
   'site/firsat/app.js',
@@ -302,14 +327,18 @@ if (WATCH) {
     } else {
       const watchedSha = git(['rev-parse', 'HEAD'], { quiet: true }).trim();
       console.log('\nPaket izleniyor (en fazla ' + Math.round(WATCH_TIMEOUT / 60000) + ' dk)…');
+      const entries = changeItemsFor(version);
+      const notes = buildReleaseNotes(version, entries.length ? entries : items);
       const result = await watchRelease({
         repo: slug,
         tag: 'v' + version,
         sha: watchedSha,
+        notes,
         timeoutMs: WATCH_TIMEOUT
       });
       if (result.ok) {
-        console.log('✓ Sürüm yayında: ' + result.releaseUrl);
+        console.log('✓ Sürüm yayında: ' + result.releaseUrl +
+          (result.notesUpdated ? ' (notlar: ' + (changeItemsFor(version).length || items.length) + ' madde)' : ''));
       } else {
         if (result.message) console.error('✖ ' + result.message);
         process.exitCode = result.reason === 'timeout' ? 0 : 1;

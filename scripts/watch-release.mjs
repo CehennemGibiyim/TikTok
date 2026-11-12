@@ -6,6 +6,10 @@
  * Tek başına:
  *   node scripts/watch-release.mjs --repo CehennemGibiyim/TikTok --tag v1.1.0 --sha <commit>
  *   node scripts/watch-release.mjs --repo owner/repo --tag v1.1.0 --timeout 600
+ *   node scripts/watch-release.mjs --repo owner/repo --tag v1.1.0 --notes-file notlar.md
+ *
+ * --notes-file (ya da notes parametresi) verilirse ve GITHUB_TOKEN/GH_TOKEN varsa,
+ * GitHub sürümünün notları bu metinle doldurulur (yazma yetkisi gerektirir).
  *
  * release.mjs içinden --watch ile çağrılır.
  */
@@ -49,6 +53,22 @@ async function apiGet(api, path, token) {
   };
 }
 
+async function apiPatch(api, path, token, payload) {
+  const response = await fetch(api + path, {
+    method: 'PATCH',
+    headers: Object.assign(authHeaders(token), { 'Content-Type': 'application/json' }),
+    body: JSON.stringify(payload)
+  });
+  const text = await response.text();
+  let body = null;
+  try {
+    body = JSON.parse(text);
+  } catch (error) {
+    body = null;
+  }
+  return { status: response.status, ok: response.ok, body };
+}
+
 function rateLimitMessage(result, api) {
   const resetAt = result.reset ? new Date(Number(result.reset) * 1000) : null;
   const when = resetAt ? resetAt.toLocaleString('tr-TR') : 'bir süre sonra';
@@ -64,6 +84,7 @@ export async function watchRelease({
   repo,
   tag,
   sha = '',
+  notes = '',
   timeoutMs = 20 * 60 * 1000,
   intervalMs = 15000,
   api = process.env.RELEASE_WATCH_API || DEFAULT_API,
@@ -144,12 +165,33 @@ export async function watchRelease({
         const updater = assets.find((asset) => asset.name === 'latest.yml');
         if (exe && updater) {
           log('✓ Paket hazır: ' + exe.name + mb(exe.size) + ' + ' + updater.name);
+
+          // Sürüm notları (CHANGE_LOG maddeleri) yalnız yazma yetkisi olan anahtarla yazılabilir.
+          let notesUpdated = false;
+          if (notes) {
+            if (!token) {
+              log('Sürüm notları yazılmadı: GITHUB_TOKEN/GH_TOKEN yok (salt-okunur istek).');
+            } else if (release.body.id) {
+              const patched = await apiPatch(
+                apiBase,
+                '/repos/' + repo + '/releases/' + release.body.id,
+                token,
+                { body: notes }
+              );
+              notesUpdated = patched.ok;
+              log(patched.ok
+                ? '✓ Sürüm notları CHANGE_LOG maddeleriyle dolduruldu.'
+                : 'Sürüm notları yazılamadı (HTTP ' + patched.status + ').');
+            }
+          }
+
           return {
             ok: true,
             reason: 'success',
             runUrl: run.html_url,
             releaseUrl: release.body.html_url,
-            assets
+            assets,
+            notesUpdated
           };
         }
         if (assets.length) {
@@ -202,10 +244,12 @@ if (isMain()) {
   const sha = value('sha');
   const timeoutSec = Number(value('timeout')) || 1200;
   const intervalSec = Number(value('interval')) || 15;
+  const notesFile = value('notes-file');
+  const notes = notesFile ? (await import('node:fs')).readFileSync(notesFile, 'utf8').trim() : '';
 
   if (!repo) {
     console.error('Kullanım: node scripts/watch-release.mjs --repo owner/repo --tag v1.0.1 [--sha <commit>] ' +
-      '[--timeout 1200] [--interval 15]');
+      '[--timeout 1200] [--interval 15] [--notes-file notlar.md]');
     process.exit(2);
   }
 
@@ -213,6 +257,7 @@ if (isMain()) {
     repo,
     tag,
     sha,
+    notes,
     timeoutMs: timeoutSec * 1000,
     intervalMs: intervalSec * 1000
   });
