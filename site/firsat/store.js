@@ -20,8 +20,17 @@
   var BACKUP_APP = 'tiktok-jeton-paneli';
   var BACKUP_VERSION = 2;
   // Panel sürümü ve sürüm geçmişi (Ayarlar'da gösterilir, yedeğe yazılır).
-  var APP_VERSION = '1.0.0';
+  var APP_VERSION = '1.1.0';
   var CHANGE_LOG = [
+    {
+      version: '1.1.0',
+      date: '2026-11-12',
+      items: [
+        "Ayarlar'da Panel sürümü kartı: sürüm, yedek biçimi ve sürüm geçmişi listesi.",
+        "Yedek dosyasına appVersion eklendi; içe aktarma mesajı panel sürümünü gösteriyor.",
+        "README'de sürüm geçmişi, yayın sonrası kontroller ve tek komutluk sürüm betiği (scripts/release.mjs)."
+      ]
+    },
     {
       version: '1.0.0',
       date: '2026-11-12',
