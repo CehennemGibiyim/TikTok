@@ -7,6 +7,7 @@
  *   node scripts/release.mjs 1.0.1 --item="Madde" --push
  *   node scripts/release.mjs 1.0.1 "Madde" --push --watch
  *   node scripts/release.mjs --notes 1.1.0    # sadece GitHub sürüm notlarını CHANGE_LOG'dan yaz
+ *   node scripts/release.mjs --check          # sürüm öncesi: değişiklikleri tara, madde öner
  *
  * Yaptıkları:
  *   1. Sürüm numarasını desktop/package.json ve site/firsat/store.js içinde eşitler,
@@ -84,6 +85,7 @@ const WATCH_TIMEOUT = Math.max(30, (Number(watchTimeoutArg && watchTimeoutArg.sp
 const ALLOW_DIRTY = flags.has('--allow-dirty');
 const BUMP_BACKUP = flags.has('--bump-backup');
 const NOTES = flags.has('--notes');
+const CHECK = flags.has('--check');
 
 function fail(message) {
   console.error('✖ ' + message);
@@ -140,6 +142,131 @@ function compareVersions(a, b) {
     if ((left[i] || 0) !== (right[i] || 0)) return (left[i] || 0) - (right[i] || 0);
   }
   return 0;
+}
+
+// ---------- sürüm öncesi kontrol (--check) ----------
+// Kod değişikliklerini okur, CHANGE_LOG maddesi olarak kullanılabilecek commit başlıklarını önerir.
+// Hiçbir dosyaya yazmaz, commit/etiket oluşturmaz.
+
+const AREAS = [
+  { match: /^scanner\//, label: 'Arka plan tarayıcısı (scanner/)', short: 'Tarayıcı' },
+  { match: /^site\/firsat\/store\.js$/, label: 'Panel depolama/yedek (store.js)', short: 'Depolama' },
+  { match: /^site\/firsat\/(app\.js|index\.html)$/, label: 'Panel arayüzü (site/firsat)', short: 'Panel' },
+  { match: /^site\//, label: 'Site (site/)', short: 'Site' },
+  { match: /^desktop\//, label: 'Windows uygulaması (desktop/)', short: 'Masaüstü' },
+  { match: /^scripts\//, label: 'Sürüm betikleri (scripts/)', short: 'Sürüm betiği' },
+  { match: /^\.github\/workflows\//, label: 'GitHub otomasyonu (.github/workflows)', short: 'Otomasyon' },
+  { match: /^(README\.md|\.gitignore)$/, label: 'Dokümantasyon/yapılandırma', short: 'Doküman' }
+];
+
+function areaFor(file) {
+  const area = AREAS.find((entry) => entry.match.test(file));
+  return area || { label: 'Diğer', short: 'Diğer' };
+}
+
+function lastReleaseTag() {
+  try {
+    const tags = git(['tag', '--list', 'v*', '--sort=-v:refname'], { quiet: true })
+      .trim()
+      .split('\n')
+      .filter(Boolean);
+    return tags[0] || '';
+  } catch (error) {
+    return '';
+  }
+}
+
+function runCheck() {
+  const tag = lastReleaseTag();
+  const shortHead = git(['rev-parse', '--short', 'HEAD'], { quiet: true }).trim();
+  const range = tag ? tag + '..HEAD' : '';
+
+  const logArgs = ['log', '--no-merges', '--pretty=format:%h\t%s'];
+  if (range) logArgs.push(range);
+  const commitLines = git(logArgs, { quiet: true }).trim().split('\n').filter(Boolean);
+
+  // Etiket varsa son sürümden beri değişen dosyalar; yoksa tüm izlenen dosyalar (hepsi "yeni").
+  const files = (tag
+    ? git(['diff', '--name-only', range], { quiet: true })
+    : git(['ls-tree', '-r', '--name-only', 'HEAD'], { quiet: true }))
+    .split('\n')
+    .filter((line) => line.trim());
+
+  // Dikkat: çıktının başındaki boşluk da anlamlıdır (“ M dosya”); trim() etmeden böl.
+  const dirty = git(['status', '--porcelain'], { quiet: true })
+    .split('\n')
+    .filter((line) => line.trim())
+    .map((line) => {
+      const path = line.slice(3).trim();
+      return path.includes('->') ? path.split('->').pop().trim() : path;
+    })
+    .filter(Boolean);
+
+  const allFiles = Array.from(new Set(files.concat(dirty)));
+  const panelVersion = (fs.readFileSync(STORE_FILE, 'utf8').match(/var APP_VERSION = '([^']+)'/) || [])[1] || '0.0.0';
+  const [major, minor] = panelVersion.split('.').map((part) => Number(part) || 0);
+  const suggestedVersion = major + '.' + (minor + 1) + '.0';
+
+  console.log('Sürüm öncesi kontrol');
+  console.log('  Panel sürümü: v' + panelVersion + ' · HEAD: ' + shortHead);
+  console.log('  Baz: ' + (tag ? tag : 'ilk commit (henüz etiket yok)'));
+  console.log('  ' + commitLines.length + ' commit · ' + allFiles.length + ' dosya' +
+    (dirty.length ? ' · ' + dirty.length + ' commit edilmemiş değişiklik' : ''));
+
+  if (!commitLines.length && !allFiles.length) {
+    console.log('\nSon sürümden beri değişiklik yok; yeni sürüm gerekmiyor gibi görünüyor.');
+    return;
+  }
+
+  // Değişen dosyaları alanlara göre topla.
+  const byArea = new Map();
+  allFiles.forEach((file) => {
+    const area = areaFor(file);
+    if (!byArea.has(area.label)) byArea.set(area.label, []);
+    byArea.get(area.label).push(file);
+  });
+
+  if (byArea.size) console.log('\nDeğişen alanlar');
+  Array.from(byArea.entries())
+    .sort((a, b) => b[1].length - a[1].length)
+    .forEach(([label, list]) => {
+      const shown = list.slice(0, 4).join(', ') + (list.length > 4 ? ' +' + (list.length - 4) : '');
+      console.log('  • ' + label + ' — ' + shown);
+    });
+
+  // Madde önerisi: sürüm betiği/doküman commit'lerini atla, gerisini başlığıyla öner.
+  const skipPattern = /^(Sürüm v\d|README:|docs?:)/i;
+  const suggestions = commitLines
+    .map((line) => {
+      const [hash, ...rest] = line.split('\t');
+      return { hash, subject: rest.join(' ').trim() };
+    })
+    .filter((entry) => entry.subject && !skipPattern.test(entry.subject))
+    .map((entry) => entry.subject);
+
+  if (!suggestions.length) {
+    console.log('\nCommit başlıklarından madde çıkarılamadı (hepsi sürüm/doküman commit\'i olabilir).');
+    console.log('Maddeleri elle ver: node scripts/release.mjs ' + suggestedVersion + ' "Kısa madde"');
+    return;
+  }
+
+  console.log('\nCHANGE_LOG için madde önerileri (' + suggestions.length + '):');
+  suggestions.forEach((subject, index) => console.log('  ' + (index + 1) + '. ' + subject));
+
+  const command = 'node scripts/release.mjs ' + suggestedVersion + ' ' +
+    suggestions.map((subject) => JSON.stringify(subject)).join(' ');
+  console.log('\nHazır komut (sürüm numarasını ve metinleri gözden geçir):');
+  console.log('  ' + command);
+  console.log('  ' + command + ' --push --watch');
+
+  if (dirty.length) {
+    console.log('\nNot: commit edilmemiş ' + dirty.length + ' dosya var; sürüm betiği temiz çalışma ağacı ister.');
+  }
+}
+
+if (CHECK) {
+  runCheck();
+  process.exit(0);
 }
 
 // ---------- 0) yalnız sürüm notları (--notes) ----------
