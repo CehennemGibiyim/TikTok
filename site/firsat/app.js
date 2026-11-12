@@ -2080,6 +2080,42 @@
     desktopApi.onScan(function (info) { renderScanState(info); });
   }
 
+  // Görünüm tercihleri (ülke filtresi, arama, sıralama) hem Store'a hem
+  // localStorage'a yazılır: yedek dosyasına da dahil olur.
+  function saveViewPrefs() {
+    try {
+      localStorage.setItem('tiktok-country-filter', countryFilter || '');
+      if (streamerSearch) localStorage.setItem('tiktok-streamer-search', streamerSearch);
+      else localStorage.removeItem('tiktok-streamer-search');
+      localStorage.setItem('tiktok-streamer-sort', sortKey);
+      localStorage.setItem('tiktok-streamer-sort-dir', String(sortDir));
+    } catch (error) { /* depo kapalı */ }
+    Store.set({
+      view: { country: countryFilter || '', search: streamerSearch || '', sortKey: sortKey, sortDir: sortDir }
+    });
+  }
+
+  // Yedekten gelen görünüm tercihlerini uygular. force verilmezse eski
+  // sürümün localStorage kayıtları varsa onlar geçerli olur.
+  function applyViewPrefs(force) {
+    var view = (state && state.view) || null;
+    if (!view) return false;
+    var emptyView = !view.country && !view.search &&
+      (!view.sortKey || view.sortKey === 'name') && Number(view.sortDir || 1) === 1;
+    if (!force && emptyView) {
+      var hasLegacy = localStorage.getItem('tiktok-country-filter') ||
+        localStorage.getItem('tiktok-streamer-search') ||
+        localStorage.getItem('tiktok-streamer-sort');
+      if (hasLegacy) return false;
+    }
+    countryFilter = String(view.country || '').toUpperCase();
+    streamerSearch = String(view.search || '');
+    sortKey = String(view.sortKey || 'name');
+    sortDir = Number(view.sortDir) === -1 ? -1 : 1;
+    if ($('streamerSearch')) $('streamerSearch').value = streamerSearch;
+    return true;
+  }
+
   function saveSettings() {
     Store.set({
       settings: Object.assign({}, state.settings, {
@@ -2318,10 +2354,7 @@
       th.addEventListener('click', function () {
         var key = th.getAttribute('data-sort');
         if (sortKey === key) sortDir *= -1; else { sortKey = key; sortDir = 1; }
-        try {
-          localStorage.setItem('tiktok-streamer-sort', sortKey);
-          localStorage.setItem('tiktok-streamer-sort-dir', String(sortDir));
-        } catch (error) { /* depo kapalı */ }
+        saveViewPrefs();
         renderStreamers();
       });
     });
@@ -2383,10 +2416,7 @@
     $('streamerSearch').value = streamerSearch;
     $('streamerSearch').addEventListener('input', function () {
       streamerSearch = $('streamerSearch').value;
-      try {
-        if (streamerSearch) localStorage.setItem('tiktok-streamer-search', streamerSearch);
-        else localStorage.removeItem('tiktok-streamer-search');
-      } catch (error) { /* depo kapalı */ }
+      saveViewPrefs();
       renderStreamers();
     });
 
@@ -2396,7 +2426,7 @@
       if (!chip) return;
       var code = chip.getAttribute('data-country') || '';
       countryFilter = (countryFilter && countryFilter === code) ? '' : code;
-      try { localStorage.setItem('tiktok-country-filter', countryFilter); } catch (error) { /* depo kapalı */ }
+      saveViewPrefs();
       renderStreamers();
       renderSweepSummary();
     });
@@ -2443,12 +2473,7 @@
       streamerSearch = '';
       sortKey = 'name';
       sortDir = 1;
-      try {
-        localStorage.removeItem('tiktok-country-filter');
-        localStorage.removeItem('tiktok-streamer-search');
-        localStorage.removeItem('tiktok-streamer-sort');
-        localStorage.removeItem('tiktok-streamer-sort-dir');
-      } catch (error) { /* depo kapalı */ }
+      saveViewPrefs();
       $('streamerSearch').value = '';
       renderStreamers();
       renderSweepSummary();
@@ -2465,6 +2490,8 @@
         try {
           Store.importJson(String(reader.result || ''));
           state = Store.get();
+          // Yedekteki görünüm tercihleri de geri gelir (filtre, arama, sıralama).
+          if (applyViewPrefs(true)) saveViewPrefs();
           renderAll();
           alert('Yedek yüklendi.');
         } catch (error) {
@@ -2477,6 +2504,9 @@
       if (!confirm('Tüm yayınlar, olaylar, hesaplar ve ajanslar silinecek. Bu işlem geri alınamaz.')) return;
       Store.clearAll();
       state = Store.get();
+      // Sıfırlanan depoda görünüm de varsayılana döner.
+      if (applyViewPrefs(true)) saveViewPrefs();
+      $('streamerSearch').value = streamerSearch;
       renderAll();
     });
   }
@@ -2486,6 +2516,10 @@
     state = Store.get();
 
     migrateEvents();
+
+    // Görünüm tercihleri Store'dan (yedeğe dahil) gelir; eski sürümlerde
+    // yalnızca localStorage'da tutuluyordu, o değerler bir kez Store'a taşınır.
+    if (!applyViewPrefs()) saveViewPrefs();
 
     Store.subscribe(function (next) { state = next; });
 

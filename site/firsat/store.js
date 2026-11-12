@@ -33,6 +33,13 @@
         coinUsd: 0.005,
         usdTry: 34.5
       },
+      // Görünüm tercihleri: yedeğe dahil olsun diye Store'da tutulur.
+      view: {
+        country: '',
+        search: '',
+        sortKey: 'name',
+        sortDir: 1
+      },
       updatedAt: null
     };
   }
@@ -120,6 +127,7 @@
       base[key] = Array.isArray(saved[key]) ? saved[key] : [];
     });
     base.settings = Object.assign(base.settings, saved.settings || {});
+    base.view = Object.assign(base.view, saved.view || {});
     base.updatedAt = saved.updatedAt || null;
     return base;
   }
