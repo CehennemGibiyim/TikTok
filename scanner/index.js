@@ -1072,16 +1072,17 @@ function boxTiming(info, box, now) {
   return { endMs, durationSec, unpackAt: endMs || 0 };
 }
 
-// Jeton alanının adı sürüme/gönderene göre değişiyor (diamondCount, coins,
-// coinCount…). Bilinen tüm adlar denenir; hiçbiri yoksa 0 döner ve panel
-// "bilinmiyor" yazar — değer uydurulmaz.
-const COIN_FIELDS = ['diamondCount', 'coinCount', 'coins', 'totalCoins', 'totalDiamondCount', 'diamond_count'];
-function pickCoins(...sources) {
-  for (const source of sources) {
+// Kutu jetonu yalnızca kutu nesnelerinin bilinen alanlarından okunur. Kök mesaja
+// (data) bakılmaz: oradaki bir "coins" alanı kutuya ait olmayabilir. Hiçbiri
+// yoksa 0 döner, panel "bilinmiyor" yazar — değer uydurulmaz.
+const BOX_COIN_FIELDS = ['diamondCount', 'coinCount', 'coins'];
+const MAX_BOX_COINS = 50000000;
+function boxCoins(info, box) {
+  for (const source of [info, box]) {
     if (!source || typeof source !== 'object') continue;
-    for (const field of COIN_FIELDS) {
+    for (const field of BOX_COIN_FIELDS) {
       const value = Number(source[field]);
-      if (value > 0) return { coins: Math.round(value), field };
+      if (Number.isInteger(value) && value > 0 && value <= MAX_BOX_COINS) return { coins: value, field };
     }
   }
   return { coins: 0, field: '' };
@@ -1111,7 +1112,7 @@ function handleEnvelope(username, eventName, data) {
   state.envelopeStats.actions[act] = (state.envelopeStats.actions[act] || 0) + 1;
   state.envelopeStats.boxTypes[boxType] = (state.envelopeStats.boxTypes[boxType] || 0) + 1;
 
-  const picked = pickCoins(info, box, data);
+  const picked = boxCoins(info, box);
   const coins = picked.coins;
   const people = Number(info.peopleCount || info.recipientCount || box.canOpen) || 0;
   const nowMs = Date.now();

@@ -20,8 +20,15 @@
   var BACKUP_APP = 'tiktok-jeton-paneli';
   var BACKUP_VERSION = 2;
   // Panel sürümü ve sürüm geçmişi (Ayarlar'da gösterilir, yedeğe yazılır).
-  var APP_VERSION = '1.1.8';
+  var APP_VERSION = '1.1.9';
   var CHANGE_LOG = [
+    {
+      version: '1.1.9',
+      date: '2026-11-13',
+      items: [
+        'Telefon düzeni sadeleştirildi: kırılgan CSS seçicileri yerine sayfadaki sınıflar kullanılıyor, durum rozeti dışındaki rozetler tek satırda kalıyor.'
+      ]
+    },
     {
       version: '1.1.8',
       date: '2026-11-13',

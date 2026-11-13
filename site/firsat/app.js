@@ -301,9 +301,6 @@
       // Kutu gönderen yayıncı listede kalır: "son kutu" zamanı da canlılık
       // sayılır, 7 gün kuralı bunu kutu yollayan yayıncıyı düşürmez.
       owner.lastBoxAt = Date.now();
-      owner.lastLiveAt = owner.lastBoxAt;
-      owner.scanLive = true;
-      owner.scanCheckedAt = owner.lastBoxAt;
       known[item.id] = true;
       events.unshift({
         id: uid('ev'),
@@ -642,7 +639,7 @@
         (detail ? ' title="' + esc(detail) + '"' : '') + '>' + esc(hints.join(' · ')) + '</div>'
       : '';
 
-    el.innerHTML = '<span class="chip chip-green">● ' + esc(parts.join(' · ')) + '</span>' + connLine;
+    el.innerHTML = '<span class="chip chip-green chip-status">● ' + esc(parts.join(' · ')) + '</span>' + connLine;
   }
 
   async function refreshScan() {
@@ -893,19 +890,12 @@
   function isExpired(event) {
     var now = Date.now();
     var end = eventEndAt(event);
-    // Sandık: pencere bitince hemen silinmez, ayardaki süre boyunca durur.
-    if (event && event.kind === 'chest') {
-      if (!end) {
-        var created = Number(event.createdAt) || Number(event.t) || 0;
-        return created > 0 && now - created > UNKNOWN_WINDOW_MS;
-      }
-      return now >= end + chestKeepMs();
-    }
     if (!end) {
-      var created = Number(event.createdAt) || 0;
+      var created = Number(event.createdAt) || Number(event.t) || 0;
       return created > 0 && now - created > UNKNOWN_WINDOW_MS;
     }
-    return now >= end + COLLECT_GRACE_MS;
+    // Sandık Ayarlar'daki süre kadar durur; portal/zarf sabit payla düşer.
+    return now >= end + (event.kind === 'chest' ? chestKeepMs() : COLLECT_GRACE_MS);
   }
 
   // Fırsatlar yalnızca toplanabilir kazanç olaylarını gösterir:

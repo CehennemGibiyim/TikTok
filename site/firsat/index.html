@@ -21,7 +21,7 @@
       </div>
     </div>
 
-    <nav class="flex flex-wrap gap-1 lg:ml-auto bg-white/5 p-1 rounded-xl border border-white/10">
+    <nav class="tab-nav flex gap-1 lg:ml-auto bg-white/5 p-1 rounded-xl border border-white/10 overflow-x-auto">
       <button data-tab="hunt" class="tab-btn">Av</button>
       <button data-tab="opportunities" class="tab-btn relative">Fırsatlar <span id="navOppCount" class="nav-count">0</span></button>
       <button data-tab="inventory" class="tab-btn">Envanter</button>
@@ -101,14 +101,14 @@
   <!-- ========== FIRSATLAR ========== -->
   <section id="view-opportunities" class="view hidden">
     <div class="card p-5">
-      <div class="flex items-start justify-between gap-3 mb-4 flex-wrap">
+      <div class="flex flex-col md:flex-row md:items-start md:justify-between gap-3 mb-4">
         <div>
           <h2 class="section-title"><i data-lucide="gift" class="w-5 h-5 text-amber-400"></i> Fırsatlar <span id="opportunityCount" class="badge ml-2">0</span></h2>
           <p class="hint mt-1">Yalnızca toplanabilir kazanç olayları: sandık, portal, zarf. Yayıncıya atılan sıradan hediyeler buraya yazılmaz. Pencere kapanınca sandık, portal ve zarf, Ayarlar'daki süre kadar (varsayılan 15 dakika) "KONTROL ET" olarak listede kalır, sonra kendiliğinden düşer.</p>
           <div id="oppFilters" class="flex flex-wrap gap-1 mt-2"></div>
           <div id="boxDiag" class="hint mt-2"></div>
         </div>
-        <div class="flex items-center gap-3">
+        <div class="flex flex-wrap items-center gap-3">
           <select id="oppSort" class="input !py-1.5 !text-xs w-auto">
             <option value="score" selected>Akıllı sıralama (acil + kârlı)</option>
             <option value="chest">📦 Sandık sıralaması</option>
@@ -122,7 +122,7 @@
           </select>
           <div class="text-right">
             <div id="pendingCoinsBig" class="text-xl font-black text-amber-400">0 jeton</div>
-            <button id="clearOpportunities" class="text-[11px] text-yellow-50/40 hover:text-red-300 mt-1">Kaçanları temizle</button>
+            <button id="clearOpportunities" class="text-[11px] whitespace-nowrap text-yellow-50/40 hover:text-red-300 mt-1">Kaçanları temizle</button>
           </div>
         </div>
       </div>
