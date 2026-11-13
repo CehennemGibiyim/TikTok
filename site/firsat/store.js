@@ -20,8 +20,16 @@
   var BACKUP_APP = 'tiktok-jeton-paneli';
   var BACKUP_VERSION = 2;
   // Panel sürümü ve sürüm geçmişi (Ayarlar'da gösterilir, yedeğe yazılır).
-  var APP_VERSION = '1.4.6';
+  var APP_VERSION = '1.4.7';
   var CHANGE_LOG = [
+    {
+      version: '1.4.7',
+      date: '2026-11-13',
+      items: [
+        'Kutu ve ölçüm sağlık eşikleri sabit 3 saat yerine üretim serisinden ölçülüyor: kutu için boxHourly, ölçüm için metrics.json saatlik serisi; gözlenen boşlukların %95’i + 2 saat pay, 2–12/8 saat aralığında.',
+        'Yeterli geçmiş yoksa eşik “—” kalıyor ve alarm üretilmiyor; hesaplanan eşikler satır başlığında görünüyor.'
+      ]
+    },
     {
       version: '1.4.6',
       date: '2026-11-13',

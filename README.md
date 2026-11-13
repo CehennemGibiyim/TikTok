@@ -218,16 +218,24 @@ Panelin üstünde, her sekmede dört yaş görünür:
 | Kaynak | Nereden | Eşik |
 |---|---|---|
 | **veri** | `live.json` → `scannedAt` | 30 dk |
-| **kutu** | Fırsatlar'a düşen son otomatik kutu (`createdAt`) | 3 sa |
+| **kutu** | Fırsatlar'a düşen son otomatik kutu (`createdAt`) | `boxHourly` boşluklarından |
 | **bağlantı** | `live.json` → `scanner.connectStats.lastOkAt` | 30 dk |
-| **ölçüm** | `metrics.json` → `generatedAt` | 3 sa |
+| **ölçüm** | `metrics.json` → `generatedAt` | `metrics.json` saatlik serisinden |
 
-Eşikler çalışma düzenine göre seçildi: tarayıcı 4 saatlik turlarda 5 dakikada bir commit eder
-(turlar arası ~10 dk), kutular saatte ~10 gelir, ölçüm saatlik üretilir. Eşik aşılırsa ilgili yaş
-kırmızıya döner ve uyarı gecikmenin kaynağını söyler: **veri** eskiyse “tarayıcı durmuş olabilir”,
-canlı varken oda dinlenmiyorsa ve son başarı eskiyse “bağlantı kurulamıyor olabilir”, tarayıcı
-çalışırken ve oda dinlenirken kutu gelmiyorsa “kutu akışı durmuş olabilir”, yalnız ölçüm eskiyse
-“ölçüm güncellenmiyor”.
+Veri ve bağlantı eşikleri çalışma düzeninden (sırasıyla 30 dk). Kutu ve ölçüm eşikleri sabit
+değil, üretim serisinden ölçülür: `boxHourly` (son 48 saat) kutu için, `metrics.json` içindeki
+`hourly.buckets` saatlik kutu serisi ölçüm için kullanılır. Panel dolu saatler arasındaki
+boşlukları çıkarır, gözlenen boşlukların %95'ine **2 saat pay** ekler (saatlik kovanın içindeki
+geliş anı bilinmediği için normal bir sessizlik saat sınırına denk geldiğinde alarm çalmasın).
+Sonuç en az 2 saat; kutu için en çok 12, ölçüm için en çok 8 saat. Ölçümün saatlik serisi yoksa
+aynı üretim ritmi kutu serisinden alınır. Yeterli geçmiş (en az 8 saat kapsama ve 3 dolu saat)
+yoksa eşik “—” kalır ve o kaynak için alarm üretilmez. Hesaplanan eşikler satırın başlığında
+(fareyle üzerine gelince) “kutu 6 sa (veriden)” gibi görünür.
+
+Eşik aşılırsa ilgili yaş kırmızıya döner ve uyarı gecikmenin kaynağını söyler: **veri** eskiyse
+“tarayıcı durmuş olabilir”, canlı varken oda dinlenmiyorsa ve son başarı eskiyse “bağlantı
+kurulamıyor olabilir”, tarayıcı çalışırken ve oda dinlenirken kutu gelmiyorsa “kutu akışı durmuş
+olabilir”, yalnız ölçüm eskiyse “ölçüm güncellenmiyor”.
 
 Yanlış alarmı önlemek için bağlantı ve kutu yaşı tek başına yetmez: canlı yayın yokken ya da bir
 oda zaten dinleniyorsa eski `lastOkAt` normaldir; kutu da yalnız tarayıcı tazeyken ve oda

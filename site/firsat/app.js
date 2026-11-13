@@ -3050,15 +3050,16 @@
 
 
   // ---------- Sistem sağlığı ----------
-  // Veri üretimi sessizce durmasın: dört kaynağın yaşı tek satırda. Eşikler
-  // çalışma düzenine göre: tarayıcı 4 saatlik turlarda 5 dakikada bir commit
-  // eder (turlar arası ~10 dk), kutular saatte ~10, ölçüm saatlik.
+  // Veri üretimi sessizce durmasın: dört kaynağın yaşı tek satırda. Veri ve
+  // bağlantı eşikleri çalışma düzeninden; kutu ve ölçüm eşikleri saatlik
+  // üretim serisinden ölçülür (aşağıda).
   var HEALTH_LIMITS = [
-    { key: 'scan', label: 'veri', limit: 30 * 60000 },
-    { key: 'box', label: 'kutu', limit: 3 * 3600000 },
-    { key: 'connect', label: 'bağlantı', limit: 30 * 60000 },
-    { key: 'metrics', label: 'ölçüm', limit: 3 * 3600000 }
+    { key: 'scan', label: 'veri' },
+    { key: 'box', label: 'kutu' },
+    { key: 'connect', label: 'bağlantı' },
+    { key: 'metrics', label: 'ölçüm' }
   ];
+  var HOUR_MS = 3600000;
 
   // Damga okunamıyorsa 0: yaş bilinmiyor demektir, "—" gösterilir ve uyarı üretmez.
   function healthStamp(value) {
@@ -3095,11 +3096,82 @@
     };
   }
 
-  function healthLimit(key) {
-    for (var i = 0; i < HEALTH_LIMITS.length; i++) {
-      if (HEALTH_LIMITS[i].key === key) return HEALTH_LIMITS[i].limit;
+  // live.json'daki boxHourly: {epochSaat: kutu sayısı}. Sayaç zaten son 48
+  // saati tutar; eski damgaları ayrıca elemez.
+  function boxHourPoints() {
+    var hourly = scanInfo && scanInfo.boxHourly;
+    if (!hourly || typeof hourly !== 'object') return [];
+    var points = [];
+    Object.keys(hourly).forEach(function (key) {
+      var hour = Number(key);
+      var count = Number(hourly[key]) || 0;
+      if (!isFinite(hour) || hour <= 0 || count <= 0) return;
+      points.push({ hour: hour, count: count });
+    });
+    return points;
+  }
+
+  // metrics.json'daki saatlik kutu serisi: [{hour: 'YYYY-MM-DDTHH', count}].
+  function metricsHourPoints() {
+    var buckets = metricsInfo && metricsInfo.hourly && metricsInfo.hourly.buckets;
+    if (!Array.isArray(buckets)) return [];
+    var points = [];
+    buckets.forEach(function (bucket) {
+      var at = Date.parse(String(bucket && bucket.hour) + ':00:00Z');
+      var count = Number(bucket && bucket.count) || 0;
+      if (!isFinite(at) || !count) return;
+      points.push({ hour: Math.floor(at / HOUR_MS), count: count });
+    });
+    return points;
+  }
+
+  // Dolu saatler arasındaki tam saatlik boşluklar. Baştaki/sondaki boşluk
+  // ölçülemez (seri orada kesiliyor), bu yüzden sayılmaz.
+  function hourGapStats(points) {
+    var byHour = {};
+    (points || []).forEach(function (point) {
+      var hour = Number(point && point.hour);
+      var count = Number(point && point.count) || 0;
+      if (!isFinite(hour) || hour <= 0 || count <= 0) return;
+      // Aynı saat iki kaynaktan gelirse sayı toplanmaz; boşluk için varlık yeter.
+      byHour[hour] = Math.max(byHour[hour] || 0, count);
+    });
+    var hours = Object.keys(byHour).map(Number).sort(function (a, b) { return a - b; });
+    if (hours.length < 3) return { span: 0, count: hours.length, gaps: [] };
+    var gaps = [];
+    for (var i = 1; i < hours.length; i += 1) {
+      var gap = hours[i] - hours[i - 1] - 1;
+      if (gap > 0) gaps.push(gap);
     }
-    return 0;
+    return {
+      span: hours[hours.length - 1] - hours[0] + 1,
+      count: hours.length,
+      gaps: gaps
+    };
+  }
+
+  // Eşik = gözlenen sessizliklerin %95'i + 2 saat. +2, saatlik kovanın içindeki
+  // geliş anını bilmemekten gelen pay: normal bir boşluk saat sınırına denk
+  // geldiğinde alarm çalmasın. En az 2 saat, en çok capHours.
+  // Yeterli geçmiş yoksa null: eşik uydurulmaz, o kaynak için alarm üretilmez.
+  function silenceLimit(points, capHours) {
+    var stats = hourGapStats(points);
+    if (stats.span < 8 || stats.count < 3) return null;
+    var gaps = stats.gaps.slice().sort(function (a, b) { return a - b; });
+    var p95 = gaps.length ? gaps[Math.max(0, Math.ceil(gaps.length * 0.95) - 1)] : 0;
+    return Math.min(capHours, Math.max(2, p95 + 2)) * HOUR_MS;
+  }
+
+  // Kutu eşiği tarayıcının boxHourly serisinden. Ölçüm eşiği metrics.json'ın
+  // saatlik serisinden; o seri yoksa kutu serisiyle aynı üretim ritmi kullanılır.
+  function healthLimits() {
+    var boxPoints = boxHourPoints();
+    return {
+      scan: 30 * 60000,
+      connect: 30 * 60000,
+      box: silenceLimit(boxPoints, 12),
+      metrics: silenceLimit(metricsHourPoints(), 8) || silenceLimit(boxPoints, 8)
+    };
   }
 
   function renderHealth() {
@@ -3107,6 +3179,7 @@
     if (!el) return;
     var now = Date.now();
     var at = healthSources();
+    var limits = healthLimits();
     var ages = {};
     HEALTH_LIMITS.forEach(function (source) {
       var stamp = at[source.key];
@@ -3117,15 +3190,16 @@
     var watching = Number(scanInfo && scanInfo.watching) || 0;
     // watching alanını taşımayan eski dosyada 0 varsayıp alarm üretilmez.
     var watchingKnown = Boolean(scanInfo) && typeof scanInfo.watching === 'number';
-    var scanStale = ages.scan !== null && ages.scan > healthLimit('scan');
+    var scanStale = ages.scan !== null && ages.scan > limits.scan;
     // Tarayıcı yaşıyorsa bağlantı/kutuya bakılır. Canlı yokken ya da oda
     // dinlenirken eski "son başarı" normaldir; bu yüzden alarm üretmez.
     var scanFresh = ages.scan !== null && !scanStale;
     var connectStale = scanFresh && live > 0 && watchingKnown && watching === 0 &&
-      ages.connect !== null && ages.connect > healthLimit('connect');
-    var boxStale = scanFresh && watchingKnown && watching > 0 &&
-      ages.box !== null && ages.box > healthLimit('box');
-    var metricsStale = ages.metrics !== null && ages.metrics > healthLimit('metrics');
+      ages.connect !== null && ages.connect > limits.connect;
+    var boxStale = scanFresh && watchingKnown && watching > 0 && limits.box !== null &&
+      ages.box !== null && ages.box > limits.box;
+    var metricsStale = limits.metrics !== null &&
+      ages.metrics !== null && ages.metrics > limits.metrics;
     var flags = { scan: scanStale, connect: connectStale, box: boxStale, metrics: metricsStale };
     var stale = [];
     var parts = HEALTH_LIMITS.map(function (source) {
@@ -3148,7 +3222,10 @@
       ' · ' + parts.join(' · ') +
       (scanPaused ? ' <span>· tarama duraklatıldı</span>' : '');
     el.title = 'Eşikler: ' + HEALTH_LIMITS.map(function (source) {
-      return source.label + ' ' + shortAge(source.limit);
+      var limit = limits[source.key];
+      var suffix = source.key === 'box' || source.key === 'metrics'
+        ? (limit === null ? ' (veri yok)' : ' (veriden)') : '';
+      return source.label + ' ' + (limit === null ? '—' : shortAge(limit)) + suffix;
     }).join(' · ') + ' · yaşlar son kayıtlardan';
   }
 
