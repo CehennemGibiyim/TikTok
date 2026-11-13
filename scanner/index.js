@@ -88,7 +88,7 @@ const CONFIG = {
   // Sınıra yaklaşınca aralık kendiliğinden uzar, yani TikTok'un hourly kotasına
   // çarpmadan yavaşlanır; bütçe boşalınca en eski deneme saati doldurunca devam eder.
   // Varsayılan 25: üretimde ölçülen pratik sınır ~23, üstüne çıkmak 429 yiyor.
-  hourBudget: Math.max(1, Number(readArg('hour-budget', 25))),
+  hourBudget: Math.max(1, Number(readArg('hour-budget', 25)) || 25),
   // Sınır yediğimizde inilebilecek en düşük eşzamanlı oda sayısı.
   minRooms: Number(readArg('min-rooms', 8)),
   // Oda kimliği bu süreden eskiyse güvenilmez: bağlanmadan önce tazelenir (30 dk).
@@ -1600,28 +1600,45 @@ function pickRoom(options) {
   return { record, probe: record === probeRoom, hot: isHot(record, now) };
 }
 
+const HOUR_MS = 3600000;
+
 // Saatlik bağlantı bütçesi: son 60 dakikadaki denemeler ve kalan hak.
-// Aralık her zaman "kalan hak / pencere sonuna kalan süre" olacak şekilde
-// hesaplanır; yani bütçe baştan itibaren saat boyunca yayılır ve TikTok'un
-// hourly kotasına hiç çarpılmadan yavaşlanır. Hak bittiğinde `nextAttemptAt`
-// en eski denemenin pencereden çıkacağı andır (kendiliğinden devam).
-// Hız sınırı görülürse `hourBudgetLearned` gerçek üst sınırı öğrenir.
+// Yürürlükteki sınır, yapılandırılan ile hız sınırından öğrenilenin küçüğüdür;
+// öğrenilen daha büyükse (ya da hiç yoksa) yapılandırılan geçerlidir.
+// Aralık "kalan hak / pencere sonuna kalan süre"dir: bütçe saat boyunca yayılır
+// ve TikTok'un hourly kotasına çarpılmadan yavaşlanır. Hak 0 ise `nextAttemptAt`
+// en eski denemenin pencereden çıkacağı an, tek hak kaldıysa `gapMs` pencerenin
+// sonudur; ikisi de kendiliğinden devam eder.
 function connectBudget(now = Date.now()) {
-  const windowMs = 3600000;
-  state.hourStarts = state.hourStarts.filter((at) => at > now - windowMs);
-  const learned = Number(state.hourBudgetLearned) || 0;
-  const limit = Math.max(1, learned > 0 ? Math.min(CONFIG.hourBudget, learned) : CONFIG.hourBudget);
+  state.hourStarts = state.hourStarts.filter((at) => at > now - HOUR_MS);
   const used = state.hourStarts.length;
+  const configured = CONFIG.hourBudget;
+  const learned = state.hourBudgetLearned || 0;
+  const limit = Math.min(configured, learned || configured);
   const remaining = Math.max(0, limit - used);
   const oldest = state.hourStarts[0] || now;
-  const nextAttemptAt = remaining > 0 ? 0 : oldest + windowMs;
-  // Kalan haklar, en eski denemenin pencereden çıkacağı ana kadar yayılır.
-  const windowLeft = Math.max(0, oldest + windowMs - now);
-  const gapMs = remaining > 0
-    ? Math.max(CONFIG.connectGapMs, Math.ceil(windowLeft / remaining))
-    : CONFIG.connectGapMs;
-  // `configured` panel içindir: "limit 25 -> ogrenilen 23" yazabilsin.
-  return { used, limit, remaining, nextAttemptAt, gapMs, learned, configured: CONFIG.hourBudget };
+  const windowLeft = Math.max(0, oldest + HOUR_MS - now);
+  return {
+    used,
+    limit,
+    remaining,
+    learned,
+    configured,
+    // Kalan haklar pencere sonuna kadar yayılır; taban aralık korunur.
+    gapMs: remaining > 0 ? Math.max(CONFIG.connectGapMs, Math.ceil(windowLeft / remaining)) : 0,
+    // Hak yoksa en eski deneme saatten çıkınca yeni hak doğar; varsa bekleme yok.
+    nextAttemptAt: remaining > 0 ? 0 : oldest + HOUR_MS
+  };
+}
+
+// Hız sınırına çarptığımız nokta gerçek üst sınırdır: bütçeyi oraya çek.
+// Yalnızca daha düşük bir sınır öğrenilirse güncellenir; daha yükseği yok sayılır.
+function learnHourBudget() {
+  const used = connectBudget().used;
+  if (state.hourBudgetLearned && used >= state.hourBudgetLearned) return;
+  state.hourBudgetLearned = Math.max(1, used);
+  log('saatlik bağlantı bütçesi öğrenildi:', state.hourBudgetLearned,
+    '— bundan sonra bu sınırın altında kalınacak');
 }
 
 async function maintainWatchers() {
@@ -1784,13 +1801,7 @@ async function maintainWatchers() {
       if (/rate|too many|device_blocked|429|\b503\b/i.test(error.message || '')) {
         state.connectFailures = Math.min(6, state.connectFailures + 1);
         state.connectStats.rateLimited += 1;
-        // Hız sınırına çarptığımız nokta gerçek üst sınırdır: bütçeyi oraya çek.
-        const usedInHour = connectBudget().used;
-        if (!state.hourBudgetLearned || usedInHour < state.hourBudgetLearned) {
-          state.hourBudgetLearned = Math.max(1, usedInHour);
-          log('saatlik bağlantı bütçesi öğrenildi:', state.hourBudgetLearned,
-            '— bundan sonra bu sınırın altında kalınacak');
-        }
+        learnHourBudget();
         // Koruma: kotayı yakmaya devam etmesin. Üçüncü hız sınırından sonra
         // dakikalık başlatma yarıya iner, bağlantı aralığı iki katına çıkar.
         if (state.connectStats.rateLimited > 2 && !state.tuningGuard) {
@@ -2169,13 +2180,23 @@ if (process.env.SCANNER_SELFTEST === '1') {
     const full = connectBudget(now);
     state.hourStarts = Array.from({ length: 8 }, () => now - 60000);
     const near = connectBudget(now);
+    // Tek hak: aralık pencerenin sonuna (en eski deneme + 1 saat) kadar uzar.
+    state.hourStarts = Array.from({ length: 9 }, () => now - 60000);
+    const single = connectBudget(now);
+    // Öğrenilen limit varsayılandan büyükse varsayılan geçerli kalır.
+    state.hourStarts = Array.from({ length: 2 }, () => now - 60000);
+    state.hourBudgetLearned = 50;
+    const highLearned = connectBudget(now);
+    state.hourStarts = Array.from({ length: 8 }, () => now - 60000);
     state.hourBudgetLearned = 5;
     const learned = connectBudget(now);
     const nextInMin = Math.round((full.nextAttemptAt - now) / 60000);
     console.log('BÜTÇE →', 'boş', empty.used + '/' + empty.limit,
       '· dolu', full.used + '/' + full.limit, 'sonraki', nextInMin, 'dk',
       '· eşik aralığı', Math.round(near.gapMs / 1000) + ' sn',
-      '· öğrenilen limit', learned.limit);
+      '· öğrenilen limit', learned.limit,
+      '· tek hak aralığı', Math.round(single.gapMs / 1000) + ' sn',
+      '· öğrenilen>varsayılan', highLearned.limit);
     if (empty.used !== 0 || empty.remaining !== 10) {
       console.log('BÜTÇE SINAMASI BAŞARISIZ: boş bütçe');
       process.exitCode = 1;
@@ -2196,6 +2217,14 @@ if (process.env.SCANNER_SELFTEST === '1') {
     }
     if (learned.limit !== 5) {
       console.log('BÜTÇE SINAMASI BAŞARISIZ: öğrenilen limit uygulanmadı');
+      process.exitCode = 1;
+    }
+    if (single.remaining !== 1 || single.nextAttemptAt !== 0 || single.gapMs !== 3540000) {
+      console.log('BÜTÇE SINAMASI BAŞARISIZ: tek hakta aralık');
+      process.exitCode = 1;
+    }
+    if (highLearned.limit !== 10 || highLearned.remaining !== 8) {
+      console.log('BÜTÇE SINAMASI BAŞARISIZ: öğrenilen limit varsayılanı aştı');
       process.exitCode = 1;
     }
     state.hourStarts = saved.starts;

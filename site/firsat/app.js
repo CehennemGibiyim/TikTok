@@ -636,7 +636,7 @@
       // Öğrenilen limit devredeyse sebebi görünsün: "limit 25 → öğrenilen 23".
       var learnedHour = Number(budget.learned) || 0;
       var configuredHour = Number(budget.configured) || limitHour;
-      if (learnedHour > 0 && configuredHour > limitHour) {
+      if (learnedHour > 0 && learnedHour < configuredHour) {
         budgetText += ' · limit ' + configuredHour + ' → öğrenilen ' + learnedHour;
       }
       if (usedHour >= limitHour && nextAt > budgetNow) {
