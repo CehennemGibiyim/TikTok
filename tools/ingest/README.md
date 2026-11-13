@@ -60,16 +60,59 @@ adb logcat -s TikTokBox | INGEST_TOKEN="..." node tools/ingest/send.mjs
 Jeton alanı sırayla `diamondCount → coinCount → coins` olarak okunur; hiçbiri yoksa
 kayıt `0` ile yazılır ve panelde "jeton bilinmiyor" görünür (değer uydurulmaz).
 
-## 4. Emülatörden yakalama
+## 4. Akış
 
-1. Android emülatörde TikTok'u aç, bir yayına gir.
-2. Trafiği yakala (mitmproxy/Charles ile HTTPS araya girme, ya da Frida ile
-   `webcast` IM çerçevelerini okuma).
-3. `envelope` / `superFanBox` mesajlarını NDJSON olarak yaz (yukarıdaki örnek
-   biçim; ham `envelopeInfo` alanlarını olduğu gibi bırakabilirsin).
-4. `send.mjs` ile uca gönder.
+1. Emülatörde TikTok'u aç, bir yayına gir.
+2. Trafiği mitmproxy'den geçir (bölüm 5); kutu mesajları NDJSON'a düşer.
+3. `send.mjs` dosyayı uca gönderir (bölüm 3).
+4. Uç kaydı ntfy'ye yayınlar ve `boxes.json`'a yazar; panel aynı yoldan işler.
 
-## 5. Sınırlar
+## 5. mitmproxy hattı (uçtan uca)
+
+Emülatördeki TikTok trafiği mitmproxy'den geçerken kutu mesajları NDJSON'a yazılır,
+sonra aynı dosya `send.mjs` ile uca gönderilir:
+
+```bash
+# 1) yakalama (emülatörde proxy + sertifika kurulu olmalı)
+pip install mitmproxy
+mitmdump -s tools/ingest/mitm_boxes.py --set boxes_out=/tmp/capture.ndjson
+
+# 2) gönderim
+INGEST_TOKEN="..." node tools/ingest/send.mjs --file=/tmp/capture.ndjson
+```
+
+Eklentinin iki ayrıştırma yolu var:
+
+| Yol | Durum | Ne yapar |
+|---|---|---|
+| JSON | varsayılan açık | `envelopeInfo` / `treasureBoxData` alanlarını okur (alan adlarına dayanır, tahmin yok) |
+| Protobuf | varsayılan **kapalı** | Şema olmadığı için yalnızca kutu anahtar kelimesi geçen alt mesajı bulur; kayıtlar `confidence: "low"` ile yazılır. Açmak için `--set accept_heuristic=true` |
+
+Gerçek uygulama akışı protobuf olduğu için **tam alan eşlemesi henüz yok**: elimizde
+gerçek bir yakalama olmadan alan numaraları sabitlenemez. Uygulamadan bir kez kayıt
+alındığında `boxes_from_protobuf()` içindeki eşleme o veriye göre netleştirilmelidir.
+O zamana kadar bu yol deneysel ve kapalıdır; yalnızca JSON yolundan gelen kayıtlar
+kesin kabul edilir.
+
+Eklenti hiçbir zaman başlık, çerez, token yazmaz; NDJSON satırları yalnızca kutu
+alanlarını (`username, businessType, coins, envelopeId, secondsUntilOpen, peopleCount,
+unpackAt, boxType, capturedAt, source, confidence`) taşır. Aynı `envelopeId` iki kez
+yazılmaz.
+
+## 6. Testler
+
+```bash
+python3 tools/ingest/test-extract.py          # ayıklama (mitmproxy gerekmez)
+node tools/ingest/test-pipeline.mjs           # örnek NDJSON → /ingest → boxes.json
+python3 -m venv /tmp/mitmenv && /tmp/mitmenv/bin/pip install mitmproxy
+/tmp/mitmenv/bin/python tools/ingest/test-mitm-hook.py   # gerçek mitmproxy nesneleriyle kancalar
+```
+
+`test-pipeline.mjs` geçici bir veri klasörü ve rastgele port kullanır, ntfy'yi kapatır
+(`--ntfy=0`); çalışan veriye dokunmaz. `test-mitm-hook.py` mitmproxy kurulu değilse
+atlanır.
+
+## 7. Sınırlar
 
 - `boxes.json`'u tarayıcı her turda kendi kutularıyla yeniden yazar; yani dosya
   kalıcı depo değildir. **Kalıcı yol ntfy'dir**: panel açıkken kayıt anında düşer.

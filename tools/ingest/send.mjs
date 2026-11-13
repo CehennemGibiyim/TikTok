@@ -47,22 +47,24 @@ async function sendOne(line) {
     });
     const body = await response.json().catch(() => ({}));
     if (!response.ok) return { ok: false, note: body.error || ('HTTP ' + response.status) };
-    if (body.duplicate) return { ok: true, note: 'zaten var' };
+    if (body.duplicate) return { ok: true, duplicate: true, note: 'zaten var' };
     return { ok: true, note: body.kind + ' @' + ((payload.username || (payload.envelopeInfo || {}).username) || '?') };
   } catch (error) {
     return { ok: false, note: 'bağlantı hatası: ' + error.message };
   }
 }
 
-let ok = 0;
+let accepted = 0;
+let duplicated = 0;
 let failed = 0;
 for (const line of lines) {
   const result = await sendOne(line);
-  if (result.ok) ok += 1;
-  else failed += 1;
+  if (!result.ok) failed += 1;
+  else if (result.duplicate) duplicated += 1;
+  else accepted += 1;
   console.log((result.ok ? 'OK   ' : 'HATA ') + result.note);
   if (DELAY_MS > 0) await sleep(DELAY_MS);
 }
 
-console.log('gönderilen: ' + ok + ' · hatalı: ' + failed);
+console.log('kabul: ' + accepted + ' · yinelenen: ' + duplicated + ' · hatalı: ' + failed);
 process.exit(failed > 0 ? 1 : 0);
