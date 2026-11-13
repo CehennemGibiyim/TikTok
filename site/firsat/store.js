@@ -20,8 +20,16 @@
   var BACKUP_APP = 'tiktok-jeton-paneli';
   var BACKUP_VERSION = 2;
   // Panel sürümü ve sürüm geçmişi (Ayarlar'da gösterilir, yedeğe yazılır).
-  var APP_VERSION = '1.1.3';
+  var APP_VERSION = '1.1.4';
   var CHANGE_LOG = [
+    {
+      version: '1.1.4',
+      date: '2026-11-13',
+      items: [
+        'Kutular panelde anlık: tarayıcı yakaladığı anda ntfy yayınıyla geliyor (ölçülen gecikme ~0.3 sn).',
+        'Panel kutuyu SSE ile dinliyor; akış koparsa 15 sn\'lik dosya okumasına düşüyor.'
+      ]
+    },
     {
       version: '1.1.3',
       date: '2026-11-13',

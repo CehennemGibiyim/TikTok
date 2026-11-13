@@ -79,7 +79,12 @@ WebSocket açarak yapılır — TikTok'un oda kimliği arama ucu bulut IP'lerind
 - **Kota koruması:** bir koşuda hız sınırı (`rateLimited`) 2'yi geçerse dakikalık başlatma yarıya iner,
   bağlantı aralığı iki katına çıkar (`scanner.tuningGuard` olarak panelde görünür).
 
-**Hız:** Panel kutuları iki yoldan alır. `data/boxes.json` son 120 kutuyu tutar ve 45 saniyede bir
+**Hız (anlık kutu):** Tarayıcı bir sandık/zarf yakaladığı anda `ntfy.sh` konusuna
+(`--ntfy-topic`, varsayılan `cehennem-tiktok-firsat-7f3a91`) JSON yayınlar. Panel aynı konuya
+SSE (`EventSource`) ile abonedir; ölçülen gecikme **~0.3 saniye**. Konu herkese açıktır:
+yalnızca kutu bildirimi taşır, gizli veri koymayın. Akış koparsa panel dosya yoluna düşer.
+
+**Yedek yol:** Panel kutuları iki yoldan alır. `data/boxes.json` son 120 kutuyu tutar ve 45 saniyede bir
 commit edilir; panel onu **15 saniyede bir** okur, yeni kutu gelince bildirim gösterir. `live.json`
 5 dakikada bir commit edilir (yayıncı listesi, süreler, teşhis). Sandık penceresi kısa olduğu için
 asıl yakalama bu hızlı dosyadan gelir.
@@ -109,6 +114,8 @@ node index.js --once             # tek tur (deneme)
 | `--min-coins` | 1 | Bu jeton değerinin altındaki olaylar yazılmaz |
 | `--commit` | 0 | Veri commit aralığı, saniye (`0` = commit yok; Actions 300 kullanır) |
 | `--commit-boxes` | 45 | Kutuların (`data/boxes.json`) commit aralığı: panel sandığı saniyeler içinde görsün |
+| `--ntfy` | 1 | Kutuları anlık yayınla (panel SSE ile dinler) |
+| `--ntfy-topic` | `cehennem-tiktok-firsat-7f3a91` | Yayın konusu; paneldeki `BOX_TOPIC` ile aynı olmalı |
 | `--poll-batch` | 0 | Her turda yoklanacak havuz dilimi (`0` = hepsi); büyük havuzda taramayı hafifletir |
 | `--once` | — | Tek tur çalış ve çık |
 | `--discover-sec` | 300 | Keşif ucunun kaç saniyede bir yoklanacağı (her çağrı 10 canlı kanal + oda kimliği) |
