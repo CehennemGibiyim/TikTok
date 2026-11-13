@@ -141,7 +141,7 @@ node index.js --once             # tek tur (deneme)
 | `--room-id-only` | 1 | Doğrulanamayan odaya yalnızca taze oda kimliği varsa bağlan |
 | `--live-stale-sec` | 900 | Bu süredir doğrulanmayan oda "canlı" sayılmaz |
 | `--starts-per-min` | 8 | Dakikada en fazla kaç yeni bağlantı başlatılır |
-| `--hour-budget` | 60 | Son 60 dakikada en fazla kaç bağlantı denenir. Limitin %80'inden sonra aralık, kalan haklar saat sonuna yayılacak şekilde kendiliğinden uzar; hak bitince en eski deneme saatten çıkınca tarama devam eder. Hız sınırı görülürse gerçek üst sınır öğrenilir ve bütçe oraya çekilir |
+| `--hour-budget` | 60 | Son 60 dakikada en fazla kaç bağlantı denenir. Aralık baştan itibaren "kalan hak / pencere sonuna kalan süre" olacak şekilde hesaplanır, yani haklar saat boyunca yayılır ve TikTok'un hourly kotasına çarpılmaz; hak bitince en eski deneme saatten çıkınca tarama kendiliğinden devam eder. Hız sınırı görülürse gerçek üst sınır öğrenilip bütçe oraya çekilir |
 | `--hot-revisit-sec` | 720 | Kutu vermiş odaya en erken bu kadar sonra dönülür |
 
 ### Ayar karşılaştırması (kota birimi başına kutu)

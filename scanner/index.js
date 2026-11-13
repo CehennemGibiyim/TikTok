@@ -1545,10 +1545,11 @@ function pickRoom(options) {
 }
 
 // Saatlik bağlantı bütçesi: son 60 dakikadaki denemeler ve kalan hak.
-// Limitin %80'inden sonra aralık, kalan haklar saat sonuna yayılacak şekilde
-// uzar; yani TikTok'un hourly kotasına çarpmadan yavaşlanır. Hak bittiğinde
-// `nextAttemptAt`, en eski denemenin pencereden çıkacağı andır (kendiliğinden
-// devam). Hız sınırı görülürse `hourBudgetLearned` gerçek üst sınırı öğrenir.
+// Aralık her zaman "kalan hak / pencere sonuna kalan süre" olacak şekilde
+// hesaplanır; yani bütçe baştan itibaren saat boyunca yayılır ve TikTok'un
+// hourly kotasına hiç çarpılmadan yavaşlanır. Hak bittiğinde `nextAttemptAt`
+// en eski denemenin pencereden çıkacağı andır (kendiliğinden devam).
+// Hız sınırı görülürse `hourBudgetLearned` gerçek üst sınırı öğrenir.
 function connectBudget(now = Date.now()) {
   const windowMs = 3600000;
   state.hourStarts = state.hourStarts.filter((at) => at > now - windowMs);
@@ -1558,11 +1559,11 @@ function connectBudget(now = Date.now()) {
   const remaining = Math.max(0, limit - used);
   const oldest = state.hourStarts[0] || now;
   const nextAttemptAt = remaining > 0 ? 0 : oldest + windowMs;
-  let gapMs = CONFIG.connectGapMs;
-  if (remaining > 0 && used >= limit * 0.8) {
-    const windowLeft = Math.max(0, oldest + windowMs - now);
-    gapMs = Math.max(gapMs, Math.ceil(windowLeft / remaining));
-  }
+  // Kalan haklar, en eski denemenin pencereden çıkacağı ana kadar yayılır.
+  const windowLeft = Math.max(0, oldest + windowMs - now);
+  const gapMs = remaining > 0
+    ? Math.max(CONFIG.connectGapMs, Math.ceil(windowLeft / remaining))
+    : CONFIG.connectGapMs;
   return { used, limit, remaining, nextAttemptAt, gapMs, learned };
 }
 
@@ -2111,6 +2112,12 @@ if (process.env.SCANNER_SELFTEST === '1') {
     }
     if (full.used !== 10 || full.remaining !== 0 || nextInMin <= 0) {
       console.log('BÜTÇE SINAMASI BAŞARISIZ: dolu bütçe');
+      process.exitCode = 1;
+    }
+    // Boş bütçede aralık = pencere / limit (burada 3600/10 = 360 sn):
+    // yani haklar saat boyunca yayılır, başta hepsi harcanmaz.
+    if (empty.gapMs !== 360000) {
+      console.log('BÜTÇE SINAMASI BAŞARISIZ: boş bütçede aralık', empty.gapMs);
       process.exitCode = 1;
     }
     if (near.gapMs <= CONFIG.connectGapMs) {
