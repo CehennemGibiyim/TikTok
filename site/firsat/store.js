@@ -20,8 +20,15 @@
   var BACKUP_APP = 'tiktok-jeton-paneli';
   var BACKUP_VERSION = 2;
   // Panel sürümü ve sürüm geçmişi (Ayarlar'da gösterilir, yedeğe yazılır).
-  var APP_VERSION = '1.4.7';
+  var APP_VERSION = '1.4.8';
   var CHANGE_LOG = [
+    {
+      version: '1.4.8',
+      date: '2026-11-13',
+      items: [
+        'Kutu düşme dakikası paydası artık yalnızca mesaj veya kutu üreten oturumları sayıyor; başarısız bağlantı ve hiç akış gelmeyen denemeler watchMin’e eklenmiyor.'
+      ]
+    },
     {
       version: '1.4.7',
       date: '2026-11-13',

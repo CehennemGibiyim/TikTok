@@ -1248,9 +1248,14 @@ function countBoxMinute(sessionSec) {
 // Oturum kapanırken dinlenen süreyi dakika kovalarına böler. Kova başına oran
 // (kutu / dinlenen dakika) böylece "5. dakikada kutu geliyor mu?" sorusunu
 // yanıtlar; 5+ yalnızca uzatılan/sıcak oturumlardan dolabilir (sansür).
+// Paydaya yalnızca gerçekten akış gelen oturumlar girer: bağlantısı kurulamayan
+// denemeler ve hiç mesaj/kutu üretmeyen oturumlar "dinlenen dakika" değildir.
+// Aksi halde kısa başarısız denemeler ilk dakika oranını düşürüp 5+ kovasını
+// olduğundan iyi gösteriyordu.
 function noteWatchExposure(watcher) {
   if (!watcher || watcher.exposureCounted) return;
   watcher.exposureCounted = true;
+  if (!(Number(watcher.messages) > 0 || Number(watcher.boxes) > 0)) return;
   const watchedSec = Math.max(0, (Date.now() - watcher.startedAt) / 1000);
   for (let i = 0; i < 6; i += 1) {
     const from = i * 60;
@@ -2432,12 +2437,25 @@ if (process.env.SCANNER_SELFTEST === '1') {
   countBoxMinute(90);
   countBoxMinute(310);
   countBoxMinute(null);
-  const fakeWatcher = { startedAt: Date.now() - 330000, sessionSec: 300 };
+  // Payda sınaması: başarısız bağlantı ve hiç akış gelmeyen oturumlar
+  // watchMin'i değiştirmemeli; mesaj gelen oturum bir kez sayılmalı.
+  const fakeFailed = { startedAt: Date.now() - 45000, messages: 0 };
+  const fakeQuiet = { startedAt: Date.now() - 600000, messages: 0 };
+  const fakeWatcher = { startedAt: Date.now() - 330000, messages: 4, sessionSec: 300 };
+  noteWatchExposure(fakeFailed);
+  noteWatchExposure(fakeQuiet);
+  const skippedSince = state.watchMinSince === 0;
   noteWatchExposure(fakeWatcher);
   noteWatchExposure(fakeWatcher);
+  const roundedWatch = state.watchMin.map((min) => Math.round(min * 10) / 10);
+  const minuteOk = state.boxMinutes.join(',') === '0,1,0,0,0,1' &&
+    roundedWatch.join(',') === '1,1,1,1,1,0.5' && skippedSince &&
+    state.watchMinSince === fakeWatcher.startedAt;
   console.log('DAKİKA →', state.boxMinutes.join(','), '·',
-    state.watchMin.map((min) => Math.round(min * 10) / 10).join(','),
-    '(beklenen 0,1,0,0,0,1 · 1,1,1,1,1,0.5)');
+    roundedWatch.join(','),
+    '(beklenen 0,1,0,0,0,1 · 1,1,1,1,1,0.5)',
+    minuteOk ? '· GEÇTİ' : '· BAŞARISIZ');
+  if (!minuteOk) process.exitCode = 1;
 
   // Panelin teşhis satırı bu alanlardan beslenir: eksikse "0 oda" sessiz kalır.
   const diag = snapshot().scanner;

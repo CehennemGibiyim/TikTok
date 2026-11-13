@@ -2494,9 +2494,10 @@
 
   // ---------- Kutu düşme dakikası ----------
   // Tarayıcı her kutuya dinleme oturumunun kaçıncı saniyesinde düştüğünü yazar
-  // (sessionSec). Burada kutu sayısı dinlenen dakikaya bölünür: 5. dakikanın getirisi
-  // watch-sec'in 5 dk olup olmadığını gösterir. 5+ kovası yalnızca uzatılan/sıcak
-  // oturumlarda dolabilir; yani 5 dk kesme noktası veriyi sansürler.
+  // (sessionSec). Burada kutu sayısı, akış gelen oturumlarda dinlenen dakikaya bölünür;
+  // başarısız ve sessiz denemeler paydaya girmez. 5. dakikanın getirisi watch-sec'in
+  // 5 dk olup olmadığını gösterir. 5+ kovası yalnızca uzatılan/sıcak oturumlarda
+  // dolabilir; yani 5 dk kesme noktası veriyi sansürler.
   var MINUTE_LABELS = ['0–1', '1–2', '2–3', '3–4', '4–5', '5+'];
 
   function renderBoxMinutes() {
@@ -2541,10 +2542,10 @@
     var earlyRate = earlyMin ? (earlyBoxes / earlyMin) * 60 : 0;
     var lastRate = rates[4];
     var beyondRate = rates[5];
-    var lines = ['Örnek: ' + fmt(totalBoxes) + ' kutu · ' + fmt(Math.round(totalMin)) + ' dk dinleme' +
+    var lines = ['Örnek: ' + fmt(totalBoxes) + ' kutu · ' + fmt(Math.round(totalMin)) + ' dk sayılan oturum' +
       (scanInfo.watchMinSince ? ' (' + ago(scanInfo.watchMinSince) + ' başladı)' : '') + '.'];
     if (totalBoxes < 30 || totalMin < 120) {
-      lines.push('Karar için veri birikiyor (eşik: 30 kutu ve 120 dk dinleme).');
+      lines.push('Karar için veri birikiyor (eşik: 30 kutu ve 120 dk sayılan oturum).');
     } else if (lastRate !== null && beyondRate !== null &&
       lastRate <= earlyRate * 1.1 && beyondRate <= earlyRate * 1.1) {
       lines.push('Okuma: 4–5 dk ve 5+ getirisi ilk 4 dakikanın altında → watch-sec 5 dk yeterli.');

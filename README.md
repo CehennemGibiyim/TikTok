@@ -252,17 +252,21 @@ sayılır, alarm üretmez.
 Tarayıcı her kutuya, dinleme oturumunun **kaçıncı saniyesinde** düştüğünü yazar
 (`sessionSec`; `boxes.json`, `live.json` olayları ve ntfy mesajı). Oturum dışından gelen kutu
 bilinmeyen sayılır (ilk dakika sanılmaz). Oturum kapanırken dinlenen süre de dakika kovalarına
-bölünür; böylece her kova için **kutu/saat = kutu ÷ dinlenen dakika** çıkar. İki dizi
-(`boxMinutes`, `watchMin`) `targets.json` ve `live.json` içinde koşular arasında birikir; Ölçüm
-sekmesindeki **Kutu düşme dakikası** kartı bunları çizer.
+bölünür; böylece her kova için **kutu/saat = kutu ÷ dinlenen dakika** çıkar. Paydaya
+**yalnızca gerçekten mesaj veya kutu üreten oturumlar** girer. Bağlantısı kurulamayan denemeler
+ve hiç akış gelmeyen oturumlar sayılmaz; aksi halde kısa başarısız denemeler ilk dakika oranını
+düşürüp 5+ kovasını olduğundan iyi gösterirdi. İki dizi (`boxMinutes`, `watchMin`)
+`targets.json` ve `live.json` içinde koşular arasında birikir; Ölçüm sekmesindeki
+**Kutu düşme dakikası** kartı bunları çizer. Bu düzeltme yalnızca sonraki kapanışlara uygulanır;
+geçmişte birikmiş payda geriye dönük ayrıştırılamaz.
 
 `watch-sec` şu an **300 saniye (5 dk)**. Eğri şu kuralla okunur:
 
 - İlk 4 dakikanın kutu/saat ortalamasına göre **4–5 dk** ve **5+** getirisi %10'dan fazla yüksek değilse
   → 5 dk yeterli (geç gelen kutu için 2,5 dk daha bağlanmak kotayı boşa harcar).
 - Son dakikalarda yoğunluk düşmüyorsa → 5 dk kesiyor olabilir; `watch-sec` artırılmalı.
-- Karar için en az **30 kutu ve 120 dakika dinleme** birikmesi beklenir; öncesinde kart yalnızca
-  “veri birikiyor” der.
+- Karar için en az **30 kutu ve 120 dakika sayılan oturum süresi** birikmesi beklenir; öncesinde
+  kart yalnızca “veri birikiyor” der.
 
 **Sansür notu:** 5+ kovası yalnızca sıcak odaların uzatılmış (7,5 dk) oturumlarından dolabilir; orada
 bile düşük çıkması 5 dakikanın yeterli olduğunu **destekler**, ama 5+ verisinin yokluğu tek başına
