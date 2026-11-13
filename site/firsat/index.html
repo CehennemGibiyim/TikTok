@@ -209,16 +209,19 @@
         <div>
           <h2 class="section-title"><i data-lucide="filter" class="w-5 h-5 text-emerald-300"></i> Kutu hunisi</h2>
           <p class="hint mt-1">
-            Bu cihazda son 7 gün: <b>kutu → görüldü → toplandı / kaçtı</b>. Yalnızca tarayıcıdan gelen kutular sayılır;
+            Bu cihazda son 7 günlük kayan pencere: <b>kutu → görüldü → toplandı / kaçtı</b>. Yalnızca tarayıcıdan gelen kutular sayılır;
             “görüldü”, kutunun panel görünürken Fırsatlar listesinde çizildiği andır. <b>Kaçtı</b> = “Kaçtı” işaretlenen,
             süresi dolan ya da kullanıcı dokunmadan listeden düşen kutu. Altındaki tür satırları sandık/portal/zarf
-            için kutu, görüldü, kaçtı ve kaçma oranını; gün satırları ise son 7 günün kutu, görüldü, toplanan
-            sayılarını ve dönüşüm oranını ayrı ayrı gösterir.
+            için kutu, görüldü, kaçtı ve kaçma oranını; gün satırları üstteki toplamla aynı 7 günlük
+            pencereyi kapsar (en eski gün kısmi olabilir) ve kutu, görüldü, toplanan sayılarını toplanabilir
+            şekilde gösterir. Görünürlük kartı, sekmenin görünür olduğu dakikaları
+            ve kutunun geldiği anda panelin görünür olup olmadığını ayrıca ölçer.
           </p>
         </div>
-        <div class="text-[11px] text-yellow-50/40 text-right whitespace-nowrap">son 7 gün</div>
+        <div class="text-[11px] text-yellow-50/40 text-right whitespace-nowrap">7 günlük pencere</div>
       </div>
       <div id="funnelSummary" class="grid grid-cols-2 lg:grid-cols-4 gap-3"></div>
+      <div id="funnelExposure" class="mt-4 border-t border-white/10 pt-3"></div>
       <p class="hint mt-3" id="funnelReaction"></p>
       <div id="funnelKinds" class="mt-4 border-t border-white/10 pt-3"></div>
       <div id="funnelDays" class="mt-4 border-t border-white/10 pt-3"></div>
@@ -230,9 +233,9 @@
           <h2 class="section-title"><i data-lucide="package-check" class="w-5 h-5 text-sky-300"></i> Kutu teslimi</h2>
           <p class="hint mt-1">
             Son tarayıcı koşusunda <b>üretilen tekil kutu</b> ile <b>bu panele ulaşan tekil kutu</b> aynı sıra numarasıyla
-            karşılaştırılır. Fark gerçek kayıtlardan ayrılır: ntfy yayın hatası, SSE/panel tarafında görülmeme ve
-            <code>boxes.json</code>un son 120 kutu penceresinin dışında kalma. Aynı kutunun iki kanaldan gelmesi
-            <b>dedupe</b> olarak ayrıca sayılır; kayıp değildir, tekil sayıdan düşülmez.
+            karşılaştırılır. Fark gerçek kayıtlardan ayrılır: ntfy yayın hatası, panel kapalıyken üretilen kutu,
+            SSE/diğer görülmeme ve <code>boxes.json</code>un son 120 kutu penceresinin dışında kalma. Aynı kutunun
+            iki kanaldan gelmesi <b>dedupe</b> olarak ayrıca sayılır; kayıp değildir, tekil sayıdan düşülmez.
           </p>
         </div>
         <div class="text-[11px] text-yellow-50/40 text-right whitespace-nowrap" id="deliveryUpdated">son koşu</div>
@@ -262,6 +265,7 @@
         <div id="boxMinuteWindow" class="text-[11px] text-yellow-50/40 text-right whitespace-nowrap" title="">son 7 gün</div>
       </div>
       <div id="boxMinuteBars" class="space-y-1"></div>
+      <div id="boxMinuteDays" class="mt-3 space-y-1"></div>
       <p class="hint mt-3" id="boxMinuteVerdict"></p>
     </div>
 
