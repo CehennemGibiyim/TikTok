@@ -189,13 +189,22 @@ node scripts/quota-report.mjs                                        # metin rap
 ### Kutu hunisi (cihazda)
 
 Ölçüm sekmesinin başında, yalnızca **bu cihazda** son 7 günün kutu hunisi var:
-**kutu → görüldü → toplandı / kaçtı**. Tarayıcıdan gelen kutular sayılır; “görüldü”, kutunun panel
-görünürken Fırsatlar listesinde çizildiği an olarak kaydedilir. **Kaçtı** = “Kaçtı” işaretlenen, süresi
-dolan ya da kullanıcı dokunmadan listeden düşen kutu. Kartlar kutu/görüldü/toplandı/kaçtı sayılarını,
-dönüşüm oranını (toplanan / görülen) ve medyan tepki süresini (toplama − görülme) verir; altındaki
-çubuklar kaçan kutuların geldiği saati gösterir. Veri cihazda (IndexedDB/localStorage) tutulur ve hesap
-panelde yapılır, çünkü kullanıcı işaretlemeleri tarayıcı geçmişinde yoktur. “Görüldü” alanı bu sürümle
-eklendi: ondan önceki kutular hunide sayılmaz, 7 gün içinde kendiliğinden arınır.
+**kutu → görüldü → toplandı / kaçtı**. Yalnızca tarayıcıdan gelen sandık/portal/zarf sayılır; elle
+eklenen kayıtlar ve yayıncıya atılan sıradan hediyeler huniye girmez.
+
+- **Görüldü:** panel görünürken ve Fırsatlar sekmesi açıkken kutu bekliyordu. Sayfa arkada ya da başka
+  sekmedeyken gelen kutu, Fırsatlar açılana kadar görülmüş sayılmaz. Tür filtresi (ör. yalnız Zarf)
+  seçili olsa da bekleyen diğer türler görüldü sayılır; ölçülen şey kutunun kullanıcının önüne çıkması.
+- **Toplandı:** yalnızca “Toplandı” işaretlenen kutu (işaretleme anı `collectedAt`).
+- **Kaçtı:** “Kaçtı” işaretlenen, süresi dolan ya da kullanıcı dokunmadan listeden düşen kutu. Süresi
+  dolduğu hâlde durumu “bekliyor” kalan kutu da kaçmış sayılır. Henüz açık bekleyenler Kaçtı kartında
+  ayrıca yazar.
+
+Kartlar kutu/görüldü/toplandı/kaçtı sayılarını, toplanma oranını (toplanan / görülen; Toplandı kartının
+altında) ve medyan tepki süresini (toplanma − görülme; alt satırda) verir. Alttaki çubuklar kaçan
+kutuların geldiği saati gösterir. Veri cihazda (IndexedDB/localStorage) tutulur ve hesap panelde yapılır,
+çünkü kullanıcı işaretlemeleri tarayıcı geçmişinde yoktur. “Görüldü” alanı bu sürümle eklendi: ondan
+önceki kutular hunide sayılmaz, 7 gün içinde kendiliğinden arınır.
 
 ### Sistem sağlığı satırı
 

@@ -2214,15 +2214,19 @@
 
   var FUNNEL_WINDOW_MS = 7 * 24 * 3600 * 1000;
 
-  function funnelMissed(event) {
-    if (event.status === 'missed' || event.status === 'expired') return true;
-    // Sandık listeden sessizce düşer ama durumu 'pending' kalır: süresi geçmişse kaçmıştır.
-    return event.status === 'pending' && isExpired(event);
+  // Huniye giren kutu: tarayıcıdan gelen sandık/portal/zarf. Elle eklenen
+  // kayıtlar ve yayıncıya atılan sıradan hediyeler hunide yok.
+  function isFunnelBox(event) {
+    return Boolean(event.auto) && isOpportunity(event);
   }
 
-  // “Görüldü” = kutu, panel görünürken Fırsatlar listesinde çizildi. Sayfa arka
-  // plandayken ya da başka sekmedeyken gelen kutu, liste açılana kadar görülmüş
-  // sayılmaz; böylece “panel kutu kaçırdı mı” sorusu ölçülebilir olur.
+  // “Görüldü” = panel görünürken kutu Fırsatlar sekmesinde bekliyordu. Sayfa arka
+  // plandayken gelen kutu, sekme açılana kadar görülmüş sayılmaz; böylece “panel kutu
+  // kaçırdı mı” sorusu ölçülebilir olur.
+  function isFunnelPending(event) {
+    return isFunnelBox(event) && event.status === 'pending' && !isExpired(event);
+  }
+
   function markFunnelSeen() {
     if (document.visibilityState !== 'visible') return;
     var view = $('view-opportunities');
@@ -2230,8 +2234,7 @@
     var now = Date.now();
     var changed = false;
     var events = state.events.map(function (event) {
-      if (!event.auto || !isOpportunity(event) || Number(event.seenAt) > 0) return event;
-      if (event.status !== 'pending' || isExpired(event)) return event;
+      if (!isFunnelPending(event) || Number(event.seenAt) > 0) return event;
       changed = true;
       return Object.assign({}, event, { seenAt: now });
     });
@@ -2245,51 +2248,59 @@
     return Math.max(Date.now() - FUNNEL_WINDOW_MS, Number(state.settings && state.settings.funnelSeenSince) || 0);
   }
 
+  // Görülen kutunun sonucu: toplandı, kaçtı ya da hâlâ açık. Tek sınıflandırma, kartlarla
+  // saat dağılımının aynı tanımı kullanmasını sağlar.
+  function funnelOutcome(event) {
+    if (event.status === 'collected') return Number(event.collectedAt) > 0 ? 'collected' : null;
+    if (event.status === 'pending') return isExpired(event) ? 'missed' : 'open';
+    if (event.status === 'missed' || event.status === 'expired') return 'missed';
+    return null;
+  }
+
   function funnelStats() {
     var since = funnelSince();
-    var boxes = state.events.filter(function (event) {
-      return event.auto && isOpportunity(event) &&
-        Number(event.createdAt) >= since;
-    });
-    var seen = boxes.filter(function (event) { return Number(event.seenAt) > 0; });
-    var collected = seen.filter(function (event) {
-      return event.status === 'collected' && Number(event.collectedAt) > 0;
-    });
-    var missed = seen.filter(funnelMissed);
-    var open = seen.filter(function (event) {
-      return event.status === 'pending' && !isExpired(event);
-    });
+    var boxes = 0;
+    var seen = 0;
+    var collected = 0;
+    var missed = 0;
+    var open = 0;
     var reactions = [];
-    collected.forEach(function (event) {
-      var diff = Number(event.collectedAt) - Number(event.seenAt);
-      if (diff >= 0 && diff <= FUNNEL_WINDOW_MS) reactions.push(diff);
-    });
-    reactions.sort(function (a, b) { return a - b; });
     var hours = [];
     for (var hour = 0; hour < 24; hour += 1) hours.push(0);
-    missed.forEach(function (event) {
-      hours[new Date(Number(event.createdAt)).getHours()] += 1;
+
+    state.events.forEach(function (event) {
+      if (!isFunnelBox(event) || Number(event.createdAt) < since) return;
+      boxes += 1;
+      if (Number(event.seenAt) <= 0) return;
+      seen += 1;
+      var outcome = funnelOutcome(event);
+      if (outcome === 'open') {
+        open += 1;
+      } else if (outcome === 'missed') {
+        missed += 1;
+        hours[new Date(Number(event.createdAt)).getHours()] += 1;
+      } else if (outcome === 'collected') {
+        collected += 1;
+        var diff = Number(event.collectedAt) - Number(event.seenAt);
+        if (diff >= 0 && diff <= FUNNEL_WINDOW_MS) reactions.push(diff);
+      }
     });
+
+    reactions.sort(function (a, b) { return a - b; });
     return {
       since: since,
-      boxes: boxes.length,
-      seen: seen.length,
-      unseen: boxes.length - seen.length,
-      collected: collected.length,
-      missed: missed.length,
-      open: open.length,
+      boxes: boxes,
+      seen: seen,
+      unseen: boxes - seen,
+      collected: collected,
+      missed: missed,
+      open: open,
       // Görülenler içinde toplanma oranı; görülen yoksa bilinmiyor.
-      conversion: seen.length ? collected.length / seen.length : null,
+      conversion: seen ? collected / seen : null,
       median: reactions.length ? reactions[Math.floor(reactions.length / 2)] : null,
       hours: hours
     };
   }
-
-  // Tarayıcı testinde huni sayılarını görebilmek için küçük bir pencere.
-  window.JetonPanelFunnel = {
-    stats: funnelStats,
-    render: renderFunnel
-  };
 
   function renderFunnel() {
     var summary = $('funnelSummary');

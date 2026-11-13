@@ -20,8 +20,16 @@
   var BACKUP_APP = 'tiktok-jeton-paneli';
   var BACKUP_VERSION = 2;
   // Panel sürümü ve sürüm geçmişi (Ayarlar'da gösterilir, yedeğe yazılır).
-  var APP_VERSION = '1.4.2';
+  var APP_VERSION = '1.4.3';
   var CHANGE_LOG = [
+    {
+      version: '1.4.3',
+      date: '2026-11-13',
+      items: [
+        'Kutu hunisi sadeleştirildi: görülen kutunun sonucu tek sınıflandırmayla (toplandı / kaçtı / açık) belirleniyor; sayılar ve davranış değişmedi.',
+        'Huni tanımları netleştirildi: görüldü = panel görünürken Fırsatlar sekmesinde bekleyen kutu (tür filtresinden bağımsız), toplandı = işaretlenen, kaçtı = işaretlenen ya da süresi dolan kutu.'
+      ]
+    },
     {
       version: '1.4.2',
       date: '2026-11-13',
