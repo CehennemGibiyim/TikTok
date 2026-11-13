@@ -634,9 +634,10 @@
       var budgetNow = Date.now();
       var budgetText = '📊 bu saat ' + usedHour + '/' + limitHour + ' bağlantı';
       // Öğrenilen limit devredeyse sebebi görünsün: "limit 25 → öğrenilen 23".
-      var learnedHour = Number(budget.learned) || 0;
-      var configuredHour = Number(budget.configured) || limitHour;
-      if (learnedHour > 0 && learnedHour < configuredHour) {
+      // connectBudget devrede olmayanı 0 bildirir; panel karşılaştırma yapmaz.
+      var learnedHour = Number(budget.learnedLimit) || 0;
+      if (learnedHour > 0) {
+        var configuredHour = Number(budget.configured) || limitHour;
         budgetText += ' · limit ' + configuredHour + ' → öğrenilen ' + learnedHour;
       }
       if (usedHour >= limitHour && nextAt > budgetNow) {

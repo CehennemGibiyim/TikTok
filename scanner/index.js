@@ -1603,8 +1603,9 @@ function pickRoom(options) {
 const HOUR_MS = 3600000;
 
 // Saatlik bağlantı bütçesi: son 60 dakikadaki denemeler ve kalan hak.
-// Yürürlükteki sınır, yapılandırılan ile hız sınırından öğrenilenin küçüğüdür;
-// öğrenilen daha büyükse (ya da hiç yoksa) yapılandırılan geçerlidir.
+// `limit`, yapılandırılan bütçe ile hız sınırından öğrenilenin küçüğüdür; öğrenilen
+// yapılandırılandan büyükse (ya da hiç yoksa) yapılandırılan geçerlidir ve dönen
+// `learnedLimit` 0 olur (panel "öğrenilen limit devrede" derken buna bakar).
 // Aralık "kalan hak / pencere sonuna kalan süre"dir: bütçe saat boyunca yayılır
 // ve TikTok'un hourly kotasına çarpılmadan yavaşlanır. Hak 0 ise `nextAttemptAt`
 // en eski denemenin pencereden çıkacağı an, tek hak kaldıysa `gapMs` pencerenin
@@ -1613,16 +1614,19 @@ function connectBudget(now = Date.now()) {
   state.hourStarts = state.hourStarts.filter((at) => at > now - HOUR_MS);
   const used = state.hourStarts.length;
   const configured = CONFIG.hourBudget;
-  const learned = state.hourBudgetLearned || 0;
-  const limit = Math.min(configured, learned || configured);
+  const stored = state.hourBudgetLearned || 0;
+  const learnedLimit = stored < configured ? stored : 0;
+  const limit = learnedLimit || configured;
   const remaining = Math.max(0, limit - used);
   const oldest = state.hourStarts[0] || now;
-  const windowLeft = Math.max(0, oldest + HOUR_MS - now);
+  // Filtre en eski denemeyi pencerede tutar, liste boşsa now kullanılır:
+  // kalan süre her zaman pozitif.
+  const windowLeft = oldest + HOUR_MS - now;
   return {
     used,
     limit,
     remaining,
-    learned,
+    learnedLimit,
     configured,
     // Kalan haklar pencere sonuna kadar yayılır; taban aralık korunur.
     gapMs: remaining > 0 ? Math.max(CONFIG.connectGapMs, Math.ceil(windowLeft / remaining)) : 0,
@@ -1633,10 +1637,11 @@ function connectBudget(now = Date.now()) {
 
 // Hız sınırına çarptığımız nokta gerçek üst sınırdır: bütçeyi oraya çek.
 // Yalnızca daha düşük bir sınır öğrenilirse güncellenir; daha yükseği yok sayılır.
+// Deneme saatleri hız sınırı hatasından önce kaydedildiği için `used` en az 1'dir.
 function learnHourBudget() {
   const used = connectBudget().used;
   if (state.hourBudgetLearned && used >= state.hourBudgetLearned) return;
-  state.hourBudgetLearned = Math.max(1, used);
+  state.hourBudgetLearned = used;
   log('saatlik bağlantı bütçesi öğrenildi:', state.hourBudgetLearned,
     '— bundan sonra bu sınırın altında kalınacak');
 }
@@ -2215,7 +2220,7 @@ if (process.env.SCANNER_SELFTEST === '1') {
       console.log('BÜTÇE SINAMASI BAŞARISIZ: eşikte aralık uzamadı');
       process.exitCode = 1;
     }
-    if (learned.limit !== 5) {
+    if (learned.limit !== 5 || learned.learnedLimit !== 5) {
       console.log('BÜTÇE SINAMASI BAŞARISIZ: öğrenilen limit uygulanmadı');
       process.exitCode = 1;
     }
@@ -2223,7 +2228,7 @@ if (process.env.SCANNER_SELFTEST === '1') {
       console.log('BÜTÇE SINAMASI BAŞARISIZ: tek hakta aralık');
       process.exitCode = 1;
     }
-    if (highLearned.limit !== 10 || highLearned.remaining !== 8) {
+    if (highLearned.limit !== 10 || highLearned.remaining !== 8 || highLearned.learnedLimit !== 0) {
       console.log('BÜTÇE SINAMASI BAŞARISIZ: öğrenilen limit varsayılanı aştı');
       process.exitCode = 1;
     }
