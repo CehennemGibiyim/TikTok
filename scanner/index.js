@@ -84,6 +84,10 @@ const CONFIG = {
   // Dakikada en fazla kaç yeni bağlantı başlatılır (Euler: "too many connections
   // started" hatası dakikalık sayaca bakıyor).
   startsPerMin: Math.max(1, Number(readArg('starts-per-min', 8))),
+  // Saatlik bağlantı bütçesi: son 60 dakikada en fazla bu kadar bağlantı denenir.
+  // Sınıra yaklaşınca aralık kendiliğinden uzar, yani TikTok'un hourly kotasına
+  // çarpmadan yavaşlanır; bütçe boşalınca en eski deneme saati doldurunca devam eder.
+  hourBudget: Math.max(1, Number(readArg('hour-budget', 60))),
   // Sınır yediğimizde inilebilecek en düşük eşzamanlı oda sayısı.
   minRooms: Number(readArg('min-rooms', 8)),
   // Oda kimliği bu süreden eskiyse güvenilmez: bağlanmadan önce tazelenir (30 dk).
@@ -150,6 +154,9 @@ const state = {
   // Bağlantı teşhisi: panel "neden 0 oda" sorusunu buradan yanıtlar.
   connectStats: { attempts: 0, ok: 0, failed: 0, rateLimited: 0, offline: 0, dayLimited: false, errors: [] },
   connectStarts: [],
+  // Saatlik bütçe: son 60 dakikadaki deneme zamanları ve hız sınırından öğrenilen üst sınır.
+  hourStarts: [],
+  hourBudgetLearned: 0,
   lastConnectorError: null,
   closeReasons: {},
   lastConnectAt: 0,
@@ -1537,12 +1544,36 @@ function pickRoom(options) {
   return { record, probe: record === probeRoom, hot: isHot(record, now) };
 }
 
+// Saatlik bağlantı bütçesi: son 60 dakikadaki denemeler ve kalan hak.
+// Limitin %80'inden sonra aralık, kalan haklar saat sonuna yayılacak şekilde
+// uzar; yani TikTok'un hourly kotasına çarpmadan yavaşlanır. Hak bittiğinde
+// `nextAttemptAt`, en eski denemenin pencereden çıkacağı andır (kendiliğinden
+// devam). Hız sınırı görülürse `hourBudgetLearned` gerçek üst sınırı öğrenir.
+function connectBudget(now = Date.now()) {
+  const windowMs = 3600000;
+  state.hourStarts = state.hourStarts.filter((at) => at > now - windowMs);
+  const learned = Number(state.hourBudgetLearned) || 0;
+  const limit = Math.max(1, learned > 0 ? Math.min(CONFIG.hourBudget, learned) : CONFIG.hourBudget);
+  const used = state.hourStarts.length;
+  const remaining = Math.max(0, limit - used);
+  const oldest = state.hourStarts[0] || now;
+  const nextAttemptAt = remaining > 0 ? 0 : oldest + windowMs;
+  let gapMs = CONFIG.connectGapMs;
+  if (remaining > 0 && used >= limit * 0.8) {
+    const windowLeft = Math.max(0, oldest + windowMs - now);
+    gapMs = Math.max(gapMs, Math.ceil(windowLeft / remaining));
+  }
+  return { used, limit, remaining, nextAttemptAt, gapMs, learned };
+}
+
 async function maintainWatchers() {
   if (!CONFIG.watch) return;
 
   const now = Date.now();
   if (state.connectorCooldownUntil > now) return;
-  if (now - state.lastConnectAt < CONFIG.connectGapMs) return;
+  const plan = connectBudget(now);
+  if (plan.remaining === 0) return;
+  if (now - state.lastConnectAt < plan.gapMs) return;
 
   for (const [username, watcher] of Array.from(state.rooms.entries())) {
     const limit = (watcher.sessionSec || CONFIG.watchSec) * 1000;
@@ -1602,7 +1633,9 @@ async function maintainWatchers() {
   // hep düşük kalıyordu). Artık arada beklenir, ısrarla doldurulur.
   const fillDeadline = Date.now() + 110000;
   while (state.rooms.size < target && Date.now() < fillDeadline) {
-    const gapLeft = CONFIG.connectGapMs - (Date.now() - state.lastConnectAt);
+    const step = connectBudget();
+    if (step.remaining === 0) break;
+    const gapLeft = step.gapMs - (Date.now() - state.lastConnectAt);
     if (gapLeft > 0) {
       await sleep(Math.min(gapLeft, 2000));
       continue;
@@ -1635,6 +1668,7 @@ async function maintainWatchers() {
 
     state.connectStats.attempts += 1;
     state.connectStarts.push(Date.now());
+    state.hourStarts.push(Date.now());
     try {
       await openWatcher(pick.record.username, sessionSec);
       state.lastConnectAt = Date.now();
@@ -1688,6 +1722,13 @@ async function maintainWatchers() {
       if (/rate|too many|device_blocked|429|\b503\b/i.test(error.message || '')) {
         state.connectFailures = Math.min(6, state.connectFailures + 1);
         state.connectStats.rateLimited += 1;
+        // Hız sınırına çarptığımız nokta gerçek üst sınırdır: bütçeyi oraya çek.
+        const usedInHour = connectBudget().used;
+        if (!state.hourBudgetLearned || usedInHour < state.hourBudgetLearned) {
+          state.hourBudgetLearned = Math.max(1, usedInHour);
+          log('saatlik bağlantı bütçesi öğrenildi:', state.hourBudgetLearned,
+            '— bundan sonra bu sınırın altında kalınacak');
+        }
         // Koruma: kotayı yakmaya devam etmesin. Üçüncü hız sınırından sonra
         // dakikalık başlatma yarıya iner, bağlantı aralığı iki katına çıkar.
         if (state.connectStats.rateLimited > 2 && !state.tuningGuard) {
@@ -1867,6 +1908,8 @@ function snapshot() {
         errors: state.connectStats.errors.slice(-3)
       },
       lastConnectorError: state.lastConnectorError,
+      // Saatlik bütçe: kaç bağlantı yapıldı, limit ne, sonraki ne zaman.
+      connectBudget: connectBudget(),
       // Bağlanılamadığı için bir süre denenmeyecek oda sayısı (teşhis).
       backoffRooms: state.failUntil.size,
       // Hız sınırı koruması: devreye girdiyse yeni değerler.
@@ -2039,6 +2082,50 @@ async function main() {
 // Kendi kendini sınama: ayrıştırıcının hangi paketleri yazıp hangilerini
 // atladığını gerçek alan adlarıyla gösterir. Ağa çıkmaz.
 if (process.env.SCANNER_SELFTEST === '1') {
+  // Saatlik bütçe sınaması (ağa çıkmaz): boş, dolu, eşiğe yakın ve öğrenilen limit.
+  (() => {
+    const now = Date.now();
+    const saved = {
+      starts: state.hourStarts,
+      learned: state.hourBudgetLearned,
+      budget: CONFIG.hourBudget
+    };
+    CONFIG.hourBudget = 10;
+    state.hourBudgetLearned = 0;
+    state.hourStarts = [];
+    const empty = connectBudget(now);
+    state.hourStarts = Array.from({ length: 10 }, (_, index) => now - (10 - index) * 60000);
+    const full = connectBudget(now);
+    state.hourStarts = Array.from({ length: 8 }, () => now - 60000);
+    const near = connectBudget(now);
+    state.hourBudgetLearned = 5;
+    const learned = connectBudget(now);
+    const nextInMin = Math.round((full.nextAttemptAt - now) / 60000);
+    console.log('BÜTÇE →', 'boş', empty.used + '/' + empty.limit,
+      '· dolu', full.used + '/' + full.limit, 'sonraki', nextInMin, 'dk',
+      '· eşik aralığı', Math.round(near.gapMs / 1000) + ' sn',
+      '· öğrenilen limit', learned.limit);
+    if (empty.used !== 0 || empty.remaining !== 10) {
+      console.log('BÜTÇE SINAMASI BAŞARISIZ: boş bütçe');
+      process.exitCode = 1;
+    }
+    if (full.used !== 10 || full.remaining !== 0 || nextInMin <= 0) {
+      console.log('BÜTÇE SINAMASI BAŞARISIZ: dolu bütçe');
+      process.exitCode = 1;
+    }
+    if (near.gapMs <= CONFIG.connectGapMs) {
+      console.log('BÜTÇE SINAMASI BAŞARISIZ: eşikte aralık uzamadı');
+      process.exitCode = 1;
+    }
+    if (learned.limit !== 5) {
+      console.log('BÜTÇE SINAMASI BAŞARISIZ: öğrenilen limit uygulanmadı');
+      process.exitCode = 1;
+    }
+    state.hourStarts = saved.starts;
+    state.hourBudgetLearned = saved.learned;
+    CONFIG.hourBudget = saved.budget;
+  })();
+
   const frames = [
     ['sıradan hediye (Rose)', { event: 'gift', data: { giftName: 'Rose', giftId: 5655, diamondCount: 1, repeatCount: 1, repeatEnd: true, msgId: 'a1' } }],
     ['sandık hediyesi', { event: 'gift', data: { giftName: 'Sandık', giftId: 9001, diamondCount: 500, repeatCount: 1, repeatEnd: true, msgId: 'a2' } }],

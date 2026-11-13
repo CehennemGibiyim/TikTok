@@ -20,8 +20,16 @@
   var BACKUP_APP = 'tiktok-jeton-paneli';
   var BACKUP_VERSION = 2;
   // Panel sürümü ve sürüm geçmişi (Ayarlar'da gösterilir, yedeğe yazılır).
-  var APP_VERSION = '1.1.9';
+  var APP_VERSION = '1.2.0';
   var CHANGE_LOG = [
+    {
+      version: '1.2.0',
+      date: '2026-11-13',
+      items: [
+        'Saatlik bağlantı bütçesi: tarama, TikTok kotasına çarpmadan yavaşlıyor ve bütçe boşalınca kendiliğinden devam ediyor.',
+        'Panelde bu saat kaç bağlantı yapıldığı, limit ve bütçe doluysa sonraki deneme süresi yazıyor.'
+      ]
+    },
     {
       version: '1.1.9',
       date: '2026-11-13',

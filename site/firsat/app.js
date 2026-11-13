@@ -612,6 +612,20 @@
       hints.push('bağlantı ' + okCount + '/' + attempts + ' başarılı' +
         (failedCount ? ' · ' + failedCount + ' hata' : ''));
     }
+    var budget = scanInfo.connectBudget;
+    if (budget && Number(budget.limit) > 0) {
+      var usedHour = Number(budget.used) || 0;
+      var limitHour = Number(budget.limit) || 0;
+      var nextAt = Number(budget.nextAttemptAt) || 0;
+      var budgetNow = Date.now();
+      var budgetText = '📊 bu saat ' + usedHour + '/' + limitHour + ' bağlantı';
+      if (usedHour >= limitHour && nextAt > budgetNow) {
+        budgetText += ' · bütçe dolu, sonraki deneme ' + clock((nextAt - budgetNow) / 1000);
+      } else if (Number(budget.gapMs) > 5000) {
+        budgetText += ' · aralık ' + Math.round(Number(budget.gapMs) / 1000) + ' sn';
+      }
+      hints.push(budgetText);
+    }
     var guard = scanInfo.tuningGuard;
     if (guard) {
       hints.push('🛡 kota koruması: dakikada ' + guard.startsPerMin + ' bağlantı · ' +
