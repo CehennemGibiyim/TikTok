@@ -1520,9 +1520,10 @@ async function maintainWatchers() {
     now - Number(record.roomIdAt) < CONFIG.roomIdFreshMs;
   const candidateFilter = (strict) => (record) => {
     if (!record.live && !record.liveUnknown) return false;
-    if (!strict) return true;
     // Kimlik yoksa bağlanmak boşa: sayfa/API doğrulaması bu IP'lerde
     // "sayfada canlı oda yok" diyor ve her deneme kota harcıyor.
+    if (!record.roomId) return false;
+    if (!strict) return true;
     return hasFreshRoomId(record);
   };
   // Bağlanılamayan oda bir süre listeye alınmaz (boşa kota harcanmasın).
