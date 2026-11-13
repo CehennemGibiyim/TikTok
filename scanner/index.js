@@ -1620,7 +1620,8 @@ function connectBudget(now = Date.now()) {
   const gapMs = remaining > 0
     ? Math.max(CONFIG.connectGapMs, Math.ceil(windowLeft / remaining))
     : CONFIG.connectGapMs;
-  return { used, limit, remaining, nextAttemptAt, gapMs, learned };
+  // `configured` panel içindir: "limit 25 -> ogrenilen 23" yazabilsin.
+  return { used, limit, remaining, nextAttemptAt, gapMs, learned, configured: CONFIG.hourBudget };
 }
 
 async function maintainWatchers() {

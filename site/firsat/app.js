@@ -633,6 +633,12 @@
       var nextAt = Number(budget.nextAttemptAt) || 0;
       var budgetNow = Date.now();
       var budgetText = '📊 bu saat ' + usedHour + '/' + limitHour + ' bağlantı';
+      // Öğrenilen limit devredeyse sebebi görünsün: "limit 25 → öğrenilen 23".
+      var learnedHour = Number(budget.learned) || 0;
+      var configuredHour = Number(budget.configured) || limitHour;
+      if (learnedHour > 0 && configuredHour > limitHour) {
+        budgetText += ' · limit ' + configuredHour + ' → öğrenilen ' + learnedHour;
+      }
       if (usedHour >= limitHour && nextAt > budgetNow) {
         budgetText += ' · bütçe dolu, sonraki deneme ' + clock((nextAt - budgetNow) / 1000);
       } else if (Number(budget.gapMs) > 5000) {
