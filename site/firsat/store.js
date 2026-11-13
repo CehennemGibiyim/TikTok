@@ -20,8 +20,16 @@
   var BACKUP_APP = 'tiktok-jeton-paneli';
   var BACKUP_VERSION = 2;
   // Panel sürümü ve sürüm geçmişi (Ayarlar'da gösterilir, yedeğe yazılır).
-  var APP_VERSION = '1.1.5';
+  var APP_VERSION = '1.1.6';
   var CHANGE_LOG = [
+    {
+      version: '1.1.6',
+      date: '2026-11-13',
+      items: [
+        'Bildirim izni açılışta ve ilk tıklamada isteniyor; panelin üstünde izin durumu yazıyor.',
+        'İzin yoksa yeni kutu için kısa sesli uyarı ve 4 saniyelik ekran vurgusu çıkıyor.'
+      ]
+    },
     {
       version: '1.1.5',
       date: '2026-11-13',
