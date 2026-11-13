@@ -100,6 +100,8 @@ for (const r of list.slice(-25)) {
   const per = r.attempts ? (r.boxes / r.attempts * 100).toFixed(2) : '0.00';
   const hours = hoursOf(r);
   const boxesPerSession = r.ok ? (r.boxes / r.ok).toFixed(2) : '-';
+  // Yarım saatten kısa koşularda kutu/saat yalnızca birkaç dakikadan türetilir: işaretle.
+  const short = hours > 0 && hours < 0.5 ? '*' : ' ';
   console.log([
     new Date(r.at).toISOString().slice(5, 16),
     'oda ' + String(r.cfg.rooms).padStart(2),
@@ -112,11 +114,12 @@ for (const r of list.slice(-25)) {
     'kutu ' + String(r.boxes).padStart(2),
     'jeton ' + String(r.boxCoins).padStart(5),
     '| kutu/100 deneme ' + per,
-    'kutu/saat ' + fmtHourly(perHour(r.boxes, hours)),
+    'kutu/saat ' + fmtHourly(perHour(r.boxes, hours)) + short,
     'kutu/5dk oturum ' + boxesPerSession
   ].join(' '));
 }
 
+console.log('(* = koşu yarım saatten kısa; kutu/saat az sayıda dakikadan türetildi)');
 console.log('');
 console.log('AYAR GRUPLARI (kutu/deneme buyukten kucuge)');
 const rows = Array.from(groups.values()).sort((a, b) => (b.boxes / Math.max(1, b.attempts)) - (a.boxes / Math.max(1, a.attempts)));
