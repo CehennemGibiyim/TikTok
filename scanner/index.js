@@ -169,6 +169,8 @@ const state = {
   boxesDirty: false,
   lastBoxCommit: 0,
   lastDiscover: 0,
+  // Keşif uçlarını sırayla kullan (her çağrı ayrı 10 kanal).
+  discoverVariant: 0,
   // Günlük ülke taraması raporu (panelde gösterilir, koşular arası korunur).
   regionSweep: { at: 0, added: 0, regions: {}, failed: [] },
   regionSweepRunning: false,
@@ -386,8 +388,17 @@ function saveTargets() {
 
 const DISCOVERY_URL = 'https://api.tik.tools/api/live/top-channels';
 
+// Ticker listesi tek çağrıda 10 kanal veriyor ve bölge parametresi ayrı bir
+// liste döndürüyor; iki listeyi sırayla çağırmak aday sayısını ikiye katlıyor.
+const DISCOVERY_VARIANTS = [
+  'https://api.tik.tools/api/live/top-channels',
+  'https://api.tik.tools/api/live/top-channels?region=US'
+];
+
 async function fetchDiscoveryPage() {
-  const response = await fetch(DISCOVERY_URL, {
+  const url = DISCOVERY_VARIANTS[state.discoverVariant % DISCOVERY_VARIANTS.length];
+  state.discoverVariant += 1;
+  const response = await fetch(url, {
     headers: { 'User-Agent': UA, Accept: 'application/json' },
     signal: AbortSignal.timeout(15000)
   });
