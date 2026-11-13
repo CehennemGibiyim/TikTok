@@ -87,7 +87,8 @@ const CONFIG = {
   // Saatlik bağlantı bütçesi: son 60 dakikada en fazla bu kadar bağlantı denenir.
   // Sınıra yaklaşınca aralık kendiliğinden uzar, yani TikTok'un hourly kotasına
   // çarpmadan yavaşlanır; bütçe boşalınca en eski deneme saati doldurunca devam eder.
-  hourBudget: Math.max(1, Number(readArg('hour-budget', 60))),
+  // Varsayılan 25: üretimde ölçülen pratik sınır ~23, üstüne çıkmak 429 yiyor.
+  hourBudget: Math.max(1, Number(readArg('hour-budget', 25))),
   // Sınır yediğimizde inilebilecek en düşük eşzamanlı oda sayısı.
   minRooms: Number(readArg('min-rooms', 8)),
   // Oda kimliği bu süreden eskiyse güvenilmez: bağlanmadan önce tazelenir (30 dk).
