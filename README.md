@@ -201,8 +201,10 @@ eklenen kayıtlar ve yayıncıya atılan sıradan hediyeler huniye girmez.
   ayrıca yazar.
 
 Kartlar kutu/görüldü/toplandı/kaçtı sayılarını, toplanma oranını (toplanan / görülen; Toplandı kartının
-altında) ve medyan tepki süresini (toplanma − görülme; alt satırda) verir. Alttaki çubuklar kaçan
-kutuların geldiği saati gösterir. Veri cihazda (IndexedDB/localStorage) tutulur ve hesap panelde yapılır,
+altında) ve medyan tepki süresini (toplanma − görülme; alt satırda) verir. Hemen altında **türe göre**
+satırlar (sandık / portal / zarf) aynı tanımlarla kutu, görüldü, kaçtı ve **kaçma oranını**
+(kaçan / görülen) gösterir; en yüksek oranlı tür ayrıca yazılır ve 5’ten az görülen varsa “az örnek”
+uyarısı düşülür. Alttaki çubuklar kaçan kutuların geldiği saati gösterir. Veri cihazda (IndexedDB/localStorage) tutulur ve hesap panelde yapılır,
 çünkü kullanıcı işaretlemeleri tarayıcı geçmişinde yoktur. “Görüldü” alanı bu sürümle eklendi: ondan
 önceki kutular hunide sayılmaz, 7 gün içinde kendiliğinden arınır.
 

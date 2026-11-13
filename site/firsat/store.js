@@ -20,8 +20,16 @@
   var BACKUP_APP = 'tiktok-jeton-paneli';
   var BACKUP_VERSION = 2;
   // Panel sürümü ve sürüm geçmişi (Ayarlar'da gösterilir, yedeğe yazılır).
-  var APP_VERSION = '1.4.3';
+  var APP_VERSION = '1.4.4';
   var CHANGE_LOG = [
+    {
+      version: '1.4.4',
+      date: '2026-11-13',
+      items: [
+        'Kutu hunisi türe göre kırıldı: sandık / portal / zarf için ayrı kutu, görüldü, kaçtı ve kaçma oranı satırları.',
+        'En çok kaçan tür ayrıca yazılır; 5’ten az görülen türde oran “az örnek” uyarısıyla birlikte gösterilir.'
+      ]
+    },
     {
       version: '1.4.3',
       date: '2026-11-13',

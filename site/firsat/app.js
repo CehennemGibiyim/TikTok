@@ -2266,21 +2266,31 @@
     var open = 0;
     var reactions = [];
     var hours = [];
+    var kinds = {};
     for (var hour = 0; hour < 24; hour += 1) hours.push(0);
+    Object.keys(KINDS).forEach(function (kind) {
+      kinds[kind] = { boxes: 0, seen: 0, collected: 0, missed: 0, open: 0 };
+    });
 
     state.events.forEach(function (event) {
       if (!isFunnelBox(event) || Number(event.createdAt) < since) return;
       boxes += 1;
+      var kind = kinds[event.kind];
+      if (kind) kind.boxes += 1;
       if (Number(event.seenAt) <= 0) return;
       seen += 1;
+      if (kind) kind.seen += 1;
       var outcome = funnelOutcome(event);
       if (outcome === 'open') {
         open += 1;
+        if (kind) kind.open += 1;
       } else if (outcome === 'missed') {
         missed += 1;
+        if (kind) kind.missed += 1;
         hours[new Date(Number(event.createdAt)).getHours()] += 1;
       } else if (outcome === 'collected') {
         collected += 1;
+        if (kind) kind.collected += 1;
         var diff = Number(event.collectedAt) - Number(event.seenAt);
         if (diff >= 0 && diff <= FUNNEL_WINDOW_MS) reactions.push(diff);
       }
@@ -2298,8 +2308,56 @@
       // Görülenler içinde toplanma oranı; görülen yoksa bilinmiyor.
       conversion: seen ? collected / seen : null,
       median: reactions.length ? reactions[Math.floor(reactions.length / 2)] : null,
-      hours: hours
+      hours: hours,
+      kinds: kinds
     };
+  }
+
+  // Tür kırılımı: hangi türün daha çok kaçtığı aynı huni tanımlarıyla görünsün.
+  // Kaçma oranının paydası görülen kutudur; hiç görülmeyen kutu bu orana girmez.
+  function renderFunnelKinds(f) {
+    var el = $('funnelKinds');
+    if (!el) return;
+    var order = ['chest', 'portal', 'letter'];
+    var rows = order.filter(function (kind) { return f.kinds[kind] && f.kinds[kind].boxes > 0; });
+    if (!rows.length) { el.innerHTML = ''; return; }
+
+    var best = null;
+    rows.forEach(function (kind) {
+      var k = f.kinds[kind];
+      if (!k.seen) return;
+      var rate = k.missed / k.seen;
+      if (!best || rate > best.rate) best = { kind: kind, rate: rate, seen: k.seen };
+    });
+
+    var header = '<div class="flex items-center gap-2 px-1 text-[10px] uppercase tracking-wide text-yellow-50/40">' +
+      '<span class="w-28 shrink-0">tür</span>' +
+      '<span class="w-10 text-right">kutu</span>' +
+      '<span class="w-14 text-right">görüldü</span>' +
+      '<span class="w-10 text-right">kaçtı</span>' +
+      '<span class="w-16 text-right">kaçma</span>' +
+      '</div>';
+    var body = rows.map(function (kind) {
+      var k = f.kinds[kind];
+      var meta = KINDS[kind] || { label: kind, icon: '' };
+      var rate = k.seen ? k.missed / k.seen : null;
+      var color = rate === null ? 'text-yellow-50/30' : (rate >= 0.5 ? 'text-red-300' : 'text-yellow-50/70');
+      return '<div class="flex items-center gap-2 rounded px-1 py-0.5 text-[11px] hover:bg-white/5">' +
+        '<span class="w-28 shrink-0 truncate text-yellow-100">' + meta.icon + ' ' + esc(meta.label) + '</span>' +
+        '<span class="w-10 text-right font-mono">' + fmt(k.boxes) + '</span>' +
+        '<span class="w-14 text-right font-mono text-sky-300">' + fmt(k.seen) + '</span>' +
+        '<span class="w-10 text-right font-mono text-red-300">' + fmt(k.missed) + '</span>' +
+        '<span class="w-16 text-right font-mono ' + color + '">' +
+          (rate === null ? '—' : '%' + Math.round(rate * 100)) + '</span>' +
+        '</div>';
+    }).join('');
+    var note = best
+      ? 'En çok kaçan tür: ' + (KINDS[best.kind] || {}).label + ' — görülenlerin %' +
+        Math.round(best.rate * 100) + "'i kaçtı (" + best.seen + ' görülen' +
+        (best.seen < 5 ? ', az örnek' : '') + ').'
+      : 'Görülen kutu yok; türe göre kaçma oranı henüz hesaplanamaz.';
+    el.innerHTML = header + '<div class="space-y-0.5 mt-1">' + body + '</div>' +
+      '<p class="hint mt-2">' + esc(note) + '</p>';
   }
 
   function renderFunnel() {
@@ -2312,6 +2370,7 @@
         'Hunide sayılacak kutu yok. Görülme kaydı bu sürümle başladı; yeni kutular Fırsatlar listesine düştükçe burası dolar.</div>';
       reaction.textContent = '';
       $('funnelHourly').innerHTML = '<div class="hint">Kaçırma kaydı yok.</div>';
+      renderFunnelKinds(f);
       return;
     }
 
@@ -2332,6 +2391,7 @@
         '<div class="stat-value ' + card[2] + '">' + card[1] + '</div>' +
         '<div class="text-[10px] text-yellow-50/40 mt-1">' + esc(card[3]) + '</div></div>';
     }).join('');
+    renderFunnelKinds(f);
 
     var lines = [];
     lines.push(f.median === null
