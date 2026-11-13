@@ -251,7 +251,9 @@ sayılır, alarm üretmez.
 
 Tarayıcı her kutuya, dinleme oturumunun **kaçıncı saniyesinde** düştüğünü yazar
 (`sessionSec`; `boxes.json`, `live.json` olayları ve ntfy mesajı). Oturum dışından gelen kutu
-bilinmeyen sayılır (ilk dakika sanılmaz). Oturum kapanırken dinlenen süre de dakika kovalarına
+bilinmeyen sayılır (ilk dakika sanılmaz). Fırsatlar kartında bu değer `⏱ 2. dk` gibi küçük bir
+rozetle görünür; `sessionSec` yoksa rozet `dk —` kalır. Böylece ölçüm eğrisinin ham verisi
+günlük kullanımda da okunur. Oturum kapanırken dinlenen süre de dakika kovalarına
 bölünür; böylece her kova için **kutu/saat = kutu ÷ dinlenen dakika** çıkar. Paydaya
 **yalnızca gerçekten mesaj veya kutu üreten oturumlar** girer. Bağlantısı kurulamayan denemeler
 ve hiç akış gelmeyen oturumlar sayılmaz; aksi halde kısa başarısız denemeler ilk dakika oranını

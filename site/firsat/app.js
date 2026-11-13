@@ -107,6 +107,23 @@
     return (h > 0 ? pad(h) + ':' : '') + pad(m) + ':' + pad(s);
   }
 
+  // sessionSec'i tam saniyeye çevirir; yok/bozuksa null döner. Number(null) 0
+  // olduğu için bilinmeyen değer burada açıkça ayıklanır.
+  function sessionSeconds(value) {
+    if (value === null || value === undefined || value === '') return null;
+    var sec = Math.round(Number(value));
+    return Number.isFinite(sec) && sec >= 0 ? sec : null;
+  }
+
+  // Kutunun düştüğü oturum dakikası: 0–59 sn "1. dk", 60–119 sn "2. dk" …
+  // 5. dakikadan sonrası ölçümdeki gibi tek "5+ dk" kovasında toplanır.
+  function sessionMinuteLabel(seconds) {
+    var sec = sessionSeconds(seconds);
+    if (sec === null) return null;
+    var minute = Math.floor(sec / 60) + 1;
+    return minute >= 6 ? '5+ dk' : minute + '. dk';
+  }
+
   function ago(ms) {
     if (!ms) return '—';
     var diff = Date.now() - Number(ms);
@@ -1545,6 +1562,18 @@
         (Number(publisher.boxCount) || 0) + ' kutu' +
         (Number(publisher.avgCoins) > 0 ? ' · ort ' + fmt(Number(publisher.avgCoins)) + ' jeton' : ' · jeton bilinmiyor') +
         '">🛡️ güven ' + publisherScore + '</span> ';
+      // Ölçümün ham verisi günlük kullanımda görünsün: kutunun düştüğü oturum
+      // dakikası. Eski/oturum dışı kutularda sessionSec yoktur; uydurma değer
+      // yerine bunu açıkça "dk —" olarak yazar.
+      var sessionSec = sessionSeconds(event.sessionSec);
+      var sessionMinute = sessionMinuteLabel(sessionSec);
+      var sessionBadge = sessionMinute
+        ? '<span class="chip !py-0 !text-[10px]" title="Kutu, dinleme oturumunun ' +
+          Math.round(sessionSec) + '. saniyesinde düştü · ölçüm kovası ' +
+          (Math.floor(sessionSec / 60) >= 5 ? '5+ dk' : Math.floor(sessionSec / 60) + '–' +
+            (Math.floor(sessionSec / 60) + 1) + ' dk') +
+          '">⏱ ' + sessionMinute + '</span> '
+        : '<span class="chip !py-0 !text-[10px] opacity-60" title="Oturum dakikası bilinmiyor (eski kayıt veya oturum dışı kutu)">⏱ dk —</span> ';
       var urgent = false;
       var timeText = '';
       var endAt = eventEndAt(event);
@@ -1588,7 +1617,7 @@
             ? fmt(event.coins) + ' <span class="text-[10px] font-normal text-yellow-50/40">jeton · kutu değeri</span>'
             : '<span class="text-[11px] font-normal text-yellow-50/40">jeton bilinmiyor</span>') + '</span>',
         '  </div>',
-        '  <div class="text-[10px] mb-1">' + publisherNote + '<span class="chip !py-0 !text-[10px]" title="aciliyet + jeton + paylaşım + tür + tazelik">Puan ' + scored.score + ' · ' + esc(scored.reason) + '</span></div>',
+        '  <div class="text-[10px] mb-1">' + publisherNote + sessionBadge + '<span class="chip !py-0 !text-[10px]" title="aciliyet + jeton + paylaşım + tür + tazelik">Puan ' + scored.score + ' · ' + esc(scored.reason) + '</span></div>',
         '  <a href="' + liveUrl(event.username) + '" target="_blank" rel="noopener" class="font-semibold text-yellow-100 hover:text-yellow-300 truncate block">@' + esc(event.username) + '</a>',
         '  <div class="text-[10px] text-yellow-50/40">' + (event.country ? flag(event.country) + ' ' + esc(countryName(event.country)) + ' · ' : '') + new Date(event.createdAt).toLocaleTimeString('tr-TR') +
           (endAt ? ' → ' + new Date(endAt).toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' }) + ' açılır' : '') +

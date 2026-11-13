@@ -20,8 +20,16 @@
   var BACKUP_APP = 'tiktok-jeton-paneli';
   var BACKUP_VERSION = 2;
   // Panel sürümü ve sürüm geçmişi (Ayarlar'da gösterilir, yedeğe yazılır).
-  var APP_VERSION = '1.4.10';
+  var APP_VERSION = '1.4.11';
   var CHANGE_LOG = [
+    {
+      version: '1.4.11',
+      date: '2026-11-13',
+      items: [
+        'Fırsatlar kartında kutunun dinleme oturumunun kaçıncı dakikasında düştüğü küçük bir rozetle görünüyor (⏱ 2. dk); ölçüm eğrisinin ham verisi günlük kullanımda da okunuyor.',
+        'Oturum saniyesi olmayan eski veya oturum dışı kutularda rozet “dk —” kalıyor; uydurma bir dakika yazılmıyor.'
+      ]
+    },
     {
       version: '1.4.10',
       date: '2026-11-13',
