@@ -94,6 +94,17 @@ edilmez: yalnızca **gerçekten yeni kutu geldiğinde** sıradaki veri commit'in
 5 dakika), yeni kutu yoksa hiç commit çıkmaz — depo saatte ~80 boş commit yerine ~12 commit alır.
 Aynı commit `live.json`'u da (yayıncı listesi, süreler, teşhis) taşır.
 
+**Telefondan gerçek kutu:** Web istemcisi sandık mesajlarını görmez; bunlar TikTok'un uygulama
+istemcisine gider. Emülatördeki gerçek uygulamadan yakalanan kutu mesajlarını anahtarlı
+`POST /ingest` ucuna gönderebilirsin; kayıt aynı yoldan (ntfy yayını + `boxes.json`) işlenir:
+
+```bash
+INGEST_TOKEN="$(openssl rand -hex 24)" node tools/ingest/server.mjs --port=8788
+INGEST_TOKEN="..." node tools/ingest/send.mjs --file=capture.ndjson
+```
+
+Ayrıntılar (uç biçimi, emülatör yakalama adımları, sınırlar): [tools/ingest/README.md](tools/ingest/README.md).
+
 Teşhis: `live.json → scanner.connectStats` (deneme/başarılı/hata/hız sınırı) ve `closeReasons`
 (`süre doldu`, `bağlantı düştü`, `yayın bitti`, `bağlanamadı`).
 
