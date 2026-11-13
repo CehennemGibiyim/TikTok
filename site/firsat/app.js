@@ -50,8 +50,14 @@
   var audioCtx = null;
   var verified = {};
   var scanInfo = null;
-  var scanUrl = 'data/live.json';
-  var poolUrl = 'data/targets.json';
+  // GitHub Pages, veri commit'lerini saatlerce geciktiriyor (build kotası).
+  // Ham dosya her zaman güncel ve CORS açık: önce oradan okunur, olmazsa
+  // Pages kopyasına düşülür.
+  var RAW_DATA = 'https://raw.githubusercontent.com/CehennemGibiyim/TikTok/main/site/firsat/data/';
+  var scanUrl = RAW_DATA + 'live.json';
+  var scanFallback = 'data/live.json';
+  var poolUrl = RAW_DATA + 'targets.json';
+  var poolFallback = 'data/targets.json';
   // Halka açık canlı kanal listesi (girişsiz, tarayıcıdan okunabilir).
   var discoveryUrl = 'https://api.tik.tools/api/live/top-channels';
   // Bulunan yayın, tarama doğrulayana kadar bu süre boyunca "canlı" sayılır.
@@ -530,15 +536,27 @@
   async function refreshScan() {
     if (scanPaused) { renderScanStatus(); return; }
     try {
-      var response = await fetch(scanUrl + '?t=' + Date.now(), { cache: 'no-store' });
-      if (!response.ok) throw new Error('HTTP ' + response.status);
-      var data = await response.json();
+      var data = await fetchScanData(scanUrl);
       scanInfo = Object.assign({ scannedAt: data.scannedAt }, data.scanner || {});
       if (applyScan(data)) renderAll();
       renderScanStatus();
     } catch (error) {
-      renderScanStatus(error.message);
+      // Ham dosya okunamazsa (ağ/CORS) Pages kopyası denenir.
+      try {
+        var backup = await fetchScanData(scanFallback);
+        scanInfo = Object.assign({ scannedAt: backup.scannedAt }, backup.scanner || {});
+        if (applyScan(backup)) renderAll();
+        renderScanStatus();
+      } catch (backupError) {
+        renderScanStatus(error.message);
+      }
     }
+  }
+
+  async function fetchScanData(url) {
+    var response = await fetch(url + '?t=' + Date.now(), { cache: 'no-store' });
+    if (!response.ok) throw new Error('HTTP ' + response.status);
+    return response.json();
   }
 
   function downloadTargets() {
@@ -558,9 +576,12 @@
 
   async function importPool() {
     try {
-      var response = await fetch(poolUrl + '?t=' + Date.now(), { cache: 'no-store' });
-      if (!response.ok) throw new Error('HTTP ' + response.status);
-      var data = await response.json();
+      var data;
+      try {
+        data = await fetchScanData(poolUrl);
+      } catch (rawError) {
+        data = await fetchScanData(poolFallback);
+      }
       var list = Array.isArray(data) ? data : data.targets || [];
       var raw = list.map(function (item) {
         return typeof item === 'string' ? item : (item && item.username) || '';

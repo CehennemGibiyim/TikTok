@@ -20,8 +20,16 @@
   var BACKUP_APP = 'tiktok-jeton-paneli';
   var BACKUP_VERSION = 2;
   // Panel sürümü ve sürüm geçmişi (Ayarlar'da gösterilir, yedeğe yazılır).
-  var APP_VERSION = '1.1.1';
+  var APP_VERSION = '1.1.2';
   var CHANGE_LOG = [
+    {
+      version: '1.1.2',
+      date: '2026-11-13',
+      items: [
+        'Tarama verisi artık ham dosyadan (raw.githubusercontent) okunuyor: GitHub Pages build kotası yüzünden Fırsatlar saatlerce eski kalıyordu.',
+        'Ham dosya okunamazsa Pages kopyasına otomatik düşülüyor (canlı veri + havuz içe alma).'
+      ]
+    },
     {
       version: '1.1.1',
       date: '2026-11-12',

@@ -113,6 +113,22 @@ node index.js --once             # tek tur (deneme)
 | `--starts-per-min` | 8 | Dakikada en fazla kaç yeni bağlantı başlatılır |
 | `--hot-revisit-sec` | 720 | Kutu vermiş odaya en erken bu kadar sonra dönülür |
 
+### Ayar karşılaştırması (kota birimi başına kutu)
+
+`node scripts/quota-report.mjs` geçmiş `live.json` commit'lerini koşu bazında okur ve
+"yakalanan kutu / 100 bağlantı denemesi" oranını ayar grubuna göre yazar.
+
+13 Kasım 2026 ölçümü (8 koşu):
+
+| Ayar | Koşu | Deneme | Başarı | Kutu | Kutu / 100 deneme | Ort. dinlenen oda |
+|---|---|---|---|---|---|---|
+| agresif (2 sn ara, 12/dk, oran 0.30) | 4 | 1418 | %16 | 134 | **9.45** | 10.3 |
+| güvenli (4 sn ara, oran 0.15) | 4 | 3376 | %11 | 123 | 3.6 | ~11 |
+
+Agresif ayar kota birimi başına **~2.6 kat** daha fazla kutu veriyor ve dinlenen oda sayısı
+düşmüyor; bu yüzden korundu. Aşırıya kaçmayı `tuningGuard` engelliyor: hız sınırı 2'yi geçince
+ayar koşu içinde kendiliğinden güvenli tarafa dönüyor.
+
 ### Çok odalı dinleme (chat reader sorusu)
 
 `https://tiktok-chat-reader.zerody.one/` bizim kullandığımız kütüphanenin (**tiktok-live-connector**)
