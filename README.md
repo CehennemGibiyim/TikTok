@@ -257,28 +257,33 @@ bölünür; böylece her kova için **kutu/saat = kutu ÷ dinlenen dakika** çı
 ve hiç akış gelmeyen oturumlar sayılmaz; aksi halde kısa başarısız denemeler ilk dakika oranını
 düşürüp 5+ kovasını olduğundan iyi gösterirdi.
 
-Ölçüm **son 7 takvim gününe (UTC)** pencerelenir. Tarayıcı günlük kovaları
-(`boxMinuteDays` → gün başına `boxMinutes`, `watchMin`) `targets.json` içinde tutar ve 7 günden
-eski günleri atar. `boxMinutes`/`watchMin` her zaman bu pencerenin toplamı olarak `targets.json`
-ve `live.json`a yazılır; panel kartında **son 7 gün** yazar. Eski sürümlerin tarihsiz ömür boyu
-toplamları pencereye alınmaz: ilk çalıştırmada ölçüm sıfırdan başlar, böylece eski ayarlarla
-toplanmış veri kararı domine etmez. Pencere bilgisi (`boxMinuteWindow`) taşımayan eski
-`live.json` verisi panelde **çizilmez**; kart bunun yerine “pencere bilinmiyor” der. Oturum süresi
-kapandığı UTC gününe yazılır (gece yarısını geçen oturum bölünmez). Bu düzeltme yalnızca
-sonraki kapanışlara uygulanır; geçmişte birikmiş payda geriye dönük ayrıştırılamaz.
+Ölçüm **son 7 takvim gününe (UTC)** pencerelenir. Tek kaynak, `targets.json` içindeki
+günlük kovalardır (`boxMinuteDays` → gün başına `boxMinutes`, `watchMin`); 7 günden eski günler
+atılır. `boxMinutes`/`watchMin` ayrıca saklanmaz: `live.json` için her snapshot'ta bu pencereden
+hesaplanır. Bu yüzden tarihsiz eski toplamlar pencereye alınmaz; ilk çalıştırmada ölçüm
+sıfırdan başlar ve eski ayarlarla toplanmış veri kararı domine etmez. Pencere bilgisi
+(`boxMinuteWindow`) taşımayan eski `live.json` verisi panelde **çizilmez**; kart bunun yerine
+“pencere bilinmiyor” der. Panel kartında **son 7 gün** yazar. Oturumun tamamı başladığı UTC
+gününe yazılır (gece yarısını geçen oturum bölünmez; kutu ve payda aynı güne düşer). Bu
+düzeltme yalnızca sonraki kapanışlara uygulanır; geçmişte birikmiş payda geriye dönük
+ayrıştırılamaz.
 
-`watch-sec` şu an **300 saniye (5 dk)**. Eğri şu kuralla okunur:
+`watch-sec` şu an **300 saniye (5 dk)**. Her kova için oran
+**kutu/saat = kutu ÷ dinlenen dakika × 60**'tır. Karar yalnızca **0–4 dk** ile **4–5 dk**
+karşılaştırmasına dayanır:
 
-- İlk 4 dakikanın kutu/saat ortalamasına göre **4–5 dk** ve **5+** getirisi %10'dan fazla yüksek değilse
-  → 5 dk yeterli (geç gelen kutu için 2,5 dk daha bağlanmak kotayı boşa harcar).
-- Son dakikalarda yoğunluk düşmüyorsa → 5 dk kesiyor olabilir; `watch-sec` artırılmalı.
-- Karar için son 7 günde en az **30 kutu ve 120 dakika sayılan oturum süresi** birikmesi beklenir;
-  öncesinde kart yalnızca “veri birikiyor” der.
+- 0–4 dk tarafında en az **20 kutu ve 60 dk**, 4–5 dk tarafında en az **10 kutu ve 30 dk** olmalı.
+  Bunlar istatistiksel test değil, küçük örneklerin gürültüsünü azaltan alt sınırlardır.
+- 4–5 dk getirisi 0–4 dk ortalamasından **%10'dan fazla yüksek değilse** → 5 dk yeterli
+  (geç gelen kutu için 2,5 dk daha bağlanmak kotayı boşa harcar).
+- **%10'dan fazla yüksekse** → 5 dk kesiyor olabilir; `watch-sec` artırılmalı.
+- Bir tarafın örneği yetersizse kart hangi tarafın ve kaç kutu/dk eksik olduğunu yazar; **“uzat”
+  sonucu üretmez.**
 
-**Sansür notu:** 5+ kovası yalnızca sıcak odaların uzatılmış (7,5 dk) oturumlarından dolabilir; orada
-bile düşük çıkması 5 dakikanın yeterli olduğunu **destekler**, ama 5+ verisinin yokluğu tek başına
-kanıt değildir. Sıcak oda seçimi (geçmişte kutu çıkmış odalar uzatılır) 5+ oranını yukarı çeker;
-yani karar için muhafazakâr bir ölçümdür.
+**Sansür notu:** 5+ kovası yalnızca sıcak odaların uzatılmış (7,5 dk) oturumlarından dolabilir. Bu
+yüzden 5+ **karara girmez**; grafikte tanı için görünür, kararı 4–5 kovası belirler. Sıcak oda seçimi
+(geçmişte kutu çıkmış odalar uzatılır) 5+ oranını yukarı çeker; yani 5+'yı karara katmamak
+muhafazakâr bir ölçümdür.
 
 Bu alanlar yayına çıktıktan sonraki oturumlarda dolar; eski kutularda `sessionSec` yoktur ve eğriye
 girmez.

@@ -20,8 +20,17 @@
   var BACKUP_APP = 'tiktok-jeton-paneli';
   var BACKUP_VERSION = 2;
   // Panel sürümü ve sürüm geçmişi (Ayarlar'da gösterilir, yedeğe yazılır).
-  var APP_VERSION = '1.4.9';
+  var APP_VERSION = '1.4.10';
   var CHANGE_LOG = [
+    {
+      version: '1.4.10',
+      date: '2026-11-13',
+      items: [
+        'Kutu düşme dakikası ölçümünde günlük kovalar tek kaynak oldu; state ve targets.json içindeki türetilmiş boxMinutes/watchMin kopyaları ve watchMinSince kaldırıldı.',
+        'Karar artık 0–4 ve 4–5 kovalarının örnek yeterliliğine bakıyor; eksik 4–5 verisi “uzat” sonucu üretmiyor ve 5+ karara girmiyor.',
+        'Gece yarısını geçen oturumun kutusu ve dinlenen süresi aynı (başlangıç) gününe yazılıyor; kutu/payda gün ayrımı kaldırıldı.'
+      ]
+    },
     {
       version: '1.4.9',
       date: '2026-11-13',

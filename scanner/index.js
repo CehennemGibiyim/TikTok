@@ -173,16 +173,10 @@ const state = {
   // Saatlik kutu sayacı {saat: sayı}: panel kutu serisini bundan çizer.
   // Koşular arasında targets.json'da kalır, 48 saatten eskisi atılır.
   boxHourly: {},
-  // Oturum dakikası ölçümü: kutu dinlemenin kaçıncı dakikasında düştü
-  // (0-1, 1-2, ..., 5+) ve her kovada kaç dakika dinlendi. İkincisi payda:
-  // oran = kutu / oturum-dakikası. Koşular arasında targets.json'da kalır.
-  boxMinutes: [0, 0, 0, 0, 0, 0],
-  watchMin: [0, 0, 0, 0, 0, 0],
-  watchMinSince: 0,
-  // Günlük kovalar: { 'YYYY-MM-DD': { boxMinutes, watchMin, watchMinSince } }.
-  // boxMinutes/watchMin yukarıda her zaman son 7 günün toplamıdır.
+  // Kutu düşme dakikası ölçümü: günlük kovalar { 'YYYY-MM-DD': { boxMinutes, watchMin } }.
+  // boxMinutes kutu sayısı, watchMin aynı kovada dinlenen dakika (payda).
+  // Tek kaynak budur; son 7 günün toplamı snapshot'ta hesaplanır.
   boxMinuteDays: {},
-  boxMinuteWindow: { days: 7, from: '', to: '' },
   lastFlush: 0,
   lastCommit: 0,
   // Kutu dosyası: commit bekleyen yeni kutu var mı, son yazılan listenin imzası.
@@ -253,14 +247,15 @@ function cleanUsername(raw) {
 // ---------- günlük oturum ölçümü ----------
 
 const MINUTE_WINDOW_DAYS = 7;
+const MINUTE_BUCKETS = 6;
 const DAY_MS = 86400000;
 
 function emptyMinutes() {
-  return [0, 0, 0, 0, 0, 0];
+  return new Array(MINUTE_BUCKETS).fill(0);
 }
 
 function readMinutes(value) {
-  return Array.isArray(value) && value.length === 6
+  return Array.isArray(value) && value.length === MINUTE_BUCKETS
     ? value.map((count) => Math.max(0, Number(count) || 0))
     : null;
 }
@@ -272,42 +267,44 @@ function minuteDayKey(ms) {
 
 function boxMinuteDay(nowMs = Date.now()) {
   const key = minuteDayKey(nowMs);
-  if (!state.boxMinuteDays[key]) {
-    state.boxMinuteDays[key] = { boxMinutes: emptyMinutes(), watchMin: emptyMinutes(), watchMinSince: 0 };
+  let day = state.boxMinuteDays[key];
+  if (!day || typeof day !== 'object') {
+    day = { boxMinutes: emptyMinutes(), watchMin: emptyMinutes() };
+    state.boxMinuteDays[key] = day;
   }
-  return state.boxMinuteDays[key];
+  return day;
 }
 
-// Son 7 takvim gününü toplar; eski günleri siler. boxMinutes/watchMin
-// yalnızca bu pencerenin toplamıdır, ömür boyu birikmez.
-function refreshBoxMinuteWindow(nowMs = Date.now()) {
+// 7 günden eski günleri diskten/bellekten atar. Okuma yan etkisiz kalsın diye
+// temizlik ayrı yapılır; yükleme ve kaydetme sırasında çağrılır.
+function pruneMinuteDays(nowMs = Date.now()) {
   const from = minuteDayKey(nowMs - (MINUTE_WINDOW_DAYS - 1) * DAY_MS);
   const to = minuteDayKey(nowMs);
-  const box = emptyMinutes();
-  const watch = emptyMinutes();
-  let since = 0;
   Object.keys(state.boxMinuteDays).forEach((key) => {
     if (!/^\d{4}-\d{2}-\d{2}$/.test(key) || key < from || key > to) {
       delete state.boxMinuteDays[key];
-      return;
     }
+  });
+}
+
+// Son 7 UTC takvim gününü toplar. Pencere dışındaki günler okunmaz.
+function minuteWindow(nowMs = Date.now()) {
+  const from = minuteDayKey(nowMs - (MINUTE_WINDOW_DAYS - 1) * DAY_MS);
+  const to = minuteDayKey(nowMs);
+  const boxMinutes = emptyMinutes();
+  const watchMin = emptyMinutes();
+  Object.keys(state.boxMinuteDays).forEach((key) => {
+    if (key < from || key > to) return;
     const day = state.boxMinuteDays[key];
     if (!day || typeof day !== 'object') return;
     const dayBox = readMinutes(day.boxMinutes) || emptyMinutes();
     const dayWatch = readMinutes(day.watchMin) || emptyMinutes();
-    for (let i = 0; i < 6; i += 1) {
-      box[i] += dayBox[i];
-      watch[i] += dayWatch[i];
+    for (let i = 0; i < MINUTE_BUCKETS; i += 1) {
+      boxMinutes[i] += dayBox[i];
+      watchMin[i] += dayWatch[i];
     }
-    const daySince = Number(day.watchMinSince) || 0;
-    if (daySince && (!since || daySince < since)) since = daySince;
   });
-  const windowStart = Date.parse(from + 'T00:00:00Z');
-  if (since && since < windowStart) since = windowStart;
-  state.boxMinutes = box;
-  state.watchMin = watch;
-  state.watchMinSince = since;
-  state.boxMinuteWindow = { days: MINUTE_WINDOW_DAYS, from, to };
+  return { days: MINUTE_WINDOW_DAYS, from, to, boxMinutes, watchMin };
 }
 
 // ---------- hedef havuzu ----------
@@ -334,25 +331,22 @@ function loadTargets() {
       });
     }
 
-    // Oturum dakikası ölçümü günlük kovalarda tutulur; panel için toplam
-    // refreshBoxMinuteWindow() üretir. Eski boxMinutes/watchMin tarihsiz olduğu
-    // için pencereye alınmaz: ilk çalıştırmada ölçüm sıfırdan başlar.
+    // Oturum dakikası ölçümünün tek kaynağı günlük kovalardır. Eski sürümlerin
+    // tarihsiz boxMinutes/watchMin toplamları pencereye alınmaz: ilk çalıştırmada
+    // ölçüm sıfırdan başlar, eski veri kararı domine etmez.
     const savedDays = parsed && parsed.boxMinuteDays;
     if (savedDays && typeof savedDays === 'object' && !Array.isArray(savedDays)) {
       Object.keys(savedDays).forEach((key) => {
         if (!/^\d{4}-\d{2}-\d{2}$/.test(key)) return;
         const entry = savedDays[key];
         if (!entry || typeof entry !== 'object') return;
-        const box = readMinutes(entry.boxMinutes) || emptyMinutes();
-        const watch = readMinutes(entry.watchMin) || emptyMinutes();
         state.boxMinuteDays[key] = {
-          boxMinutes: box,
-          watchMin: watch,
-          watchMinSince: Number(entry.watchMinSince) || 0
+          boxMinutes: readMinutes(entry.boxMinutes) || emptyMinutes(),
+          watchMin: readMinutes(entry.watchMin) || emptyMinutes()
         };
       });
     }
-    refreshBoxMinuteWindow();
+    pruneMinuteDays();
 
     // Son ülke taraması raporu: günde bir çalışsın diye zamanı korunur.
     const savedSweep = parsed && parsed.regionSweep;
@@ -424,7 +418,7 @@ function targetFor(username) {
 }
 
 function saveTargets() {
-  refreshBoxMinuteWindow();
+  pruneMinuteDays();
   // Dışarıdan eklenenler korunur: dosyada olup bellekte olmayan adresler
   // (masaüstü uygulamasında panelin bölge keşfi) havuza alınır.
   try {
@@ -469,12 +463,8 @@ function saveTargets() {
     probeHistory: state.probeHistory,
     // Saatlik kutu sayıları: panel 24 saatlik kutu serisini bundan çizer.
     boxHourly: state.boxHourly,
-    // Oturum dakikası eğrisi: son 7 günün kutu sayısı ve dinlenen dakikası (payda).
-    boxMinutes: state.boxMinutes,
-    watchMin: state.watchMin,
-    watchMinSince: state.watchMinSince,
+    // Oturum dakikası: tek kaynak günlük kovalar; son 7 günün toplamı live.json'da.
     boxMinuteDays: state.boxMinuteDays,
-    boxMinuteWindow: state.boxMinuteWindow,
     // Günlük ülke taraması: zamanı ve sonucu koşular arasında korunur.
     regionSweep: state.regionSweep,
     updatedAt: new Date().toISOString(),
@@ -1273,7 +1263,7 @@ function handleEnvelope(username, eventName, data) {
   const sessionSec = sessionWatcher
     ? Math.max(0, (Date.now() - sessionWatcher.startedAt) / 1000)
     : null;
-  countBoxMinute(sessionSec);
+  countBoxMinute(sessionSec, sessionWatcher && sessionWatcher.startedAt);
 
   const boxTarget = targetFor(username);
   if (boxTarget) {
@@ -1316,36 +1306,33 @@ function minuteBucket(sessionSec) {
 
 // Kutu düşme dakikası: yalnızca gerçek bir oturum varsa sayılır (kaynak bilinmiyorsa
 // 0'a yazıp ilk dakika sanmak yanlış eğri üretirdi).
-function countBoxMinute(sessionSec) {
+function countBoxMinute(sessionSec, sessionStartedAt) {
   if (sessionSec === null || sessionSec === undefined) return;
-  const day = boxMinuteDay();
-  day.boxMinutes[minuteBucket(sessionSec)] += 1;
-  refreshBoxMinuteWindow();
+  boxMinuteDay(sessionStartedAt).boxMinutes[minuteBucket(sessionSec)] += 1;
   state.targetsDirty = true;
 }
 
-// Oturum kapanırken dinlenen süreyi dakika kovalarına böler. Kova başına oran
+// Oturum kapanırken dinlenen süreyi dakika kovalarına böler ve oturumun başladığı
+// güne yazar (kutu sayımıyla aynı gün). Kova başına oran
 // (kutu / dinlenen dakika) böylece "5. dakikada kutu geliyor mu?" sorusunu
 // yanıtlar; 5+ yalnızca uzatılan/sıcak oturumlardan dolabilir (sansür).
 // Paydaya yalnızca gerçekten akış gelen oturumlar girer: bağlantısı kurulamayan
 // denemeler ve hiç mesaj/kutu üretmeyen oturumlar "dinlenen dakika" değildir.
 // Aksi halde kısa başarısız denemeler ilk dakika oranını düşürüp 5+ kovasını
 // olduğundan iyi gösteriyordu.
-function noteWatchExposure(watcher) {
+function noteWatchExposure(watcher, nowMs = Date.now()) {
   if (!watcher || watcher.exposureCounted) return;
   watcher.exposureCounted = true;
   if (!(Number(watcher.messages) > 0 || Number(watcher.boxes) > 0)) return;
-  const watchedSec = Math.max(0, (Date.now() - watcher.startedAt) / 1000);
-  const day = boxMinuteDay();
-  for (let i = 0; i < 6; i += 1) {
+  const watchedSec = Math.max(0, (nowMs - watcher.startedAt) / 1000);
+  // Kutu sayımıyla aynı güne yazılır: gece yarısını geçen oturum bölünmez.
+  const day = boxMinuteDay(watcher.startedAt);
+  for (let i = 0; i < MINUTE_BUCKETS; i += 1) {
     const from = i * 60;
-    const to = i === 5 ? Infinity : (i + 1) * 60;
+    const to = i === MINUTE_BUCKETS - 1 ? Infinity : (i + 1) * 60;
     const overlapSec = Math.min(watchedSec, to) - from;
     if (overlapSec > 0) day.watchMin[i] += overlapSec / 60;
   }
-  const startedAt = Number(watcher.startedAt) || Date.now();
-  if (!day.watchMinSince || startedAt < day.watchMinSince) day.watchMinSince = startedAt;
-  refreshBoxMinuteWindow();
   state.targetsDirty = true;
 }
 
@@ -2069,7 +2056,7 @@ async function pollTargets() {
 
 function snapshot() {
   const nowMs = Date.now();
-  refreshBoxMinuteWindow(nowMs);
+  const minute = minuteWindow(nowMs);
   const staleLiveMs = CONFIG.liveStaleSec * 1000;
   const streamers = Array.from(state.streamers.values())
     // Havuzdaki her adres yazılır: panel "taranmış ama yayında değil" ile
@@ -2137,10 +2124,9 @@ function snapshot() {
       probeHistory: state.probeHistory,
       boxHourly: state.boxHourly,
       // Oturum dakikası eğrisi: son 7 gün, kutu sayısı / dinlenen dakika (0-1 ... 5+).
-      boxMinutes: state.boxMinutes,
-      watchMin: state.watchMin,
-      watchMinSince: state.watchMinSince,
-      boxMinuteWindow: state.boxMinuteWindow,
+      boxMinutes: minute.boxMinutes,
+      watchMin: minute.watchMin,
+      boxMinuteWindow: { days: minute.days, from: minute.from, to: minute.to },
       connectFailures: state.connectFailures,
       // Bağlantı teşhisi: kaç deneme, kaçı başarılı, son hatalar, soğuma.
       connectStats: {
@@ -2515,33 +2501,48 @@ if (process.env.SCANNER_SELFTEST === '1') {
 
   // Oturum dakikası: 90 sn'de düşen kutu 1-2, 310 sn'deki 5+ kovasına yazılır.
   // Dinlenen süre kovalara bölünür; aynı oturum iki kez kapanırsa sayılmaz.
-  state.boxMinutes = [0, 0, 0, 0, 0, 0];
-  state.watchMin = [0, 0, 0, 0, 0, 0];
-  state.watchMinSince = 0;
   state.boxMinuteDays = {};
-  state.boxMinuteWindow = { days: 7, from: '', to: '' };
-  countBoxMinute(90);
-  countBoxMinute(310);
-  countBoxMinute(null);
+  const testNow = Date.now();
+  countBoxMinute(90, testNow);
+  countBoxMinute(310, testNow);
+  countBoxMinute(null, testNow);
   // Payda sınaması: başarısız bağlantı ve hiç akış gelmeyen oturumlar
   // watchMin'i değiştirmemeli; mesaj gelen oturum bir kez sayılmalı.
-  const fakeFailed = { startedAt: Date.now() - 45000, messages: 0 };
-  const fakeQuiet = { startedAt: Date.now() - 600000, messages: 0 };
-  const fakeWatcher = { startedAt: Date.now() - 330000, messages: 4, sessionSec: 300 };
-  noteWatchExposure(fakeFailed);
-  noteWatchExposure(fakeQuiet);
-  const skippedSince = state.watchMinSince === 0;
-  noteWatchExposure(fakeWatcher);
-  noteWatchExposure(fakeWatcher);
-  const roundedWatch = state.watchMin.map((min) => Math.round(min * 10) / 10);
-  const minuteOk = state.boxMinutes.join(',') === '0,1,0,0,0,1' &&
-    roundedWatch.join(',') === '1,1,1,1,1,0.5' && skippedSince &&
-    state.watchMinSince === fakeWatcher.startedAt;
-  console.log('DAKİKA →', state.boxMinutes.join(','), '·',
+  const fakeFailed = { startedAt: testNow - 45000, messages: 0 };
+  const fakeQuiet = { startedAt: testNow - 600000, messages: 0 };
+  const fakeWatcher = { startedAt: testNow - 330000, messages: 4, sessionSec: 300 };
+  const beforeWatch = minuteWindow(testNow).watchMin.join(',');
+  noteWatchExposure(fakeFailed, testNow);
+  noteWatchExposure(fakeQuiet, testNow);
+  const skippedOk = minuteWindow(testNow).watchMin.join(',') === beforeWatch;
+  noteWatchExposure(fakeWatcher, testNow);
+  noteWatchExposure(fakeWatcher, testNow);
+  const minute = minuteWindow(testNow);
+  const roundedWatch = minute.watchMin.map((min) => Math.round(min * 10) / 10);
+  const minuteOk = minute.boxMinutes.join(',') === '0,1,0,0,0,1' &&
+    roundedWatch.join(',') === '1,1,1,1,1,0.5' && skippedOk;
+  console.log('DAKİKA →', minute.boxMinutes.join(','), '·',
     roundedWatch.join(','),
     '(beklenen 0,1,0,0,0,1 · 1,1,1,1,1,0.5)',
     minuteOk ? '· GEÇTİ' : '· BAŞARISIZ');
   if (!minuteOk) process.exitCode = 1;
+
+  // Gece yarısı sınaması: kutu ve payda oturumun başladığı güne yazılmalı.
+  state.boxMinuteDays = {};
+  const crossStart = Date.UTC(2026, 10, 12, 23, 58);
+  const crossEnd = crossStart + 5 * 60000;
+  countBoxMinute(120, crossStart);
+  noteWatchExposure({ startedAt: crossStart, messages: 1 }, crossEnd);
+  const crossDay = state.boxMinuteDays['2026-11-12'];
+  const crossNext = state.boxMinuteDays['2026-11-13'];
+  const crossOk = Boolean(crossDay) && !crossNext &&
+    crossDay.boxMinutes[2] === 1 && crossDay.watchMin[2] === 1 &&
+    crossDay.watchMin.reduce((sum, min) => sum + min, 0) === 5;
+  console.log('GÜN →', crossDay ? crossDay.boxMinutes.join(',') : 'yok', '·',
+    crossDay ? crossDay.watchMin.join(',') : 'yok',
+    '(beklenen 12 Kasım’da 1 kutu · 5 dk; 13 Kasım boş)',
+    crossOk ? '· GEÇTİ' : '· BAŞARISIZ');
+  if (!crossOk) process.exitCode = 1;
 
   // Pencere sınaması: 8 gün önceki kova dışarıda kalmalı, 6 gün önceki içeride.
   state.boxMinuteDays = {};
@@ -2549,26 +2550,23 @@ if (process.env.SCANNER_SELFTEST === '1') {
   const todayDay = boxMinuteDay(windowNow);
   todayDay.boxMinutes[0] = 2;
   todayDay.watchMin[0] = 4;
-  todayDay.watchMinSince = windowNow;
   const oldDay = minuteDayKey(windowNow - 8 * DAY_MS);
   const edgeDay = minuteDayKey(windowNow - (MINUTE_WINDOW_DAYS - 1) * DAY_MS);
   state.boxMinuteDays[oldDay] = {
     boxMinutes: [99, 0, 0, 0, 0, 0],
-    watchMin: [99, 0, 0, 0, 0, 0],
-    watchMinSince: windowNow - 8 * DAY_MS
+    watchMin: [99, 0, 0, 0, 0, 0]
   };
   state.boxMinuteDays[edgeDay] = {
     boxMinutes: [1, 0, 0, 0, 0, 0],
-    watchMin: [1, 0, 0, 0, 0, 0],
-    watchMinSince: windowNow - (MINUTE_WINDOW_DAYS - 1) * DAY_MS
+    watchMin: [1, 0, 0, 0, 0, 0]
   };
-  refreshBoxMinuteWindow(windowNow);
-  const windowOk = state.boxMinutes[0] === 3 && state.watchMin[0] === 5 &&
+  pruneMinuteDays(windowNow);
+  const window = minuteWindow(windowNow);
+  const windowOk = window.boxMinutes[0] === 3 && window.watchMin[0] === 5 &&
     !state.boxMinuteDays[oldDay] && Boolean(state.boxMinuteDays[edgeDay]) &&
-    state.boxMinuteWindow.days === MINUTE_WINDOW_DAYS &&
-    state.boxMinuteWindow.from === edgeDay;
-  console.log('PENCERE →', state.boxMinutes[0], 'kutu ·', state.watchMin[0], 'dk ·',
-    state.boxMinuteWindow.from, '–', state.boxMinuteWindow.to,
+    window.days === MINUTE_WINDOW_DAYS && window.from === edgeDay;
+  console.log('PENCERE →', window.boxMinutes[0], 'kutu ·', window.watchMin[0], 'dk ·',
+    window.from, '–', window.to,
     '(beklenen 3 kutu · 5 dk · yalnız 7 gün)',
     windowOk ? '· GEÇTİ' : '· BAŞARISIZ');
   if (!windowOk) process.exitCode = 1;

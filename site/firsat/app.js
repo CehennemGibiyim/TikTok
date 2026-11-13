@@ -2495,17 +2495,63 @@
   // ---------- Kutu düşme dakikası ----------
   // Tarayıcı her kutuya dinleme oturumunun kaçıncı saniyesinde düştüğünü yazar
   // (sessionSec). Burada kutu sayısı, akış gelen oturumlarda dinlenen dakikaya bölünür;
-  // başarısız ve sessiz denemeler paydaya girmez. 5. dakikanın getirisi watch-sec'in
-  // 5 dk olup olmadığını gösterir. 5+ kovası yalnızca uzatılan/sıcak oturumlarda
-  // dolabilir; yani 5 dk kesme noktası veriyi sansürler.
+  // başarısız ve sessiz denemeler paydaya girmez. Karar, 4–5 dakikanın getirisini
+  // 0–4 dakikanın ortalamasıyla karşılaştırır. 5+ kovası yalnızca uzatılan/sıcak
+  // oturumlarda dolabildiği için sansürlüdür ve karara girmez.
   var MINUTE_LABELS = ['0–1', '1–2', '2–3', '3–4', '4–5', '5+'];
+  // Karar eşikleri tek yerde. Bunlar istatistiksel kesinlik değil, küçük
+  // örneklerin gürültüsünü azaltan alt sınırlardır. Karar yalnızca 0–4 ile
+  // 4–5 dakika karşılaştırmasına dayanır; 5+ sansürlü olduğu için karara girmez.
+  var MINUTE_EARLY_BOXES = 20;
+  var MINUTE_EARLY_WATCH = 60;
+  var MINUTE_LAST_BOXES = 10;
+  var MINUTE_LAST_WATCH = 30;
+  var MINUTE_MARGIN = 0.1;
+
+  function minuteRate(boxes, minutes) {
+    return minutes > 0 ? (boxes / minutes) * 60 : null;
+  }
+
+  function minuteSample(boxes, minutes) {
+    return fmt(boxes) + ' kutu / ' + fmt(Math.round(minutes)) + ' dk';
+  }
+
+  function minuteDecision(counts, minutes) {
+    var earlyBoxes = counts[0] + counts[1] + counts[2] + counts[3];
+    var earlyMin = minutes[0] + minutes[1] + minutes[2] + minutes[3];
+    if (earlyBoxes < MINUTE_EARLY_BOXES || earlyMin < MINUTE_EARLY_WATCH) {
+      return '0–4 dk karşılaştırması için en az ' + fmt(MINUTE_EARLY_BOXES) +
+        ' kutu ve ' + fmt(MINUTE_EARLY_WATCH) + ' dk gerekli; şu an ' +
+        minuteSample(earlyBoxes, earlyMin) + '.';
+    }
+    var lastBoxes = counts[4];
+    var lastMin = minutes[4];
+    if (lastBoxes < MINUTE_LAST_BOXES || lastMin < MINUTE_LAST_WATCH) {
+      return '4–5 dk için en az ' + fmt(MINUTE_LAST_BOXES) + ' kutu ve ' +
+        fmt(MINUTE_LAST_WATCH) + ' dk gerekli; şu an ' +
+        minuteSample(lastBoxes, lastMin) + '. Henüz karar yok.';
+    }
+    var earlyRate = minuteRate(earlyBoxes, earlyMin);
+    var lastRate = minuteRate(lastBoxes, lastMin);
+    var change = earlyRate > 0 ? (lastRate / earlyRate - 1) : null;
+    var changeText = change === null ? '' :
+      ' (' + (change >= 0 ? '+' : '') + Math.round(change * 100) + '%)';
+    var reading = '0–4 dk ' + fmt(Math.round(earlyRate * 10) / 10) + '/sa · 4–5 dk ' +
+      fmt(Math.round(lastRate * 10) / 10) + '/sa' + changeText;
+    var enough = earlyRate > 0
+      ? lastRate <= earlyRate * (1 + MINUTE_MARGIN)
+      : lastRate === 0;
+    return 'Okuma: ' + reading + ' → ' + (enough
+      ? '4–5 dk getirisi ilk 4 dakikadan %10’dan fazla yüksek değil; watch-sec 5 dk yeterli.'
+      : '4–5 dk getirisi ilk 4 dakikadan %10’dan fazla yüksek; watch-sec 5 dk kesiyor olabilir, uzatmayı dene.');
+  }
 
   function renderBoxMinutes() {
     var bars = $('boxMinuteBars');
     var verdict = $('boxMinuteVerdict');
     if (!bars || !verdict) return;
     // Hangi pencerenin çizildiği kartta yazılı: eski live.json'da pencere
-    // bilgisi yoksa "son 7 gün" demeyip bunu açıkça belirt.
+    // bilgisi yoksa “son 7 gün” demeyip bunu açıkça belirt.
     var windowEl = $('boxMinuteWindow');
     var windowInfo = scanInfo && scanInfo.boxMinuteWindow;
     var windowDays = Number(windowInfo && windowInfo.days);
@@ -2543,9 +2589,7 @@
       verdict.textContent = '';
       return;
     }
-    var rates = counts.map(function (count, index) {
-      return minutes[index] ? (count / minutes[index]) * 60 : null;
-    });
+    var rates = counts.map(function (count, index) { return minuteRate(count, minutes[index]); });
     var maxRate = 0.0001;
     rates.forEach(function (rate) { if (rate !== null) maxRate = Math.max(maxRate, rate); });
     bars.innerHTML = rates.map(function (rate, index) {
@@ -2560,23 +2604,9 @@
         '</div>';
     }).join('');
 
-    var earlyMin = minutes[0] + minutes[1] + minutes[2] + minutes[3];
-    var earlyBoxes = counts[0] + counts[1] + counts[2] + counts[3];
-    var earlyRate = earlyMin ? (earlyBoxes / earlyMin) * 60 : 0;
-    var lastRate = rates[4];
-    var beyondRate = rates[5];
-    var lines = ['Örnek: ' + fmt(totalBoxes) + ' kutu · ' + fmt(Math.round(totalMin)) + ' dk sayılan oturum' +
-      ' · ' + windowText +
-      (scanInfo.watchMinSince ? ' (' + ago(scanInfo.watchMinSince) + ' başladı)' : '') + '.'];
-    if (totalBoxes < 30 || totalMin < 120) {
-      lines.push('Karar için veri birikiyor (eşik: 30 kutu ve 120 dk sayılan oturum).');
-    } else if (lastRate !== null && beyondRate !== null &&
-      lastRate <= earlyRate * 1.1 && beyondRate <= earlyRate * 1.1) {
-      lines.push('Okuma: 4–5 dk ve 5+ getirisi ilk 4 dakikanın altında → watch-sec 5 dk yeterli.');
-    } else {
-      lines.push('Okuma: son dakikalarda kutu yoğunluğu düşmüyor → watch-sec 5 dk kesiyor olabilir, uzatmayı dene.');
-    }
-    lines.push('5+ yalnızca uzatılan/sıcak oturumlarda görülür: 5 dk kesme noktası veriyi sansürler.');
+    var lines = ['Örnek: ' + minuteSample(totalBoxes, totalMin) + ' · ' + windowText + '.'];
+    lines.push(minuteDecision(counts, minutes));
+    lines.push('5+ karara girmez: yalnızca uzatılmış/sıcak oturumlardan dolar.');
     verdict.textContent = lines.join(' ');
   }
 
