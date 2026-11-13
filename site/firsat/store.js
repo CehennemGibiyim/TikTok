@@ -20,8 +20,15 @@
   var BACKUP_APP = 'tiktok-jeton-paneli';
   var BACKUP_VERSION = 2;
   // Panel sürümü ve sürüm geçmişi (Ayarlar'da gösterilir, yedeğe yazılır).
-  var APP_VERSION = '1.1.7';
+  var APP_VERSION = '1.1.8';
   var CHANGE_LOG = [
+    {
+      version: '1.1.8',
+      date: '2026-11-13',
+      items: [
+        'Penceresi kapanan kutunun listede kaldığı süre artık Ayarlar sekmesinden değiştirilebiliyor (varsayılan 15 dakika).'
+      ]
+    },
     {
       version: '1.1.7',
       date: '2026-11-13',
@@ -132,6 +139,8 @@
       settings: {
         letterTtlSec: 180,
         inactiveDays: 7,
+        // Penceresi kapanan sandık/portal/zarf kaç dakika daha listede kalır.
+        chestKeepMin: 15,
         notify: true,
         tiktokCutPct: 50,
         agencyCutPct: 10,

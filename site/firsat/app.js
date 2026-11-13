@@ -877,9 +877,14 @@
   // Kök paneldeki davranış: sandık süresi dolunca 3 dk "KONTROL ET!" olarak kalır.
   var CHEST_GRACE_MS = 3 * 60 * 1000;
   var UNKNOWN_WINDOW_MS = 30 * 60 * 1000;
-  // Sandık pencere bittikten sonra da sonsuza kadar kalmaz: kullanıcı
-  // toplayabilsin diye 15 dakika "KONTROL ET!" olarak durur, sonra düşer.
-  var CHEST_KEEP_MS = 15 * 60 * 1000;
+  // Sandık pencere bittikten sonra da sonsuza kadar kalmaz: kullanıcı toplayabilsin
+  // diye bir süre "KONTROL ET!" olarak durur, sonra düşer. Süre Ayarlar'daki
+  // "chestKeepMin" değerinden gelir (varsayılan 15 dakika).
+  function chestKeepMs() {
+    var minutes = Number(state.settings && state.settings.chestKeepMin);
+    if (!isFinite(minutes) || minutes < 0) minutes = 15;
+    return minutes * 60 * 1000;
+  }
 
   // Zarf ve portalda da pencere bitince kutu hemen düşmez: kullanıcı
   // toplayabilsin diye pay bırakılır, sonra listeden çıkar.
@@ -888,13 +893,13 @@
   function isExpired(event) {
     var now = Date.now();
     var end = eventEndAt(event);
-    // Sandık: pencere bitince hemen silinmez, CHEST_KEEP_MS boyunca durur.
+    // Sandık: pencere bitince hemen silinmez, ayardaki süre boyunca durur.
     if (event && event.kind === 'chest') {
       if (!end) {
         var created = Number(event.createdAt) || Number(event.t) || 0;
         return created > 0 && now - created > UNKNOWN_WINDOW_MS;
       }
-      return now >= end + CHEST_KEEP_MS;
+      return now >= end + chestKeepMs();
     }
     if (!end) {
       var created = Number(event.createdAt) || 0;
@@ -1970,6 +1975,7 @@
   function renderSettings() {
     $('letterTtl').value = state.settings.letterTtlSec;
     $('inactiveDays').value = state.settings.inactiveDays;
+    $('chestKeepMin').value = chestKeepMs() / 60000;
     $('notifyToggle').checked = Boolean(state.settings.notify);
 
     var info = Store.storageInfo();
@@ -2323,6 +2329,7 @@
       settings: Object.assign({}, state.settings, {
         letterTtlSec: Math.max(10, Number($('letterTtl').value) || 180),
         inactiveDays: Math.max(1, Number($('inactiveDays').value) || 7),
+        chestKeepMin: Math.max(0, $('chestKeepMin').value === '' ? 15 : (Number($('chestKeepMin').value) || 0)),
         notify: $('notifyToggle').checked
       })
     });
