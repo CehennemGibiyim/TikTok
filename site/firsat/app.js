@@ -63,6 +63,9 @@
   // Anlık kutu yayını: tarayıcı bu konuya yazar, panel SSE ile dinler.
   // Git commit/CDN gecikmesi (dakikalar) sandık penceresini kaçırıyordu.
   var BOX_TOPIC = 'cehennem-tiktok-firsat-7f3a91';
+  // Yayın anahtarı: konu herkese açık olduğu için yalnızca bu anahtarı taşıyan
+  // mesajlar kabul edilir (tarayıcıdaki --ntfy-key / NTFY_KEY ile aynı).
+  var BOX_KEY = 'XQMPSwldDoS26gnVIV1ClCyb';
   // Halka açık canlı kanal listesi (girişsiz, tarayıcıdan okunabilir).
   var discoveryUrl = 'https://api.tik.tools/api/live/top-channels';
   // Bulunan yayın, tarama doğrulayana kadar bu süre boyunca "canlı" sayılır.
@@ -267,6 +270,65 @@
   // Panel bu dosyayı okuyup canlı yayınları, gerçek sürelerini ve jeton
   // olaylarını kendiliğinden gösterir.
 
+  // Kutu kayıtlarını tek yerde birleştirir: tarama dosyası, hızlı kutu dosyası
+  // ve anlık yayın aynı kuralları kullanır. Yayıncı panelde yoksa oluşturulur,
+  // aynı kutu (scanId) iki kez yazılmaz, sandık/portal/zarf dışındaki tür atılır.
+  function mergeBoxItems(items, streamers, events) {
+    var byName = {};
+    streamers.forEach(function (streamer) { byName[cleanUsername(streamer.username)] = streamer; });
+    var known = {};
+    events.forEach(function (event) { if (event.scanId) known[event.scanId] = true; });
+    var fresh = [];
+
+    (items || []).forEach(function (item) {
+      if (!item || !item.id || known[item.id]) return;
+      if (item.kind && ['chest', 'portal', 'letter'].indexOf(item.kind) === -1) return;
+      var username = cleanUsername(item.username);
+      if (!username) return;
+      var owner = byName[username];
+      if (!owner) {
+        owner = {
+          id: uid('st'),
+          username: username,
+          country: String(item.country || '').toUpperCase().slice(0, 2),
+          createdAt: Date.now(),
+          scanLive: true,
+          scanCheckedAt: Date.now()
+        };
+        streamers.push(owner);
+        byName[username] = owner;
+      }
+      known[item.id] = true;
+      events.unshift({
+        id: uid('ev'),
+        streamerId: owner.id,
+        username: owner.username,
+        country: owner.country || '',
+        kind: item.kind === 'letter' ? 'letter' : (item.kind === 'portal' ? 'portal' : 'chest'),
+        coins: Number(item.coins) || 0,
+        durationSec: Number(item.durationSec) || 0,
+        availableAt: Number(item.availableAt) || Number(item.t) || Date.now(),
+        // TikTok'un bildirdiği gerçek açılış anı: süre bundan sayılır.
+        unpackAt: Number(item.unpackAt) || 0,
+        hasWindow: Boolean(item.hasWindow) || Number(item.unpackAt) > 0,
+        expiresAt: 0,
+        shared: Number(item.shared) || 0,
+        status: 'pending',
+        createdAt: Number(item.t) || Date.now(),
+        scanId: item.id,
+        auto: true,
+        giftName: item.boxName || item.giftName || '',
+        boxName: item.boxName || item.giftName || '',
+        businessType: Number(item.businessType) || 0,
+        boxType: item.boxType || '',
+        senderName: item.senderName || item.sender || ''
+      });
+      fresh.push(username);
+    });
+
+    return { changed: fresh.length > 0, fresh: fresh };
+  }
+
   function applyScan(data) {
     if (!data || !Array.isArray(data.streamers)) return false;
 
@@ -376,10 +438,8 @@
 
     var events = state.events.slice();
 
-    // Yeni tarama koşulu: Fırsatlar sıfırdan başlar. Önceki koşuların bekleyen
-    // otomatik kayıtları düşürülür; topladıkların geçmişte kalır.
-    // Yeni tarama koşusu: eski bekleyen kutular ARTIK SİLİNMEZ (her 3 saatte bir
-    // Fırsatlar sıfırlanıyordu). Yalnızca 12 saatten eski otomatik kayıtlar düşer;
+    // Yeni tarama koşusu: bekleyen kutular SİLİNMEZ (her koşuda Fırsatlar
+    // sıfırlanıyordu). Yalnızca 12 saatten eski otomatik kayıtlar düşer;
     // süresi dolanlar zaten "KONTROL ET"/bitti olarak ayrı işaretleniyor.
     var runId = Number((data.scanner && data.scanner.runId) || 0);
     var settings = Object.assign({}, state.settings || {});
@@ -394,59 +454,7 @@
       if (events.length !== beforeClean) changed = true;
     }
 
-    var known = {};
-    events.forEach(function (event) { if (event.scanId) known[event.scanId] = true; });
-
-    (data.events || []).forEach(function (item) {
-      if (!item || !item.id || known[item.id]) return;
-      // Tarayıcı yalnızca sandık/portal/zarf yazar; hediye türü artık kabul edilmez.
-      if (item.kind && !['chest', 'portal', 'letter'].includes(item.kind)) return;
-      var owner = byName[cleanUsername(item.username)];
-      if (!owner) {
-        // Kutu veren yayıncı panelin listesinde yoksa da kutu kaybolmaz:
-        // kayıt yerinde oluşturulur (Fırsatlar'a her durumda düşer).
-        owner = {
-          id: uid('st'),
-          username: cleanUsername(item.username),
-          country: String(item.country || '').toUpperCase().slice(0, 2),
-          createdAt: Date.now(),
-          scanLive: true,
-          scanCheckedAt: Date.now()
-        };
-        streamers.push(owner);
-        byName[cleanUsername(item.username)] = owner;
-        changed = true;
-      }
-      known[item.id] = true;
-      events.unshift({
-        id: uid('ev'),
-        streamerId: owner.id,
-        username: owner.username,
-        country: owner.country || '',
-        kind: item.kind === 'letter' ? 'letter'
-          : (item.kind === 'portal' ? 'portal'
-          : (item.kind === 'gift' ? 'gift' : 'chest')),
-        coins: Number(item.coins) || 0,
-        durationSec: Number(item.durationSec) || 0,
-        availableAt: Number(item.availableAt) || Number(item.t) || Date.now(),
-        // TikTok'un bildirdiği gerçek açılış anı: süre bundan sayılır.
-        unpackAt: Number(item.unpackAt) || 0,
-        hasWindow: Boolean(item.hasWindow) || Number(item.unpackAt) > 0,
-        expiresAt: 0,
-        shared: Number(item.shared) || 0,
-        status: 'pending',
-        createdAt: Number(item.t) || Date.now(),
-        scanId: item.id,
-        auto: true,
-        giftName: item.giftName || '',
-        boxName: item.boxName || item.giftName || '',
-        businessType: Number(item.businessType) || 0,
-        boxType: item.boxType || '',
-        senderName: item.senderName || item.sender || '',
-        sender: item.sender || ''
-      });
-      changed = true;
-    });
+    if (mergeBoxItems(data.events, streamers, events).changed) changed = true;
 
     if (changed) {
       Store.set({ streamers: streamers, events: events, settings: settings });
@@ -461,69 +469,13 @@
   function applyBoxes(boxes) {
     if (!Array.isArray(boxes) || !boxes.length) return false;
     var streamers = state.streamers.slice();
-    var byName = {};
-    streamers.forEach(function (streamer) { byName[streamer.username] = streamer; });
     var events = state.events.slice();
-    var known = {};
-    events.forEach(function (event) { if (event.scanId) known[event.scanId] = true; });
-    var changed = false;
-    var fresh = [];
-
-    boxes.forEach(function (item) {
-      if (!item || !item.id || known[item.id]) return;
-      if (item.kind && !['chest', 'portal', 'letter'].includes(item.kind)) return;
-      var username = cleanUsername(item.username);
-      if (!username) return;
-      // Kurulum sırasında yayınlanan deneme kutuları listeye girmesin.
-      if (/^anlik_test_/.test(username) || username === 'test_anlik_kutu' || username === 'test_user') return;
-      var owner = byName[username];
-      if (!owner) {
-        owner = {
-          id: uid('st'),
-          username: username,
-          country: '',
-          createdAt: Date.now(),
-          scanLive: true,
-          scanCheckedAt: Date.now()
-        };
-        streamers.push(owner);
-        byName[username] = owner;
-        changed = true;
-      }
-      known[item.id] = true;
-      events.unshift({
-        id: uid('ev'),
-        streamerId: owner.id,
-        username: owner.username,
-        country: owner.country || '',
-        kind: item.kind === 'letter' ? 'letter' : (item.kind === 'portal' ? 'portal' : 'chest'),
-        coins: Number(item.coins) || 0,
-        durationSec: Number(item.durationSec) || 0,
-        availableAt: Number(item.availableAt) || Number(item.t) || Date.now(),
-        unpackAt: Number(item.unpackAt) || 0,
-        hasWindow: Boolean(item.hasWindow) || Number(item.unpackAt) > 0,
-        expiresAt: 0,
-        shared: Number(item.shared) || 0,
-        status: 'pending',
-        createdAt: Number(item.t) || Date.now(),
-        scanId: item.id,
-        auto: true,
-        giftName: item.boxName || '',
-        boxName: item.boxName || '',
-        businessType: Number(item.businessType) || 0,
-        boxType: item.boxType || '',
-        senderName: '',
-        sender: ''
-      });
-      fresh.push(username);
-      changed = true;
-    });
-
-    if (!changed) return false;
+    var merged = mergeBoxItems(boxes, streamers, events);
+    if (!merged.changed) return false;
     Store.set({ streamers: streamers, events: events });
     state = Store.get();
     renderAll();
-    if (fresh.length) notifyBoxes(fresh);
+    notifyBoxes(merged.fresh);
     return true;
   }
 
@@ -549,7 +501,9 @@
           var parsed = JSON.parse(message.data || '{}');
           if (parsed.event && parsed.event !== 'message') return;
           var box = parsed.message ? JSON.parse(parsed.message) : parsed;
-          if (box && box.username && box.id) applyBoxes([box]);
+          // Anahtarsız/yanlış anahtarlı mesaj sahte olabilir: yok sayılır.
+          if (!box || box.key !== BOX_KEY) return;
+          if (box.username && box.id) applyBoxes([box]);
         } catch (error) { /* bozuk mesaj yok sayılır */ }
       });
     } catch (error) { /* akış yoksa 15 sn'lik dosya okuması devrede */ }

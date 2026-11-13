@@ -60,6 +60,9 @@ const CONFIG = {
   // Panel aynı konuya abone olur (site/firsat/app.js → BOX_TOPIC).
   ntfy: readArg('ntfy', 1) ? true : false,
   ntfyTopic: String(readArg('ntfy-topic', 'cehennem-tiktok-firsat-7f3a91')),
+  // Konu herkese açık: sahte kutu yayınlanamasın diye paylaşılan anahtar.
+  // Paneldeki BOX_KEY ile aynı olmalı (değiştirirsen iki tarafı birlikte değiştir).
+  ntfyKey: String(readArg('ntfy-key', process.env.NTFY_KEY || 'XQMPSwldDoS26gnVIV1ClCyb')),
   // Havuzun her turda kaç adresi yoklanacağı (0 = hepsi). Ağır tarama
   // dinleme döngüsünü yavaşlatıyordu; havuz sırayla dilim dilim yoklanır.
   pollBatch: Number(readArg('poll-batch', 0)),
@@ -696,6 +699,7 @@ function recordEvent(username, data) {
 function publishBox(event) {
   if (!CONFIG.ntfy || typeof fetch !== 'function') return;
   const payload = {
+    key: CONFIG.ntfyKey,
     id: event.id,
     t: event.t,
     username: event.username,
