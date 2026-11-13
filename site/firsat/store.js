@@ -20,8 +20,17 @@
   var BACKUP_APP = 'tiktok-jeton-paneli';
   var BACKUP_VERSION = 2;
   // Panel sürümü ve sürüm geçmişi (Ayarlar'da gösterilir, yedeğe yazılır).
-  var APP_VERSION = '1.4.0';
+  var APP_VERSION = '1.4.1';
   var CHANGE_LOG = [
+    {
+      version: '1.4.1',
+      date: '2026-11-13',
+      items: [
+        'Sistem sağlığı satırı: live.json, son kutu, son başarılı bağlantı ve metrics.json yaşları her sekmede görünür.',
+        'Eşik aşılınca (veri/bağlantı 30 dk, kutu/ölçüm 3 sa) “tarayıcı durmuş olabilir” uyarısı ve hangi kaynağın geciktiği yazılır; tarama bilerek duraklatıldıysa uyarı çıkmaz.',
+        'Son başarılı bağlantı zamanı live.json içine (connectStats.lastOkAt) yazılır; bu alanı taşımayan eski dosyalarda değer “—” görünür.'
+      ]
+    },
     {
       version: '1.4.0',
       date: '2026-11-13',

@@ -208,6 +208,9 @@ body {
 .chip-danger { background: rgba(239, 68, 68, 0.12); border-color: rgba(239, 68, 68, 0.35); color: #fca5a5; }
 .chip-danger:hover { background: rgba(239, 68, 68, 0.25); }
 
+/* Sistem sağlığı satırı: eşik aşılınca kırmızıya döner. */
+.health-stale { border-color: rgba(239, 68, 68, 0.45); background: rgba(127, 29, 29, 0.16); }
+
 .opp-card {
   background: rgba(255, 255, 255, 0.04);
   border: 1px solid rgba(255, 255, 255, 0.08);

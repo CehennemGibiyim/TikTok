@@ -153,7 +153,7 @@ const state = {
   // Kota koruması devreye girdiyse burada tutulur (panelde gösterilir).
   tuningGuard: null,
   // Bağlantı teşhisi: panel "neden 0 oda" sorusunu buradan yanıtlar.
-  connectStats: { attempts: 0, ok: 0, failed: 0, rateLimited: 0, offline: 0, dayLimited: false, errors: [] },
+  connectStats: { attempts: 0, ok: 0, failed: 0, rateLimited: 0, offline: 0, dayLimited: false, lastOkAt: 0, errors: [] },
   connectStarts: [],
   // Saatlik bütçe: son 60 dakikadaki deneme zamanları ve hız sınırından öğrenilen üst sınır.
   hourStarts: [],
@@ -1758,6 +1758,8 @@ async function maintainWatchers() {
       state.lastConnectAt = Date.now();
       state.connectFailures = 0;
       state.connectStats.ok += 1;
+      // Panel "son başarılı bağlantı" tazeliğini bundan ölçer.
+      state.connectStats.lastOkAt = Date.now();
       // Bağlantı kuruldu: oda gerçekten yayında. "Canlı" bilgisi tazelenir,
       // api-live doğrulayamasa da etiket doğru kalır.
       const liveRecord = state.streamers.get(pick.record.username);
@@ -1992,6 +1994,8 @@ function snapshot() {
         offline: state.connectStats.offline,
         // TikTok günlük bağlantı kotası bitti mi (panelde sebep olarak yazılır).
         dayLimited: Boolean(state.connectStats.dayLimited),
+        // Son başarılı bağlantının zamanı: panel sağlık satırı bunu izler.
+        lastOkAt: Number(state.connectStats.lastOkAt) || 0,
         errors: state.connectStats.errors.slice(-3)
       },
       lastConnectorError: state.lastConnectorError,

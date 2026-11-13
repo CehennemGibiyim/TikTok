@@ -678,6 +678,7 @@
       : '';
 
     el.innerHTML = '<span class="chip chip-green chip-status">● ' + esc(parts.join(' · ')) + '</span>' + connLine;
+    renderHealth();
   }
 
   async function refreshScan() {
@@ -2094,6 +2095,7 @@
       if (!metricsInfo) metricsInfo = null;
     }
     renderMetrics();
+    renderHealth();
   }
 
   function metricsNumber(value, suffix) {
@@ -2843,6 +2845,70 @@
     }).join('');
   }
 
+
+  // ---------- Sistem sağlığı ----------
+  // Veri üretimi sessizce durmasın: dört kaynağın yaşı tek satırda. Eşikler
+  // çalışma düzenine göre: tarayıcı 4 saatlik turlarda 5 dakikada bir commit
+  // eder (turlar arası ~10 dk), kutular saatte ~10, ölçüm saatlik.
+  var HEALTH_LIMITS = [
+    { key: 'scan', label: 'veri', limit: 30 * 60000 },
+    { key: 'box', label: 'kutu', limit: 3 * 3600000 },
+    { key: 'connect', label: 'bağlantı', limit: 30 * 60000 },
+    { key: 'metrics', label: 'ölçüm', limit: 3 * 3600000 }
+  ];
+
+  function shortAge(ms) {
+    if (!ms) return '—';
+    var minutes = Math.floor(ms / 60000);
+    if (minutes < 1) return 'şimdi';
+    if (minutes < 60) return minutes + ' dk';
+    var hours = Math.floor(minutes / 60);
+    if (hours < 24) return hours + ' sa' + (minutes % 60 ? ' ' + (minutes % 60) + ' dk' : '');
+    return Math.floor(hours / 24) + ' gün';
+  }
+
+  // Yaşlar cihazdaki son kayıtlardan: live.json kendi damgasını, kutular
+  // Fırsatlar'a düşen otomatik olayları, bağlantı tarayıcının bildirdiği son
+  // başarıyı, ölçüm metrics.json'ın üretim zamanını taşır.
+  function healthSources() {
+    var scannedAt = scanInfo && scanInfo.scannedAt ? new Date(scanInfo.scannedAt).getTime() : 0;
+    var boxAt = 0;
+    state.events.forEach(function (event) {
+      if (!event.auto || !isOpportunity(event)) return;
+      boxAt = Math.max(boxAt, Number(event.createdAt) || 0);
+    });
+    return {
+      scan: scannedAt || 0,
+      box: boxAt,
+      connect: Number(scanInfo && scanInfo.connectStats && scanInfo.connectStats.lastOkAt) || 0,
+      metrics: metricsInfo && metricsInfo.generatedAt ? new Date(metricsInfo.generatedAt).getTime() : 0
+    };
+  }
+
+  function renderHealth() {
+    var el = $('systemHealth');
+    if (!el) return;
+    var now = Date.now();
+    var at = healthSources();
+    var stale = [];
+    var parts = HEALTH_LIMITS.map(function (source) {
+      var stamp = at[source.key];
+      var late = stamp > 0 && now - stamp > source.limit;
+      if (late) stale.push(source.label + ' ' + shortAge(now - stamp));
+      return '<span' + (late ? ' class="text-red-300 font-semibold"' : '') + '>' +
+        esc(source.label + ' ' + (stamp ? shortAge(now - stamp) : '—')) + '</span>';
+    });
+    var warn = stale.length > 0 && !scanPaused;
+    el.classList.toggle('health-stale', warn);
+    el.innerHTML = (warn
+      ? '<span class="chip chip-danger" title="' + esc(stale.join(' · ')) + '">⚠ tarayıcı durmuş olabilir</span>'
+      : '<span>🩺 sistem</span>') +
+      ' · ' + parts.join(' · ') +
+      (scanPaused ? '<span>· tarama duraklatıldı</span>' : '');
+    el.title = 'Eşikler: veri 30 dk · kutu 3 sa · bağlantı 30 dk · ölçüm 3 sa' +
+      ' · yaşlar son kayıtlardan';
+  }
+
   function renderAll() {
     renderStats();
     renderStreamers();
@@ -2852,6 +2918,7 @@
     renderCalc();
     renderMetrics();
     renderFunnel();
+    renderHealth();
     renderSettings();
     if (window.lucide) lucide.createIcons();
   }

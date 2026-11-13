@@ -197,6 +197,24 @@ dönüşüm oranını (toplanan / görülen) ve medyan tepki süresini (toplama 
 panelde yapılır, çünkü kullanıcı işaretlemeleri tarayıcı geçmişinde yoktur. “Görüldü” alanı bu sürümle
 eklendi: ondan önceki kutular hunide sayılmaz, 7 gün içinde kendiliğinden arınır.
 
+### Sistem sağlığı satırı
+
+Panelin üstünde, her sekmede dört yaş görünür:
+
+| Kaynak | Nereden | Eşik |
+|---|---|---|
+| **veri** | `live.json` → `scannedAt` | 30 dk |
+| **kutu** | Fırsatlar'a düşen son otomatik kutu (`createdAt`) | 3 sa |
+| **bağlantı** | `live.json` → `scanner.connectStats.lastOkAt` | 30 dk |
+| **ölçüm** | `metrics.json` → `generatedAt` | 3 sa |
+
+Eşikler çalışma düzenine göre seçildi: tarayıcı 4 saatlik turlarda 5 dakikada bir commit eder
+(turlar arası ~10 dk), kutular saatte ~10 gelir, ölçüm saatlik üretilir. Eşik aşılırsa satır
+kırmızıya döner ve **“tarayıcı durmuş olabilir”** uyarısı geciken kaynakları yaşlarıyla yazar;
+böylece veri üretimi sessizce durmaz. Tarama panelden bilerek duraklatıldıysa uyarı çıkmaz, satırda
+“tarama duraklatıldı” yazar. Bilinmeyen değer “—” görünür ve uyarı üretmez; örneğin
+`lastOkAt` alanını taşımayan eski `live.json` dosyalarında bağlantı yaşı boş kalır.
+
 `.github/workflows/metrics.yml` bu komutu **saatte bir** (ve elle çalıştırınca) `fetch-depth: 0`
 ile koşar, dosya değiştiyse commit eder. Sekmede dört bölüm var: özet kartları (ort. kutu/saat,
 son koşunun kutu/5 dk oturumu, karşılaştırılabilir koşu sayısı, ayar grubu sayısı), **saatlik kutu
