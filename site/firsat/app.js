@@ -331,7 +331,10 @@
         boxName: item.boxName || item.giftName || '',
         businessType: Number(item.businessType) || 0,
         boxType: item.boxType || '',
-        senderName: item.senderName || item.sender || ''
+        senderName: item.senderName || item.sender || '',
+        // Kutunun düştüğü oturum saniyesi (tarayıcı bilmiyorsa null).
+        sessionSec: item.sessionSec === null || item.sessionSec === undefined
+          ? null : Math.max(0, Number(item.sessionSec) || 0)
       });
       fresh.push(username);
     });
@@ -678,6 +681,7 @@
       : '';
 
     el.innerHTML = '<span class="chip chip-green chip-status">● ' + esc(parts.join(' · ')) + '</span>' + connLine;
+    renderBoxMinutes();
     renderHealth();
   }
 
@@ -2352,6 +2356,70 @@
       : '<div class="hint">Son 7 günde kaçan kutu yok.</div>';
   }
 
+
+  // ---------- Kutu düşme dakikası ----------
+  // Tarayıcı her kutuya dinleme oturumunun kaçıncı saniyesinde düştüğünü yazar
+  // (sessionSec). Burada kutu sayısı dinlenen dakikaya bölünür: 5. dakikanın getirisi
+  // watch-sec'in 5 dk olup olmadığını gösterir. 5+ kovası yalnızca uzatılan/sıcak
+  // oturumlarda dolabilir; yani 5 dk kesme noktası veriyi sansürler.
+  var MINUTE_LABELS = ['0–1', '1–2', '2–3', '3–4', '4–5', '5+'];
+
+  function renderBoxMinutes() {
+    var bars = $('boxMinuteBars');
+    var verdict = $('boxMinuteVerdict');
+    if (!bars || !verdict) return;
+    var data = scanInfo && scanInfo.boxMinutes;
+    var watch = scanInfo && scanInfo.watchMin;
+    if (!Array.isArray(data) || !Array.isArray(watch)) {
+      bars.innerHTML = '<div class="hint">Ölçüm bu sürümle başladı; tarayıcı ilk oturumları kapattıkça dolar.</div>';
+      verdict.textContent = '';
+      return;
+    }
+    var counts = MINUTE_LABELS.map(function (label, index) { return Math.max(0, Number(data[index]) || 0); });
+    var minutes = MINUTE_LABELS.map(function (label, index) { return Math.max(0, Number(watch[index]) || 0); });
+    var totalBoxes = counts.reduce(function (sum, count) { return sum + count; }, 0);
+    var totalMin = minutes.reduce(function (sum, min) { return sum + min; }, 0);
+    if (!totalBoxes || !totalMin) {
+      bars.innerHTML = '<div class="hint">Henüz kutu düşme kaydı yok; oturumlar kapandıkça burası dolar.</div>';
+      verdict.textContent = '';
+      return;
+    }
+    var rates = counts.map(function (count, index) {
+      return minutes[index] ? (count / minutes[index]) * 60 : null;
+    });
+    var maxRate = 0.0001;
+    rates.forEach(function (rate) { if (rate !== null) maxRate = Math.max(maxRate, rate); });
+    bars.innerHTML = rates.map(function (rate, index) {
+      var width = rate === null ? 0 : Math.max(2, Math.round((rate / maxRate) * 100));
+      return '<div class="flex items-center gap-2 text-[11px]">' +
+        '<span class="w-12 shrink-0 text-yellow-50/50 font-mono">' + MINUTE_LABELS[index] + ' dk</span>' +
+        '<span class="w-16 shrink-0 text-right font-mono text-amber-300">' +
+          (rate === null ? '—' : fmt(Math.round(rate * 10) / 10) + '/sa') + '</span>' +
+        '<span class="flex-1 h-2 rounded bg-white/5 overflow-hidden"><span class="block h-full rounded bg-amber-500/70" style="width:' + width + '%"></span></span>' +
+        '<span class="w-24 shrink-0 text-right text-yellow-50/40">' + counts[index] + ' kutu · ' +
+          fmt(Math.round(minutes[index])) + ' dk</span>' +
+        '</div>';
+    }).join('');
+
+    var earlyMin = minutes[0] + minutes[1] + minutes[2] + minutes[3];
+    var earlyBoxes = counts[0] + counts[1] + counts[2] + counts[3];
+    var earlyRate = earlyMin ? (earlyBoxes / earlyMin) * 60 : 0;
+    var lastRate = rates[4];
+    var beyondRate = rates[5];
+    var lines = ['Örnek: ' + fmt(totalBoxes) + ' kutu · ' + fmt(Math.round(totalMin)) + ' dk dinleme' +
+      (scanInfo.watchMinSince ? ' (' + ago(scanInfo.watchMinSince) + ' başladı)' : '') + '.'];
+    if (totalBoxes < 30 || totalMin < 120) {
+      lines.push('Karar için veri birikiyor (eşik: 30 kutu ve 120 dk dinleme).');
+    } else if (lastRate !== null && beyondRate !== null &&
+      lastRate <= earlyRate * 1.1 && beyondRate <= earlyRate * 1.1) {
+      lines.push('Okuma: 4–5 dk ve 5+ getirisi ilk 4 dakikanın altında → watch-sec 5 dk yeterli.');
+    } else {
+      lines.push('Okuma: son dakikalarda kutu yoğunluğu düşmüyor → watch-sec 5 dk kesiyor olabilir, uzatmayı dene.');
+    }
+    lines.push('5+ yalnızca uzatılan/sıcak oturumlarda görülür: 5 dk kesme noktası veriyi sansürler.');
+    verdict.textContent = lines.join(' ');
+  }
+
   function renderScanState(info) {
     var el = $('scanState');
     if (!el || !desktopApi) return;
@@ -2918,6 +2986,7 @@
     renderCalc();
     renderMetrics();
     renderFunnel();
+    renderBoxMinutes();
     renderHealth();
     renderSettings();
     if (window.lucide) lucide.createIcons();
@@ -3190,7 +3259,7 @@
       var metrics = $('view-metrics');
       if (opp && !opp.classList.contains('hidden')) renderOpportunities();
       if (streams && !streams.classList.contains('hidden')) renderStreamers();
-      if (metrics && !metrics.classList.contains('hidden')) renderFunnel();
+      if (metrics && !metrics.classList.contains('hidden')) { renderFunnel(); renderBoxMinutes(); }
     }, 30000);
   }
 

@@ -229,6 +229,22 @@
     <div class="card p-5 mb-5">
       <div class="flex flex-col md:flex-row md:items-start md:justify-between gap-2 mb-3">
         <div>
+          <h2 class="section-title"><i data-lucide="timer" class="w-5 h-5 text-amber-400"></i> Kutu düşme dakikası</h2>
+          <p class="hint mt-1">
+            Dinleme oturumunun kaçıncı dakikasında kutu düştü? Çubuklar <b>kutu/saat</b>
+            (kutu ÷ dinlenen dakika). <code>watch-sec</code> 5 dakika olduğu için 5+ kovası yalnızca
+            sıcak/uzatılmış oturumlardan dolar; eğri, 5 dakikanın yeterli olup olmadığını gösterir.
+          </p>
+        </div>
+        <div class="text-[11px] text-yellow-50/40 text-right whitespace-nowrap">tarayıcı oturumları</div>
+      </div>
+      <div id="boxMinuteBars" class="space-y-1"></div>
+      <p class="hint mt-3" id="boxMinuteVerdict"></p>
+    </div>
+
+    <div class="card p-5 mb-5">
+      <div class="flex flex-col md:flex-row md:items-start md:justify-between gap-2 mb-3">
+        <div>
           <h2 class="section-title"><i data-lucide="bar-chart-3" class="w-5 h-5 text-amber-400"></i> Ölçüm</h2>
           <p class="hint mt-1">
             <code>scripts/quota-report.mjs</code> geçmiş <code>live.json</code> ve <code>boxes.json</code> commit'lerinden hesaplar;

@@ -173,6 +173,12 @@ const state = {
   // Saatlik kutu sayacı {saat: sayı}: panel kutu serisini bundan çizer.
   // Koşular arasında targets.json'da kalır, 48 saatten eskisi atılır.
   boxHourly: {},
+  // Oturum dakikası ölçümü: kutu dinlemenin kaçıncı dakikasında düştü
+  // (0-1, 1-2, ..., 5+) ve her kovada kaç dakika dinlendi. İkincisi payda:
+  // oran = kutu / oturum-dakikası. Koşular arasında targets.json'da kalır.
+  boxMinutes: [0, 0, 0, 0, 0, 0],
+  watchMin: [0, 0, 0, 0, 0, 0],
+  watchMinSince: 0,
   lastFlush: 0,
   lastCommit: 0,
   // Kutu dosyası: commit bekleyen yeni kutu var mı, son yazılan listenin imzası.
@@ -263,6 +269,16 @@ function loadTargets() {
         state.boxHourly[hour] = count;
       });
     }
+
+    // Oturum dakikası ölçümü: iki küçük dizi koşular arasında birikir.
+    const saveMinutes = (value) => Array.isArray(value) && value.length === 6
+      ? value.map((count) => Math.max(0, Number(count) || 0))
+      : null;
+    const savedBoxMinutes = saveMinutes(parsed && parsed.boxMinutes);
+    const savedWatchMin = saveMinutes(parsed && parsed.watchMin);
+    if (savedBoxMinutes) state.boxMinutes = savedBoxMinutes;
+    if (savedWatchMin) state.watchMin = savedWatchMin;
+    state.watchMinSince = Number(parsed && parsed.watchMinSince) || 0;
 
     // Son ülke taraması raporu: günde bir çalışsın diye zamanı korunur.
     const savedSweep = parsed && parsed.regionSweep;
@@ -378,6 +394,10 @@ function saveTargets() {
     probeHistory: state.probeHistory,
     // Saatlik kutu sayıları: panel 24 saatlik kutu serisini bundan çizer.
     boxHourly: state.boxHourly,
+    // Oturum dakikası eğrisi: kutu sayısı ve dinlenen dakika (payda).
+    boxMinutes: state.boxMinutes,
+    watchMin: state.watchMin,
+    watchMinSince: state.watchMinSince,
     // Günlük ülke taraması: zamanı ve sonucu koşular arasında korunur.
     regionSweep: state.regionSweep,
     updatedAt: new Date().toISOString(),
@@ -691,7 +711,10 @@ function recordEvent(username, data) {
     hasWindow: Math.max(0, Math.round(Number(data.availableAt) || 0)) > 0,
     availableAt: Math.max(0, Math.round(Number(data.availableAt) || 0)) ||
       Date.now() + Math.max(0, Math.round(Number(data.durationSec) || 0)) * 1000,
-    source: 'scan'
+    source: 'scan',
+    // Dinleme oturumunun kaçıncı saniyesinde düştü; oturum dışıysa bilinmiyor.
+    sessionSec: data.sessionSec === null || data.sessionSec === undefined
+      ? null : Math.max(0, Math.round(Number(data.sessionSec) || 0))
   };
   state.events.unshift(event);
   if (state.events.length > 400) state.events.length = 400;
@@ -727,7 +750,8 @@ function publishBox(event) {
     durationSec: event.durationSec || 0,
     unpackAt: event.unpackAt || 0,
     availableAt: event.availableAt || 0,
-    hasWindow: Boolean(event.hasWindow)
+    hasWindow: Boolean(event.hasWindow),
+    sessionSec: event.sessionSec === undefined ? null : event.sessionSec
   };
   fetch('https://ntfy.sh/' + encodeURIComponent(CONFIG.ntfyTopic), {
     method: 'POST',
@@ -752,7 +776,8 @@ function writeBoxes() {
     durationSec: event.durationSec || 0,
     unpackAt: event.unpackAt || 0,
     availableAt: event.availableAt || 0,
-    hasWindow: Boolean(event.hasWindow)
+    hasWindow: Boolean(event.hasWindow),
+    sessionSec: event.sessionSec === undefined ? null : event.sessionSec
   }));
   const body = {
     scannedAt: new Date().toISOString(),
@@ -1011,6 +1036,9 @@ async function closeWatcher(username, reason) {
     }
   }
 
+  // Oturum süresi ölçüme yazılır: kutu oranının paydası dinlenen dakika.
+  noteWatchExposure(watcher);
+
   if (watcher.timer) clearTimeout(watcher.timer);
   try {
     if (watcher.connection) watcher.connection.disconnect();
@@ -1164,6 +1192,11 @@ function handleEnvelope(username, eventName, data) {
   // Oturum bazında kutu sayısı: keşif oranı bu sonuçlara göre ayarlanır.
   const sessionWatcher = state.rooms.get(username);
   if (sessionWatcher) sessionWatcher.boxes = (Number(sessionWatcher.boxes) || 0) + 1;
+  // Kutu, oturumun kaçıncı saniyesinde düştü? Oturum yoksa bilinmiyor (null).
+  const sessionSec = sessionWatcher
+    ? Math.max(0, (Date.now() - sessionWatcher.startedAt) / 1000)
+    : null;
+  countBoxMinute(sessionSec);
 
   const boxTarget = targetFor(username);
   if (boxTarget) {
@@ -1194,8 +1227,39 @@ function handleEnvelope(username, eventName, data) {
     businessType: Number(info.businessType) || 0,
     boxType: boxType === 'yok' ? '' : boxType,
     sender: info.sendUserName || '',
-    senderName: info.sendUserName || info.senderName || ''
+    senderName: info.sendUserName || info.senderName || '',
+    sessionSec
   });
+}
+
+// Dinlemenin kaçıncı dakikasında olduğumuzu 0-1 ... 4-5, 5+ kovasına çevirir.
+function minuteBucket(sessionSec) {
+  return Math.min(5, Math.floor(Math.max(0, Number(sessionSec) || 0) / 60));
+}
+
+// Kutu düşme dakikası: yalnızca gerçek bir oturum varsa sayılır (kaynak bilinmiyorsa
+// 0'a yazıp ilk dakika sanmak yanlış eğri üretirdi).
+function countBoxMinute(sessionSec) {
+  if (sessionSec === null || sessionSec === undefined) return;
+  state.boxMinutes[minuteBucket(sessionSec)] += 1;
+  state.targetsDirty = true;
+}
+
+// Oturum kapanırken dinlenen süreyi dakika kovalarına böler. Kova başına oran
+// (kutu / dinlenen dakika) böylece "5. dakikada kutu geliyor mu?" sorusunu
+// yanıtlar; 5+ yalnızca uzatılan/sıcak oturumlardan dolabilir (sansür).
+function noteWatchExposure(watcher) {
+  if (!watcher || watcher.exposureCounted) return;
+  watcher.exposureCounted = true;
+  const watchedSec = Math.max(0, (Date.now() - watcher.startedAt) / 1000);
+  for (let i = 0; i < 6; i += 1) {
+    const from = i * 60;
+    const to = i === 5 ? Infinity : (i + 1) * 60;
+    const overlapSec = Math.min(watchedSec, to) - from;
+    if (overlapSec > 0) state.watchMin[i] += overlapSec / 60;
+  }
+  if (!state.watchMinSince) state.watchMinSince = watcher.startedAt;
+  state.targetsDirty = true;
 }
 
 // Kutu yakalamayı saatlik sayaca yazar; 48 saatten eski kovalar silinir.
@@ -1984,6 +2048,10 @@ function snapshot() {
       },
       probeHistory: state.probeHistory,
       boxHourly: state.boxHourly,
+      // Oturum dakikası eğrisi: kutu sayısı / dinlenen dakika (0-1 ... 5+).
+      boxMinutes: state.boxMinutes,
+      watchMin: state.watchMin,
+      watchMinSince: state.watchMinSince,
       connectFailures: state.connectFailures,
       // Bağlantı teşhisi: kaç deneme, kaçı başarılı, son hatalar, soğuma.
       connectStats: {
@@ -2355,6 +2423,21 @@ if (process.env.SCANNER_SELFTEST === '1') {
   const nowHour = Math.floor(Date.now() / 3600000);
   console.log('KUTU saatlik →', Object.keys(state.boxHourly).length, 'kova ·',
     Number(state.boxHourly[nowHour]) || 0, '(beklenen 1 kova · 2)');
+
+  // Oturum dakikası: 90 sn'de düşen kutu 1-2, 310 sn'deki 5+ kovasına yazılır.
+  // Dinlenen süre kovalara bölünür; aynı oturum iki kez kapanırsa sayılmaz.
+  state.boxMinutes = [0, 0, 0, 0, 0, 0];
+  state.watchMin = [0, 0, 0, 0, 0, 0];
+  state.watchMinSince = 0;
+  countBoxMinute(90);
+  countBoxMinute(310);
+  countBoxMinute(null);
+  const fakeWatcher = { startedAt: Date.now() - 330000, sessionSec: 300 };
+  noteWatchExposure(fakeWatcher);
+  noteWatchExposure(fakeWatcher);
+  console.log('DAKİKA →', state.boxMinutes.join(','), '·',
+    state.watchMin.map((min) => Math.round(min * 10) / 10).join(','),
+    '(beklenen 0,1,0,0,0,1 · 1,1,1,1,1,0.5)');
 
   // Panelin teşhis satırı bu alanlardan beslenir: eksikse "0 oda" sessiz kalır.
   const diag = snapshot().scanner;

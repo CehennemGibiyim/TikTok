@@ -20,8 +20,17 @@
   var BACKUP_APP = 'tiktok-jeton-paneli';
   var BACKUP_VERSION = 2;
   // Panel sürümü ve sürüm geçmişi (Ayarlar'da gösterilir, yedeğe yazılır).
-  var APP_VERSION = '1.4.1';
+  var APP_VERSION = '1.4.2';
   var CHANGE_LOG = [
+    {
+      version: '1.4.2',
+      date: '2026-11-13',
+      items: [
+        'Ölçüm sekmesinde “kutu düşme dakikası” eğrisi: kutu, dinleme oturumunun 0–1, 1–2, …, 5+ dakikasından hangisinde düştü; çubuklar kutu/saat (kutu ÷ dinlenen dakika).',
+        'Kutu kaydına oturum saniyesi (sessionSec) eklendi; tarayıcı bilmiyorsa boş kalır ve ilk dakika sayılmaz.',
+        'Eğri, watch-sec’in 5 dakika olup olmadığını gerekçelendirir: 4–5 dk ve 5+ getirisi ilk 4 dakikanın altındaysa 5 dk yeterli; değilse uyarır. Karar için 30 kutu ve 120 dk dinleme birikmesi beklenir.'
+      ]
+    },
     {
       version: '1.4.1',
       date: '2026-11-13',
