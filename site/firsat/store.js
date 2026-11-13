@@ -20,8 +20,17 @@
   var BACKUP_APP = 'tiktok-jeton-paneli';
   var BACKUP_VERSION = 2;
   // Panel sürümü ve sürüm geçmişi (Ayarlar'da gösterilir, yedeğe yazılır).
-  var APP_VERSION = '1.2.0';
+  var APP_VERSION = '1.2.1';
   var CHANGE_LOG = [
+    {
+      version: '1.2.1',
+      date: '2026-11-13',
+      items: [
+        'Yayıncı güvenilirlik skoru: kutu sayısı, ortalama jeton ve son kutu tazeliğinden 0-100 puan.',
+        'Yayın tablosunda “Güven” sütunu, Fırsatlar kartında “🛡️ güven” rozeti; ipucunda kutu sayısı ve ortalama jeton.',
+        'Skorlu odalara dönüş önceliği: 100 puan odaya dönüş aralığını yarıya indirir, sıralamada öne geçirir.'
+      ]
+    },
     {
       version: '1.2.0',
       date: '2026-11-13',

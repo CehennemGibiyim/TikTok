@@ -310,7 +310,11 @@ function loadTargets() {
             : 0),
         roomIdMiss: (typeof item === 'object' && item && Number(item.roomIdMiss)) || 0,
         // Kutu geçmişi dosyada kalır: yeni koşu yayıncıyı yine öncelikli izler.
+        // boxCoinSum/boxCoinsSeen: jetonu bilinen kutuların toplamı ve sayısı
+        // (ortalama jeton buradan çıkar; bilinmeyen jeton ortalamaya girmez).
         boxEvents: (typeof item === 'object' && item && Number(item.boxEvents)) || 0,
+        boxCoinSum: (typeof item === 'object' && item && Number(item.boxCoinSum)) || 0,
+        boxCoinsSeen: (typeof item === 'object' && item && Number(item.boxCoinsSeen)) || 0,
         lastBoxAt: (typeof item === 'object' && item && Number(item.lastBoxAt)) || 0,
         lastWatchedAt: (typeof item === 'object' && item && Number(item.lastWatchedAt)) || 0,
         addedAt: (typeof item === 'object' && item && Number(item.addedAt)) || 0,
@@ -347,6 +351,8 @@ function saveTargets() {
         roomIdAt: 0,
         roomIdMiss: 0,
         boxEvents: 0,
+        boxCoinSum: 0,
+        boxCoinsSeen: 0,
         lastBoxAt: 0,
         lastWatchedAt: 0,
         addedAt: Number(item && item.addedAt) || Date.now(),
@@ -382,6 +388,8 @@ function saveTargets() {
       roomIdAt: target.roomIdAt || 0,
       roomIdMiss: target.roomIdMiss || 0,
       boxEvents: target.boxEvents || 0,
+      boxCoinSum: target.boxCoinSum || 0,
+      boxCoinsSeen: target.boxCoinsSeen || 0,
       lastBoxAt: target.lastBoxAt || 0,
       lastWatchedAt: target.lastWatchedAt || 0,
       addedAt: target.addedAt || 0,
@@ -1159,6 +1167,12 @@ function handleEnvelope(username, eventName, data) {
   const boxTarget = targetFor(username);
   if (boxTarget) {
     boxTarget.boxEvents = (Number(boxTarget.boxEvents) || 0) + 1;
+    // Ortalama jeton: yalnızca jetonu TikTok'un bildirdiği kutular sayılır,
+    // "bilinmiyor" (0) ortalamayı aşağı çekmesin.
+    if (coins > 0) {
+      boxTarget.boxCoinSum = (Number(boxTarget.boxCoinSum) || 0) + coins;
+      boxTarget.boxCoinsSeen = (Number(boxTarget.boxCoinsSeen) || 0) + 1;
+    }
     boxTarget.lastBoxAt = Date.now();
     state.targetsDirty = true;
   }
@@ -1485,12 +1499,49 @@ async function openWatcher(username, sessionSec) {
 // Adaylara bütçenin bir kısmı ayrılır: sıcak listede olmayan ama kutu paylaşan
 // yeni yayıncılar böylece kendiliğinden bulunur, kutu düşerse sıcağa geçer.
 
+// Yayıncının kutu geçmişinden güvenilirlik skoru (0-100).
+// Üç ölçüt ve ağırlıkları:
+//   • kutu sayısı  (40): 1 kutu %28, 3 kutu %63, 6 kutu %86 — doygun artış,
+//   • ortalama jeton (30): 100 jeton tam puan; jeton hiç bildirilmediyse
+//     nötr %50 ("bilinmiyor" kötü sayılmaz),
+//   • tazelik      (30): son kutudan geçen günle üstel düşer (3 günde ~%37).
+// Hiç kutu görülmemişse skor 0'dır; çağıran taraf `boxes === 0` ise bunu
+// "bilinmiyor" olarak gösterir.
+function publisherScore(target, now = Date.now()) {
+  const boxes = Number(target && target.boxEvents) || 0;
+  const seen = Number(target && target.boxCoinsSeen) || 0;
+  const sum = Number(target && target.boxCoinSum) || 0;
+  const avgCoins = seen > 0 ? Math.round(sum / seen) : null;
+  const lastBoxAt = Number(target && target.lastBoxAt) || 0;
+  if (!boxes) return { score: 0, boxes: 0, avgCoins: null, lastBoxAt: 0 };
+  const volume = 1 - Math.exp(-boxes / 3);
+  const coins = avgCoins === null ? 0.5 : Math.min(1, avgCoins / 100);
+  const days = lastBoxAt ? Math.max(0, (now - lastBoxAt) / 86400000) : Infinity;
+  const fresh = Number.isFinite(days) ? Math.exp(-days / 3) : 0;
+  const score = Math.round(volume * 40 + coins * 30 + fresh * 30);
+  return {
+    score: Math.max(0, Math.min(100, score)),
+    boxes,
+    avgCoins,
+    lastBoxAt
+  };
+}
+
+function scoreFor(username, now = Date.now()) {
+  return publisherScore(targetFor(username), now);
+}
+
+// Skor yükseldikçe odaya dönüş aralığı kısalır: 100 puan aralığı yarıya indirir.
+// Alt sınır 5 dakika (aynı odaya sürekli bağlanıp kotayı yakmamak için).
+function returnGap(baseMs, score) {
+  const factor = 1 - Math.max(0, Math.min(100, Number(score) || 0)) / 200;
+  return Math.max(5 * 60000, Math.round(baseMs * factor));
+}
+
 function boxPriority(record, now) {
-  const target = targetFor(record.username);
-  const history = Number(target && target.boxEvents) || 0;
-  const recentBox = target && Number(target.lastBoxAt) &&
-    (now - Number(target.lastBoxAt) < CONFIG.hotWindowMs);
-  return history + (recentBox ? 3 : 0) + (Number(record.boxes) || 0);
+  const info = scoreFor(record.username, now);
+  const recentBox = info.lastBoxAt && (now - info.lastBoxAt < CONFIG.hotWindowMs);
+  return info.score + (recentBox ? 10 : 0);
 }
 
 function isHotRoom(record, now) {
@@ -1525,6 +1576,9 @@ function pickRoom(options) {
     live, rooms, probing, probeBudget, recent, now,
     hotRevisitMs, revisitMs, isHot, watchedAt
   } = options;
+  // Aralık sayı ya da odaya göre hesaplayan fonksiyon olabilir: güvenilirlik
+  // skoru yüksek odaya daha erken dönülür.
+  const gap = (value, record) => (typeof value === 'function' ? value(record) : value);
 
   const free = live.filter((record) =>
     !rooms.has(record.username) && now - watchedAt(record) >= 60000);
@@ -1535,8 +1589,9 @@ function pickRoom(options) {
   const probeRoom = probing < probeBudget ? untouched[0] : null;
 
   const hotRoom = free.find((record) =>
-    isHot(record, now) && now - watchedAt(record) >= hotRevisitMs);
-  const coldRoom = free.find((record) => now - watchedAt(record) >= revisitMs);
+    isHot(record, now) && now - watchedAt(record) >= gap(hotRevisitMs, record));
+  const coldRoom = free.find((record) =>
+    now - watchedAt(record) >= gap(revisitMs, record));
   const fallback = free.find((record) => !recent.includes(record.username)) || free[0];
 
   const record = probeRoom || hotRoom || coldRoom || fallback;
@@ -1655,7 +1710,11 @@ async function maintainWatchers() {
     const probing = Array.from(state.rooms.values()).filter((watcher) => watcher.probe).length;
     const pick = pickRoom({
       live, rooms: state.rooms, probing, probeBudget, recent: state.recent, now,
-      hotRevisitMs: CONFIG.hotRevisitMs, revisitMs: CONFIG.revisitMs,
+      // Dönüş aralığı güvenilirlik skoruna bağlı: skor 100 ise yarısı.
+      hotRevisitMs: (record) =>
+        returnGap(CONFIG.hotRevisitMs, scoreFor(record.username, now).score),
+      revisitMs: (record) =>
+        returnGap(CONFIG.revisitMs, scoreFor(record.username, now).score),
       isHot: isHotRoom, watchedAt: lastWatchedAt
     });
     if (!pick) break;
@@ -1848,28 +1907,37 @@ function snapshot() {
       if (a.live !== b.live) return a.live ? -1 : 1;
       return (b.coins || 0) - (a.coins || 0);
     })
-    .map((record) => ({
-      username: record.username,
-      country: record.country || '',
-      // "Canlı" etiketi yalnızca tazeyse ya da oda gerçekten dinleniyorsa verilir.
-      // api-live bulut IP'lerinde boş döndüğü için eski kayıtlar yayında sanılıyordu.
-      live: Boolean(record.live) && (state.rooms.has(record.username) ||
-        nowMs - (Number(record.lastSeenLiveAt) || 0) < staleLiveMs),
-      liveUnknown: Boolean(record.liveUnknown),
-      startTime: Number(record.startTime) || 0,
-      title: record.title || '',
-      viewers: Number(record.viewers) || 0,
-      coins: Number(record.coins) || 0,
-      gifts: Number(record.gifts) || 0,
-      lastGiftAt: record.lastGiftAt || 0,
-      lastGiftName: record.lastGiftName || '',
-      lastSeenLiveAt: record.lastSeenLiveAt || 0,
-      reason: record.reason || '',
-      checkedAt: record.checkedAt || 0,
-      roomId: record.roomId || '',
-      boxes: Number(record.boxes) || 0,
-      lastBoxAt: Number((targetFor(record.username) || {}).lastBoxAt) || 0
-    }));
+    .map((record) => {
+      // Yayıncının kutu geçmişinden güvenilirlik skoru (panelde ve seçimde).
+      const info = scoreFor(record.username, nowMs);
+      return {
+        username: record.username,
+        country: record.country || '',
+        // "Canlı" etiketi yalnızca tazeyse ya da oda gerçekten dinleniyorsa verilir.
+        // api-live bulut IP'lerinde boş döndüğü için eski kayıtlar yayında sanılıyordu.
+        live: Boolean(record.live) && (state.rooms.has(record.username) ||
+          nowMs - (Number(record.lastSeenLiveAt) || 0) < staleLiveMs),
+        liveUnknown: Boolean(record.liveUnknown),
+        startTime: Number(record.startTime) || 0,
+        title: record.title || '',
+        viewers: Number(record.viewers) || 0,
+        coins: Number(record.coins) || 0,
+        gifts: Number(record.gifts) || 0,
+        lastGiftAt: record.lastGiftAt || 0,
+        lastGiftName: record.lastGiftName || '',
+        lastSeenLiveAt: record.lastSeenLiveAt || 0,
+        reason: record.reason || '',
+        checkedAt: record.checkedAt || 0,
+        roomId: record.roomId || '',
+        boxes: Number(record.boxes) || 0,
+        lastBoxAt: info.lastBoxAt,
+        // Kutu geçmişi: kaç kutu, ortalama jeton, güvenilirlik skoru (0-100).
+        // Hiç kutu yoksa skor null yazılır: panel "0" ile "bilinmiyor"u ayırır.
+        boxCount: info.boxes,
+        avgCoins: info.avgCoins,
+        score: info.boxes ? info.score : null
+      };
+    });
 
   return {
     scannedAt: new Date().toISOString(),
@@ -2131,6 +2199,41 @@ if (process.env.SCANNER_SELFTEST === '1') {
     state.hourStarts = saved.starts;
     state.hourBudgetLearned = saved.learned;
     CONFIG.hourBudget = saved.budget;
+  })();
+
+  // Güvenilirlik skoru sınaması: kutu sayısı + ortalama jeton + tazelik.
+  (() => {
+    const now = Date.now();
+    const none = publisherScore(null, now);
+    const fresh = publisherScore({
+      boxEvents: 3, boxCoinSum: 300, boxCoinsSeen: 3, lastBoxAt: now - 60000
+    }, now);
+    const old = publisherScore({
+      boxEvents: 3, boxCoinSum: 15, boxCoinsSeen: 3, lastBoxAt: now - 10 * 86400000
+    }, now);
+    const unknownCoins = publisherScore({
+      boxEvents: 3, boxCoinSum: 0, boxCoinsSeen: 0, lastBoxAt: now - 60000
+    }, now);
+    const gap100 = returnGap(1800000, 100);
+    const gapNone = returnGap(1800000, 0);
+    console.log('GÜVEN →', 'kutusuz', none.score,
+      '· taze/100 jeton', fresh.score, '(ort', fresh.avgCoins + ')',
+      '· eski/5 jeton', old.score, '· jeton bilinmiyor', unknownCoins.score,
+      '· dönüş aralığı', Math.round(gap100 / 60000) + '/' + Math.round(gapNone / 60000), 'dk');
+    const checks = [
+      ['kutusuz skor 0 değil', none.score === 0 && none.avgCoins === null],
+      ['taze 3 kutu 80 altında (beklenen ~%85)', fresh.score >= 80 && fresh.score <= 90],
+      ['eski/düşük jeton cezalı (45 altı)', old.score < 45],
+      ['jeton bilinmiyorken nötr', unknownCoins.avgCoins === null &&
+        unknownCoins.score > old.score && unknownCoins.score < fresh.score],
+      ['yüksek skor dönüş aralığını kısaltıyor', gap100 === 900000 && gapNone === 1800000]
+    ];
+    checks.forEach(([label, ok]) => {
+      if (!ok) {
+        console.log('GÜVEN SINAMASI BAŞARISIZ:', label);
+        process.exitCode = 1;
+      }
+    });
   })();
 
   const frames = [

@@ -108,6 +108,28 @@ Ayrıntılar (uç biçimi, emülatör yakalama adımları, sınırlar): [tools/i
 Teşhis: `live.json → scanner.connectStats` (deneme/başarılı/hata/hız sınırı) ve `closeReasons`
 (`süre doldu`, `bağlantı düştü`, `yayın bitti`, `bağlanamadı`).
 
+### Güvenilirlik skoru (kutu geçmişi)
+
+Her yayıncının kutu geçmişi `targets.json` içinde tutulur: `boxEvents` (kaç kutu), `boxCoinSum` /
+`boxCoinsSeen` (jetonu **bilinen** kutuların toplamı ve sayısı → ortalama) ve `lastBoxAt`.
+Tarayıcı bundan 0-100 **güven skoru** üretir ve `live.json` içinde yayıncı başına `score`,
+`boxCount`, `avgCoins` olarak yazar:
+
+| Ölçüt | Ağırlık | Hesap |
+|---|---|---|
+| Kutu sayısı | 40 | `1 − e^(−kutu/3)` — 1 kutu %28, 3 kutu %63, 6 kutu %86 (doygun) |
+| Ortalama jeton | 30 | `min(1, ort/100)`; jeton hiç bildirilmediyse nötr %50 |
+| Tazelik | 30 | `e^(−gün/3)` — son kutudan 3 gün geçince ~%37 |
+
+Hiç kutu görülmemişse skor yazılmaz (`null`): panel "0" ile "bilinmiyor"u ayırır ve `—` gösterir.
+Jetonu bildirilmemiş kutular ortalamaya girmez (0 jetonlu süper fan kutusu ortalamayı bozmaz).
+
+Skor hem sıralamayı hem **dönüş önceliğini** besler: oda listesi güven skoruna göre sıralanır
+(taze kutu bonusu +10) ve skorlu odaya dönüş aralığı kısalır — `returnGap`: 100 puan aralığı yarıya
+indirir (sıcak 12 dk → 6 dk, normal 30 dk → 15 dk), alt sınır 5 dakika.
+Panelde "Yayın tablosu → Güven" sütunu skoru, ipucu kutu sayısı/ortalama jetonu/son kutuyu gösterir;
+Fırsatlar kartında `🛡️ güven` rozeti aynı skoru taşır.
+
 ### Havuzu doldurmak
 
 Panelde **Tarama listesi indir** → inen `targets.json` dosyasını depoya `site/firsat/data/targets.json`
@@ -211,7 +233,8 @@ verdiği 10 canlı kanaldır.
     "username": "ornek", "country": "TR", "live": true, "startTime": 1762700000,
     "title": "Akşam yayını", "viewers": 812, "coins": 350, "gifts": 4,
     "lastGiftAt": 1762701500, "lastGiftName": "Rose", "lastSeenLiveAt": 1762701800,
-    "checkedAt": 1762701810
+    "checkedAt": 1762701810, "lastBoxAt": 1762701700000,
+    "boxCount": 3, "avgCoins": 100, "score": 85
   }],
   "events": [{
     "id": "ornek-1762701500-a1b2c", "t": 1762701500123, "username": "ornek",

@@ -363,6 +363,13 @@
         if (item.roomId) copy.roomId = String(item.roomId);
         copy.boxes = Number(item.boxes) || 0;
         if (item.lastBoxAt) copy.lastBoxAt = Number(item.lastBoxAt) || 0;
+        // Kutu geçmişinden çıkan güvenilirlik skoru (tarayıcı hesaplar).
+        // Skor yoksa alan silinir: panel "0" ile "bilinmiyor"u ayırır.
+        if (item.score === null || item.score === undefined) delete copy.score;
+        else copy.score = Number(item.score) || 0;
+        if (item.avgCoins === null || item.avgCoins === undefined) delete copy.avgCoins;
+        else copy.avgCoins = Number(item.avgCoins) || 0;
+        copy.boxCount = Number(item.boxCount) || 0;
 
         if (item.live && startIso && existing.startedAt !== startIso) {
           // TikTok'un gerçek başlangıç saati: süre sıfırdan ve doğru sayılır.
@@ -400,6 +407,9 @@
         roomId: item.roomId ? String(item.roomId) : '',
         boxes: Number(item.boxes) || 0,
         lastBoxAt: Number(item.lastBoxAt) || 0,
+        boxCount: Number(item.boxCount) || 0,
+        score: item.score === null || item.score === undefined ? undefined : (Number(item.score) || 0),
+        avgCoins: item.avgCoins === null || item.avgCoins === undefined ? undefined : (Number(item.avgCoins) || 0),
         source: 'scan'
       };
       byName[username] = created;
@@ -1094,9 +1104,27 @@
       case 'portal': return metrics.portal;
       case 'coins': return metrics.coins;
       case 'collected': return metrics.collected;
+      case 'score': return Number(streamer.score) || 0;
       case 'lastSeen': return metrics.lastSeen;
       default: return streamer.username;
     }
+  }
+
+  // Kutu geçmişinden güvenilirlik rozeti: skor + ipucunda kutu sayısı,
+  // ortalama jeton ve son kutu zamanı. Hiç kutu yoksa "—" (bilinmiyor).
+  function scoreChip(streamer) {
+    if (streamer.score === undefined || streamer.score === null) {
+      return '<span class="text-[10px] text-yellow-50/30" title="Bu yayıncıdan henüz kutu görülmedi; skor yok">—</span>';
+    }
+    var score = Number(streamer.score) || 0;
+    var parts = [(Number(streamer.boxCount) || 0) + ' kutu'];
+    if (Number(streamer.avgCoins) > 0) parts.push('ort ' + fmt(Number(streamer.avgCoins)) + ' jeton');
+    else parts.push('jeton bilinmiyor');
+    if (Number(streamer.lastBoxAt) > 0) parts.push('son kutu ' + ago(Number(streamer.lastBoxAt)));
+    var cls = score >= 70 ? 'chip-green' : (score >= 40 ? 'chip-amber' : '');
+    return '<span class="chip ' + cls + ' !py-0 !text-[10px]" title="Kutu geçmişi: ' +
+      esc(parts.join(' · ')) + ' → güven ' + score + '/100. Yüksek skorlu odaya daha erken dönülür.">' +
+      score + '</span>';
   }
 
   function renderStreamers() {
@@ -1133,7 +1161,7 @@
     if (total > STREAMER_ROW_LIMIT) list = list.slice(0, STREAMER_ROW_LIMIT);
 
     if (!total) {
-      rows.innerHTML = '<tr><td colspan="10" class="text-[11px] text-yellow-50/40 pt-3">' +
+      rows.innerHTML = '<tr><td colspan="11" class="text-[11px] text-yellow-50/40 pt-3">' +
         (countryFilter
           ? esc(countryFilter + ' (' + countryName(countryFilter) + ') için listede yayıncı yok. Rozete tekrar basınca filtre kalkar.')
           : 'Aramayla eşleşen yayıncı yok.') + '</td></tr>';
@@ -1174,6 +1202,7 @@
         '  <td class="text-purple-300">' + metrics.portal + '</td>',
         '  <td class="font-bold text-amber-400">' + fmt(metrics.coins) + '</td>',
         '  <td><span class="text-green-300 font-bold">' + fmt(metrics.collected) + '</span> <span class="text-[10px] text-yellow-50/40">(' + metrics.collectedCount + ')</span></td>',
+        '  <td class="whitespace-nowrap">' + scoreChip(streamer) + '</td>',
         '  <td class="text-[11px] text-yellow-50/50 whitespace-nowrap">' + ago(metrics.lastSeen) + '</td>',
         '  <td><div class="flex flex-wrap gap-1 justify-end">',
         '    <button class="chip chip-amber" data-add-event="' + streamer.id + '" data-kind="chest">+ Sandık</button>',
@@ -1188,7 +1217,7 @@
     }).join('');
 
     if (total > STREAMER_ROW_LIMIT) {
-      rows.innerHTML += '<tr><td colspan="10" class="text-[11px] text-yellow-50/40 pt-3">' +
+      rows.innerHTML += '<tr><td colspan="11" class="text-[11px] text-yellow-50/40 pt-3">' +
         (total - STREAMER_ROW_LIMIT) + ' yayıncı daha listede (hepsi kayıtlı ve taranıyor). ' +
         'İlk ' + STREAMER_ROW_LIMIT + ' satır gösteriliyor; yukarıdaki aramayla diğerlerini bul.</td></tr>';
     }
@@ -1482,6 +1511,18 @@
     container.innerHTML = pending.map(function (event) {
       var meta = KINDS[event.kind] || KINDS.chest;
       var scored = opportunityScore(event);
+      // Kutu geçmişinden güvenilirlik: bu yayıncıdan daha önce kaç kutu,
+      // ortalama kaç jeton çıktı. Skor yoksa rozet yazılmaz.
+      var publisher = state.streamers.find(function (streamer) {
+        return streamer.id === event.streamerId;
+      });
+      var publisherScore = publisher && publisher.score !== undefined && publisher.score !== null
+        ? Number(publisher.score) : null;
+      var publisherNote = publisherScore === null ? '' :
+        '<span class="chip !py-0 !text-[10px]" title="Yayıncı güveni ' + publisherScore + '/100 · ' +
+        (Number(publisher.boxCount) || 0) + ' kutu' +
+        (Number(publisher.avgCoins) > 0 ? ' · ort ' + fmt(Number(publisher.avgCoins)) + ' jeton' : ' · jeton bilinmiyor') +
+        '">🛡️ güven ' + publisherScore + '</span> ';
       var urgent = false;
       var timeText = '';
       var endAt = eventEndAt(event);
@@ -1525,7 +1566,7 @@
             ? fmt(event.coins) + ' <span class="text-[10px] font-normal text-yellow-50/40">jeton · kutu değeri</span>'
             : '<span class="text-[11px] font-normal text-yellow-50/40">jeton bilinmiyor</span>') + '</span>',
         '  </div>',
-        '  <div class="text-[10px] mb-1"><span class="chip !py-0 !text-[10px]" title="aciliyet + jeton + paylaşım + tür + tazelik">Puan ' + scored.score + ' · ' + esc(scored.reason) + '</span></div>',
+        '  <div class="text-[10px] mb-1">' + publisherNote + '<span class="chip !py-0 !text-[10px]" title="aciliyet + jeton + paylaşım + tür + tazelik">Puan ' + scored.score + ' · ' + esc(scored.reason) + '</span></div>',
         '  <a href="' + liveUrl(event.username) + '" target="_blank" rel="noopener" class="font-semibold text-yellow-100 hover:text-yellow-300 truncate block">@' + esc(event.username) + '</a>',
         '  <div class="text-[10px] text-yellow-50/40">' + (event.country ? flag(event.country) + ' ' + esc(countryName(event.country)) + ' · ' : '') + new Date(event.createdAt).toLocaleTimeString('tr-TR') +
           (endAt ? ' → ' + new Date(endAt).toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' }) + ' açılır' : '') +
