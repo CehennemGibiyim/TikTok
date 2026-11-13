@@ -60,6 +60,9 @@
   var poolFallback = 'data/targets.json';
   var boxesUrl = RAW_DATA + 'boxes.json';
   var boxesFallback = 'data/boxes.json';
+  // Anlık kutu yayını: tarayıcı bu konuya yazar, panel SSE ile dinler.
+  // Git commit/CDN gecikmesi (dakikalar) sandık penceresini kaçırıyordu.
+  var BOX_TOPIC = 'cehennem-tiktok-firsat-7f3a91';
   // Halka açık canlı kanal listesi (girişsiz, tarayıcıdan okunabilir).
   var discoveryUrl = 'https://api.tik.tools/api/live/top-channels';
   // Bulunan yayın, tarama doğrulayana kadar bu süre boyunca "canlı" sayılır.
@@ -532,6 +535,22 @@
         new Notification('Fırsatlar', { body: text });
       }
     } catch (error) { /* bildirim yoksa sessiz */ }
+  }
+
+  // Saniyeler içinde gelen kutular (ntfy.sh SSE). Koparsa dosya yolu devrede.
+  function startBoxStream() {
+    if (typeof EventSource !== 'function') return;
+    try {
+      var source = new EventSource('https://ntfy.sh/' + BOX_TOPIC + '/sse');
+      source.addEventListener('message', function (message) {
+        try {
+          var parsed = JSON.parse(message.data || '{}');
+          if (parsed.event && parsed.event !== 'message') return;
+          var box = parsed.message ? JSON.parse(parsed.message) : parsed;
+          if (box && box.username && box.id) applyBoxes([box]);
+        } catch (error) { /* bozuk mesaj yok sayılır */ }
+      });
+    } catch (error) { /* akış yoksa 15 sn'lik dosya okuması devrede */ }
   }
 
   async function refreshBoxes() {
@@ -2723,6 +2742,7 @@
     // Kutular ayrı ve sık okunur: sandık penceresi kaçmasın.
     refreshBoxes();
     setInterval(refreshBoxes, 15000);
+    startBoxStream();
     setInterval(pruneInactive, 600000);
     // Sıralama zamanla değişir (kalan süre azalır): liste kendiliğinden tazelenir.
     setInterval(function () {

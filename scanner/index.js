@@ -56,6 +56,10 @@ const CONFIG = {
   commitSec: Number(readArg('commit', 0)),
   // Kutular ayrı ve sık commit edilir: yakalama penceresi kısa, panel hızlı görsün.
   commitBoxesSec: Number(readArg('commit-boxes', 45)),
+  // Anlık kutu yayını: commit/CDN beklemeden panel saniyeler içinde görsün.
+  // Panel aynı konuya abone olur (site/firsat/app.js → BOX_TOPIC).
+  ntfy: readArg('ntfy', 1) ? true : false,
+  ntfyTopic: String(readArg('ntfy-topic', 'cehennem-tiktok-firsat-7f3a91')),
   // Havuzun her turda kaç adresi yoklanacağı (0 = hepsi). Ağır tarama
   // dinleme döngüsünü yavaşlatıyordu; havuz sırayla dilim dilim yoklanır.
   pollBatch: Number(readArg('poll-batch', 0)),
@@ -673,6 +677,34 @@ function recordEvent(username, data) {
   log('olay', username, data.kind, coins, 'jeton', data.giftName || '');
   // Kutu anında hızlı dosyaya yazılır: commit beklemeden panel görebilsin.
   writeBoxes();
+  publishBox(event);
+}
+
+// Anlık yayın (ntfy.sh): panel SSE ile dinler, kutu saniyeler içinde düşer.
+// Git commit/CDN gecikmesi (dakikalar) böylece aşılır. Hata olursa sessiz geçilir.
+function publishBox(event) {
+  if (!CONFIG.ntfy || typeof fetch !== 'function') return;
+  const payload = {
+    id: event.id,
+    t: event.t,
+    username: event.username,
+    kind: event.kind,
+    coins: event.coins,
+    boxName: event.boxName || event.giftName || '',
+    businessType: event.businessType || 0,
+    boxType: event.boxType || '',
+    shared: event.shared || 0,
+    durationSec: event.durationSec || 0,
+    unpackAt: event.unpackAt || 0,
+    availableAt: event.availableAt || 0,
+    hasWindow: Boolean(event.hasWindow)
+  };
+  fetch('https://ntfy.sh/' + encodeURIComponent(CONFIG.ntfyTopic), {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload),
+    signal: AbortSignal.timeout(4000)
+  }).catch(() => { /* yayın başarısız: dosya yolu yine var */ });
 }
 
 // Panelin hızlı okuduğu kutu listesi (son 120 kutu, en yeni önce).
