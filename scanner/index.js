@@ -1980,6 +1980,10 @@ async function main() {
   const watchTask = CONFIG.watch ? (async () => {
     while (watchLoop && Date.now() < deadline) {
       try {
+        // Keşif burada da çalışır: tarama turu 4 dakikada bir döndüğü için
+        // keşif de 4 dakikaya sıkışıyordu, oysa yeni yayınlar her 30 saniyede
+        // bulunabiliyor. Taze oda kimliği = gerçekten yayında olan aday.
+        await discoverLive();
         await maintainWatchers();
       } catch (error) {
         state.lastError = error.message;
