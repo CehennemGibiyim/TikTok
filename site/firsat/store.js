@@ -20,8 +20,16 @@
   var BACKUP_APP = 'tiktok-jeton-paneli';
   var BACKUP_VERSION = 2;
   // Panel sürümü ve sürüm geçmişi (Ayarlar'da gösterilir, yedeğe yazılır).
-  var APP_VERSION = '1.4.8';
+  var APP_VERSION = '1.4.9';
   var CHANGE_LOG = [
+    {
+      version: '1.4.9',
+      date: '2026-11-13',
+      items: [
+        'Kutu düşme dakikası ölçümü son 7 UTC gününe pencerelendi; günlük kovalar tutuluyor ve eski tarihsiz toplamlar pencereye alınmıyor.',
+        'Panel kartında çizilen pencerenin “son 7 gün” olduğu yazıyor; pencere bilgisi olmayan eski veri çizilmiyor ve bunun yerine “pencere bilinmiyor” deniyor.'
+      ]
+    },
     {
       version: '1.4.8',
       date: '2026-11-13',

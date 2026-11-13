@@ -2504,9 +2504,32 @@
     var bars = $('boxMinuteBars');
     var verdict = $('boxMinuteVerdict');
     if (!bars || !verdict) return;
+    // Hangi pencerenin çizildiği kartta yazılı: eski live.json'da pencere
+    // bilgisi yoksa "son 7 gün" demeyip bunu açıkça belirt.
+    var windowEl = $('boxMinuteWindow');
+    var windowInfo = scanInfo && scanInfo.boxMinuteWindow;
+    var windowDays = Number(windowInfo && windowInfo.days);
+    var windowKnown = Boolean(windowInfo && windowDays > 0 && windowInfo.from && windowInfo.to);
+    var windowText = windowKnown ? 'son ' + windowDays + ' gün' : 'pencere bilinmiyor';
+    if (windowEl) {
+      windowEl.textContent = windowText;
+      windowEl.title = windowKnown
+        ? 'UTC ' + windowInfo.from + ' – ' + windowInfo.to + ' (' + windowDays + ' takvim günü, ikisi dahil)'
+        : 'Pencere bilgisi olmayan eski ölçüm gösterilmez';
+    }
     var data = scanInfo && scanInfo.boxMinutes;
     var watch = scanInfo && scanInfo.watchMin;
-    if (!Array.isArray(data) || !Array.isArray(watch)) {
+    var hasData = Array.isArray(data) && Array.isArray(watch);
+    // Pencere bilgisi yoksa eski ömür boyu toplamları çizmeyiz: o veri hangi
+    // ayarlarla toplandığı bilinmediği için kararı domine etmemeli.
+    if (!windowKnown) {
+      bars.innerHTML = hasData
+        ? '<div class="hint">Pencere bilgisi olmayan eski ölçüm gösterilmiyor; tarayıcı güncellenince son 7 gün yeniden birikecek.</div>'
+        : '<div class="hint">Ölçüm bu sürümle başladı; tarayıcı güncellenince son 7 gün birikecek.</div>';
+      verdict.textContent = '';
+      return;
+    }
+    if (!hasData) {
       bars.innerHTML = '<div class="hint">Ölçüm bu sürümle başladı; tarayıcı ilk oturumları kapattıkça dolar.</div>';
       verdict.textContent = '';
       return;
@@ -2543,6 +2566,7 @@
     var lastRate = rates[4];
     var beyondRate = rates[5];
     var lines = ['Örnek: ' + fmt(totalBoxes) + ' kutu · ' + fmt(Math.round(totalMin)) + ' dk sayılan oturum' +
+      ' · ' + windowText +
       (scanInfo.watchMinSince ? ' (' + ago(scanInfo.watchMinSince) + ' başladı)' : '') + '.'];
     if (totalBoxes < 30 || totalMin < 120) {
       lines.push('Karar için veri birikiyor (eşik: 30 kutu ve 120 dk sayılan oturum).');

@@ -255,18 +255,25 @@ bilinmeyen sayılır (ilk dakika sanılmaz). Oturum kapanırken dinlenen süre d
 bölünür; böylece her kova için **kutu/saat = kutu ÷ dinlenen dakika** çıkar. Paydaya
 **yalnızca gerçekten mesaj veya kutu üreten oturumlar** girer. Bağlantısı kurulamayan denemeler
 ve hiç akış gelmeyen oturumlar sayılmaz; aksi halde kısa başarısız denemeler ilk dakika oranını
-düşürüp 5+ kovasını olduğundan iyi gösterirdi. İki dizi (`boxMinutes`, `watchMin`)
-`targets.json` ve `live.json` içinde koşular arasında birikir; Ölçüm sekmesindeki
-**Kutu düşme dakikası** kartı bunları çizer. Bu düzeltme yalnızca sonraki kapanışlara uygulanır;
-geçmişte birikmiş payda geriye dönük ayrıştırılamaz.
+düşürüp 5+ kovasını olduğundan iyi gösterirdi.
+
+Ölçüm **son 7 takvim gününe (UTC)** pencerelenir. Tarayıcı günlük kovaları
+(`boxMinuteDays` → gün başına `boxMinutes`, `watchMin`) `targets.json` içinde tutar ve 7 günden
+eski günleri atar. `boxMinutes`/`watchMin` her zaman bu pencerenin toplamı olarak `targets.json`
+ve `live.json`a yazılır; panel kartında **son 7 gün** yazar. Eski sürümlerin tarihsiz ömür boyu
+toplamları pencereye alınmaz: ilk çalıştırmada ölçüm sıfırdan başlar, böylece eski ayarlarla
+toplanmış veri kararı domine etmez. Pencere bilgisi (`boxMinuteWindow`) taşımayan eski
+`live.json` verisi panelde **çizilmez**; kart bunun yerine “pencere bilinmiyor” der. Oturum süresi
+kapandığı UTC gününe yazılır (gece yarısını geçen oturum bölünmez). Bu düzeltme yalnızca
+sonraki kapanışlara uygulanır; geçmişte birikmiş payda geriye dönük ayrıştırılamaz.
 
 `watch-sec` şu an **300 saniye (5 dk)**. Eğri şu kuralla okunur:
 
 - İlk 4 dakikanın kutu/saat ortalamasına göre **4–5 dk** ve **5+** getirisi %10'dan fazla yüksek değilse
   → 5 dk yeterli (geç gelen kutu için 2,5 dk daha bağlanmak kotayı boşa harcar).
 - Son dakikalarda yoğunluk düşmüyorsa → 5 dk kesiyor olabilir; `watch-sec` artırılmalı.
-- Karar için en az **30 kutu ve 120 dakika sayılan oturum süresi** birikmesi beklenir; öncesinde
-  kart yalnızca “veri birikiyor” der.
+- Karar için son 7 günde en az **30 kutu ve 120 dakika sayılan oturum süresi** birikmesi beklenir;
+  öncesinde kart yalnızca “veri birikiyor” der.
 
 **Sansür notu:** 5+ kovası yalnızca sıcak odaların uzatılmış (7,5 dk) oturumlarından dolabilir; orada
 bile düşük çıkması 5 dakikanın yeterli olduğunu **destekler**, ama 5+ verisinin yokluğu tek başına
