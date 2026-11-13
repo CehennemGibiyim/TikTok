@@ -44,4 +44,4 @@ jobs:
         # Uç 10 kanallık bir anlık görüntü veriyor ve dakikalar içinde komple
         # değişiyor: 60 sn'de bir sormak, 2 dakikada bir sormaktan iki kat yeni
         # yayıncı demek (tüm ülkelerden, sıralamada olmasa da canlı olanlar).
-        run: node scanner/index.js --minutes=230 --commit=300 --watch=1 --watch-rooms=32 --watch-sec=600 --connect-gap=2000 --min-rooms=12 --discover-sec=30 --probe-ratio=0.30 --room-id-fresh-sec=900 --max-pool=6000 --concurrency=12 --poll=120 --starts-per-min=12
+        run: node scanner/index.js --minutes=230 --commit=300 --commit-boxes=45 --watch=1 --watch-rooms=40 --watch-sec=600 --connect-gap=2000 --min-rooms=12 --discover-sec=30 --probe-ratio=0.30 --room-id-fresh-sec=900 --max-pool=6000 --concurrency=8 --poll=240 --poll-batch=600 --starts-per-min=12

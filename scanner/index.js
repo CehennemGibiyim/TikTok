@@ -28,6 +28,9 @@ const DATA_DIR = process.env.SCANNER_DATA_DIR
   : path.join(ROOT, 'site', 'firsat', 'data');
 const TARGETS_FILE = path.join(DATA_DIR, 'targets.json');
 const LIVE_FILE = path.join(DATA_DIR, 'live.json');
+// Küçük ve hızlı dosya: yalnızca son kutular. Panel bunu 15 saniyede bir
+// okur, böylece sandık/zarf panelde dakikalar değil saniyeler içinde görünür.
+const BOX_FILE = path.join(DATA_DIR, 'boxes.json');
 
 const UA = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 ' +
   '(KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36';
@@ -51,6 +54,11 @@ const CONFIG = {
   concurrency: Number(readArg('concurrency', 6)),
   minCoins: Number(readArg('min-coins', 1)),
   commitSec: Number(readArg('commit', 0)),
+  // Kutular ayrı ve sık commit edilir: yakalama penceresi kısa, panel hızlı görsün.
+  commitBoxesSec: Number(readArg('commit-boxes', 45)),
+  // Havuzun her turda kaç adresi yoklanacağı (0 = hepsi). Ağır tarama
+  // dinleme döngüsünü yavaşlatıyordu; havuz sırayla dilim dilim yoklanır.
+  pollBatch: Number(readArg('poll-batch', 0)),
   discover: readArg('discover', 1) ? true : false,
   discoverSec: Number(readArg('discover-sec', 300)),
 
@@ -153,6 +161,9 @@ const state = {
   boxHourly: {},
   lastFlush: 0,
   lastCommit: 0,
+  // Hızlı kutu dosyası: kirli mi, en son ne zaman commit edildi.
+  boxesDirty: false,
+  lastBoxCommit: 0,
   lastDiscover: 0,
   // Günlük ülke taraması raporu (panelde gösterilir, koşular arası korunur).
   regionSweep: { at: 0, added: 0, regions: {}, failed: [] },
@@ -660,6 +671,39 @@ function recordEvent(username, data) {
     record.lastGiftName = event.giftName || record.lastGiftName || '';
   }
   log('olay', username, data.kind, coins, 'jeton', data.giftName || '');
+  // Kutu anında hızlı dosyaya yazılır: commit beklemeden panel görebilsin.
+  writeBoxes();
+}
+
+// Panelin hızlı okuduğu kutu listesi (son 120 kutu, en yeni önce).
+function writeBoxes() {
+  const boxes = state.events.slice(0, 120).map((event) => ({
+    id: event.id,
+    t: event.t,
+    username: event.username,
+    kind: event.kind,
+    coins: event.coins,
+    boxName: event.boxName || event.giftName || '',
+    businessType: event.businessType || 0,
+    boxType: event.boxType || '',
+    shared: event.shared || 0,
+    durationSec: event.durationSec || 0,
+    unpackAt: event.unpackAt || 0,
+    availableAt: event.availableAt || 0,
+    hasWindow: Boolean(event.hasWindow)
+  }));
+  const body = {
+    scannedAt: new Date().toISOString(),
+    runId: startedAtMs,
+    boxes
+  };
+  try {
+    fs.mkdirSync(DATA_DIR, { recursive: true });
+    fs.writeFileSync(BOX_FILE, JSON.stringify(body, null, 1) + '\n');
+    state.boxesDirty = true;
+  } catch (error) {
+    log('kutu dosyası yazılamadı:', error.message);
+  }
 }
 
 // ---------- 2) dinleme ----------
@@ -1610,7 +1654,15 @@ async function maintainWatchers() {
 // ---------- 3) tarama turu ----------
 
 async function pollTargets() {
-  const targets = state.targets;
+  // Havuz büyükse hepsi her turda yoklanmaz: sırayla dilim dilim yoklanır.
+  // 2400 adresi her 2 dakikada sorgulamak taramayı ağırlaştırıp dinlemeyi yavaşlatıyordu.
+  const all = state.targets;
+  let targets = all;
+  if (CONFIG.pollBatch > 0 && all.length > CONFIG.pollBatch) {
+    const start = (state.polls * CONFIG.pollBatch) % all.length;
+    targets = [];
+    for (let i = 0; i < CONFIG.pollBatch; i += 1) targets.push(all[(start + i) % all.length]);
+  }
   state.polls += 1;
   let liveCount = 0;
 
@@ -1811,6 +1863,41 @@ function syncWithRemote() {
   }
 }
 
+// Kutular ayrı ve sık commit edilir: sandık penceresi kısa olduğu için panelin
+// 5 dakikalık veri commit'ini beklemesi "hiç sandık yakalayamıyorum" demekti.
+function commitBoxes() {
+  if (!CONFIG.commitSec || !CONFIG.commitBoxesSec) return;
+  if (!state.boxesDirty) return;
+  const now = Date.now();
+  if (now - state.lastBoxCommit < CONFIG.commitBoxesSec * 1000) return;
+  state.lastBoxCommit = now;
+  try {
+    // Her 45 saniyede pull yapmak gereksiz ağ trafiği: yalnızca push reddedilirse
+    // eşitlenir (aşağıdaki catch).
+    git(['add', 'site/firsat/data/boxes.json']);
+    if (!git(['status', '--porcelain', 'site/firsat/data/boxes.json']).trim()) {
+      state.boxesDirty = false;
+      return;
+    }
+    const last = state.events[0];
+    const label = last
+      ? (last.kind === 'letter' ? 'Zarf' : (last.kind === 'portal' ? 'Portal' : 'Sandık')) +
+        ': @' + last.username + ' · ' + (Number(last.coins) || 0) + ' jeton'
+      : 'Kutular';
+    git(['commit', '-m', 'Kutu güncellemesi — ' + label]);
+    try {
+      git(['push', '--quiet']);
+    } catch (pushError) {
+      syncWithRemote();
+      git(['push', '--quiet']);
+    }
+    state.boxesDirty = false;
+    log('kutular commit edildi');
+  } catch (error) {
+    log('kutu commit atlandı:', (error.stdout || error.message || '').toString().slice(0, 160));
+  }
+}
+
 function commitData() {
   if (!CONFIG.commitSec) return;
   const now = Date.now();
@@ -1846,6 +1933,7 @@ async function main() {
     log('uyarı: site/firsat/data/targets.json boş — taranacak adres yok.');
   }
   state.roomBudget = CONFIG.watchRooms;
+  writeBoxes();
   // Kayıtlı oran varsa ondan devam et; yoksa ayardaki başlangıç oranı.
   state.probe.ratio = state.savedRatio || CONFIG.probeRatio;
   log('havuz', state.targets.length, 'adres · süre',
@@ -1864,6 +1952,7 @@ async function main() {
         state.lastError = error.message;
         log('dinleme turu hatası:', error.message);
       }
+      commitBoxes();
       await sleep(3000);
     }
   })() : null;
@@ -1878,6 +1967,7 @@ async function main() {
     }
     flush(true);
     commitData();
+    commitBoxes();
     if (CONFIG.once) break;
     await sleep(CONFIG.pollSec * 1000);
   } while (Date.now() < deadline);

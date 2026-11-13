@@ -58,6 +58,8 @@
   var scanFallback = 'data/live.json';
   var poolUrl = RAW_DATA + 'targets.json';
   var poolFallback = 'data/targets.json';
+  var boxesUrl = RAW_DATA + 'boxes.json';
+  var boxesFallback = 'data/boxes.json';
   // Halka açık canlı kanal listesi (girişsiz, tarayıcıdan okunabilir).
   var discoveryUrl = 'https://api.tik.tools/api/live/top-channels';
   // Bulunan yayın, tarama doğrulayana kadar bu süre boyunca "canlı" sayılır.
@@ -448,6 +450,101 @@
       state = Store.get();
     }
     return changed;
+  }
+
+  // Hızlı kutu kanalı: tarayıcı kutuları ayrı ve küçük bir dosyaya yazıp sık
+  // commit ediyor; panel bunu 15 saniyede bir okur. Böylece sandık, 5 dakikalık
+  // tarama commit'ini beklemeden Fırsatlar'a düşer (yakalama penceresi kısa).
+  function applyBoxes(boxes) {
+    if (!Array.isArray(boxes) || !boxes.length) return false;
+    var streamers = state.streamers.slice();
+    var byName = {};
+    streamers.forEach(function (streamer) { byName[streamer.username] = streamer; });
+    var events = state.events.slice();
+    var known = {};
+    events.forEach(function (event) { if (event.scanId) known[event.scanId] = true; });
+    var changed = false;
+    var fresh = [];
+
+    boxes.forEach(function (item) {
+      if (!item || !item.id || known[item.id]) return;
+      if (item.kind && !['chest', 'portal', 'letter'].includes(item.kind)) return;
+      var username = cleanUsername(item.username);
+      if (!username) return;
+      var owner = byName[username];
+      if (!owner) {
+        owner = {
+          id: uid('st'),
+          username: username,
+          country: '',
+          createdAt: Date.now(),
+          scanLive: true,
+          scanCheckedAt: Date.now()
+        };
+        streamers.push(owner);
+        byName[username] = owner;
+        changed = true;
+      }
+      known[item.id] = true;
+      events.unshift({
+        id: uid('ev'),
+        streamerId: owner.id,
+        username: owner.username,
+        country: owner.country || '',
+        kind: item.kind === 'letter' ? 'letter' : (item.kind === 'portal' ? 'portal' : 'chest'),
+        coins: Number(item.coins) || 0,
+        durationSec: Number(item.durationSec) || 0,
+        availableAt: Number(item.availableAt) || Number(item.t) || Date.now(),
+        unpackAt: Number(item.unpackAt) || 0,
+        hasWindow: Boolean(item.hasWindow) || Number(item.unpackAt) > 0,
+        expiresAt: 0,
+        shared: Number(item.shared) || 0,
+        status: 'pending',
+        createdAt: Number(item.t) || Date.now(),
+        scanId: item.id,
+        auto: true,
+        giftName: item.boxName || '',
+        boxName: item.boxName || '',
+        businessType: Number(item.businessType) || 0,
+        boxType: item.boxType || '',
+        senderName: '',
+        sender: ''
+      });
+      fresh.push(username);
+      changed = true;
+    });
+
+    if (!changed) return false;
+    Store.set({ streamers: streamers, events: events });
+    state = Store.get();
+    renderAll();
+    if (fresh.length) notifyBoxes(fresh);
+    return true;
+  }
+
+  function notifyBoxes(usernames) {
+    var unique = usernames.filter(function (name, index) {
+      return usernames.indexOf(name) === index;
+    });
+    var text = '📦 Yeni kutu: ' + unique.slice(0, 3).map(function (name) { return '@' + name; }).join(', ');
+    try {
+      if (window.Notification && Notification.permission === 'granted') {
+        new Notification('Fırsatlar', { body: text });
+      }
+    } catch (error) { /* bildirim yoksa sessiz */ }
+  }
+
+  async function refreshBoxes() {
+    if (scanPaused) return;
+    try {
+      var data = await fetchScanData(boxesUrl);
+      if (data && Array.isArray(data.boxes)) applyBoxes(data.boxes);
+    } catch (error) {
+      try {
+        var backup = await fetchScanData(boxesFallback);
+        if (backup && Array.isArray(backup.boxes)) applyBoxes(backup.boxes);
+      } catch (backupError) { /* kutu dosyası yoksa sorun değil */ }
+    }
   }
 
   function renderScanStatus(error) {
@@ -2623,6 +2720,9 @@
     refreshScan();
     setInterval(tick, 1000);
     setInterval(function () { if (!scanPaused) refreshScan(); }, 30000);
+    // Kutular ayrı ve sık okunur: sandık penceresi kaçmasın.
+    refreshBoxes();
+    setInterval(refreshBoxes, 15000);
     setInterval(pruneInactive, 600000);
     // Sıralama zamanla değişir (kalan süre azalır): liste kendiliğinden tazelenir.
     setInterval(function () {
