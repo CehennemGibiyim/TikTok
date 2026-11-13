@@ -20,8 +20,17 @@
   var BACKUP_APP = 'tiktok-jeton-paneli';
   var BACKUP_VERSION = 2;
   // Panel sürümü ve sürüm geçmişi (Ayarlar'da gösterilir, yedeğe yazılır).
-  var APP_VERSION = '1.1.2';
+  var APP_VERSION = '1.1.3';
   var CHANGE_LOG = [
+    {
+      version: '1.1.3',
+      date: '2026-11-13',
+      items: [
+        'Sandık/zarf artık saniyeler içinde panelde: hızlı kutu kanalı (boxes.json, 15 sn) ve yeni kutu bildirimi.',
+        'Tarama hafifletildi: havuz her turda tamamı yerine 600\'lük dilimler hâlinde yoklanıyor, dinlemeye kaynak kalıyor.',
+        'Dinleme bütçesi 40 odaya çıkarıldı.'
+      ]
+    },
     {
       version: '1.1.2',
       date: '2026-11-13',
