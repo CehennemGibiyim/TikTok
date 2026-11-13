@@ -2,19 +2,10 @@
  "note": "Taranacak adresler. Keşif kendi bulduklarını buraya ekler; elle eklenenler korunur.",
  "probeRatio": 0.2,
  "probeStats": {
-  "sessions": 37,
-  "withBox": 7
+  "sessions": 40,
+  "withBox": 8
  },
  "probeHistory": [
-  {
-   "at": 1794430189480,
-   "from": 40,
-   "to": 40,
-   "probeRate": 13,
-   "hotRate": null,
-   "sessions": 8,
-   "boxSessions": 1
-  },
   {
    "at": 1794430547167,
    "from": 40,
@@ -365,6 +356,15 @@
    "hotRate": 100,
    "sessions": 8,
    "boxSessions": 1
+  },
+  {
+   "at": 1794543356667,
+   "from": 20,
+   "to": 20,
+   "probeRate": 13,
+   "hotRate": null,
+   "sessions": 8,
+   "boxSessions": 1
   }
  ],
  "boxHourly": {
@@ -396,7 +396,7 @@
   "498481": 16,
   "498482": 13,
   "498483": 39,
-  "498484": 8
+  "498484": 11
  },
  "regionSweep": {
   "at": 0,
@@ -404,8 +404,34 @@
   "regions": {},
   "failed": []
  },
- "updatedAt": "2026-11-13T04:13:34.901Z",
+ "updatedAt": "2026-11-13T04:18:57.984Z",
  "targets": [
+  {
+   "username": "mitrasfineart",
+   "country": "CA",
+   "source": "discovery",
+   "roomId": "7707470543074659079",
+   "roomIdAt": 1794543498206,
+   "roomIdMiss": 1,
+   "boxEvents": 0,
+   "lastBoxAt": 0,
+   "lastWatchedAt": 0,
+   "addedAt": 1794543498206,
+   "lastSeenLiveAt": 0
+  },
+  {
+   "username": "yuni_cabral",
+   "country": "VN",
+   "source": "discovery",
+   "roomId": "7707494074305235732",
+   "roomIdAt": 1794543336716,
+   "roomIdMiss": 1,
+   "boxEvents": 0,
+   "lastBoxAt": 0,
+   "lastWatchedAt": 0,
+   "addedAt": 1794543336716,
+   "lastSeenLiveAt": 0
+  },
   {
    "username": "alz3bi_37",
    "country": "ME",
@@ -413,8 +439,8 @@
    "roomId": "7707488320323193614",
    "roomIdAt": 1794543174746,
    "roomIdMiss": 0,
-   "boxEvents": 0,
-   "lastBoxAt": 0,
+   "boxEvents": 1,
+   "lastBoxAt": 1794543220049,
    "lastWatchedAt": 1794543178912,
    "addedAt": 1794543174746,
    "lastSeenLiveAt": 0
@@ -516,7 +542,7 @@
    "source": "discovery",
    "roomId": "7707483333383097109",
    "roomIdAt": 1794542850809,
-   "roomIdMiss": 0,
+   "roomIdMiss": 1,
    "boxEvents": 0,
    "lastBoxAt": 0,
    "lastWatchedAt": 1794542949588,
@@ -530,8 +556,8 @@
    "roomId": "7707489878447147784",
    "roomIdAt": 1794542509908,
    "roomIdMiss": 0,
-   "boxEvents": 3,
-   "lastBoxAt": 1794543213499,
+   "boxEvents": 5,
+   "lastBoxAt": 1794543319929,
    "lastWatchedAt": 1794542786364,
    "addedAt": 1794542509908,
    "lastSeenLiveAt": 0
@@ -16171,7 +16197,7 @@
    "roomIdMiss": 0,
    "boxEvents": 0,
    "lastBoxAt": 0,
-   "lastWatchedAt": 1794543054675,
+   "lastWatchedAt": 1794543249439,
    "addedAt": 1794448657500,
    "lastSeenLiveAt": 1794448853407
   },
