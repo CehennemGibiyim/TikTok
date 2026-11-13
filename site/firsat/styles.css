@@ -425,9 +425,21 @@ body {
   .btn-primary, .btn-ghost, .chip { max-width: 100%; }
   .card, .note-box, .hint, .stream-table td, .stream-table th { overflow-wrap: anywhere; }
 
-  /* Uzun durum satırları (tarama/keşif) kartı yana taşırmasın. */
+  /* Uzun durum satırları (tarama/keşif) kartı yana taşırmasın.
+     .chip varsayılan olarak tek satırda duruyor; telefonda kesiliyordu,
+     artık alt satıra geçebiliyor. */
   #scanStatus, #findStatus, #addStatus { min-width: 0; overflow-wrap: anywhere; }
   main .flex > * { min-width: 0; }
+  .chip { white-space: normal; text-align: center; }
+  /* Kart içindeki küçük rozetler (SANDIK, CANLI, KONTROL ET) iki satıra
+     bölünmesin; yalnızca uzun durum yazıları alt satıra geçsin. */
+  #opportunityList .chip, #clearOpportunities { white-space: nowrap; }
+
+  /* Fırsatlar başlığı: sıralama kutusu ve jeton özeti sıkışıp alt alta
+     dökülüyordu; telefonda tam genişliğe yayılır. */
+  #view-opportunities > .card > .flex { flex-direction: column; align-items: stretch; }
+  #view-opportunities > .card > .flex > .flex { width: 100%; justify-content: space-between; flex-wrap: wrap; gap: 0.5rem; }
+  #pendingCoinsBig { white-space: nowrap; }
 }
 
 @media (max-width: 400px) {
