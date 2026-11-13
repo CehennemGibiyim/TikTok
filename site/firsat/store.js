@@ -20,8 +20,16 @@
   var BACKUP_APP = 'tiktok-jeton-paneli';
   var BACKUP_VERSION = 2;
   // Panel sürümü ve sürüm geçmişi (Ayarlar'da gösterilir, yedeğe yazılır).
-  var APP_VERSION = '1.1.4';
+  var APP_VERSION = '1.1.5';
   var CHANGE_LOG = [
+    {
+      version: '1.1.5',
+      date: '2026-11-13',
+      items: [
+        'Anlık kutu yayınına doğrulama anahtarı eklendi: anahtarsız mesajlar panelde yok sayılıyor.',
+        'Kutu birleştirme tek fonksiyonda toplandı; kullanılmayan alanlar ve test adı süzgeci kaldırıldı.'
+      ]
+    },
     {
       version: '1.1.4',
       date: '2026-11-13',

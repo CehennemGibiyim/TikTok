@@ -81,8 +81,12 @@ WebSocket açarak yapılır — TikTok'un oda kimliği arama ucu bulut IP'lerind
 
 **Hız (anlık kutu):** Tarayıcı bir sandık/zarf yakaladığı anda `ntfy.sh` konusuna
 (`--ntfy-topic`, varsayılan `cehennem-tiktok-firsat-7f3a91`) JSON yayınlar. Panel aynı konuya
-SSE (`EventSource`) ile abonedir; ölçülen gecikme **~0.3 saniye**. Konu herkese açıktır:
-yalnızca kutu bildirimi taşır, gizli veri koymayın. Akış koparsa panel dosya yoluna düşer.
+SSE (`EventSource`) ile abonedir; ölçülen gecikme **~0.3 saniye**. Akış koparsa panel dosya yoluna düşer.
+
+Konu herkese açık olduğu için yayın bir **doğrulama anahtarı** taşır: yükün içindeki `key` alanı
+paneldeki `BOX_KEY` ile eşleşmezse mesaj yok sayılır (rastgele biri sahte sandık yayınlayamaz).
+Anahtar `--ntfy-key` / `NTFY_KEY` ile değiştirilir; değiştirirsen paneldeki `BOX_KEY` değerini de
+aynı yap. Not: panel JS herkese açık olduğu için bu bir "kapı kilidi", kriptografik imza değil.
 
 **Yedek yol:** Panel kutuları iki yoldan alır. `data/boxes.json` son 120 kutuyu tutar ve 45 saniyede bir
 commit edilir; panel onu **15 saniyede bir** okur, yeni kutu gelince bildirim gösterir. `live.json`
@@ -116,6 +120,7 @@ node index.js --once             # tek tur (deneme)
 | `--commit-boxes` | 45 | Kutuların (`data/boxes.json`) commit aralığı: panel sandığı saniyeler içinde görsün |
 | `--ntfy` | 1 | Kutuları anlık yayınla (panel SSE ile dinler) |
 | `--ntfy-topic` | `cehennem-tiktok-firsat-7f3a91` | Yayın konusu; paneldeki `BOX_TOPIC` ile aynı olmalı |
+| `--ntfy-key` | `NTFY_KEY` ya da gömülü değer | Yayın doğrulama anahtarı; paneldeki `BOX_KEY` ile aynı olmalı |
 | `--poll-batch` | 0 | Her turda yoklanacak havuz dilimi (`0` = hepsi); büyük havuzda taramayı hafifletir |
 | `--once` | — | Tek tur çalış ve çık |
 | `--discover-sec` | 300 | Keşif ucunun kaç saniyede bir yoklanacağı (her çağrı 10 canlı kanal + oda kimliği) |
