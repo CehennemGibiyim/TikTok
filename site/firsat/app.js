@@ -222,7 +222,8 @@
     document.querySelectorAll('.tab-btn').forEach(function (button) {
       button.classList.toggle('active', button.getAttribute('data-tab') === tab);
     });
-    if (tab === 'metrics') refreshMetrics();
+    if (tab === 'metrics') { refreshMetrics(); renderFunnel(); }
+    if (tab === 'opportunities') renderOpportunities();
     if (window.lucide) lucide.createIcons();
   }
 
@@ -321,6 +322,8 @@
         expiresAt: 0,
         shared: Number(item.shared) || 0,
         status: 'pending',
+        // Görülme (huni) alanı: kutu Fırsatlar listesinde çizilince doldurulur.
+        seenAt: 0,
         createdAt: Number(item.t) || Date.now(),
         scanId: item.id,
         auto: true,
@@ -1504,6 +1507,7 @@
   }
 
   function renderOpportunities() {
+    markFunnelSeen();
     var container = $('opportunityList');
     var pendingAll = pendingEvents();
     renderOppFilters(pendingAll);
@@ -2197,6 +2201,155 @@
     if (window.lucide) lucide.createIcons();
   }
 
+  // ---------- Kutu hunisi (cihazda) ----------
+  // Tarayıcıdan gelen kutuların cihazdaki yolculuğu: kutu → görüldü →
+  // toplandı / kaçtı. Kullanıcı işaretlemeleri yalnızca bu cihazda olduğu için
+  // hesap burada yapılır (metrics.json'a yazılmaz). Kapsam: son 7 gün.
+
+  var FUNNEL_WINDOW_MS = 7 * 24 * 3600 * 1000;
+
+  function funnelMissed(event) {
+    if (event.status === 'missed' || event.status === 'expired') return true;
+    // Sandık listeden sessizce düşer ama durumu 'pending' kalır: süresi geçmişse kaçmıştır.
+    return event.status === 'pending' && isExpired(event);
+  }
+
+  // “Görüldü” = kutu, panel görünürken Fırsatlar listesinde çizildi. Sayfa arka
+  // plandayken ya da başka sekmedeyken gelen kutu, liste açılana kadar görülmüş
+  // sayılmaz; böylece “panel kutu kaçırdı mı” sorusu ölçülebilir olur.
+  function markFunnelSeen() {
+    if (document.visibilityState !== 'visible') return;
+    var view = $('view-opportunities');
+    if (!view || view.classList.contains('hidden')) return;
+    var now = Date.now();
+    var changed = false;
+    var events = state.events.map(function (event) {
+      if (!event.auto || !isOpportunity(event) || Number(event.seenAt) > 0) return event;
+      if (event.status !== 'pending' || isExpired(event)) return event;
+      changed = true;
+      return Object.assign({}, event, { seenAt: now });
+    });
+    if (!changed) return;
+    Store.set({ events: events });
+    state = Store.get();
+  }
+
+  // Görülme kaydı bu sürümle başladı: ondan önceki kutular “görülmedi” sayılmasın.
+  function funnelSince() {
+    return Math.max(Date.now() - FUNNEL_WINDOW_MS, Number(state.settings && state.settings.funnelSeenSince) || 0);
+  }
+
+  function funnelStats() {
+    var since = funnelSince();
+    var boxes = state.events.filter(function (event) {
+      return event.auto && isOpportunity(event) &&
+        Number(event.createdAt) >= since;
+    });
+    var seen = boxes.filter(function (event) { return Number(event.seenAt) > 0; });
+    var collected = seen.filter(function (event) {
+      return event.status === 'collected' && Number(event.collectedAt) > 0;
+    });
+    var missed = seen.filter(funnelMissed);
+    var open = seen.filter(function (event) {
+      return event.status === 'pending' && !isExpired(event);
+    });
+    var reactions = [];
+    collected.forEach(function (event) {
+      var diff = Number(event.collectedAt) - Number(event.seenAt);
+      if (diff >= 0 && diff <= FUNNEL_WINDOW_MS) reactions.push(diff);
+    });
+    reactions.sort(function (a, b) { return a - b; });
+    var hours = [];
+    for (var hour = 0; hour < 24; hour += 1) hours.push(0);
+    missed.forEach(function (event) {
+      hours[new Date(Number(event.createdAt)).getHours()] += 1;
+    });
+    return {
+      since: since,
+      boxes: boxes.length,
+      seen: seen.length,
+      unseen: boxes.length - seen.length,
+      collected: collected.length,
+      missed: missed.length,
+      open: open.length,
+      // Görülenler içinde toplanma oranı; görülen yoksa bilinmiyor.
+      conversion: seen.length ? collected.length / seen.length : null,
+      median: reactions.length ? reactions[Math.floor(reactions.length / 2)] : null,
+      hours: hours
+    };
+  }
+
+  // Tarayıcı testinde huni sayılarını görebilmek için küçük bir pencere.
+  window.JetonPanelFunnel = {
+    stats: funnelStats,
+    render: renderFunnel
+  };
+
+  function renderFunnel() {
+    var summary = $('funnelSummary');
+    if (!summary) return;
+    var f = funnelStats();
+    var reaction = $('funnelReaction');
+    if (!f.boxes) {
+      summary.innerHTML = '<div class="empty-state col-span-2 lg:col-span-4">' +
+        'Hunide sayılacak kutu yok. Görülme kaydı bu sürümle başladı; yeni kutular Fırsatlar listesine düştükçe burası dolar.</div>';
+      reaction.textContent = '';
+      $('funnelHourly').innerHTML = '<div class="hint">Kaçırma kaydı yok.</div>';
+      return;
+    }
+
+    function percent(part, total) {
+      return total ? Math.round((part / total) * 100) + '%' : '—';
+    }
+
+    var cards = [
+      ['Kutu (7 gün)', fmt(f.boxes), 'text-amber-300',
+        f.unseen ? f.unseen + ' tanesi hiç görülmedi' : 'hepsi panelde görüldü'],
+      ['Görüldü', fmt(f.seen), 'text-sky-300', 'kutuların ' + percent(f.seen, f.boxes)],
+      ['Toplandı', fmt(f.collected), 'text-green-300', 'görülenlerin ' + percent(f.collected, f.seen)],
+      ['Kaçtı', fmt(f.missed), 'text-red-300',
+        f.open ? f.open + ' kutu açık bekliyor' : 'açık kutu yok']
+    ];
+    summary.innerHTML = cards.map(function (card) {
+      return '<div class="card p-4"><div class="stat-label">' + esc(card[0]) + '</div>' +
+        '<div class="stat-value ' + card[2] + '">' + card[1] + '</div>' +
+        '<div class="text-[10px] text-yellow-50/40 mt-1">' + esc(card[3]) + '</div></div>';
+    }).join('');
+
+    var lines = [];
+    lines.push(f.median === null
+      ? 'Medyan tepki süresi: henüz toplanan kutu yok.'
+      : 'Medyan tepki süresi: ' + clock(f.median / 1000) + ' (' + f.collected + ' toplanan kutuda).');
+    if (f.seen === 0) {
+      lines.push('Okuma: kutular listeye ulaşmadan gidiyor → darboğaz gösterim.');
+    } else if (f.unseen / f.boxes >= 0.3) {
+      lines.push("Okuma: kutuların en az %30'u hiç görülmedi → darboğaz gösterim (panel kapalı ya da Fırsatlar açık değil).");
+    } else if (f.conversion <= 0.5) {
+      lines.push('Okuma: kutular görülüyor ama yarısı ya da daha azı toplanıyor → darboğaz kullanıcı tepkisi.');
+    } else {
+      lines.push('Okuma: görülen kutuların yarısından çoğu toplanıyor → darboğaz algılama tarafında.');
+    }
+    if (f.since > Date.now() - FUNNEL_WINDOW_MS + 3600000) {
+      lines.push('Görülme kaydı ' + ago(f.since) + ' başladı.');
+    }
+    reaction.textContent = lines.join(' ');
+
+    var maxMiss = 1;
+    f.hours.forEach(function (count) { maxMiss = Math.max(maxMiss, count); });
+    var rows = [];
+    f.hours.forEach(function (count, hour) {
+      if (!count) return;
+      var width = Math.max(4, Math.round((count / maxMiss) * 100));
+      rows.push('<div class="flex items-center gap-2 text-[11px]">' +
+        '<span class="w-14 shrink-0 text-yellow-50/50 font-mono">' + (hour < 10 ? '0' : '') + hour + ':00</span>' +
+        '<span class="w-8 shrink-0 text-right font-mono text-red-300">' + count + '</span>' +
+        '<span class="flex-1 h-2 rounded bg-white/5 overflow-hidden"><span class="block h-full rounded bg-red-500/70" style="width:' + width + '%"></span></span>' +
+        '</div>');
+    });
+    $('funnelHourly').innerHTML = rows.length ? rows.join('')
+      : '<div class="hint">Son 7 günde kaçan kutu yok.</div>';
+  }
+
   function renderScanState(info) {
     var el = $('scanState');
     if (!el || !desktopApi) return;
@@ -2698,6 +2851,7 @@
     renderAgencies();
     renderCalc();
     renderMetrics();
+    renderFunnel();
     renderSettings();
     if (window.lucide) lucide.createIcons();
   }
@@ -2911,11 +3065,22 @@
     });
   }
 
+  // Görülme kaydının başlangıcı: bu sürümden önceki kutular hunide
+  // “görülmedi” sayılmasın diye ilk açılışta işaretlenir (yedeğe dahil).
+  function ensureFunnelSince() {
+    var settings = Object.assign({}, state.settings || {});
+    if (Number(settings.funnelSeenSince) > 0) return;
+    settings.funnelSeenSince = Date.now();
+    Store.set({ settings: settings });
+    state = Store.get();
+  }
+
   async function boot() {
     await Store.ready();
     state = Store.get();
 
     migrateEvents();
+    ensureFunnelSince();
 
     // Görünüm tercihleri Store'dan (yedeğe dahil) gelir; eski sürümlerde
     // yalnızca localStorage'da tutuluyordu, o değerler bir kez Store'a taşınır.
@@ -2946,13 +3111,19 @@
       ensureNotifyPermission();
       renderNotifyState();
     }, { once: true });
+    // Sayfaya dönünce Fırsatlar listesi tazelenir; görülme anı bundan sayılır.
+    document.addEventListener('visibilitychange', function () {
+      if (document.visibilityState === 'visible') renderAll();
+    });
     setInterval(pruneInactive, 600000);
     // Sıralama zamanla değişir (kalan süre azalır): liste kendiliğinden tazelenir.
     setInterval(function () {
       var opp = $('view-opportunities');
       var streams = $('view-hunt');
+      var metrics = $('view-metrics');
       if (opp && !opp.classList.contains('hidden')) renderOpportunities();
       if (streams && !streams.classList.contains('hidden')) renderStreamers();
+      if (metrics && !metrics.classList.contains('hidden')) renderFunnel();
     }, 30000);
   }
 

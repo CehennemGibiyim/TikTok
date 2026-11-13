@@ -204,6 +204,28 @@
     <div class="card p-5 mb-5">
       <div class="flex flex-col md:flex-row md:items-start md:justify-between gap-2 mb-3">
         <div>
+          <h2 class="section-title"><i data-lucide="filter" class="w-5 h-5 text-emerald-300"></i> Kutu hunisi</h2>
+          <p class="hint mt-1">
+            Bu cihazda son 7 gün: <b>kutu → görüldü → toplandı / kaçtı</b>. Yalnızca tarayıcıdan gelen kutular sayılır;
+            “görüldü”, kutunun panel görünürken Fırsatlar listesinde çizildiği andır. <b>Kaçtı</b> = “Kaçtı” işaretlenen,
+            süresi dolan ya da kullanıcı dokunmadan listeden düşen kutu.
+          </p>
+        </div>
+        <div class="text-[11px] text-yellow-50/40 text-right whitespace-nowrap">son 7 gün</div>
+      </div>
+      <div id="funnelSummary" class="grid grid-cols-2 lg:grid-cols-4 gap-3"></div>
+      <p class="hint mt-3" id="funnelReaction"></p>
+    </div>
+
+    <div class="card p-5 mb-5">
+      <h2 class="section-title mb-1"><i data-lucide="clock" class="w-5 h-5 text-red-300"></i> Kaçırma dağılımı</h2>
+      <p class="hint mb-3">Kaçan kutuların geldiği saat (yerel saat, son 7 gün).</p>
+      <div id="funnelHourly" class="space-y-1"></div>
+    </div>
+
+    <div class="card p-5 mb-5">
+      <div class="flex flex-col md:flex-row md:items-start md:justify-between gap-2 mb-3">
+        <div>
           <h2 class="section-title"><i data-lucide="bar-chart-3" class="w-5 h-5 text-amber-400"></i> Ölçüm</h2>
           <p class="hint mt-1">
             <code>scripts/quota-report.mjs</code> geçmiş <code>live.json</code> ve <code>boxes.json</code> commit'lerinden hesaplar;

@@ -186,6 +186,17 @@ node scripts/quota-report.mjs --json                                 # stdout'a 
 node scripts/quota-report.mjs                                        # metin raporu (aynı sayılar)
 ```
 
+### Kutu hunisi (cihazda)
+
+Ölçüm sekmesinin başında, yalnızca **bu cihazda** son 7 günün kutu hunisi var:
+**kutu → görüldü → toplandı / kaçtı**. Tarayıcıdan gelen kutular sayılır; “görüldü”, kutunun panel
+görünürken Fırsatlar listesinde çizildiği an olarak kaydedilir. **Kaçtı** = “Kaçtı” işaretlenen, süresi
+dolan ya da kullanıcı dokunmadan listeden düşen kutu. Kartlar kutu/görüldü/toplandı/kaçtı sayılarını,
+dönüşüm oranını (toplanan / görülen) ve medyan tepki süresini (toplama − görülme) verir; altındaki
+çubuklar kaçan kutuların geldiği saati gösterir. Veri cihazda (IndexedDB/localStorage) tutulur ve hesap
+panelde yapılır, çünkü kullanıcı işaretlemeleri tarayıcı geçmişinde yoktur. “Görüldü” alanı bu sürümle
+eklendi: ondan önceki kutular hunide sayılmaz, 7 gün içinde kendiliğinden arınır.
+
 `.github/workflows/metrics.yml` bu komutu **saatte bir** (ve elle çalıştırınca) `fetch-depth: 0`
 ile koşar, dosya değiştiyse commit eder. Sekmede dört bölüm var: özet kartları (ort. kutu/saat,
 son koşunun kutu/5 dk oturumu, karşılaştırılabilir koşu sayısı, ayar grubu sayısı), **saatlik kutu

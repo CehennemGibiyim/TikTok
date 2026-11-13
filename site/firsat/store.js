@@ -20,8 +20,17 @@
   var BACKUP_APP = 'tiktok-jeton-paneli';
   var BACKUP_VERSION = 2;
   // Panel sürümü ve sürüm geçmişi (Ayarlar'da gösterilir, yedeğe yazılır).
-  var APP_VERSION = '1.3.1';
+  var APP_VERSION = '1.4.0';
   var CHANGE_LOG = [
+    {
+      version: '1.4.0',
+      date: '2026-11-13',
+      items: [
+        'Ölçüm sekmesinde kutu hunisi: bu cihazda son 7 gün — kutu → görüldü → toplandı / kaçtı, dönüşüm oranı ve medyan tepki süresi.',
+        'Kaçırma dağılımı: kaçan kutuların geldiği saat; hangi saatlerde bildirim/panelin açık tutulacağını gösterir.',
+        '“Görüldü”, kutunun panel görünürken Fırsatlar listesinde çizildiği an; panel kapalıyken gelen ve süresi dolan kutu “hiç görülmedi” olarak sayılır.'
+      ]
+    },
     {
       version: '1.3.1',
       date: '2026-11-13',
