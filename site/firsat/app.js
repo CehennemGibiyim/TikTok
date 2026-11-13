@@ -474,6 +474,8 @@
       if (item.kind && !['chest', 'portal', 'letter'].includes(item.kind)) return;
       var username = cleanUsername(item.username);
       if (!username) return;
+      // Kurulum sırasında yayınlanan deneme kutuları listeye girmesin.
+      if (/^anlik_test_/.test(username) || username === 'test_anlik_kutu' || username === 'test_user') return;
       var owner = byName[username];
       if (!owner) {
         owner = {
