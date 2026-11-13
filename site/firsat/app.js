@@ -298,6 +298,12 @@
         streamers.push(owner);
         byName[username] = owner;
       }
+      // Kutu gönderen yayıncı listede kalır: "son kutu" zamanı da canlılık
+      // sayılır, 7 gün kuralı bunu kutu yollayan yayıncıyı düşürmez.
+      owner.lastBoxAt = Date.now();
+      owner.lastLiveAt = owner.lastBoxAt;
+      owner.scanLive = true;
+      owner.scanCheckedAt = owner.lastBoxAt;
       known[item.id] = true;
       events.unshift({
         id: uid('ev'),
@@ -871,18 +877,25 @@
   // Kök paneldeki davranış: sandık süresi dolunca 3 dk "KONTROL ET!" olarak kalır.
   var CHEST_GRACE_MS = 3 * 60 * 1000;
   var UNKNOWN_WINDOW_MS = 30 * 60 * 1000;
+  // Sandık pencere bittikten sonra da sonsuza kadar kalmaz: kullanıcı
+  // toplayabilsin diye 15 dakika "KONTROL ET!" olarak durur, sonra düşer.
+  var CHEST_KEEP_MS = 15 * 60 * 1000;
 
   // Zarf ve portalda da pencere bitince kutu hemen düşmez: kullanıcı
   // toplayabilsin diye pay bırakılır, sonra listeden çıkar.
   var COLLECT_GRACE_MS = 15 * 60 * 1000;
 
   function isExpired(event) {
-    // Sandık asla kaçmaz: süre dolsa bile beklemede kalır ("KONTROL ET!").
-    // Toplanan/toplanamayan sandık ancak "Topladım" ile veya yeni tarama
-    // koşusunda düşer.
-    if (event && event.kind === 'chest') return false;
     var now = Date.now();
     var end = eventEndAt(event);
+    // Sandık: pencere bitince hemen silinmez, CHEST_KEEP_MS boyunca durur.
+    if (event && event.kind === 'chest') {
+      if (!end) {
+        var created = Number(event.createdAt) || Number(event.t) || 0;
+        return created > 0 && now - created > UNKNOWN_WINDOW_MS;
+      }
+      return now >= end + CHEST_KEEP_MS;
+    }
     if (!end) {
       var created = Number(event.createdAt) || 0;
       return created > 0 && now - created > UNKNOWN_WINDOW_MS;
@@ -2418,7 +2431,11 @@
     var now = Date.now();
     var removed = state.streamers.filter(function (streamer) {
       if (streamer.startedAt) return false;
-      var last = Number(streamer.lastLiveAt) || Number(streamer.createdAt);
+      var last = Math.max(
+        Number(streamer.lastLiveAt) || 0,
+        Number(streamer.lastBoxAt) || 0,
+        Number(streamer.createdAt) || 0
+      );
       return last && now - last > limit;
     });
 

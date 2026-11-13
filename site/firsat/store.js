@@ -20,8 +20,18 @@
   var BACKUP_APP = 'tiktok-jeton-paneli';
   var BACKUP_VERSION = 2;
   // Panel sürümü ve sürüm geçmişi (Ayarlar'da gösterilir, yedeğe yazılır).
-  var APP_VERSION = '1.1.6';
+  var APP_VERSION = '1.1.7';
   var CHANGE_LOG = [
+    {
+      version: '1.1.7',
+      date: '2026-11-13',
+      items: [
+        'Cep telefonu düzeni: sekmeler tek satırda kaydırılıyor, kart boşlukları küçüldü, tablo sayfayı yana kaydırmıyor, alanlara dokununca sayfa yakınlaşmıyor.',
+        'Penceresi kapanan sandık 15 dakika sonra listeden düşüyor (önceden hiç düşmüyordu).',
+        'Kutu gönderen yayıncı listede kalıyor: son kutu zamanı da canlılık sayılıyor.',
+        'Kutu jetonu için bilinen tüm alan adları okunuyor (diamondCount, coinCount, coins…); hiçbiri yoksa "bilinmiyor" yazılıyor.'
+      ]
+    },
     {
       version: '1.1.6',
       date: '2026-11-13',

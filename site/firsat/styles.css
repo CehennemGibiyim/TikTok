@@ -390,3 +390,45 @@ body {
 @keyframes boxFlashOut {
   to { opacity: 0; transform: translate(-50%, -10px); }
 }
+
+/* ---------- Cep telefonu düzeni ---------- */
+/* Telefonda kartlar iç içe giriyor, sekmeler iki satıra kırılıyor ve geniş
+   tablo sayfayı yana kaydırıyordu. Aşağıdaki kurallar yalnızca dar ekranda
+   çalışır; masaüstü görünümü değişmez. */
+@media (max-width: 640px) {
+  body { overflow-x: hidden; }
+  main { padding-left: 0.7rem; padding-right: 0.7rem; max-width: 100vw; overflow-wrap: anywhere; }
+  header > div { padding-left: 0.7rem; padding-right: 0.7rem; }
+
+  /* Sekmeler tek satırda kalır, yana kaydırılır (başlık şişmez). */
+  header nav {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+  }
+  header nav::-webkit-scrollbar { display: none; }
+  .tab-btn { flex: 0 0 auto; white-space: nowrap; padding: 0.4rem 0.65rem; font-size: 0.8rem; }
+
+  /* Kart boşlukları küçülür: iç içe geçmiş görünüm azalır (main .card > .p-5). */
+  main .card { padding: 0.8rem; border-radius: 0.85rem; }
+  .stat-value { font-size: 1.15rem; }
+  .stat-label { font-size: 9px; letter-spacing: 0.07em; }
+  .section-title { font-size: 0.85rem; }
+
+  /* iOS'ta odaklanınca sayfa yakınlaşmasın (16px altındaki alanlar tetikler). */
+  .input, input, select, textarea { font-size: 16px !important; }
+
+  /* Butonlar, rozetler ve uzun adlar satırı taşırmasın. */
+  .btn-primary, .btn-ghost, .chip { max-width: 100%; }
+  .card, .note-box, .hint, .stream-table td, .stream-table th { overflow-wrap: anywhere; }
+
+  /* Geniş tablo kartın içinde kaydırılır, sayfa değil. */
+  .stream-table { min-width: 520px; }
+}
+
+@media (max-width: 400px) {
+  main .card { padding: 0.65rem; }
+  .stat-value { font-size: 1.02rem; }
+  .tab-btn { padding: 0.35rem 0.5rem; font-size: 0.75rem; }
+}

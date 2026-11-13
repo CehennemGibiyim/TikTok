@@ -1072,6 +1072,21 @@ function boxTiming(info, box, now) {
   return { endMs, durationSec, unpackAt: endMs || 0 };
 }
 
+// Jeton alanının adı sürüme/gönderene göre değişiyor (diamondCount, coins,
+// coinCount…). Bilinen tüm adlar denenir; hiçbiri yoksa 0 döner ve panel
+// "bilinmiyor" yazar — değer uydurulmaz.
+const COIN_FIELDS = ['diamondCount', 'coinCount', 'coins', 'totalCoins', 'totalDiamondCount', 'diamond_count'];
+function pickCoins(...sources) {
+  for (const source of sources) {
+    if (!source || typeof source !== 'object') continue;
+    for (const field of COIN_FIELDS) {
+      const value = Number(source[field]);
+      if (value > 0) return { coins: Math.round(value), field };
+    }
+  }
+  return { coins: 0, field: '' };
+}
+
 function handleEnvelope(username, eventName, data) {
   const info = (data && (data.envelopeInfo || data)) || {};
   const box = (data && data.treasureBoxData) || info.treasureBoxData || {};
@@ -1096,7 +1111,8 @@ function handleEnvelope(username, eventName, data) {
   state.envelopeStats.actions[act] = (state.envelopeStats.actions[act] || 0) + 1;
   state.envelopeStats.boxTypes[boxType] = (state.envelopeStats.boxTypes[boxType] || 0) + 1;
 
-  const coins = Number(info.diamondCount || info.coins || box.coins) || 0;
+  const picked = pickCoins(info, box, data);
+  const coins = picked.coins;
   const people = Number(info.peopleCount || info.recipientCount || box.canOpen) || 0;
   const nowMs = Date.now();
   const timing = boxTiming(info, box, nowMs);
@@ -1105,7 +1121,7 @@ function handleEnvelope(username, eventName, data) {
 
   state.envelopeSamples.push({
     t: nowMs, user: username, event: eventName, action: act, boxType,
-    businessType: info.businessType || 0, coins, people,
+    businessType: info.businessType || 0, coins, people, coinsField: picked.field,
     secondsUntilOpen: openIn, unpackAt: timing.unpackAt,
     // Teşhis: gelen kutuda hangi alanlar var? Süre alanı adı değişirse buradan görülür.
     keys: Object.keys(info).slice(0, 14)
