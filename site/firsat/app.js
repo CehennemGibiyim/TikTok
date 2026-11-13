@@ -479,16 +479,50 @@
     return true;
   }
 
+  // Bildirim izni yoksa da kullanıcı fark etsin: kısa ses + ekranda vurgu.
   function notifyBoxes(usernames) {
     var unique = usernames.filter(function (name, index) {
       return usernames.indexOf(name) === index;
     });
-    var text = '📦 Yeni kutu: ' + unique.slice(0, 3).map(function (name) { return '@' + name; }).join(', ');
+    var text = 'Yeni kutu: ' + unique.slice(0, 3).map(function (name) { return '@' + name; }).join(', ');
+    var granted = window.Notification && Notification.permission === 'granted';
+    if (granted) {
+      try { new Notification('Fırsatlar', { body: text }); } catch (error) { /* yok sayılır */ }
+      return;
+    }
+    beep();
+    flashBox(text);
+  }
+
+  // Ekranda kısa vurgu (banner + Fırsatlar sekmesinin sayacı).
+  function flashBox(text) {
+    var old = document.querySelector('.box-flash');
+    if (old) old.remove();
+    var el = document.createElement('div');
+    el.className = 'box-flash';
+    el.textContent = '📦 ' + text;
+    document.body.appendChild(el);
+    setTimeout(function () { el.remove(); }, 4200);
+  }
+
+  // Bildirim izni: tarayıcı ancak kullanıcı hareketinden sonra izin verir.
+  var notifyAsked = false;
+  function ensureNotifyPermission() {
+    if (notifyAsked) return;
+    if (!('Notification' in window) || Notification.permission !== 'default') return;
+    notifyAsked = true;
     try {
-      if (window.Notification && Notification.permission === 'granted') {
-        new Notification('Fırsatlar', { body: text });
-      }
-    } catch (error) { /* bildirim yoksa sessiz */ }
+      var result = Notification.requestPermission(function () { renderNotifyState(); });
+      if (result && typeof result.then === 'function') result.then(renderNotifyState, function () {});
+    } catch (error) { /* izin istenemedi */ }
+  }
+
+  // Panelin bir yerinde izin durumu görünsün (red edilmişse kullanıcı bilsin).
+  function renderNotifyState() {
+    var el = $('notifyState');
+    if (!el || !('Notification' in window)) return;
+    var stateText = { granted: 'açık', denied: 'kapalı (tarayıcıdan izin ver)', default: 'izin bekliyor' }[Notification.permission] || Notification.permission;
+    el.textContent = 'Bildirim: ' + stateText;
   }
 
   // Saniyeler içinde gelen kutular (ntfy.sh SSE). Koparsa dosya yolu devrede.
@@ -2343,6 +2377,8 @@
   function beep() {
     try {
       audioCtx = audioCtx || new (window.AudioContext || window.webkitAudioContext)();
+      // Tarayıcı sesi ilk harekete kadar askıya alır: uyarı sessiz kalmasın.
+      if (audioCtx.state === 'suspended') audioCtx.resume();
       var osc = audioCtx.createOscillator();
       var gain = audioCtx.createGain();
       osc.type = 'sine';
@@ -2699,6 +2735,14 @@
     refreshBoxes();
     setInterval(refreshBoxes, 15000);
     startBoxStream();
+
+    // Bildirim izni: açılışta denenir, tarayıcı isterse ilk tıklamada tekrar sorulur.
+    ensureNotifyPermission();
+    renderNotifyState();
+    document.addEventListener('pointerdown', function () {
+      ensureNotifyPermission();
+      renderNotifyState();
+    }, { once: true });
     setInterval(pruneInactive, 600000);
     // Sıralama zamanla değişir (kalan süre azalır): liste kendiliğinden tazelenir.
     setInterval(function () {
