@@ -223,11 +223,21 @@ Panelin üstünde, her sekmede dört yaş görünür:
 | **ölçüm** | `metrics.json` → `generatedAt` | 3 sa |
 
 Eşikler çalışma düzenine göre seçildi: tarayıcı 4 saatlik turlarda 5 dakikada bir commit eder
-(turlar arası ~10 dk), kutular saatte ~10 gelir, ölçüm saatlik üretilir. Eşik aşılırsa satır
-kırmızıya döner ve **“tarayıcı durmuş olabilir”** uyarısı geciken kaynakları yaşlarıyla yazar;
-böylece veri üretimi sessizce durmaz. Tarama panelden bilerek duraklatıldıysa uyarı çıkmaz, satırda
-“tarama duraklatıldı” yazar. Bilinmeyen değer “—” görünür ve uyarı üretmez; örneğin
-`lastOkAt` alanını taşımayan eski `live.json` dosyalarında bağlantı yaşı boş kalır.
+(turlar arası ~10 dk), kutular saatte ~10 gelir, ölçüm saatlik üretilir. Eşik aşılırsa ilgili yaş
+kırmızıya döner ve uyarı gecikmenin kaynağını söyler: **veri** eskiyse “tarayıcı durmuş olabilir”,
+canlı varken oda dinlenmiyorsa ve son başarı eskiyse “bağlantı kurulamıyor olabilir”, tarayıcı
+çalışırken ve oda dinlenirken kutu gelmiyorsa “kutu akışı durmuş olabilir”, yalnız ölçüm eskiyse
+“ölçüm güncellenmiyor”.
+
+Yanlış alarmı önlemek için bağlantı ve kutu yaşı tek başına yetmez: canlı yayın yokken ya da bir
+oda zaten dinleniyorsa eski `lastOkAt` normaldir; kutu da yalnız tarayıcı tazeyken ve oda
+dinlenirken değerlendirilir. Tarayıcı durmuşsa yalnız “veri” kırmızı olur; bağlantı/kutu yaşları
+soluk kalır (aynı arıza iki kez sayılmaz). Tarama panelden bilerek duraklatıldıysa hiçbir yaş
+kırmızıya dönmez, satırda “tarama duraklatıldı” yazar.
+
+Bilinmeyen değer “—” görünür ve uyarı üretmez; örneğin `lastOkAt` alanını taşımayan eski
+`live.json` dosyalarında bağlantı yaşı boş kalır. Gelecekten gelen damga (saat kayması) “şimdi”
+sayılır, alarm üretmez.
 
 ### Kutu düşme dakikası (watch-sec gerekçesi)
 

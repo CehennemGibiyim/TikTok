@@ -20,8 +20,16 @@
   var BACKUP_APP = 'tiktok-jeton-paneli';
   var BACKUP_VERSION = 2;
   // Panel sürümü ve sürüm geçmişi (Ayarlar'da gösterilir, yedeğe yazılır).
-  var APP_VERSION = '1.4.5';
+  var APP_VERSION = '1.4.6';
   var CHANGE_LOG = [
+    {
+      version: '1.4.6',
+      date: '2026-11-13',
+      items: [
+        'Sistem sağlığı satırı sadeleştirildi: yaş/eşik hesabı tek geçişte; uyarı metni gecikmenin kaynağını (tarayıcı, bağlantı, kutu, ölçüm) söylüyor.',
+        'Yanlış alarm azaltıldı: canlı yokken ya da oda dinlenirken eski bağlantı/kutu yaşı uyarı üretmiyor; tarayıcı durmuşsa yalnız “veri” kırmızı oluyor. Duraklatma satırı anında temizliyor; bilinmeyen “—”, gelecek damga “şimdi” kalıyor.'
+      ]
+    },
     {
       version: '1.4.5',
       date: '2026-11-13',

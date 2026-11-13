@@ -893,6 +893,8 @@
     // "Canlı yayınları bul" taramadan bağımsızdır: duraklatma onu durdurmaz.
     renderScanToggle();
     renderScanStatus();
+    // Duraklatınca renderScanStatus erken döner; satırı yine de temizle.
+    if (scanPaused) renderHealth();
     if (!scanPaused) refreshScan();
   }
 
@@ -3058,9 +3060,17 @@
     { key: 'metrics', label: 'ölçüm', limit: 3 * 3600000 }
   ];
 
+  // Damga okunamıyorsa 0: yaş bilinmiyor demektir, "—" gösterilir ve uyarı üretmez.
+  function healthStamp(value) {
+    if (!value) return 0;
+    var ms = typeof value === 'number' ? value : new Date(value).getTime();
+    return isFinite(ms) && ms > 0 ? ms : 0;
+  }
+
+  // null = bilinmiyor. Negatif yaş (saat kayması) "şimdi" sayılır, alarm üretmez.
   function shortAge(ms) {
-    if (!ms) return '—';
-    var minutes = Math.floor(ms / 60000);
+    if (ms === null) return '—';
+    var minutes = Math.floor(Math.max(0, ms) / 60000);
     if (minutes < 1) return 'şimdi';
     if (minutes < 60) return minutes + ' dk';
     var hours = Math.floor(minutes / 60);
@@ -3072,18 +3082,24 @@
   // Fırsatlar'a düşen otomatik olayları, bağlantı tarayıcının bildirdiği son
   // başarıyı, ölçüm metrics.json'ın üretim zamanını taşır.
   function healthSources() {
-    var scannedAt = scanInfo && scanInfo.scannedAt ? new Date(scanInfo.scannedAt).getTime() : 0;
     var boxAt = 0;
     state.events.forEach(function (event) {
       if (!event.auto || !isOpportunity(event)) return;
-      boxAt = Math.max(boxAt, Number(event.createdAt) || 0);
+      boxAt = Math.max(boxAt, healthStamp(event.createdAt));
     });
     return {
-      scan: scannedAt || 0,
+      scan: healthStamp(scanInfo && scanInfo.scannedAt),
       box: boxAt,
-      connect: Number(scanInfo && scanInfo.connectStats && scanInfo.connectStats.lastOkAt) || 0,
-      metrics: metricsInfo && metricsInfo.generatedAt ? new Date(metricsInfo.generatedAt).getTime() : 0
+      connect: healthStamp(scanInfo && scanInfo.connectStats && scanInfo.connectStats.lastOkAt),
+      metrics: healthStamp(metricsInfo && metricsInfo.generatedAt)
     };
+  }
+
+  function healthLimit(key) {
+    for (var i = 0; i < HEALTH_LIMITS.length; i++) {
+      if (HEALTH_LIMITS[i].key === key) return HEALTH_LIMITS[i].limit;
+    }
+    return 0;
   }
 
   function renderHealth() {
@@ -3091,23 +3107,49 @@
     if (!el) return;
     var now = Date.now();
     var at = healthSources();
+    var ages = {};
+    HEALTH_LIMITS.forEach(function (source) {
+      var stamp = at[source.key];
+      // Bilinmeyen damga null kalır: "—" gösterilir, uyarı üretmez.
+      ages[source.key] = stamp ? Math.max(0, now - stamp) : null;
+    });
+    var live = Number(scanInfo && scanInfo.liveCount) || 0;
+    var watching = Number(scanInfo && scanInfo.watching) || 0;
+    // watching alanını taşımayan eski dosyada 0 varsayıp alarm üretilmez.
+    var watchingKnown = Boolean(scanInfo) && typeof scanInfo.watching === 'number';
+    var scanStale = ages.scan !== null && ages.scan > healthLimit('scan');
+    // Tarayıcı yaşıyorsa bağlantı/kutuya bakılır. Canlı yokken ya da oda
+    // dinlenirken eski "son başarı" normaldir; bu yüzden alarm üretmez.
+    var scanFresh = ages.scan !== null && !scanStale;
+    var connectStale = scanFresh && live > 0 && watchingKnown && watching === 0 &&
+      ages.connect !== null && ages.connect > healthLimit('connect');
+    var boxStale = scanFresh && watchingKnown && watching > 0 &&
+      ages.box !== null && ages.box > healthLimit('box');
+    var metricsStale = ages.metrics !== null && ages.metrics > healthLimit('metrics');
+    var flags = { scan: scanStale, connect: connectStale, box: boxStale, metrics: metricsStale };
     var stale = [];
     var parts = HEALTH_LIMITS.map(function (source) {
-      var stamp = at[source.key];
-      var late = stamp > 0 && now - stamp > source.limit;
-      if (late) stale.push(source.label + ' ' + shortAge(now - stamp));
+      // Duraklatılmış taramada eski yaşlar kırmızıya dönmez: uyarı bilerek susturulur.
+      var late = !scanPaused && flags[source.key];
+      if (late) stale.push(source);
       return '<span' + (late ? ' class="text-red-300 font-semibold"' : '') + '>' +
-        esc(source.label + ' ' + (stamp ? shortAge(now - stamp) : '—')) + '</span>';
+        esc(source.label + ' ' + shortAge(ages[source.key])) + '</span>';
     });
-    var warn = stale.length > 0 && !scanPaused;
-    el.classList.toggle('health-stale', warn);
-    el.innerHTML = (warn
-      ? '<span class="chip chip-danger" title="' + esc(stale.join(' · ')) + '">⚠ tarayıcı durmuş olabilir</span>'
+    // Uyarı metni hangi kaynağın geciktiğini söyler: ölçüm gecikmesi tarayıcı
+    // durmuş gibi görünmesin.
+    var warnText = flags.scan ? 'tarayıcı durmuş olabilir'
+      : flags.connect ? 'bağlantı kurulamıyor olabilir'
+      : flags.box ? 'kutu akışı durmuş olabilir'
+      : 'ölçüm güncellenmiyor';
+    el.classList.toggle('health-stale', stale.length > 0);
+    el.innerHTML = (stale.length
+      ? '<span class="chip chip-danger">⚠ ' + warnText + '</span>'
       : '<span>🩺 sistem</span>') +
       ' · ' + parts.join(' · ') +
-      (scanPaused ? '<span>· tarama duraklatıldı</span>' : '');
-    el.title = 'Eşikler: veri 30 dk · kutu 3 sa · bağlantı 30 dk · ölçüm 3 sa' +
-      ' · yaşlar son kayıtlardan';
+      (scanPaused ? ' <span>· tarama duraklatıldı</span>' : '');
+    el.title = 'Eşikler: ' + HEALTH_LIMITS.map(function (source) {
+      return source.label + ' ' + shortAge(source.limit);
+    }).join(' · ') + ' · yaşlar son kayıtlardan';
   }
 
   function renderAll() {
