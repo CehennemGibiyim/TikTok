@@ -137,6 +137,9 @@ const state = {
   // Her gerçek kutuya koşu içinde artan bir sıra numarası verilir. Panel
   // "üretilen" ile "panele ulaşan"ı aynı kimlik kümesinde karşılaştırır.
   boxSeq: 0,
+  // Her üretilen kutunun zamanı; panel teslim farkını "panel kapalı"ya
+  // ayırabilsin diye seq ile aynı sırada tutulur.
+  boxTimes: [],
   // Teslim teşhisi: ntfy yayın sonucu ve boxes.json penceresi. Bunlar
   // yalnızca gerçek denemelerden/gerçek dosya yazımından gelir.
   delivery: {
@@ -188,6 +191,8 @@ const state = {
   // Saatlik kutu sayacı {saat: sayı}: panel kutu serisini bundan çizer.
   // Koşular arasında targets.json'da kalır, 48 saatten eskisi atılır.
   boxHourly: {},
+  // Oda dinlenen saatler {saat: oda sayısı}: kutu eşiği yalnız bu saatlerden hesaplanır.
+  watchHourly: {},
   // Kutu düşme dakikası ölçümü: günlük kovalar { 'YYYY-MM-DD': { boxMinutes, watchMin } }.
   // boxMinutes kutu sayısı, watchMin aynı kovada dinlenen dakika (payda).
   // Tek kaynak budur; son 7 günün toplamı snapshot'ta hesaplanır.
@@ -346,6 +351,17 @@ function loadTargets() {
       });
     }
 
+    const savedWatchHourly = parsed && parsed.watchHourly;
+    if (savedWatchHourly && typeof savedWatchHourly === 'object') {
+      const keepFrom = Math.floor(Date.now() / 3600000) - 48;
+      Object.keys(savedWatchHourly).forEach((key) => {
+        const hour = Number(key);
+        const count = Number(savedWatchHourly[key]);
+        if (!Number.isFinite(hour) || hour < keepFrom) return;
+        if (count > 0) state.watchHourly[hour] = Math.max(state.watchHourly[hour] || 0, count);
+      });
+    }
+
     // Oturum dakikası ölçümünün tek kaynağı günlük kovalardır. Eski sürümlerin
     // tarihsiz boxMinutes/watchMin toplamları pencereye alınmaz: ilk çalıştırmada
     // ölçüm sıfırdan başlar, eski veri kararı domine etmez.
@@ -478,6 +494,8 @@ function saveTargets() {
     probeHistory: state.probeHistory,
     // Saatlik kutu sayıları: panel 24 saatlik kutu serisini bundan çizer.
     boxHourly: state.boxHourly,
+    // Oda dinlenen saatler: kutu eşiği yalnız bu saatlerden hesaplanır.
+    watchHourly: state.watchHourly,
     // Oturum dakikası: tek kaynak günlük kovalar; son 7 günün toplamı live.json'da.
     boxMinuteDays: state.boxMinuteDays,
     // Günlük ülke taraması: zamanı ve sonucu koşular arasında korunur.
@@ -774,6 +792,7 @@ function recordEvent(username, data) {
   // tarayıcının ürettiği kutu sayısını kendi gördüğü kimliklerle karşılaştırır.
   const seq = state.boxSeq + 1;
   state.boxSeq = seq;
+  state.boxTimes[seq - 1] = Date.now();
   const event = {
     id,
     seq,
@@ -878,6 +897,7 @@ function deliverySnapshot() {
     ntfyOk: Number(state.delivery.ntfyOk) || 0,
     ntfyFail: Number(state.delivery.ntfyFail) || 0,
     ntfyFailSeqs: state.delivery.ntfyFailSeqs.slice(-400),
+    boxTimes: state.boxTimes.slice(),
     fileFromSeq: Number(state.delivery.fileFromSeq) || 0,
     fileSeqCount: Number(state.delivery.fileSeqCount) || 0,
     fileCap: BOX_FILE_CAP
@@ -2121,6 +2141,15 @@ async function pollTargets() {
 
 function snapshot() {
   const nowMs = Date.now();
+  // Oda dinlenen saatler geçmişte tutulur: kutu eşiği yalnız bu saatlerden hesaplanır.
+  if (state.rooms.size > 0) {
+    const hour = Math.floor(nowMs / 3600000);
+    state.watchHourly[hour] = Math.max(state.watchHourly[hour] || 0, state.rooms.size);
+    const keepFrom = hour - 48;
+    Object.keys(state.watchHourly).forEach((key) => {
+      if ((Number(key) || 0) < keepFrom) delete state.watchHourly[key];
+    });
+  }
   const minute = minuteWindow(nowMs);
   const staleLiveMs = CONFIG.liveStaleSec * 1000;
   const streamers = Array.from(state.streamers.values())
@@ -2188,10 +2217,40 @@ function snapshot() {
       },
       probeHistory: state.probeHistory,
       boxHourly: state.boxHourly,
+      watchHourly: state.watchHourly,
       // Oturum dakikası eğrisi: son 7 gün, kutu sayısı / dinlenen dakika (0-1 ... 5+).
       boxMinutes: minute.boxMinutes,
       watchMin: minute.watchMin,
       boxMinuteWindow: { days: minute.days, from: minute.from, to: minute.to },
+      // Son 7 günün gün gün kutu/dinlenen dakika toplamları: hangi günün
+      // ölçümü bozduğunu panelde göstermek için.
+      boxMinuteDaily: (function () {
+        const out = [];
+        const from = minute.from;
+        const to = minute.to;
+        let cursor = from;
+        // Takvim günlerini from..to arasında sırayla üret.
+        const days = [];
+        let key = from;
+        while (true) {
+          days.push(key);
+          if (key === to) break;
+          const ms = Date.parse(key + 'T00:00:00Z') + DAY_MS;
+          key = new Date(ms).toISOString().slice(0, 10);
+          if (days.length > MINUTE_WINDOW_DAYS + 2) break;
+        }
+        days.forEach((dayKey) => {
+          const entry = state.boxMinuteDays[dayKey];
+          const box = entry && Array.isArray(entry.boxMinutes) ? entry.boxMinutes : emptyMinutes();
+          const watch = entry && Array.isArray(entry.watchMin) ? entry.watchMin : emptyMinutes();
+          out.push({
+            date: dayKey,
+            boxes: box.reduce((sum, n) => sum + (Number(n) || 0), 0),
+            watchMin: Math.round(watch.reduce((sum, n) => sum + (Number(n) || 0), 0) * 10) / 10
+          });
+        });
+        return out;
+      })(),
       connectFailures: state.connectFailures,
       // Bağlantı teşhisi: kaç deneme, kaçı başarılı, son hatalar, soğuma.
       connectStats: {

@@ -20,8 +20,59 @@
   var BACKUP_APP = 'tiktok-jeton-paneli';
   var BACKUP_VERSION = 2;
   // Panel sürümü ve sürüm geçmişi (Ayarlar'da gösterilir, yedeğe yazılır).
-  var APP_VERSION = '1.4.12';
+  var APP_VERSION = '1.4.18';
   var CHANGE_LOG = [
+    {
+      version: '1.4.18',
+      date: '2026-11-13',
+      items: [
+        'Kutu sağlık eşiği yalnız oda dinlenen saatlerden hesaplanıyor; tarayıcı watchHourly geçmişini tutuyor ve izlenmeyen saatler boşluk/yaş olarak sayılmıyor.',
+        'Sistem sağlığı satırındaki hesaplanan eşikler fareyle üzerine gelmeye gerek kalmadan küçük bir “eşikler” açılırında mobilde de görünüyor.',
+        'Kutu düşme dakikası kartına son 7 günün gün gün kutu ve dinlenen dakika mini serisi eklendi; kart hangi UTC günleri kapsadığını da yazıyor.'
+      ]
+    },
+    {
+      version: '1.4.17',
+      date: '2026-11-13',
+      items: [
+        'Kutu hunisine tür ve gün kırılımı eklendi: tür başına kaçma oranı ve medyan tepki süresi, gün gün kutu/görüldü/toplanan/dönüşüm satırları.',
+        'Teslim oranı farkı ntfy hatası, panel kapalı, SSE/diğer ve boxes.json 120 olarak ayrılıyor; panel görünürlük kaydı bunu sınıflandırıyor.',
+        'Günlük kırılım üstteki 7 günlük pencereyle aynı aralığı kapsıyor; pencere bir günün ortasında başlarsa en eski gün * ile kısmi işaretleniyor.',
+        'Huni tür ve gün satırları mobil genişlikte taşmayacak şekilde daraltıldı; boş hunide gün satırları temizleniyor.',
+        'Sistem sağlığı dinamik eşiği sadeleştirildi: boş/eksik veride ve eşik sınırında alarm üretilmiyor; metrik gecikmesi tarayıcı sağlamken değerlendiriliyor.'
+      ]
+    },
+    {
+      version: '1.4.16',
+      date: '2026-11-13',
+      items: [
+        'Türe göre huni satırlarına tür başına medyan tepki süresi eklendi; hangi türün kısa pencere yüzünden kaçtığı görünüyor.'
+      ]
+    },
+    {
+      version: '1.4.15',
+      date: '2026-11-13',
+      items: [
+        'Kutu teslimi farkı artık panel kapalıyken üretilen kutuları ayrıca sayıyor: ntfy hatası, panel kapalı, SSE/diğer ve boxes.json 120 ayrı satırlarda görünüyor.',
+        'Tarayıcı her kutunun üretim zamanını delivery.boxTimes listesinde taşıyor; panel bu zamanı cihazdaki görünürlük kaydıyla karşılaştırıyor.'
+      ]
+    },
+    {
+      version: '1.4.14',
+      date: '2026-11-13',
+      items: [
+        'Kutu hunisi sadeleştirildi: kart HTML’i tek yardımcıda üretiliyor, saat çubukları 24 saatlik diziyi iki kez dolaşmak yerine tek geçişte toplanıyor. Sayılar ve görünüm değişmedi.',
+        'Kullanılmayan huni ara alanları (visibleSeen, visibleMs, tür bazlı collected/open ve gün end) kaldırıldı.'
+      ]
+    },
+    {
+      version: '1.4.13',
+      date: '2026-11-13',
+      items: [
+        'Panel görünürlüğü ölçülmeye başladı: görünür sekmede geçen dakika, bu dakikaya bölünen kutu sayısı ve kutunun geldiği anda panelin görünür olup olmadığı cihazda kaydediliyor.',
+        'Huni, hiç görülmeyenleri panel kapalıyken gelenler ve panel görünürken görülmeyenler olarak ayırıyor; maruz kalma dönüşümü toplanan / görünürken gelen kutu olarak ayrıca gösteriliyor.'
+      ]
+    },
     {
       version: '1.4.12',
       date: '2026-11-13',
@@ -294,7 +345,9 @@
         tiktokCutPct: 50,
         agencyCutPct: 10,
         coinUsd: 0.005,
-        usdTry: 34.5
+        usdTry: 34.5,
+        // Panel görünürlüğü: görünür aralıklar ve son örnek zamanı.
+        visibility: { since: 0, intervals: [], lastTickAt: 0, visible: false }
       },
       // Görünüm tercihleri: yedeğe dahil olsun diye Store'da tutulur.
       view: {
@@ -502,6 +555,11 @@
     ready: ready,
     get: get,
     set: set,
+    // Sayfa kapanırken bekleyen yazmayı hemen diske geçir.
+    flush: function () {
+      if (saveTimer) { clearTimeout(saveTimer); saveTimer = null; }
+      saveNow();
+    },
     subscribe: subscribe,
     exportJson: exportJson,
     importJson: importJson,

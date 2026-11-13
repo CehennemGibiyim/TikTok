@@ -57,6 +57,10 @@
   // bu andan sonra üretilmiş kutular "ilk görülen" sayılır. Böylece panel
   // kapalıyken üretilmiş eski kutular oranı yanlışlıkla düşürmez.
   var PANEL_SESSION_AT = Date.now();
+  // Görünürlük aralıkları: sekme görünürken geçen süreyi ve kutunun geldiği
+  // anda panelin görünür olup olmadığını aynı gerçek zaman çizgisinde tutar.
+  var VISIBILITY_PRUNE_MS = 7 * 24 * 3600 * 1000;
+  var visibilitySavedAt = 0;
   // GitHub Pages, veri commit'lerini saatlerce geciktiriyor (build kotası).
   // Ham dosya her zaman güncel ve CORS açık: önce oradan okunur, olmazsa
   // Pages kopyasına düşülür.
@@ -331,6 +335,13 @@
           existing.scanRunId = Number(item.runId || runId) || 0;
           changed = true;
         }
+        if (existing.arrivedVisible === undefined || existing.arrivedVisible === null) {
+          var arrived = wasPanelVisibleAt(Number(existing.createdAt) || 0);
+          if (arrived !== null) {
+            existing.arrivedVisible = arrived;
+            changed = true;
+          }
+        }
         return;
       }
       var username = cleanUsername(item.username);
@@ -351,6 +362,7 @@
       // Kutu gönderen yayıncı listede kalır: "son kutu" zamanı da canlılık
       // sayılır, 7 gün kuralı bunu kutu yollayan yayıncıyı düşürmez.
       owner.lastBoxAt = Date.now();
+      var eventCreatedAt = Number(item.t) || Date.now();
       var event = {
         id: uid('ev'),
         streamerId: owner.id,
@@ -368,7 +380,7 @@
         status: 'pending',
         // Görülme (huni) alanı: kutu Fırsatlar listesinde çizilince doldurulur.
         seenAt: 0,
-        createdAt: Number(item.t) || Date.now(),
+        createdAt: eventCreatedAt,
         scanId: item.id,
         auto: true,
         giftName: item.boxName || item.giftName || '',
@@ -384,7 +396,10 @@
         seq: Number(item.seq) || 0,
         scanRunId: Number(item.runId || runId) || 0,
         receivedAt: Date.now(),
-        via: source ? [source] : []
+        via: source ? [source] : [],
+        // Kutu gerçekten geldiği anda panel görünür müydü? Görünürlük kaydı
+        // başlamadan önceki kutularda null kalır; bu değer uydurulmaz.
+        arrivedVisible: wasPanelVisibleAt(eventCreatedAt)
       };
       known[item.id] = event;
       events.unshift(event);
@@ -2390,9 +2405,11 @@
     var failed = {};
     (d.ntfyFailSeqs || []).forEach(function (seq) { failed[Number(seq)] = true; });
     var fileFrom = Number(d.fileFromSeq) || 0;
+    var boxTimes = Array.isArray(d.boxTimes) ? d.boxTimes : [];
     var ntfyGap = 0;
     var fileGap = 0;
     var panelGap = 0;
+    var panelClosedGap = 0;
     for (var seq = baseSeq + 1; seq <= lastSeq; seq += 1) {
       if (received[seq]) continue;
       // Öncelik gerçek yayın hatasında: başarısız ntfy denemesi kayıtlıysa
@@ -2400,6 +2417,7 @@
       // yalnızca ntfy hatası olmayan eski sıralar için ayrı sayılır.
       if (failed[seq]) ntfyGap += 1;
       else if (fileFrom > 0 && seq < fileFrom) fileGap += 1;
+      else if (wasPanelVisibleAt(Number(boxTimes[seq - 1]) || 0) === false) panelClosedGap += 1;
       else panelGap += 1;
     }
 
@@ -2415,6 +2433,7 @@
       ntfyGap: ntfyGap,
       fileGap: fileGap,
       panelGap: panelGap,
+      panelClosedGap: panelClosedGap,
       ntfyOnly: ntfyOnly,
       pollOnly: pollOnly,
       both: both,
@@ -2477,7 +2496,8 @@
 
     var rows = [
       ['ntfy hatası', s.ntfyGap, 'yayın başarısız; kutu panelde yok', 'text-red-300'],
-      ['SSE / panel', s.panelGap, 'ntfy kabul edilmiş ya da panel kapalı; kutu yok', 'text-amber-300'],
+      ['Panel kapalı', s.panelClosedGap, 'panel görünmezken üretilen kutu', 'text-sky-300'],
+      ['SSE / diğer', s.panelGap, 'ntfy başarılı ama kutu bu panelde yok', 'text-amber-300'],
       ['boxes.json 120', s.fileGap, 'kutu dosya penceresinin dışında', 'text-orange-300'],
       ['Dedupe', s.dedupe, 'aynı kutu iki kanaldan; tekil sayıldı', 'text-sky-300']
     ];
@@ -2497,7 +2517,8 @@
       lines.push('Bu aralıkta üretilen her tekil kutu panele ulaştı.');
     } else {
       lines.push('Fark ' + fmt(s.gap) + ' kutu: ntfy hatası ' + fmt(s.ntfyGap) +
-        ' · SSE/panel ' + fmt(s.panelGap) + ' · boxes.json 120 ' + fmt(s.fileGap) + '.');
+        ' · panel kapalı ' + fmt(s.panelClosedGap) + ' · SSE/diğer ' + fmt(s.panelGap) +
+        ' · boxes.json 120 ' + fmt(s.fileGap) + '.');
     }
     if (s.produced) {
       lines.push('Sıra aralığı: ' + fmt(s.baseSeq + 1) + '–' + fmt(s.lastSeq) + ' (taban ' + fmt(s.baseSeq) + ').');
@@ -2579,13 +2600,193 @@
     return null;
   }
 
+  // ---------- Panel görünürlüğü ----------
+  // Sekme görünürken geçen aralıklar cihazda tutulur. Bir kutunun geliş anı
+  // bu aralıklardan birine düşüyorsa panel o anda görünürdü; düşmüyorsa
+  // kapalıydı. Kayıt başlamadan önceki kutularda değer null (bilinmiyor) kalır.
+
+  function visibilityData() {
+    if (!state || !state.settings) return null;
+    var vis = state.settings.visibility;
+    return vis && typeof vis === 'object' ? vis : null;
+  }
+
+  function closeOpenVisibility(vis, at) {
+    if (!vis || !Array.isArray(vis.intervals)) return;
+    for (var i = vis.intervals.length - 1; i >= 0; i -= 1) {
+      var interval = vis.intervals[i];
+      if (Number(interval.to) > 0) continue;
+      interval.to = Math.max(Number(interval.from) || 0, at);
+      return;
+    }
+  }
+
+  function visibilityEnd(interval, now) {
+    var to = Number(interval.to) || 0;
+    if (to > 0) return to;
+    var vis = visibilityData();
+    if (vis && vis.visible) return now;
+    return Math.min(now, Number(vis && vis.lastTickAt) || Number(interval.from) || 0);
+  }
+
+  function wasPanelVisibleAt(timestamp) {
+    var at = Number(timestamp) || 0;
+    var vis = visibilityData();
+    if (!vis || !Array.isArray(vis.intervals) || !at) return null;
+    var now = Date.now();
+    // Gelecekten gelen damga (saat kayması) kapalı sanılmasın: şimdiki anı sor.
+    if (at > now) at = now;
+    // since=0 yedeği eski bir sürümden gelmiş olabilir; o durumda hangi
+    // kutunun görünürlükle çakıştığını bilmiyoruz, "kapalıydı" demeyiz.
+    if (!Number(vis.since) || at < Number(vis.since)) return null;
+    for (var i = 0; i < vis.intervals.length; i += 1) {
+      var interval = vis.intervals[i];
+      var from = Number(interval.from) || 0;
+      if (!from || at < from) continue;
+      if (at <= visibilityEnd(interval, now)) return true;
+    }
+    return false;
+  }
+
+  function normalizeVisibility(raw, now) {
+    var source = raw && typeof raw === 'object' ? raw : {};
+    var since = Number(source.since) || now;
+    var lastTick = Number(source.lastTickAt) || 0;
+    var intervals = [];
+    (Array.isArray(source.intervals) ? source.intervals : []).forEach(function (item) {
+      if (!item || typeof item !== 'object') return;
+      var from = Number(item.from) || 0;
+      var to = Number(item.to) || 0;
+      if (!from || from > now + 60000) return;
+      if (to && to <= from) return;
+      intervals.push({ from: from, to: to });
+    });
+    intervals.sort(function (a, b) { return a.from - b.from; });
+    // Önceki oturum kapanırken yazılamadıysa açık aralığı son örnek anında kapat:
+    // panelin kapalı olduğu saatleri görünür süreye eklemeyiz.
+    intervals.forEach(function (item) {
+      if (Number(item.to) > 0) return;
+      item.to = Math.max(item.from, Math.min(now, lastTick || item.from));
+    });
+    var cut = now - VISIBILITY_PRUNE_MS;
+    intervals = intervals.filter(function (item) { return item.to > item.from && item.to > cut; })
+      .map(function (item) { return { from: Math.max(item.from, cut), to: item.to }; });
+    // Çakışan aralıkları birleştir; aynı süre iki kez sayılmasın.
+    var merged = [];
+    intervals.forEach(function (item) {
+      var last = merged[merged.length - 1];
+      if (!last || item.from > last.to) merged.push(item);
+      else last.to = Math.max(last.to, item.to);
+    });
+    if (merged.length > 2000) merged = merged.slice(-2000);
+    return { since: since, intervals: merged, lastTickAt: lastTick, visible: false };
+  }
+
+  function persistVisibility(force) {
+    var vis = visibilityData();
+    if (!vis) return;
+    var now = Date.now();
+    vis.lastTickAt = now;
+    var settings = Object.assign({}, state.settings || {});
+    settings.visibility = vis;
+    Store.set({ settings: settings });
+    state = Store.get();
+    visibilitySavedAt = now;
+    if (force && Store.flush) Store.flush();
+  }
+
+  function sampleVisibility() {
+    var vis = visibilityData();
+    if (!vis) return;
+    var now = Date.now();
+    var visible = document.visibilityState === 'visible';
+    var wasVisible = vis.visible;
+    if (!Number(vis.since)) vis.since = now;
+    if (visible) {
+      if (!vis.visible) {
+        closeOpenVisibility(vis, now);
+        vis.intervals.push({ from: now, to: 0 });
+        vis.visible = true;
+      } else {
+        var last = vis.intervals[vis.intervals.length - 1];
+        var lastTick = Number(vis.lastTickAt) || now;
+        if (!last || Number(last.to) > 0) {
+          vis.intervals.push({ from: now, to: 0 });
+        } else if (now - lastTick > 5000) {
+          // Uyku/askıya alma boşluğu görünür süreye yazılmasın.
+          last.to = Math.max(Number(last.from) || lastTick, lastTick);
+          vis.intervals.push({ from: now, to: 0 });
+        }
+      }
+      vis.lastTickAt = now;
+    } else if (vis.visible) {
+      closeOpenVisibility(vis, now);
+      vis.visible = false;
+      vis.lastTickAt = now;
+    }
+    // Sekme kapanıp açılırken aralık sınırını hemen yaz; 10 saniyelik
+    // gecikme, sayfa bu arada kapanırsa görünür süreyi kaybettirebilir.
+    if (visible !== wasVisible) persistVisibility(true);
+    else if (visible && now - visibilitySavedAt >= 10000) persistVisibility(false);
+  }
+
+  function endVisibilitySession() {
+    var vis = visibilityData();
+    if (!vis) return;
+    var now = Date.now();
+    closeOpenVisibility(vis, now);
+    vis.visible = false;
+    vis.lastTickAt = now;
+    persistVisibility(true);
+  }
+
+  function startVisibilityTracking() {
+    var now = Date.now();
+    var settings = Object.assign({}, state.settings || {});
+    settings.visibility = normalizeVisibility(settings.visibility, now);
+    Store.set({ settings: settings });
+    state = Store.get();
+    visibilitySavedAt = now;
+    sampleVisibility();
+    document.addEventListener('visibilitychange', sampleVisibility);
+    window.addEventListener('pagehide', endVisibilitySession);
+    window.addEventListener('pageshow', sampleVisibility);
+    setInterval(sampleVisibility, 1000);
+  }
+
+  function visibleMsBetween(from, to) {
+    var vis = visibilityData();
+    if (!vis || !Array.isArray(vis.intervals)) return 0;
+    var now = Date.now();
+    var total = 0;
+    vis.intervals.forEach(function (interval) {
+      var start = Number(interval.from) || 0;
+      var end = visibilityEnd(interval, now);
+      if (!start || !end || end <= start) return;
+      var a = Math.max(start, from);
+      var b = Math.min(end, to);
+      if (b > a) total += b - a;
+    });
+    return total;
+  }
+
   function funnelStats() {
     var since = funnelSince();
+    var now = Date.now();
+    var visibleMinutes = visibleMsBetween(since, now) / 60000;
     var boxes = 0;
     var seen = 0;
     var collected = 0;
     var missed = 0;
     var open = 0;
+    var visibleBoxes = 0;
+    var closedBoxes = 0;
+    var unknownBoxes = 0;
+    var unseenClosed = 0;
+    var unseenVisible = 0;
+    var unseenUnknown = 0;
+    var visibleSeen = 0;
+    var visibleCollected = 0;
     var reactions = [];
     var hours = [];
     var kinds = {};
@@ -2595,17 +2796,20 @@
     today.setHours(0, 0, 0, 0);
     for (var hour = 0; hour < 24; hour += 1) hours.push(0);
     Object.keys(KINDS).forEach(function (kind) {
-      kinds[kind] = { boxes: 0, seen: 0, collected: 0, missed: 0, open: 0 };
+      kinds[kind] = { boxes: 0, seen: 0, missed: 0, reactions: [] };
     });
-    // Son 7 takvim günü; kayıt başlangıcından tamamen önceki günler boş satır olarak
-    // görünmesin diye düşürülür. Gün, kutunun geldiği yerel tarihtir.
-    for (var back = 6; back >= 0; back -= 1) {
+    // Üstteki toplamla aynı 7 günlük pencereyi kapsayan takvim günleri. Pencere
+    // bir günün ortasında başlayabildiği için en eski gün de kısmi (*) olabilir;
+    // bu satır, toplam kutu sayısının gün satırlarıyla toplanabilmesini sağlar.
+    // Kayıt başlangıcından tamamen önceki günler boş satır olarak görünmesin diye
+    // düşürülür. Gün, kutunun geldiği yerel tarihtir.
+    for (var back = 7; back >= 0; back -= 1) {
       var start = new Date(today);
       start.setDate(today.getDate() - back);
       var next = new Date(start);
       next.setDate(start.getDate() + 1);
       if (next.getTime() <= since) continue;
-      var day = { start: start.getTime(), end: next.getTime(), boxes: 0, seen: 0, collected: 0 };
+      var day = { start: start.getTime(), boxes: 0, seen: 0, collected: 0 };
       days.push(day);
       dayMap[day.start] = day;
     }
@@ -2613,49 +2817,151 @@
     state.events.forEach(function (event) {
       if (!isFunnelBox(event) || Number(event.createdAt) < since) return;
       boxes += 1;
+      // Kutu gerçekten geldiğinde panel görünür müydü? Üç durum ayrı tutulur:
+      // görünür, kapalı, bu görünürlük kaydından önce (bilinmiyor).
+      var arrival = event.arrivedVisible;
+      if (arrival === true) visibleBoxes += 1;
+      else if (arrival === false) closedBoxes += 1;
+      else unknownBoxes += 1;
       var kind = kinds[event.kind];
       if (kind) kind.boxes += 1;
       var eventDay = new Date(Number(event.createdAt));
       eventDay.setHours(0, 0, 0, 0);
       var day = dayMap[eventDay.getTime()];
       if (day) day.boxes += 1;
-      if (Number(event.seenAt) <= 0) return;
+      if (Number(event.seenAt) <= 0) {
+        if (arrival === true) unseenVisible += 1;
+        else if (arrival === false) unseenClosed += 1;
+        else unseenUnknown += 1;
+        return;
+      }
       seen += 1;
+      if (arrival === true) visibleSeen += 1;
       if (kind) kind.seen += 1;
       if (day) day.seen += 1;
       var outcome = funnelOutcome(event);
       if (outcome === 'open') {
         open += 1;
-        if (kind) kind.open += 1;
       } else if (outcome === 'missed') {
         missed += 1;
         if (kind) kind.missed += 1;
         hours[new Date(Number(event.createdAt)).getHours()] += 1;
       } else if (outcome === 'collected') {
         collected += 1;
-        if (kind) kind.collected += 1;
+        if (arrival === true) visibleCollected += 1;
         if (day) day.collected += 1;
         var diff = Number(event.collectedAt) - Number(event.seenAt);
-        if (diff >= 0 && diff <= FUNNEL_WINDOW_MS) reactions.push(diff);
+        if (diff >= 0 && diff <= FUNNEL_WINDOW_MS) {
+          reactions.push(diff);
+          if (kind) kind.reactions.push(diff);
+        }
       }
     });
 
+    Object.keys(kinds).forEach(function (kind) {
+      var kindReactions = kinds[kind].reactions;
+      kindReactions.sort(function (a, b) { return a - b; });
+      kinds[kind].median = kindReactions.length
+        ? kindReactions[Math.floor(kindReactions.length / 2)]
+        : null;
+      delete kinds[kind].reactions;
+    });
     reactions.sort(function (a, b) { return a - b; });
     return {
       since: since,
       boxes: boxes,
       seen: seen,
-      unseen: boxes - seen,
       collected: collected,
       missed: missed,
       open: open,
       // Görülenler içinde toplanma oranı; görülen yoksa bilinmiyor.
       conversion: seen ? collected / seen : null,
       median: reactions.length ? reactions[Math.floor(reactions.length / 2)] : null,
+      // Maruz kalma: yalnızca panel görünürken gelen kutular.
+      visibleBoxes: visibleBoxes,
+      closedBoxes: closedBoxes,
+      unknownBoxes: unknownBoxes,
+      visibleCollected: visibleCollected,
+      visibleDetection: visibleBoxes ? visibleSeen / visibleBoxes : null,
+      exposureConversion: visibleBoxes ? visibleCollected / visibleBoxes : null,
+      unseenClosed: unseenClosed,
+      unseenVisible: unseenVisible,
+      unseenUnknown: unseenUnknown,
+      visibleMinutes: visibleMinutes,
+      // Tüm huni kutuları / görünür dakika ve yalnız görünürken gelenler / dakika.
+      boxesPerVisibleMinute: visibleMinutes > 0 ? boxes / visibleMinutes : null,
+      visibleBoxesPerVisibleMinute: visibleMinutes > 0 ? visibleBoxes / visibleMinutes : null,
       hours: hours,
       kinds: kinds,
       days: days
     };
+  }
+
+  function visibilityMinutesText(minutes) {
+    var value = Number(minutes) || 0;
+    if (value <= 0) return '0';
+    return value >= 100 ? String(Math.round(value)) : (Math.round(value * 10) / 10).toFixed(1).replace('.', ',');
+  }
+
+  function perMinuteText(value) {
+    if (value === null || value === undefined) return '—';
+    return (Math.round(Number(value) * 100) / 100).toFixed(2).replace('.', ',');
+  }
+
+  // Huni kartlarının HTML'i tek yerde: iki farklı bölümde aynı kart işaretlemesi
+  // tekrarlanmasın. Kart dizisi [etiket, değer, renk sınıfı, alt açıklama] taşır.
+  function funnelCardsHtml(cards) {
+    return cards.map(function (card) {
+      return '<div class="card p-4"><div class="stat-label">' + esc(card[0]) + '</div>' +
+        '<div class="stat-value ' + card[2] + '">' + card[1] + '</div>' +
+        '<div class="text-[10px] text-yellow-50/40 mt-1">' + esc(card[3]) + '</div></div>';
+    }).join('');
+  }
+
+  // Maruz kalma kartı: görünür süre ve kutunun geldiği andaki görünürlük.
+  // "Hiç görülmedi" üçe ayrılır: panel kapalıydı / panel görünürdü ama kutu
+  // görülmedi / bilinmiyor. Oranlar yalnızca gerçek gözlemlerden hesaplanır.
+  function renderFunnelExposure(f) {
+    var el = $('funnelExposure');
+    if (!el) return;
+    var minutes = Number(f.visibleMinutes) || 0;
+    var rate = f.boxesPerVisibleMinute;
+    var visibleRate = f.visibleBoxesPerVisibleMinute;
+    var exposure = f.exposureConversion === null || f.exposureConversion === undefined
+      ? '—' : '%' + Math.round(f.exposureConversion * 100);
+    var detection = f.visibleDetection === null || f.visibleDetection === undefined
+      ? '—' : '%' + Math.round(f.visibleDetection * 100);
+    var cards = [
+      ['Görünür süre', visibilityMinutesText(minutes) + ' dk', 'text-cyan-300',
+        'sekme görünürken · son 7 gün'],
+      ['Kutu / görünür dk', perMinuteText(rate), 'text-amber-300',
+        'tüm kutu ÷ görünür dakika'],
+      ['Görünürken gelen', fmt(f.visibleBoxes), 'text-sky-300',
+        'görünürken ' + perMinuteText(visibleRate) + ' kutu/dk'],
+      ['Kapalıyken gelen', fmt(f.closedBoxes), 'text-yellow-300',
+        f.unknownBoxes ? f.unknownBoxes + ' kutu bilinmiyor' : 'kutunun geldiği an kapalıydı']
+    ];
+    var cells = [
+      ['Hiç görülmedi · panel kapalıydı', f.unseenClosed, 'text-amber-300'],
+      ['Hiç görülmedi · panel görünürdü', f.unseenVisible, 'text-red-300'],
+      ['Hiç görülmedi · bilinmiyor', f.unseenUnknown, 'text-yellow-50/50']
+    ];
+    el.innerHTML = '<div class="grid grid-cols-2 lg:grid-cols-4 gap-3">' +
+      funnelCardsHtml(cards) + '</div>' +
+      '<div class="mt-3 grid grid-cols-1 md:grid-cols-3 gap-2 text-[11px]">' +
+      cells.map(function (cell) {
+        return '<div class="rounded border border-white/10 px-2 py-2">' +
+          '<span class="block text-[10px] text-yellow-50/45">' + esc(cell[0]) + '</span>' +
+          '<span class="font-mono font-bold ' + cell[2] + '">' + fmt(cell[1]) + '</span></div>';
+      }).join('') + '</div>' +
+      '<p class="hint mt-3">Maruz kalma dönüşümü: <b>' + exposure + '</b> (' +
+        fmt(f.visibleCollected) + ' toplanan / ' + fmt(f.visibleBoxes) + ' görünürken gelen) · ' +
+        'görünürken gelenlerin görülme oranı: <b>' + detection + '</b>. ' +
+        'Panel kapalıyken gelen kutular bu oranın paydasına girmez; panel görünürken Fırsatlar sekmesi kapalıysa da kutu görülmemiş sayılır.</p>' +
+      (minutes <= 0
+        ? '<p class="hint mt-2">Görünürlük kaydı bu sürümle başladı; ilk ölçüm için sekmeyi açık tut. ' +
+          'Eski kutularda görünürlük bilinmiyor olarak kalır.</p>'
+        : '');
   }
 
   // Gün gün bakış: son 7 günün kutu / görülen / toplanan sayıları ve dönüşümü.
@@ -2663,14 +2969,14 @@
   function renderFunnelDays(f) {
     var el = $('funnelDays');
     if (!el) return;
-    if (!f.days || !f.days.length) { el.innerHTML = ''; return; }
+    if (!f.days || !f.days.length || !f.boxes) { el.innerHTML = ''; return; }
 
     var header = '<div class="flex items-center gap-2 px-1 text-[10px] uppercase tracking-wide text-yellow-50/40">' +
-      '<span class="w-28 shrink-0">gün</span>' +
-      '<span class="w-10 text-right">kutu</span>' +
-      '<span class="w-14 text-right">görüldü</span>' +
-      '<span class="w-14 text-right">toplanan</span>' +
-      '<span class="w-16 text-right">dönüşüm</span>' +
+      '<span class="min-w-0 flex-1 truncate">gün</span>' +
+      '<span class="w-8 shrink-0 text-right truncate">kutu</span>' +
+      '<span class="w-10 shrink-0 text-right truncate">görüldü</span>' +
+      '<span class="w-12 shrink-0 text-right truncate">toplanan</span>' +
+      '<span class="w-11 shrink-0 text-right truncate">dönüşüm</span>' +
       '</div>';
     var todayStart = new Date();
     todayStart.setHours(0, 0, 0, 0);
@@ -2682,16 +2988,17 @@
         weekday: 'short', day: '2-digit', month: '2-digit'
       }) + (partial ? '*' : '');
       return '<div class="flex items-center gap-2 rounded px-1 py-0.5 text-[11px] hover:bg-white/5">' +
-        '<span class="w-28 shrink-0 truncate text-yellow-100">' + esc(label) + '</span>' +
-        '<span class="w-10 text-right font-mono">' + fmt(day.boxes) + '</span>' +
-        '<span class="w-14 text-right font-mono text-sky-300">' + fmt(day.seen) + '</span>' +
-        '<span class="w-14 text-right font-mono text-green-300">' + fmt(day.collected) + '</span>' +
-        '<span class="w-16 text-right font-mono ' + color + '">' +
+        '<span class="min-w-0 flex-1 truncate text-yellow-100">' + esc(label) + '</span>' +
+        '<span class="w-8 shrink-0 text-right font-mono">' + fmt(day.boxes) + '</span>' +
+        '<span class="w-10 shrink-0 text-right font-mono text-sky-300">' + fmt(day.seen) + '</span>' +
+        '<span class="w-12 shrink-0 text-right font-mono text-green-300">' + fmt(day.collected) + '</span>' +
+        '<span class="w-11 shrink-0 text-right font-mono ' + color + '">' +
           (rate === null ? '—' : '%' + Math.round(rate * 100)) + '</span>' +
         '</div>';
     }).join('');
     el.innerHTML = header + '<div class="space-y-0.5 mt-1">' + body + '</div>' +
-      '<p class="hint mt-2">Gün, kutunun geldiği yerel tarih; dönüşüm = toplanan / görülen. ' +
+      '<p class="hint mt-2">Gün, kutunun geldiği yerel tarih; günlük dönüşüm = toplanan / görülen. ' +
+      'Maruz kalma dönüşümü (toplanan / panel görünürken gelen) üstteki karttadır. ' +
       '* kısmi gün (bugün ya da kayıt başlangıcı).</p>';
   }
 
@@ -2704,37 +3011,36 @@
     var rows = order.filter(function (kind) { return f.kinds[kind] && f.kinds[kind].boxes > 0; });
     if (!rows.length) { el.innerHTML = ''; return; }
 
-    var best = null;
-    rows.forEach(function (kind) {
-      var k = f.kinds[kind];
-      if (!k.seen) return;
-      var rate = k.missed / k.seen;
-      if (!best || rate > best.rate) best = { kind: kind, rate: rate, seen: k.seen };
-    });
-
     var header = '<div class="flex items-center gap-2 px-1 text-[10px] uppercase tracking-wide text-yellow-50/40">' +
-      '<span class="w-28 shrink-0">tür</span>' +
-      '<span class="w-10 text-right">kutu</span>' +
-      '<span class="w-14 text-right">görüldü</span>' +
-      '<span class="w-10 text-right">kaçtı</span>' +
-      '<span class="w-16 text-right">kaçma</span>' +
+      '<span class="min-w-0 flex-1 truncate">tür</span>' +
+      '<span class="w-8 shrink-0 text-right truncate">kutu</span>' +
+      '<span class="w-10 shrink-0 text-right truncate">görüldü</span>' +
+      '<span class="w-8 shrink-0 text-right truncate">kaçtı</span>' +
+      '<span class="w-10 shrink-0 text-right truncate">kaçma</span>' +
+      '<span class="w-10 shrink-0 text-right truncate">medyan</span>' +
       '</div>';
+    var best = null;
     var body = rows.map(function (kind) {
       var k = f.kinds[kind];
-      var meta = KINDS[kind] || { label: kind, icon: '' };
+      var meta = KINDS[kind];
       var rate = k.seen ? k.missed / k.seen : null;
+      if (rate !== null && (!best || rate > best.rate)) {
+        best = { kind: kind, rate: rate, seen: k.seen };
+      }
       var color = rate === null ? 'text-yellow-50/30' : (rate >= 0.5 ? 'text-red-300' : 'text-yellow-50/70');
       return '<div class="flex items-center gap-2 rounded px-1 py-0.5 text-[11px] hover:bg-white/5">' +
-        '<span class="w-28 shrink-0 truncate text-yellow-100">' + meta.icon + ' ' + esc(meta.label) + '</span>' +
-        '<span class="w-10 text-right font-mono">' + fmt(k.boxes) + '</span>' +
-        '<span class="w-14 text-right font-mono text-sky-300">' + fmt(k.seen) + '</span>' +
-        '<span class="w-10 text-right font-mono text-red-300">' + fmt(k.missed) + '</span>' +
-        '<span class="w-16 text-right font-mono ' + color + '">' +
+        '<span class="min-w-0 flex-1 truncate text-yellow-100">' + meta.icon + ' ' + esc(meta.label) + '</span>' +
+        '<span class="w-8 shrink-0 text-right font-mono">' + fmt(k.boxes) + '</span>' +
+        '<span class="w-10 shrink-0 text-right font-mono text-sky-300">' + fmt(k.seen) + '</span>' +
+        '<span class="w-8 shrink-0 text-right font-mono text-red-300">' + fmt(k.missed) + '</span>' +
+        '<span class="w-10 shrink-0 text-right font-mono ' + color + '">' +
           (rate === null ? '—' : '%' + Math.round(rate * 100)) + '</span>' +
+        '<span class="w-10 shrink-0 text-right font-mono text-yellow-50/70">' +
+          (k.median === null ? '—' : clock(k.median / 1000)) + '</span>' +
         '</div>';
     }).join('');
     var note = best
-      ? 'En çok kaçan tür: ' + (KINDS[best.kind] || {}).label + ' — görülenlerin %' +
+      ? 'En çok kaçan tür: ' + KINDS[best.kind].label + ' — görülenlerin %' +
         Math.round(best.rate * 100) + "'i kaçtı (" + best.seen + ' görülen' +
         (best.seen < 5 ? ', az örnek' : '') + ').'
       : 'Görülen kutu yok; türe göre kaçma oranı henüz hesaplanamaz.';
@@ -2746,14 +3052,17 @@
     var summary = $('funnelSummary');
     if (!summary) return;
     var f = funnelStats();
+    var unseen = f.boxes - f.seen;
     var reaction = $('funnelReaction');
+    renderFunnelExposure(f);
+    // Tür ve gün kartları iki durumda da aynı; bir kez burada çizilir.
+    renderFunnelKinds(f);
+    renderFunnelDays(f);
     if (!f.boxes) {
       summary.innerHTML = '<div class="empty-state col-span-2 lg:col-span-4">' +
         'Hunide sayılacak kutu yok. Görülme kaydı bu sürümle başladı; yeni kutular Fırsatlar listesine düştükçe burası dolar.</div>';
       reaction.textContent = '';
       $('funnelHourly').innerHTML = '<div class="hint">Kaçırma kaydı yok.</div>';
-      renderFunnelKinds(f);
-      renderFunnelDays(f);
       return;
     }
 
@@ -2763,19 +3072,16 @@
 
     var cards = [
       ['Kutu (7 gün)', fmt(f.boxes), 'text-amber-300',
-        f.unseen ? f.unseen + ' tanesi hiç görülmedi' : 'hepsi panelde görüldü'],
-      ['Görüldü', fmt(f.seen), 'text-sky-300', 'kutuların ' + percent(f.seen, f.boxes)],
-      ['Toplandı', fmt(f.collected), 'text-green-300', 'görülenlerin ' + percent(f.collected, f.seen)],
+        'görünürken ' + fmt(f.visibleBoxes) + ' · kapalıyken ' + fmt(f.closedBoxes) +
+        (f.unknownBoxes ? ' · ' + fmt(f.unknownBoxes) + ' bilinmiyor' : '')],
+      ['Görüldü', fmt(f.seen), 'text-sky-300',
+        'kutuların ' + percent(f.seen, f.boxes) + (unseen ? ' · ' + fmt(unseen) + ' hiç görülmedi' : '')],
+      ['Toplandı', fmt(f.collected), 'text-green-300',
+        'görülenlerin ' + percent(f.collected, f.seen) + ' · maruz kalanların ' + percent(f.visibleCollected, f.visibleBoxes)],
       ['Kaçtı', fmt(f.missed), 'text-red-300',
         f.open ? f.open + ' kutu açık bekliyor' : 'açık kutu yok']
     ];
-    summary.innerHTML = cards.map(function (card) {
-      return '<div class="card p-4"><div class="stat-label">' + esc(card[0]) + '</div>' +
-        '<div class="stat-value ' + card[2] + '">' + card[1] + '</div>' +
-        '<div class="text-[10px] text-yellow-50/40 mt-1">' + esc(card[3]) + '</div></div>';
-    }).join('');
-    renderFunnelKinds(f);
-    renderFunnelDays(f);
+    summary.innerHTML = funnelCardsHtml(cards);
 
     var lines = [];
     lines.push(f.median === null
@@ -2783,8 +3089,10 @@
       : 'Medyan tepki süresi: ' + clock(f.median / 1000) + ' (' + f.collected + ' toplanan kutuda).');
     if (f.seen === 0) {
       lines.push('Okuma: kutular listeye ulaşmadan gidiyor → darboğaz gösterim.');
-    } else if (f.unseen / f.boxes >= 0.3) {
-      lines.push("Okuma: kutuların en az %30'u hiç görülmedi → darboğaz gösterim (panel kapalı ya da Fırsatlar açık değil).");
+    } else if (f.unseenVisible > 0 && f.unseenVisible >= f.unseenClosed) {
+      lines.push('Okuma: panel görünürken gelen kutuların bir kısmı hiç görülmedi → Fırsatlar sekmesi kapalı ya da gecikme; panel kapalı değildi.');
+    } else if (f.unseenClosed > 0 && unseen / f.boxes >= 0.3) {
+      lines.push('Okuma: hiç görülmeyenlerin çoğu panel kapalıyken gelmiş → darboğaz maruz kalma; paneli açık tut.');
     } else if (f.conversion <= 0.5) {
       lines.push('Okuma: kutular görülüyor ama yarısı ya da daha azı toplanıyor → darboğaz kullanıcı tepkisi.');
     } else {
@@ -2793,24 +3101,38 @@
     if (f.since > Date.now() - FUNNEL_WINDOW_MS + 3600000) {
       lines.push('Görülme kaydı ' + ago(f.since) + ' başladı.');
     }
+    if (f.visibleMinutes > 0) {
+      lines.push('Panel görünür: ' + visibilityMinutesText(f.visibleMinutes) + ' dk · tüm kutu ' +
+        perMinuteText(f.boxesPerVisibleMinute) + '/dk · görünürken gelen ' +
+        perMinuteText(f.visibleBoxesPerVisibleMinute) + '/dk.');
+    } else {
+      lines.push('Panel görünür süresi henüz kaydedilmedi; kutu/görünür dakika için sekmeyi açık tut.');
+    }
+    lines.push(f.visibleBoxes
+      ? 'Maruz kalma dönüşümü: ' + percent(f.visibleCollected, f.visibleBoxes) +
+        ' (toplanan / görünürken gelen). Görülen dönüşüm: ' + percent(f.collected, f.seen) + '.'
+      : 'Maruz kalma dönüşümü: —; panel görünürken gelen kutu yok.');
+    lines.push('Hiç görülmeyenler: panel kapalıyken ' + fmt(f.unseenClosed) +
+      ' · panel görünürken ' + fmt(f.unseenVisible) + ' · bilinmiyor ' + fmt(f.unseenUnknown) + '.');
     reaction.textContent = lines.join(' ');
 
-    var maxMiss = 1;
-    f.hours.forEach(function (count) { maxMiss = Math.max(maxMiss, count); });
-    var rows = [];
-    f.hours.forEach(function (count, hour) {
-      if (!count) return;
-      var width = Math.max(4, Math.round((count / maxMiss) * 100));
-      rows.push('<div class="flex items-center gap-2 text-[11px]">' +
-        '<span class="w-14 shrink-0 text-yellow-50/50 font-mono">' + (hour < 10 ? '0' : '') + hour + ':00</span>' +
-        '<span class="w-8 shrink-0 text-right font-mono text-red-300">' + count + '</span>' +
-        '<span class="flex-1 h-2 rounded bg-white/5 overflow-hidden"><span class="block h-full rounded bg-red-500/70" style="width:' + width + '%"></span></span>' +
-        '</div>');
-    });
-    $('funnelHourly').innerHTML = rows.length ? rows.join('')
+    var hourRows = f.hours.map(function (count, hour) {
+      return count ? [hour, count] : null;
+    }).filter(Boolean);
+    var maxMiss = hourRows.reduce(function (max, row) {
+      return Math.max(max, row[1]);
+    }, 1);
+    $('funnelHourly').innerHTML = hourRows.length
+      ? hourRows.map(function (row) {
+        var width = Math.max(4, Math.round((row[1] / maxMiss) * 100));
+        return '<div class="flex items-center gap-2 text-[11px]">' +
+          '<span class="w-14 shrink-0 text-yellow-50/50 font-mono">' + (row[0] < 10 ? '0' : '') + row[0] + ':00</span>' +
+          '<span class="w-8 shrink-0 text-right font-mono text-red-300">' + row[1] + '</span>' +
+          '<span class="flex-1 h-2 rounded bg-white/5 overflow-hidden"><span class="block h-full rounded bg-red-500/70" style="width:' + width + '%"></span></span>' +
+          '</div>';
+      }).join('')
       : '<div class="hint">Son 7 günde kaçan kutu yok.</div>';
   }
-
 
   // ---------- Kutu düşme dakikası ----------
   // Tarayıcı her kutuya dinleme oturumunun kaçıncı saniyesinde düştüğünü yazar
@@ -2869,6 +3191,7 @@
   function renderBoxMinutes() {
     var bars = $('boxMinuteBars');
     var verdict = $('boxMinuteVerdict');
+    var daysEl = $('boxMinuteDays');
     if (!bars || !verdict) return;
     // Hangi pencerenin çizildiği kartta yazılı: eski live.json'da pencere
     // bilgisi yoksa “son 7 gün” demeyip bunu açıkça belirt.
@@ -2893,11 +3216,13 @@
         ? '<div class="hint">Pencere bilgisi olmayan eski ölçüm gösterilmiyor; tarayıcı güncellenince son 7 gün yeniden birikecek.</div>'
         : '<div class="hint">Ölçüm bu sürümle başladı; tarayıcı güncellenince son 7 gün birikecek.</div>';
       verdict.textContent = '';
+      if (daysEl) daysEl.innerHTML = '';
       return;
     }
     if (!hasData) {
       bars.innerHTML = '<div class="hint">Ölçüm bu sürümle başladı; tarayıcı ilk oturumları kapattıkça dolar.</div>';
       verdict.textContent = '';
+      if (daysEl) daysEl.innerHTML = '';
       return;
     }
     var counts = MINUTE_LABELS.map(function (label, index) { return Math.max(0, Number(data[index]) || 0); });
@@ -2907,6 +3232,7 @@
     if (!totalBoxes || !totalMin) {
       bars.innerHTML = '<div class="hint">Henüz kutu düşme kaydı yok; oturumlar kapandıkça burası dolar.</div>';
       verdict.textContent = '';
+      if (daysEl) daysEl.innerHTML = '';
       return;
     }
     var rates = counts.map(function (count, index) { return minuteRate(count, minutes[index]); });
@@ -2924,6 +3250,28 @@
         '</div>';
     }).join('');
 
+    if (daysEl) {
+      var daily = scanInfo && Array.isArray(scanInfo.boxMinuteDaily) ? scanInfo.boxMinuteDaily : [];
+      if (daily.length) {
+        var maxBoxes = daily.reduce(function (max, day) { return Math.max(max, Number(day && day.boxes) || 0); }, 0);
+        if (maxBoxes < 1) maxBoxes = 1;
+        daysEl.innerHTML = '<div class="text-[10px] text-yellow-50/50 mb-1">Günlük mini seri (UTC ' +
+          esc(windowInfo.from) + ' – ' + esc(windowInfo.to) + '):</div>' +
+          daily.map(function (day) {
+            var boxes = Math.max(0, Number(day && day.boxes) || 0);
+            var mins = Math.max(0, Number(day && day.watchMin) || 0);
+            var width = boxes ? Math.max(2, Math.round((boxes / maxBoxes) * 100)) : 0;
+            return '<div class="flex items-center gap-2 text-[10px]">' +
+              '<span class="w-12 shrink-0 font-mono text-yellow-50/50">' + esc(String(day && day.date ? day.date : '').slice(5)) + '</span>' +
+              '<span class="w-12 shrink-0 text-right font-mono text-amber-300">' + boxes + ' kutu</span>' +
+              '<span class="flex-1 h-1.5 rounded bg-white/5 overflow-hidden"><span class="block h-full rounded bg-amber-500/60" style="width:' + width + '%"></span></span>' +
+              '<span class="w-14 shrink-0 text-right text-yellow-50/40">' + (mins ? fmt(Math.round(mins)) + ' dk' : '—') + '</span>' +
+              '</div>';
+          }).join('');
+      } else {
+        daysEl.innerHTML = '';
+      }
+    }
     var lines = ['Örnek: ' + minuteSample(totalBoxes, totalMin) + ' · ' + windowText + '.'];
     lines.push(minuteDecision(counts, minutes));
     lines.push('5+ karara girmez: yalnızca uzatılmış/sıcak oturumlardan dolar.');
@@ -3473,17 +3821,35 @@
 
   // live.json'daki boxHourly: {epochSaat: kutu sayısı}. Sayaç zaten son 48
   // saati tutar; eski damgaları ayrıca elemez.
+  // Oda dinlenen saatler varsa kutu eşiği yalnız bu saatlerden hesaplanır:
+  // dinlenmeyen saatler boşluk sayılmaz. Eski tarayıcıda watchHourly yoksa
+  // kutu serisi olduğu gibi kullanılır (geriye dönük uyum).
   function boxHourPoints() {
-    var hourly = scanInfo && scanInfo.boxHourly;
+    var watchHourly = scanInfo && scanInfo.watchHourly;
+    var boxHourly = scanInfo && scanInfo.boxHourly;
+    if (watchHourly && typeof watchHourly === 'object' && Object.keys(watchHourly).length) {
+      var points = [];
+      Object.keys(watchHourly).forEach(function (key) {
+        var hour = Number(key);
+        if (!isFinite(hour) || hour <= 0) return;
+        var count = boxHourly && typeof boxHourly === 'object'
+          ? (Number(boxHourly[key]) || 0)
+          : 0;
+        points.push({ hour: hour, count: count });
+      });
+      points.sort(function (a, b) { return a.hour - b.hour; });
+      return points;
+    }
+    var hourly = boxHourly;
     if (!hourly || typeof hourly !== 'object') return [];
-    var points = [];
+    var fallback = [];
     Object.keys(hourly).forEach(function (key) {
       var hour = Number(key);
       var count = Number(hourly[key]) || 0;
       if (!isFinite(hour) || hour <= 0 || count <= 0) return;
-      points.push({ hour: hour, count: count });
+      fallback.push({ hour: hour, count: count });
     });
-    return points;
+    return fallback;
   }
 
   // metrics.json'daki saatlik kutu serisi: [{hour: 'YYYY-MM-DDTHH', count}].
@@ -3500,41 +3866,51 @@
     return points;
   }
 
-  // Dolu saatler arasındaki tam saatlik boşluklar. Baştaki/sondaki boşluk
-  // ölçülemez (seri orada kesiliyor), bu yüzden sayılmaz.
-  function hourGapStats(points) {
+  // Eşik = gözlenen sessizliklerin %95'i + 2 saat. +2, saatlik kovanın içindeki
+  // geliş anını bilmemekten gelen pay: normal bir boşluk saat sınırına denk
+  // geldiğinde alarm çalmasın. En az 2 saat, en çok capHours.
+  // Veri yoksa veya seri çok kısaysa null: eşik uydurulmaz, alarm üretilmez.
+  // points bir izleme saati serisidir (count 0 olabilir). Boşluklar duvar saati
+  // değil, izleme saatleri üzerinden sayılır; dinlenmeyen saatler boşluk değildir.
+  function silenceLimit(points, capHours, watched) {
+    if (watched) {
+      var series = (points || []).slice().sort(function (a, b) {
+        return Number(a && a.hour) - Number(b && b.hour);
+      });
+      if (series.length < 8) return null;
+      var present = [];
+      series.forEach(function (point, index) {
+        if ((Number(point && point.count) || 0) > 0) present.push(index);
+      });
+      if (present.length < 3) return null;
+      var gaps = [];
+      for (var i = 1; i < present.length; i += 1) {
+        var gap = present[i] - present[i - 1] - 1;
+        if (gap > 0) gaps.push(gap);
+      }
+      gaps.sort(function (a, b) { return a - b; });
+      var p95 = gaps.length ? gaps[Math.max(0, Math.ceil(gaps.length * 0.95) - 1)] : 0;
+      return Math.min(capHours, Math.max(2, p95 + 2)) * HOUR_MS;
+    }
     var byHour = {};
     (points || []).forEach(function (point) {
       var hour = Number(point && point.hour);
       var count = Number(point && point.count) || 0;
       if (!isFinite(hour) || hour <= 0 || count <= 0) return;
-      // Aynı saat iki kaynaktan gelirse sayı toplanmaz; boşluk için varlık yeter.
       byHour[hour] = Math.max(byHour[hour] || 0, count);
     });
     var hours = Object.keys(byHour).map(Number).sort(function (a, b) { return a - b; });
-    if (hours.length < 3) return { span: 0, count: hours.length, gaps: [] };
-    var gaps = [];
-    for (var i = 1; i < hours.length; i += 1) {
-      var gap = hours[i] - hours[i - 1] - 1;
-      if (gap > 0) gaps.push(gap);
+    if (hours.length < 3) return null;
+    var span = hours[hours.length - 1] - hours[0] + 1;
+    if (span < 8) return null;
+    var wallGaps = [];
+    for (var j = 1; j < hours.length; j += 1) {
+      var gap = hours[j] - hours[j - 1] - 1;
+      if (gap > 0) wallGaps.push(gap);
     }
-    return {
-      span: hours[hours.length - 1] - hours[0] + 1,
-      count: hours.length,
-      gaps: gaps
-    };
-  }
-
-  // Eşik = gözlenen sessizliklerin %95'i + 2 saat. +2, saatlik kovanın içindeki
-  // geliş anını bilmemekten gelen pay: normal bir boşluk saat sınırına denk
-  // geldiğinde alarm çalmasın. En az 2 saat, en çok capHours.
-  // Yeterli geçmiş yoksa null: eşik uydurulmaz, o kaynak için alarm üretilmez.
-  function silenceLimit(points, capHours) {
-    var stats = hourGapStats(points);
-    if (stats.span < 8 || stats.count < 3) return null;
-    var gaps = stats.gaps.slice().sort(function (a, b) { return a - b; });
-    var p95 = gaps.length ? gaps[Math.max(0, Math.ceil(gaps.length * 0.95) - 1)] : 0;
-    return Math.min(capHours, Math.max(2, p95 + 2)) * HOUR_MS;
+    wallGaps.sort(function (a, b) { return a - b; });
+    var wallP95 = wallGaps.length ? wallGaps[Math.max(0, Math.ceil(wallGaps.length * 0.95) - 1)] : 0;
+    return Math.min(capHours, Math.max(2, wallP95 + 2)) * HOUR_MS;
   }
 
   // Kutu eşiği tarayıcının boxHourly serisinden. Ölçüm eşiği metrics.json'ın
@@ -3544,8 +3920,8 @@
     return {
       scan: 30 * 60000,
       connect: 30 * 60000,
-      box: silenceLimit(boxPoints, 12),
-      metrics: silenceLimit(metricsHourPoints(), 8) || silenceLimit(boxPoints, 8)
+      box: silenceLimit(boxPoints, 12, true),
+      metrics: silenceLimit(metricsHourPoints(), 8, false) || silenceLimit(boxPoints, 8, true)
     };
   }
 
@@ -3571,9 +3947,19 @@
     var scanFresh = ages.scan !== null && !scanStale;
     var connectStale = scanFresh && live > 0 && watchingKnown && watching === 0 &&
       ages.connect !== null && ages.connect > limits.connect;
+    // Kutu yaşı izleme saatleri üzerinden sayılır: dinlenmeyen saatler yaşa eklenmez.
+    var boxPoints = boxHourPoints();
+    var boxWatchedAge = null;
+    if (boxPoints.length) {
+      var lastBoxIndex = -1;
+      for (var bi = boxPoints.length - 1; bi >= 0; bi -= 1) {
+        if ((Number(boxPoints[bi].count) || 0) > 0) { lastBoxIndex = bi; break; }
+      }
+      boxWatchedAge = lastBoxIndex === -1 ? boxPoints.length : (boxPoints.length - 1 - lastBoxIndex);
+    }
     var boxStale = scanFresh && watchingKnown && watching > 0 && limits.box !== null &&
-      ages.box !== null && ages.box > limits.box;
-    var metricsStale = limits.metrics !== null &&
+      boxWatchedAge !== null && boxWatchedAge * HOUR_MS > limits.box;
+    var metricsStale = scanFresh && limits.metrics !== null &&
       ages.metrics !== null && ages.metrics > limits.metrics;
     var flags = { scan: scanStale, connect: connectStale, box: boxStale, metrics: metricsStale };
     var stale = [];
@@ -3591,10 +3977,17 @@
       : flags.box ? 'kutu akışı durmuş olabilir'
       : 'ölçüm güncellenmiyor';
     el.classList.toggle('health-stale', stale.length > 0);
+    var thresholdText = HEALTH_LIMITS.map(function (source) {
+      var limit = limits[source.key];
+      var suffix = source.key === 'box' || source.key === 'metrics'
+        ? (limit === null ? ' (veri yok)' : ' (veriden)') : '';
+      return source.label + ' ' + (limit === null ? '—' : shortAge(limit)) + suffix;
+    }).join(' · ');
     el.innerHTML = (stale.length
       ? '<span class="chip chip-danger">⚠ ' + warnText + '</span>'
       : '<span>🩺 sistem</span>') +
       ' · ' + parts.join(' · ') +
+      ' <details class="inline-block ml-1"><summary class="cursor-pointer select-none text-[10px] text-yellow-50/60">eşikler</summary><span class="text-[10px] text-yellow-50/60">' + esc(thresholdText) + '</span></details>' +
       (scanPaused ? ' <span>· tarama duraklatıldı</span>' : '');
     el.title = 'Eşikler: ' + HEALTH_LIMITS.map(function (source) {
       var limit = limits[source.key];
@@ -3845,6 +4238,9 @@
 
     migrateEvents();
     ensureFunnelSince();
+    // Kutu geldiğinde panelin görünür olup olmadığını kaydedebilmek için
+    // görünürlük takibi ilk taramadan önce başlar.
+    startVisibilityTracking();
 
     // Görünüm tercihleri Store'dan (yedeğe dahil) gelir; eski sürümlerde
     // yalnızca localStorage'da tutuluyordu, o değerler bir kez Store'a taşınır.

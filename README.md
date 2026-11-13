@@ -202,8 +202,11 @@ Fark, tahminle değil gerçek kayıtlarla ayrılır:
 
 - **ntfy hatası:** tarayıcının ntfy yayını başarısız (fetch hatası veya 2xx dışı yanıt) ve kutu panelde
   yok. Başarısız sıraların son 400'ü `live.json` içinde taşınır; sayaçlar tamdır.
-- **SSE / panel:** ntfy yayını başarısız değil ama kutu bu panelde yok. Bu, SSE kopması, panelin kapalı
-  olması ya da dosya okumasının kaçması olabilir; kart bunu tek tek ayırmadığını söyler.
+- **Panel kapalı:** kutu panel görünmezken (bu cihazın görünürlük kaydına göre) üretilmiş ve panelde
+  yok. Tarayıcının `boxTimes` listesi kullanılır; görünürlük kaydı başlamadan önceki kutular buraya
+  yazılmaz.
+- **SSE / diğer:** ntfy yayını başarısız değil ama kutu bu panelde yok. Bu, SSE kopması ya da dosya
+  okumasının kaçması olabilir; kart bunu tek tek ayırmadığını söyler.
 - **boxes.json 120:** kutu, dosyanın o anki son 120 kutu penceresinin dışında (sırası dosyadaki en eski
   sıradan küçük) ve panelde yok. Dosya tavanı 120'dir; daha eski kutular dosyadan okunamaz.
 - **Dedupe:** aynı kutu hem ntfy hem dosya yolundan geldiyse yalnız bir tekil kayıt tutulur. Bu sayı
@@ -216,7 +219,7 @@ alanları taşımıyorsa kart “bu sürümde ölçüm yok” der; eksik veriden
 
 ### Kutu hunisi (cihazda)
 
-Ölçüm sekmesinin başında, yalnızca **bu cihazda** son 7 günün kutu hunisi var:
+Ölçüm sekmesinin başında, yalnızca **bu cihazda** son 7 günlük kayan pencerenin kutu hunisi var:
 **kutu → görüldü → toplandı / kaçtı**. Yalnızca tarayıcıdan gelen sandık/portal/zarf sayılır; elle
 eklenen kayıtlar ve yayıncıya atılan sıradan hediyeler huniye girmez.
 
@@ -229,15 +232,31 @@ eklenen kayıtlar ve yayıncıya atılan sıradan hediyeler huniye girmez.
   ayrıca yazar.
 
 Kartlar kutu/görüldü/toplandı/kaçtı sayılarını, toplanma oranını (toplanan / görülen; Toplandı kartının
-altında) ve medyan tepki süresini (toplanma − görülme; alt satırda) verir. Hemen altında **türe göre**
-satırlar (sandık / portal / zarf) aynı tanımlarla kutu, görüldü, kaçtı ve **kaçma oranını**
-(kaçan / görülen) gösterir; en yüksek oranlı tür ayrıca yazılır ve 5’ten az görülen varsa “az örnek”
-uyarısı düşülür. Ardından **gün gün** son 7 takvim günü gelir: her gün için kutu, görüldü, toplanan ve
-dönüşüm (toplanan / görülen). O gün hiç görülen yoksa dönüşüm “—” kalır; %50 altı dönüşüm kırmızı
-gösterilir, böylece kötü geçen gün tek bakışta ayrılır. Bugün ve kayıt ortasında başlayan ilk gün
-`*` ile “kısmi” işaretlenir (gün henüz dolmadığı için sayılar düşük görünebilir). Alttaki çubuklar kaçan kutuların geldiği saati gösterir. Veri cihazda (IndexedDB/localStorage) tutulur ve hesap panelde yapılır,
+altında) ve medyan tepki süresini (toplanma − görülme; alt satırda) verir. Sayıların altında **panel
+görünürlüğü / maruz kalma** kartı vardır: görünür sekmede geçen dakika, tüm kutu / görünür dakika,
+panel görünürken gelen kutu ve bunun dakikaya oranı. Bu karttaki oranların paydası yalnızca **panel
+görünürken gelen** kutulardır; kapalıyken gelenler maruz kalma dönüşümüne girmez, ayrı sayılır.
+“Hiç görülmedi” üçe ayrılır: panel kapalıyken gelen, panel görünürken gelip görülmeyen ve görünürlük
+kaydı başlamadan önce geldiği için bilinmeyen. Böylece “kutu hiç gösterilmedi” ile “panel kapalıydı”
+aynı sayıya gizlenmez. Görünürlük kaydı bu sürümle başlar; eski kutularda değer `null`/bilinmiyor kalır.
+Hemen altında **türe göre**
+satırlar (sandık / portal / zarf) aynı tanımlarla kutu, görüldü, kaçtı, **kaçma oranını**
+(kaçan / görülen) ve tür başına **medyan tepki süresini** (toplanma − görülme) gösterir; böylece
+kısa pencere yüzünden kaçan tür ayrıca görünür. En yüksek oranlı tür ayrıca yazılır ve 5’ten az
+görülen varsa “az örnek” uyarısı düşülür. Ardından **günlük kırılım**, üstteki toplamla aynı 7 günlük pencereyi kapsar: pencere bir
+günün ortasında başlayabildiği için en eski gün de `*` ile “kısmi” işaretlenir. Böylece gün
+satırlarının kutu/görüldü/toplanan sayıları toplamla toplanabilir. Her gün için kutu, görüldü,
+toplanan ve dönüşüm (toplanan / görülen) yazar. O gün hiç görülen yoksa dönüşüm “—” kalır; %50 altı
+dönüşüm kırmızı gösterilir, böylece kötü geçen gün tek bakışta ayrılır. Bugün ve pencere ortasında
+başlayan ilk gün `*` ile “kısmi” işaretlenir (gün henüz dolmadığı için sayılar düşük görünebilir). Alttaki çubuklar kaçan kutuların geldiği saati gösterir. Veri cihazda (IndexedDB/localStorage) tutulur ve hesap panelde yapılır,
 çünkü kullanıcı işaretlemeleri tarayıcı geçmişinde yoktur. “Görüldü” alanı bu sürümle eklendi: ondan
 önceki kutular hunide sayılmaz, 7 gün içinde kendiliğinden arınır.
+
+Görünürlük aralıkları cihazda `settings.visibility` altında tutulur; sekme görünürken 1 saniyelik
+örneklerle birleştirilir, 7 günden eskisi budanır ve sayfa kapanırken bekleyen yazma hemen diske
+geçirilir. Kutu geldiği anda bu aralıkların içindeyse `arrivedVisible=true`, dışındaysa `false`,
+kayıt başlamadan önceyse `null` olur. Maruz kalma dönüşümü = panel görünürken gelenlerden toplanan /
+panel görünürken gelen; günlük tablodaki dönüşüm ise hâlâ toplanan / görülen'dir.
 
 ### Sistem sağlığı satırı
 
@@ -251,8 +270,8 @@ Panelin üstünde, her sekmede dört yaş görünür:
 | **ölçüm** | `metrics.json` → `generatedAt` | `metrics.json` saatlik serisinden |
 
 Veri ve bağlantı eşikleri çalışma düzeninden (sırasıyla 30 dk). Kutu ve ölçüm eşikleri sabit
-değil, üretim serisinden ölçülür: `boxHourly` (son 48 saat) kutu için, `metrics.json` içindeki
-`hourly.buckets` saatlik kutu serisi ölçüm için kullanılır. Panel dolu saatler arasındaki
+değil, üretim serisinden ölçülür: kutu için yalnız `watchHourly` (oda dinlenen saatler) içindeki
+`boxHourly` sayıları, ölçüm için `metrics.json` içindeki `hourly.buckets` saatlik kutu serisi kullanılır. Panel dolu saatler arasındaki
 boşlukları çıkarır, gözlenen boşlukların %95'ine **2 saat pay** ekler (saatlik kovanın içindeki
 geliş anı bilinmediği için normal bir sessizlik saat sınırına denk geldiğinde alarm çalmasın).
 Sonuç en az 2 saat; kutu için en çok 12, ölçüm için en çok 8 saat. Ölçümün saatlik serisi yoksa
