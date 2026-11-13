@@ -135,7 +135,11 @@ node index.js --once             # tek tur (deneme)
 ### Ayar karşılaştırması (kota birimi başına kutu)
 
 `node scripts/quota-report.mjs` geçmiş `live.json` commit'lerini koşu bazında okur ve
-"yakalanan kutu / 100 bağlantı denemesi" oranını ayar grubuna göre yazar.
+"yakalanan kutu / 100 bağlantı denemesi" oranını ayar grubuna göre yazar. Ayrıca her koşu için
+**kutu/saat** (koşunun ilk ve son anlık görüntüsü arasındaki süreye bölünerek) ve **kutu/5 dk oturum**
+(başarılı bağlantı başına kutu; `--watch-sec=300` ile bir oturum = 5 dakika) sütunlarını basar;
+`boxes.json` commit'lerinden de **saatlik kutu dağılımı** (son 24 saat, kutu kimliğine göre tekilleştirilmiş)
+çıkarır. Not: `boxes.json` yalnızca son 120 kutuyu tuttuğu için eski saatlerde sayı eksik olabilir.
 
 13 Kasım 2026 ölçümü (8 koşu):
 
