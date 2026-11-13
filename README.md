@@ -88,10 +88,11 @@ paneldeki `BOX_KEY` ile eşleşmezse mesaj yok sayılır (rastgele biri sahte sa
 Anahtar `--ntfy-key` / `NTFY_KEY` ile değiştirilir; değiştirirsen paneldeki `BOX_KEY` değerini de
 aynı yap. Not: panel JS herkese açık olduğu için bu bir "kapı kilidi", kriptografik imza değil.
 
-**Yedek yol:** Panel kutuları iki yoldan alır. `data/boxes.json` son 120 kutuyu tutar ve 45 saniyede bir
-commit edilir; panel onu **15 saniyede bir** okur, yeni kutu gelince bildirim gösterir. `live.json`
-5 dakikada bir commit edilir (yayıncı listesi, süreler, teşhis). Sandık penceresi kısa olduğu için
-asıl yakalama bu hızlı dosyadan gelir.
+**Yedek yol:** Panel kutuları iki yoldan alır. Asıl yol ntfy'dir (saniyeler içinde). `data/boxes.json`
+son 120 kutuyu tutar ve panel onu **15 saniyede bir** okur. Bu dosya artık ayrı ve sık commit
+edilmez: yalnızca **gerçekten yeni kutu geldiğinde** sıradaki veri commit'ine eklenir (Actions'ta
+5 dakika), yeni kutu yoksa hiç commit çıkmaz — depo saatte ~80 boş commit yerine ~12 commit alır.
+Aynı commit `live.json`'u da (yayıncı listesi, süreler, teşhis) taşır.
 
 Teşhis: `live.json → scanner.connectStats` (deneme/başarılı/hata/hız sınırı) ve `closeReasons`
 (`süre doldu`, `bağlantı düştü`, `yayın bitti`, `bağlanamadı`).
@@ -116,8 +117,7 @@ node index.js --once             # tek tur (deneme)
 | `--max-rooms` | 15 | Aynı anda dinlenecek oda sayısı |
 | `--concurrency` | 4 | Aynı anda sorgulanacak adres sayısı |
 | `--min-coins` | 1 | Bu jeton değerinin altındaki olaylar yazılmaz |
-| `--commit` | 0 | Veri commit aralığı, saniye (`0` = commit yok; Actions 300 kullanır) |
-| `--commit-boxes` | 45 | Kutuların (`data/boxes.json`) commit aralığı: panel sandığı saniyeler içinde görsün |
+| `--commit` | 0 | Veri ve kutu commit aralığı, saniye (`0` = commit yok; Actions 300 kullanır). Kutular yalnızca yeni kutu varsa bu commit'e eklenir |
 | `--ntfy` | 1 | Kutuları anlık yayınla (panel SSE ile dinler) |
 | `--ntfy-topic` | `cehennem-tiktok-firsat-7f3a91` | Yayın konusu; paneldeki `BOX_TOPIC` ile aynı olmalı |
 | `--ntfy-key` | `NTFY_KEY` ya da gömülü değer | Yayın doğrulama anahtarı; paneldeki `BOX_KEY` ile aynı olmalı |

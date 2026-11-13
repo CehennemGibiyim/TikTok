@@ -55,7 +55,6 @@ const CONFIG = {
   minCoins: Number(readArg('min-coins', 1)),
   commitSec: Number(readArg('commit', 0)),
   // Kutular ayrı ve sık commit edilir: yakalama penceresi kısa, panel hızlı görsün.
-  commitBoxesSec: Number(readArg('commit-boxes', 45)),
   // Anlık kutu yayını: commit/CDN beklemeden panel saniyeler içinde görsün.
   // Panel aynı konuya abone olur (site/firsat/app.js → BOX_TOPIC).
   ntfy: readArg('ntfy', 1) ? true : false,
@@ -168,9 +167,9 @@ const state = {
   boxHourly: {},
   lastFlush: 0,
   lastCommit: 0,
-  // Hızlı kutu dosyası: kirli mi, en son ne zaman commit edildi.
+  // Kutu dosyası: commit bekleyen yeni kutu var mı, son yazılan listenin imzası.
   boxesDirty: false,
-  lastBoxCommit: 0,
+  boxesSig: '',
   lastDiscover: 0,
   // Keşif uçlarını sırayla kullan (her çağrı ayrı 10 kanal).
   discoverVariant: 0,
@@ -744,10 +743,16 @@ function writeBoxes() {
     runId: startedAtMs,
     boxes
   };
+  // scannedAt her yazımda değişiyor; commit'i ona değil kutu listesine bağlıyoruz,
+  // yoksa dosya hiç değişmese de "kirli" görünüp boş commit attırıyordu.
+  const sig = boxes.map((box) => box.id + ':' + Number(box.coins || 0)).join('|');
   try {
     fs.mkdirSync(DATA_DIR, { recursive: true });
     fs.writeFileSync(BOX_FILE, JSON.stringify(body, null, 1) + '\n');
-    state.boxesDirty = true;
+    if (sig !== state.boxesSig) {
+      state.boxesSig = sig;
+      if (boxes.length) state.boxesDirty = true;
+    }
   } catch (error) {
     log('kutu dosyası yazılamadı:', error.message);
   }
@@ -1911,41 +1916,9 @@ function syncWithRemote() {
   }
 }
 
-// Kutular ayrı ve sık commit edilir: sandık penceresi kısa olduğu için panelin
-// 5 dakikalık veri commit'ini beklemesi "hiç sandık yakalayamıyorum" demekti.
-function commitBoxes() {
-  if (!CONFIG.commitSec || !CONFIG.commitBoxesSec) return;
-  if (!state.boxesDirty) return;
-  const now = Date.now();
-  if (now - state.lastBoxCommit < CONFIG.commitBoxesSec * 1000) return;
-  state.lastBoxCommit = now;
-  try {
-    // Her 45 saniyede pull yapmak gereksiz ağ trafiği: yalnızca push reddedilirse
-    // eşitlenir (aşağıdaki catch).
-    git(['add', 'site/firsat/data/boxes.json']);
-    if (!git(['status', '--porcelain', 'site/firsat/data/boxes.json']).trim()) {
-      state.boxesDirty = false;
-      return;
-    }
-    const last = state.events[0];
-    const label = last
-      ? (last.kind === 'letter' ? 'Zarf' : (last.kind === 'portal' ? 'Portal' : 'Sandık')) +
-        ': @' + last.username + ' · ' + (Number(last.coins) || 0) + ' jeton'
-      : 'Kutular';
-    git(['commit', '-m', 'Kutu güncellemesi — ' + label]);
-    try {
-      git(['push', '--quiet']);
-    } catch (pushError) {
-      syncWithRemote();
-      git(['push', '--quiet']);
-    }
-    state.boxesDirty = false;
-    log('kutular commit edildi');
-  } catch (error) {
-    log('kutu commit atlandı:', (error.stdout || error.message || '').toString().slice(0, 160));
-  }
-}
-
+// Anlık bildirim ntfy üzerinden gidiyor; boxes.json sadece yedek yol. Bu yüzden
+// kutular ayrı ve sık commit edilmez: yeni kutu varsa sıradaki veri commit'ine
+// eklenir (varsayılan 5 dakika), yoksa dosya hiç commit edilmez.
 function commitData() {
   if (!CONFIG.commitSec) return;
   const now = Date.now();
@@ -1955,18 +1928,22 @@ function commitData() {
     syncWithRemote();
     // targets.json de commit edilir: kutu geçmişi ve son izleme zamanı
     // koşu bitince kaybolmasın, sonraki koşu aynı odaları öncelikli dinlesin.
-    git(['add', 'site/firsat/data/live.json', 'site/firsat/data/targets.json']);
-    if (!git(['status', '--porcelain', 'site/firsat/data/live.json', 'site/firsat/data/targets.json']).trim()) return;
+    const files = ['site/firsat/data/live.json', 'site/firsat/data/targets.json'];
+    if (state.boxesDirty) files.push('site/firsat/data/boxes.json');
+    git(['add'].concat(files));
+    if (!git(['status', '--porcelain'].concat(files)).trim()) return;
     const summary = snapshot().scanner;
     git(['commit', '-m',
       'Canlı tarama: ' + summary.liveCount + '/' + summary.targetCount +
-      ' yayında · ' + summary.watching + ' oda dinleniyor']);
+      ' yayında · ' + summary.watching + ' oda dinleniyor' +
+      (state.boxesDirty ? ' · yeni kutular' : '')]);
     try {
       git(['push', '--quiet']);
     } catch (pushError) {
       syncWithRemote();
       git(['push', '--quiet']);
     }
+    state.boxesDirty = false;
     log('veri commit edildi');
   } catch (error) {
     log('commit atlandı:', (error.stdout || error.message || '').toString().slice(0, 160));
@@ -2004,7 +1981,9 @@ async function main() {
         state.lastError = error.message;
         log('dinleme turu hatası:', error.message);
       }
-      commitBoxes();
+      // Veri commit'i burada da denenir: commit zamanı dolduğu an 3 saniyelik
+      // turda yakalanır (240 saniyelik tarama turunu beklemez).
+      commitData();
       await sleep(3000);
     }
   })() : null;
@@ -2019,7 +1998,6 @@ async function main() {
     }
     flush(true);
     commitData();
-    commitBoxes();
     if (CONFIG.once) break;
     await sleep(CONFIG.pollSec * 1000);
   } while (Date.now() < deadline);
