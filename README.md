@@ -186,6 +186,34 @@ node scripts/quota-report.mjs --json                                 # stdout'a 
 node scripts/quota-report.mjs                                        # metin raporu (aynı sayılar)
 ```
 
+### Kutu teslimi (panel)
+
+Ölçüm sekmesindeki **Kutu teslimi** kartı, son tarayıcı koşusunda **üretilen tekil kutu** ile
+**bu panele ulaşan tekil kutu**yu aynı kümede karşılaştırır. Tarayıcı her gerçek kutuya koşu içinde
+artan bir `seq` verir; panel bu sıraları kendi yerel olaylarında görür. Koşu başladığında panel
+zaten açıksa taban 0'dır; bütün koşu ölçülür. Panel koşudan sonra açıldıysa ilk okumadaki son sıra
+tabandır: panel kapalıyken üretilmiş eski kutular teslim oranını yanlışlıkla düşürmez. Sayfa
+açıldıktan sonra gelen ilk kutu, ilk tarama okumasından önce görülse bile tabanın bir altına çekilerek
+sayılır. Oranın paydası bu tabandan sonraki `seq` aralığıdır; payı aynı aralıkta bu cihazda görülen
+tekil sıralardır. Bu yüzden kart **son koşu + bu cihaz** kapsamındadır; başka bir tarayıcıda açılan
+panel kendi teslimini gösterir.
+
+Fark, tahminle değil gerçek kayıtlarla ayrılır:
+
+- **ntfy hatası:** tarayıcının ntfy yayını başarısız (fetch hatası veya 2xx dışı yanıt) ve kutu panelde
+  yok. Başarısız sıraların son 400'ü `live.json` içinde taşınır; sayaçlar tamdır.
+- **SSE / panel:** ntfy yayını başarısız değil ama kutu bu panelde yok. Bu, SSE kopması, panelin kapalı
+  olması ya da dosya okumasının kaçması olabilir; kart bunu tek tek ayırmadığını söyler.
+- **boxes.json 120:** kutu, dosyanın o anki son 120 kutu penceresinin dışında (sırası dosyadaki en eski
+  sıradan küçük) ve panelde yok. Dosya tavanı 120'dir; daha eski kutular dosyadan okunamaz.
+- **Dedupe:** aynı kutu hem ntfy hem dosya yolundan geldiyse yalnız bir tekil kayıt tutulur. Bu sayı
+  kayıp değildir ve teslim oranının paydasından düşülmez. Tarayıcının kendi tekilleştirdiği tekrarlar
+  da ayrıca yazılır.
+
+Kart ayrıca SSE'nin açılma, kopma ve **yeniden bağlanma** sayılarını (bu cihazda birikimli), son
+kopma zamanını ve ntfy başarı/başarısızlık sayılarını gösterir. `boxes.json` veya `live.json` bu
+alanları taşımıyorsa kart “bu sürümde ölçüm yok” der; eksik veriden sayı üretmez.
+
 ### Kutu hunisi (cihazda)
 
 Ölçüm sekmesinin başında, yalnızca **bu cihazda** son 7 günün kutu hunisi var:

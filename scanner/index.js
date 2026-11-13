@@ -122,6 +122,8 @@ const CONFIG = {
 
 const startedAtMs = Date.now();
 const deadline = CONFIG.minutes > 0 ? startedAtMs + CONFIG.minutes * 60000 : Infinity;
+// Panelin okuduğu hızlı kutu dosyasının gerçek tavanı.
+const BOX_FILE_CAP = 120;
 
 // ---------- durum ----------
 
@@ -132,6 +134,19 @@ const state = {
   rooms: new Map(),
   /** @type {Array<object>} son jeton olayları */
   events: [],
+  // Her gerçek kutuya koşu içinde artan bir sıra numarası verilir. Panel
+  // "üretilen" ile "panele ulaşan"ı aynı kimlik kümesinde karşılaştırır.
+  boxSeq: 0,
+  // Teslim teşhisi: ntfy yayın sonucu ve boxes.json penceresi. Bunlar
+  // yalnızca gerçek denemelerden/gerçek dosya yazımından gelir.
+  delivery: {
+    ntfyAttempts: 0,
+    ntfyOk: 0,
+    ntfyFail: 0,
+    ntfyFailSeqs: [],
+    fileFromSeq: 0,
+    fileSeqCount: 0
+  },
   seenEvents: new Set(),
   targets: [],
   recent: [],
@@ -755,8 +770,14 @@ function recordEvent(username, data) {
   state.seenEvents.add(id);
   if (state.seenEvents.size > 5000) state.seenEvents.clear();
 
+  // Sıra yalnızca gerçekten yazılan tekil kutuya verilir; panel bununla
+  // tarayıcının ürettiği kutu sayısını kendi gördüğü kimliklerle karşılaştırır.
+  const seq = state.boxSeq + 1;
+  state.boxSeq = seq;
   const event = {
     id,
+    seq,
+    runId: startedAtMs,
     t: Date.now(),
     username,
     kind: data.kind,
@@ -806,6 +827,8 @@ function publishBox(event) {
   const payload = {
     key: CONFIG.ntfyKey,
     id: event.id,
+    seq: event.seq || 0,
+    runId: event.runId || startedAtMs,
     t: event.t,
     username: event.username,
     kind: event.kind,
@@ -820,18 +843,53 @@ function publishBox(event) {
     hasWindow: Boolean(event.hasWindow),
     sessionSec: event.sessionSec === undefined ? null : event.sessionSec
   };
+  state.delivery.ntfyAttempts += 1;
+  function finishNtfy(ok) {
+    if (ok) {
+      state.delivery.ntfyOk += 1;
+      return;
+    }
+    state.delivery.ntfyFail += 1;
+    const seq = Number(event.seq) || 0;
+    if (seq > 0) {
+      state.delivery.ntfyFailSeqs.push(seq);
+      // Yalnızca son 400 hata sırası tutulur; daha eskisi panelde "dosya
+      // penceresi" olarak sınıflandırılır. Sayaçların kendisi tamdır.
+      if (state.delivery.ntfyFailSeqs.length > 400) state.delivery.ntfyFailSeqs.shift();
+    }
+  }
   fetch('https://ntfy.sh/' + encodeURIComponent(CONFIG.ntfyTopic), {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(payload),
     signal: AbortSignal.timeout(4000)
-  }).catch(() => { /* yayın başarısız: dosya yolu yine var */ });
+  }).then((response) => finishNtfy(Boolean(response && response.ok)), () => finishNtfy(false));
+}
+
+// Panelin teslim kartı için gerçek sayaçlar. produced = bu koşuda yazılan
+// tekil kutu sayısı; lastSeq aynı kümenin son sırasıdır.
+function deliverySnapshot() {
+  return {
+    runId: startedAtMs,
+    produced: Number(state.boxSeq) || 0,
+    lastSeq: Number(state.boxSeq) || 0,
+    duplicate: Number(state.envelopeStats.duplicate) || 0,
+    ntfyAttempts: Number(state.delivery.ntfyAttempts) || 0,
+    ntfyOk: Number(state.delivery.ntfyOk) || 0,
+    ntfyFail: Number(state.delivery.ntfyFail) || 0,
+    ntfyFailSeqs: state.delivery.ntfyFailSeqs.slice(-400),
+    fileFromSeq: Number(state.delivery.fileFromSeq) || 0,
+    fileSeqCount: Number(state.delivery.fileSeqCount) || 0,
+    fileCap: BOX_FILE_CAP
+  };
 }
 
 // Panelin hızlı okuduğu kutu listesi (son 120 kutu, en yeni önce).
 function writeBoxes() {
-  const boxes = state.events.slice(0, 120).map((event) => ({
+  const boxes = state.events.slice(0, BOX_FILE_CAP).map((event) => ({
     id: event.id,
+    seq: event.seq || 0,
+    runId: event.runId || startedAtMs,
     t: event.t,
     username: event.username,
     kind: event.kind,
@@ -846,9 +904,16 @@ function writeBoxes() {
     hasWindow: Boolean(event.hasWindow),
     sessionSec: event.sessionSec === undefined ? null : event.sessionSec
   }));
+  // Dosya penceresi: bu anki son 120 kutunun en eski sırası. Panel, eksik
+  // kutuyu bu pencerenin dışındaysa "boxes.json 120" olarak ayırır.
+  state.delivery.fileSeqCount = boxes.length;
+  state.delivery.fileFromSeq = boxes.length
+    ? (Number(boxes[boxes.length - 1].seq) || 0)
+    : 0;
   const body = {
     scannedAt: new Date().toISOString(),
     runId: startedAtMs,
+    delivery: deliverySnapshot(),
     boxes
   };
   // scannedAt her yazımda değişiyor; commit'i ona değil kutu listesine bağlıyoruz,
@@ -2162,6 +2227,8 @@ function snapshot() {
       minutesLeft: CONFIG.minutes > 0 ? Math.max(0, Math.round((deadline - Date.now()) / 60000)) : null,
       lastError: state.lastError,
       envelopes: state.envelopeStats,
+      // Kutu teslimi: panel üretilen sıra ile kendi gördüğü sırayı karşılaştırır.
+      delivery: deliverySnapshot(),
       envelopeSamples: state.envelopeSamples,
       // Günlük ülke taraması raporu (panel Ayarlar kartında gösterir).
       regionSweep: {

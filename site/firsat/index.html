@@ -225,6 +225,24 @@
     </div>
 
     <div class="card p-5 mb-5">
+      <div class="flex flex-col md:flex-row md:items-start md:justify-between gap-2 mb-3">
+        <div>
+          <h2 class="section-title"><i data-lucide="package-check" class="w-5 h-5 text-sky-300"></i> Kutu teslimi</h2>
+          <p class="hint mt-1">
+            Son tarayıcı koşusunda <b>üretilen tekil kutu</b> ile <b>bu panele ulaşan tekil kutu</b> aynı sıra numarasıyla
+            karşılaştırılır. Fark gerçek kayıtlardan ayrılır: ntfy yayın hatası, SSE/panel tarafında görülmeme ve
+            <code>boxes.json</code>un son 120 kutu penceresinin dışında kalma. Aynı kutunun iki kanaldan gelmesi
+            <b>dedupe</b> olarak ayrıca sayılır; kayıp değildir, tekil sayıdan düşülmez.
+          </p>
+        </div>
+        <div class="text-[11px] text-yellow-50/40 text-right whitespace-nowrap" id="deliveryUpdated">son koşu</div>
+      </div>
+      <div id="deliverySummary" class="grid grid-cols-2 lg:grid-cols-4 gap-3"></div>
+      <div id="deliveryBreakdown" class="mt-4 border-t border-white/10 pt-3"></div>
+      <p class="hint mt-3" id="deliveryNote"></p>
+    </div>
+
+    <div class="card p-5 mb-5">
       <h2 class="section-title mb-1"><i data-lucide="clock" class="w-5 h-5 text-red-300"></i> Kaçırma dağılımı</h2>
       <p class="hint mb-3">Kaçan kutuların geldiği saat (yerel saat, son 7 gün).</p>
       <div id="funnelHourly" class="space-y-1"></div>

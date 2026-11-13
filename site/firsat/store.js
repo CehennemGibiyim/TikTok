@@ -20,8 +20,17 @@
   var BACKUP_APP = 'tiktok-jeton-paneli';
   var BACKUP_VERSION = 2;
   // Panel sürümü ve sürüm geçmişi (Ayarlar'da gösterilir, yedeğe yazılır).
-  var APP_VERSION = '1.4.11';
+  var APP_VERSION = '1.4.12';
   var CHANGE_LOG = [
+    {
+      version: '1.4.12',
+      date: '2026-11-13',
+      items: [
+        'Ölçüm sekmesine “Kutu teslimi” kartı eklendi: son tarayıcı koşusunda üretilen tekil kutu ile bu panele ulaşan tekil kutu aynı sıra numarasıyla karşılaştırılıyor.',
+        'Fark gerçek kayıtlardan ayrılıyor: ntfy yayın hatası, SSE/panel tarafında görülmeme ve boxes.json son 120 kutu penceresinin dışında kalma; aynı kutunun iki kanaldan gelmesi dedupe olarak ayrı sayılıyor.',
+        'SSE açılma, kopma ve yeniden bağlanma sayaçları bu cihazda kalıcı; panel kapalıyken gelen kutulara uydurma bir kayıp nedeni atanmıyor.'
+      ]
+    },
     {
       version: '1.4.11',
       date: '2026-11-13',

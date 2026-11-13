@@ -51,6 +51,12 @@
   var verified = {};
   var scanInfo = null;
   var metricsInfo = null;
+  // SSE bağlantısının anlık durumu; sayaçlar settings.boxStream'de kalıcı.
+  var streamConnected = false;
+  // Panelin bu sayfa oturumunun başlangıcı: teslim tabanı hesaplanırken yalnızca
+  // bu andan sonra üretilmiş kutular "ilk görülen" sayılır. Böylece panel
+  // kapalıyken üretilmiş eski kutular oranı yanlışlıkla düşürmez.
+  var PANEL_SESSION_AT = Date.now();
   // GitHub Pages, veri commit'lerini saatlerce geciktiriyor (build kotası).
   // Ham dosya her zaman güncel ve CORS açık: önce oradan okunur, olmazsa
   // Pages kopyasına düşülür.
@@ -239,7 +245,7 @@
     document.querySelectorAll('.tab-btn').forEach(function (button) {
       button.classList.toggle('active', button.getAttribute('data-tab') === tab);
     });
-    if (tab === 'metrics') { refreshMetrics(); renderFunnel(); }
+    if (tab === 'metrics') { refreshMetrics(); renderFunnel(); renderDelivery(); }
     if (tab === 'opportunities') renderOpportunities();
     if (window.lucide) lucide.createIcons();
   }
@@ -295,16 +301,38 @@
   // Kutu kayıtlarını tek yerde birleştirir: tarama dosyası, hızlı kutu dosyası
   // ve anlık yayın aynı kuralları kullanır. Yayıncı panelde yoksa oluşturulur,
   // aynı kutu (scanId) iki kez yazılmaz, sandık/portal/zarf dışındaki tür atılır.
-  function mergeBoxItems(items, streamers, events) {
+  function mergeBoxItems(items, streamers, events, source, runId) {
     var byName = {};
     streamers.forEach(function (streamer) { byName[cleanUsername(streamer.username)] = streamer; });
     var known = {};
-    events.forEach(function (event) { if (event.scanId) known[event.scanId] = true; });
+    events.forEach(function (event) { if (event.scanId) known[event.scanId] = event; });
     var fresh = [];
+    var changed = false;
 
     (items || []).forEach(function (item) {
-      if (!item || !item.id || known[item.id]) return;
+      if (!item || !item.id) return;
       if (item.kind && ['chest', 'portal', 'letter'].indexOf(item.kind) === -1) return;
+      var existing = known[item.id];
+      if (existing) {
+        // Aynı kutu ikinci kanaldan da geldiyse tekil kayıt korunur; yalnızca
+        // hangi kanallardan geldiği işaretlenir. Aynı kanalın tekrar okunması
+        // (15 sn'lik dosya yoklaması) dedupe sayılmaz.
+        var via = Array.isArray(existing.via) ? existing.via.slice() : [];
+        if (source && via.indexOf(source) === -1) {
+          via.push(source);
+          existing.via = via;
+          changed = true;
+        }
+        if (!Number(existing.seq) && Number(item.seq)) {
+          existing.seq = Number(item.seq);
+          changed = true;
+        }
+        if (!Number(existing.scanRunId) && (Number(item.runId) || Number(runId))) {
+          existing.scanRunId = Number(item.runId || runId) || 0;
+          changed = true;
+        }
+        return;
+      }
       var username = cleanUsername(item.username);
       if (!username) return;
       var owner = byName[username];
@@ -323,8 +351,7 @@
       // Kutu gönderen yayıncı listede kalır: "son kutu" zamanı da canlılık
       // sayılır, 7 gün kuralı bunu kutu yollayan yayıncıyı düşürmez.
       owner.lastBoxAt = Date.now();
-      known[item.id] = true;
-      events.unshift({
+      var event = {
         id: uid('ev'),
         streamerId: owner.id,
         username: owner.username,
@@ -351,12 +378,21 @@
         senderName: item.senderName || item.sender || '',
         // Kutunun düştüğü oturum saniyesi (tarayıcı bilmiyorsa null).
         sessionSec: item.sessionSec === null || item.sessionSec === undefined
-          ? null : Math.max(0, Number(item.sessionSec) || 0)
-      });
+          ? null : Math.max(0, Number(item.sessionSec) || 0),
+        // Teslim ölçümü: aynı kutunun sırası, koşusu ve bu cihazda hangi
+        // kanallardan geldiği. Bunlar yalnızca gerçek kayıtlardan gelir.
+        seq: Number(item.seq) || 0,
+        scanRunId: Number(item.runId || runId) || 0,
+        receivedAt: Date.now(),
+        via: source ? [source] : []
+      };
+      known[item.id] = event;
+      events.unshift(event);
+      changed = true;
       fresh.push(username);
     });
 
-    return { changed: fresh.length > 0, fresh: fresh };
+    return { changed: changed, fresh: fresh };
   }
 
   function applyScan(data) {
@@ -494,7 +530,7 @@
       if (events.length !== beforeClean) changed = true;
     }
 
-    if (mergeBoxItems(data.events, streamers, events).changed) changed = true;
+    if (mergeBoxItems(data.events, streamers, events, 'live', runId).changed) changed = true;
 
     if (changed) {
       Store.set({ streamers: streamers, events: events, settings: settings });
@@ -506,11 +542,11 @@
   // Hızlı kutu kanalı: tarayıcı kutuları ayrı ve küçük bir dosyaya yazıp sık
   // commit ediyor; panel bunu 15 saniyede bir okur. Böylece sandık, 5 dakikalık
   // tarama commit'ini beklemeden Fırsatlar'a düşer (yakalama penceresi kısa).
-  function applyBoxes(boxes) {
+  function applyBoxes(boxes, source, runId) {
     if (!Array.isArray(boxes) || !boxes.length) return false;
     var streamers = state.streamers.slice();
     var events = state.events.slice();
-    var merged = mergeBoxItems(boxes, streamers, events);
+    var merged = mergeBoxItems(boxes, streamers, events, source || 'file', runId);
     if (!merged.changed) return false;
     Store.set({ streamers: streamers, events: events });
     state = Store.get();
@@ -565,11 +601,37 @@
     el.textContent = 'Bildirim: ' + stateText;
   }
 
+  // SSE açılma/kopma sayaçları yalnızca EventSource'un gerçek olaylarıyla
+  // artar; yeniden bağlanma sayısı ilk açılmadan sonraki açılmalardır.
+  function noteBoxStream(kind) {
+    var settings = Object.assign({}, state.settings || {});
+    var stream = Object.assign({
+      opens: 0, errors: 0, reconnects: 0, lastOpenAt: 0, lastErrorAt: 0
+    }, settings.boxStream || {});
+    var now = Date.now();
+    if (kind === 'open') {
+      if (Number(stream.opens) > 0) stream.reconnects = (Number(stream.reconnects) || 0) + 1;
+      stream.opens = (Number(stream.opens) || 0) + 1;
+      stream.lastOpenAt = now;
+      streamConnected = true;
+    } else {
+      stream.errors = (Number(stream.errors) || 0) + 1;
+      stream.lastErrorAt = now;
+      streamConnected = false;
+    }
+    settings.boxStream = stream;
+    Store.set({ settings: settings });
+    state = Store.get();
+    renderDelivery();
+  }
+
   // Saniyeler içinde gelen kutular (ntfy.sh SSE). Koparsa dosya yolu devrede.
   function startBoxStream() {
     if (typeof EventSource !== 'function') return;
     try {
       var source = new EventSource('https://ntfy.sh/' + BOX_TOPIC + '/sse');
+      source.onopen = function () { noteBoxStream('open'); };
+      source.onerror = function () { noteBoxStream('error'); };
       source.addEventListener('message', function (message) {
         try {
           var parsed = JSON.parse(message.data || '{}');
@@ -577,7 +639,7 @@
           var box = parsed.message ? JSON.parse(parsed.message) : parsed;
           // Anahtarsız/yanlış anahtarlı mesaj sahte olabilir: yok sayılır.
           if (!box || box.key !== BOX_KEY) return;
-          if (box.username && box.id) applyBoxes([box]);
+          if (box.username && box.id) applyBoxes([box], 'ntfy', box.runId || (scanInfo && scanInfo.runId));
         } catch (error) { /* bozuk mesaj yok sayılır */ }
       });
     } catch (error) { /* akış yoksa 15 sn'lik dosya okuması devrede */ }
@@ -587,11 +649,11 @@
     if (scanPaused) return;
     try {
       var data = await fetchScanData(boxesUrl);
-      if (data && Array.isArray(data.boxes)) applyBoxes(data.boxes);
+      if (data && Array.isArray(data.boxes)) applyBoxes(data.boxes, 'file', data.runId);
     } catch (error) {
       try {
         var backup = await fetchScanData(boxesFallback);
-        if (backup && Array.isArray(backup.boxes)) applyBoxes(backup.boxes);
+        if (backup && Array.isArray(backup.boxes)) applyBoxes(backup.boxes, 'file', backup.runId);
       } catch (backupError) { /* kutu dosyası yoksa sorun değil */ }
     }
   }
@@ -699,6 +761,7 @@
 
     el.innerHTML = '<span class="chip chip-green chip-status">● ' + esc(parts.join(' · ')) + '</span>' + connLine;
     renderBoxMinutes();
+    renderDelivery();
     renderHealth();
   }
 
@@ -707,6 +770,7 @@
     try {
       var data = await fetchScanData(scanUrl);
       scanInfo = Object.assign({ scannedAt: data.scannedAt }, data.scanner || {});
+      ensureDeliveryRun();
       if (applyScan(data)) renderAll();
       renderScanStatus();
     } catch (error) {
@@ -714,6 +778,7 @@
       try {
         var backup = await fetchScanData(scanFallback);
         scanInfo = Object.assign({ scannedAt: backup.scannedAt }, backup.scanner || {});
+        ensureDeliveryRun();
         if (applyScan(backup)) renderAll();
         renderScanStatus();
       } catch (backupError) {
@@ -2150,6 +2215,7 @@
       $('metricsHourly').innerHTML = '';
       $('metricsGroupsTable').innerHTML = '';
       $('metricsRunsTable').innerHTML = '';
+      renderDelivery();
       return;
     }
 
@@ -2235,6 +2301,231 @@
         }).join('') + '</tbody>'
       : '<tbody><tr><td class="text-[11px] text-yellow-50/40">Ölçülmüş koşu yok.</td></tr></tbody>';
 
+    renderDelivery();
+    if (window.lucide) lucide.createIcons();
+  }
+
+  // ---------- Kutu teslimi ----------
+  // Tarayıcı her gerçek kutuya koşu içinde artan bir sıra numarası verir
+  // (seq). Panel aynı sıraları kendi yerel olaylarında görür; böylece
+  // "üretilen" ile "panele ulaşan tekil" aynı kümede karşılaştırılır.
+  // Panel ilk kez hangi sırada görürse o sıra taban olur: panel kapalıyken
+  // üretilen eski kutular teslim oranını yanlışlıkla düşürmez.
+
+  function ensureDeliveryRun() {
+    if (!scanInfo) return;
+    var d = scanInfo.delivery;
+    var runId = Number(scanInfo.runId || (d && d.runId) || 0);
+    if (!runId || !d) return;
+    var settings = Object.assign({}, state.settings || {});
+    var box = settings.boxDelivery || {};
+    if (Number(box.runId) !== runId) {
+      var lastSeq = Number(d.lastSeq) || 0;
+      var firstSeen = 0;
+      state.events.forEach(function (event) {
+        if (!event.auto || Number(event.scanRunId) !== runId) return;
+        if (Number(event.createdAt) < PANEL_SESSION_AT) return;
+        var seq = Number(event.seq) || 0;
+        if (seq > 0 && (!firstSeen || seq < firstSeen)) firstSeen = seq;
+      });
+      // Koşu başladığında panel zaten açıksa bütün koşu sayılır (taban 0).
+      // Panel koşudan sonra açıldıysa o anki son sıra tabandır; yalnızca ilk
+      // okumadan önce bu oturumda görülen bir kutu varsa taban onun bir eksiğine
+      // çekilir, böylece ilk kutu sessizce dışlanmaz.
+      var baseSeq = PANEL_SESSION_AT <= runId
+        ? 0
+        : (firstSeen ? Math.min(lastSeq, firstSeen - 1) : lastSeq);
+      settings.boxDelivery = {
+        runId: runId,
+        baseSeq: baseSeq,
+        since: Date.now()
+      };
+      Store.set({ settings: settings });
+      state = Store.get();
+    }
+  }
+
+  function deliveryStats() {
+    if (!scanInfo) return { error: 'Canlı tarayıcı verisi okunamadı.' };
+    var d = scanInfo.delivery;
+    var runId = Number(scanInfo.runId || (d && d.runId) || 0);
+    if (!d || !runId) {
+      return { error: 'Tarayıcı teslim sayaçlarını yayınlamıyor; bu sürümde ölçüm yok.' };
+    }
+    var box = (state.settings && state.settings.boxDelivery) || {};
+    if (Number(box.runId) !== runId) {
+      return { error: 'Bu koşu için panel izleme başlangıcı yok; bir sonraki tarama okumasında kurulur.' };
+    }
+    var baseSeq = Math.max(0, Number(box.baseSeq) || 0);
+    var lastSeq = Math.max(0, Number(d.lastSeq) || 0);
+    if (baseSeq > lastSeq) {
+      return { error: 'Kutu sırası sıfırlandı; teslim ölçümü bu koşu için hesaplanamıyor.' };
+    }
+
+    var produced = Math.max(0, lastSeq - baseSeq);
+    var received = {};
+    var ntfyOnly = 0;
+    var pollOnly = 0;
+    var both = 0;
+    var channelUnknown = 0;
+    state.events.forEach(function (event) {
+      if (!event.auto) return;
+      var seq = Number(event.seq) || 0;
+      if (!seq || seq <= baseSeq || seq > lastSeq) return;
+      if (Number(event.scanRunId) !== runId) return;
+      if (received[seq]) return;
+      received[seq] = true;
+      var via = Array.isArray(event.via) ? event.via : [];
+      var hasNtfy = via.indexOf('ntfy') !== -1;
+      var hasPoll = via.indexOf('file') !== -1 || via.indexOf('live') !== -1;
+      if (hasNtfy && hasPoll) both += 1;
+      else if (hasNtfy) ntfyOnly += 1;
+      else if (hasPoll) pollOnly += 1;
+      else channelUnknown += 1;
+    });
+
+    var reachedIds = Object.keys(received).length;
+    var reached = Math.min(produced, reachedIds);
+    var gap = Math.max(0, produced - reached);
+    var failed = {};
+    (d.ntfyFailSeqs || []).forEach(function (seq) { failed[Number(seq)] = true; });
+    var fileFrom = Number(d.fileFromSeq) || 0;
+    var ntfyGap = 0;
+    var fileGap = 0;
+    var panelGap = 0;
+    for (var seq = baseSeq + 1; seq <= lastSeq; seq += 1) {
+      if (received[seq]) continue;
+      // Öncelik gerçek yayın hatasında: başarısız ntfy denemesi kayıtlıysa
+      // kutu dosyada olsa bile "ntfy hatası" olarak ayrılır. Dosya penceresi
+      // yalnızca ntfy hatası olmayan eski sıralar için ayrı sayılır.
+      if (failed[seq]) ntfyGap += 1;
+      else if (fileFrom > 0 && seq < fileFrom) fileGap += 1;
+      else panelGap += 1;
+    }
+
+    var stream = (state.settings && state.settings.boxStream) || {};
+    return {
+      runId: runId,
+      baseSeq: baseSeq,
+      lastSeq: lastSeq,
+      produced: produced,
+      reached: reached,
+      rate: produced ? reached / produced : null,
+      gap: gap,
+      ntfyGap: ntfyGap,
+      fileGap: fileGap,
+      panelGap: panelGap,
+      ntfyOnly: ntfyOnly,
+      pollOnly: pollOnly,
+      both: both,
+      channelUnknown: channelUnknown,
+      dedupe: both,
+      scannerDuplicate: Number(d.duplicate) || 0,
+      ntfyAttempts: Number(d.ntfyAttempts) || 0,
+      ntfyOk: Number(d.ntfyOk) || 0,
+      ntfyFail: Number(d.ntfyFail) || 0,
+      fileFrom: fileFrom,
+      fileSeqCount: Number(d.fileSeqCount) || 0,
+      fileCap: Number(d.fileCap) || 120,
+      sseOpens: Number(stream.opens) || 0,
+      sseErrors: Number(stream.errors) || 0,
+      sseReconnects: Number(stream.reconnects) || 0,
+      sseLastErrorAt: Number(stream.lastErrorAt) || 0,
+      sseConnected: streamConnected,
+      since: Number(box.since) || 0
+    };
+  }
+
+  function renderDelivery() {
+    var summary = $('deliverySummary');
+    if (!summary) return;
+    var breakdown = $('deliveryBreakdown');
+    var note = $('deliveryNote');
+    var stamp = $('deliveryUpdated');
+    var s = deliveryStats();
+    if (s.error) {
+      summary.innerHTML = '<div class="empty-state col-span-2 lg:col-span-4">' + esc(s.error) + '</div>';
+      breakdown.innerHTML = '';
+      note.textContent = '';
+      if (stamp) stamp.textContent = 'son koşu';
+      return;
+    }
+
+    var rateText = s.rate === null ? '—' : '%' + Math.round(s.rate * 100);
+    var rateColor = s.rate === null ? 'text-yellow-50/40' : (s.rate < 0.9 ? 'text-red-300' : 'text-green-300');
+    if (stamp) {
+      stamp.textContent = (scanInfo && scanInfo.scannedAt
+        ? 'son koşu · ' + new Date(scanInfo.scannedAt).toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' })
+        : 'son koşu') + ' · panel ' + (s.since ? new Date(s.since).toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' }) : '—') + '’den beri';
+    }
+
+    var cards = [
+      ['Üretilen', fmt(s.produced), 'text-amber-300',
+        'tarayıcının bu koşuda yazdığı tekil kutu'],
+      ['Panele ulaşan', fmt(s.reached), 'text-sky-300',
+        s.channelUnknown ? s.channelUnknown + ' kutunun kanalı bilinmiyor' : 'tekil kutu (dedupe sonrası)'],
+      ['Teslim oranı', rateText, rateColor,
+        s.produced ? 'ulaşan ÷ üretilen' : 'bu aralıkta üretim yok'],
+      ['SSE yeniden bağlanma', fmt(s.sseReconnects), 'text-purple-300',
+        fmt(s.sseErrors) + ' kopma · ' + (s.sseConnected ? 'şu an açık' : 'şu an kapalı')]
+    ];
+    summary.innerHTML = cards.map(function (card) {
+      return '<div class="card p-4"><div class="stat-label">' + esc(card[0]) + '</div>' +
+        '<div class="stat-value ' + card[2] + '">' + card[1] + '</div>' +
+        '<div class="text-[10px] text-yellow-50/40 mt-1">' + esc(card[3]) + '</div></div>';
+    }).join('');
+
+    var rows = [
+      ['ntfy hatası', s.ntfyGap, 'yayın başarısız; kutu panelde yok', 'text-red-300'],
+      ['SSE / panel', s.panelGap, 'ntfy kabul edilmiş ya da panel kapalı; kutu yok', 'text-amber-300'],
+      ['boxes.json 120', s.fileGap, 'kutu dosya penceresinin dışında', 'text-orange-300'],
+      ['Dedupe', s.dedupe, 'aynı kutu iki kanaldan; tekil sayıldı', 'text-sky-300']
+    ];
+    breakdown.innerHTML = '<div class="flex items-center gap-2 px-1 text-[10px] uppercase tracking-wide text-yellow-50/40">' +
+      '<span class="flex-1">farkın ayrımı</span><span class="w-12 text-right">kutu</span></div>' +
+      '<div class="space-y-1 mt-1">' + rows.map(function (row) {
+        return '<div class="flex items-center gap-2 rounded px-1 py-1 text-[11px] hover:bg-white/5">' +
+          '<span class="flex-1 text-yellow-100">' + esc(row[0]) +
+          '<span class="block text-[10px] text-yellow-50/40">' + esc(row[2]) + '</span></span>' +
+          '<span class="w-12 text-right font-mono ' + row[3] + '">' + fmt(row[1]) + '</span></div>';
+      }).join('') + '</div>';
+
+    var lines = [];
+    if (!s.produced) {
+      lines.push('Panel bu koşuda izlemeye başladıktan sonra henüz kutu üretilmedi.');
+    } else if (!s.gap) {
+      lines.push('Bu aralıkta üretilen her tekil kutu panele ulaştı.');
+    } else {
+      lines.push('Fark ' + fmt(s.gap) + ' kutu: ntfy hatası ' + fmt(s.ntfyGap) +
+        ' · SSE/panel ' + fmt(s.panelGap) + ' · boxes.json 120 ' + fmt(s.fileGap) + '.');
+    }
+    if (s.produced) {
+      lines.push('Sıra aralığı: ' + fmt(s.baseSeq + 1) + '–' + fmt(s.lastSeq) + ' (taban ' + fmt(s.baseSeq) + ').');
+    }
+    lines.push('Kanallar: ntfy ' + fmt(s.ntfyOnly) + ' tekil · dosya ' + fmt(s.pollOnly) +
+      ' tekil · ikisi ' + fmt(s.both) + '.');
+    if (s.ntfyAttempts) {
+      lines.push('ntfy: ' + fmt(s.ntfyOk) + '/' + fmt(s.ntfyAttempts) + ' başarılı' +
+        (s.ntfyFail ? ' · ' + fmt(s.ntfyFail) + ' hata' : '') + '.');
+    } else {
+      lines.push('ntfy bu koşuda kapalıydı; kutu yalnız dosya yolundan geldi.');
+    }
+    lines.push('Dosya penceresi: son ' + fmt(s.fileSeqCount) + '/' + fmt(s.fileCap) +
+      ' kutu' + (s.fileFrom ? ' (en eski sıra ' + fmt(s.fileFrom) + ')' : '') + '.');
+    if (s.scannerDuplicate) {
+      lines.push('Tarayıcı aynı kutu bildirimini ' + fmt(s.scannerDuplicate) + ' kez tekilleştirdi; bunlar üretilen sayısına girmez.');
+    }
+    if (s.ntfyFail > 400) {
+      lines.push('ntfy hata sıralarının yalnız son 400’ü taşınıyor; daha eski hatalar “SSE / panel” ya da “boxes.json 120” satırına düşebilir.');
+    }
+    if (!s.sseConnected) {
+      lines.push('SSE şu an kapalı; panel 15 saniyelik dosya okumasına düşüyor. Bu sırada gelen kutular dosya penceresine sığmazsa fark büyür.');
+    }
+    if (s.sseLastErrorAt) {
+      lines.push('Son SSE kopması: ' + new Date(s.sseLastErrorAt).toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' }) + '.');
+    }
+    lines.push('SSE sayaçları bu cihazda birikir. Panel kapalıyken gelen kutu dosya penceresinde hâlâ varsa “SSE / panel”, pencereden çıkmışsa “boxes.json 120” satırına yazılır; kayıp nedeni uydurulmaz.');
+    note.textContent = lines.join(' ');
     if (window.lucide) lucide.createIcons();
   }
 
@@ -3322,6 +3613,7 @@
     renderCalc();
     renderMetrics();
     renderFunnel();
+    renderDelivery();
     renderBoxMinutes();
     renderHealth();
     renderSettings();
@@ -3595,7 +3887,7 @@
       var metrics = $('view-metrics');
       if (opp && !opp.classList.contains('hidden')) renderOpportunities();
       if (streams && !streams.classList.contains('hidden')) renderStreamers();
-      if (metrics && !metrics.classList.contains('hidden')) { renderFunnel(); renderBoxMinutes(); }
+      if (metrics && !metrics.classList.contains('hidden')) { renderFunnel(); renderBoxMinutes(); renderDelivery(); }
     }, 30000);
   }
 
