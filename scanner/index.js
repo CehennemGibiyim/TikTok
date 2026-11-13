@@ -888,6 +888,11 @@ function publishBox(event) {
 // Panelin teslim kartı için gerçek sayaçlar. produced = bu koşuda yazılan
 // tekil kutu sayısı; lastSeq aynı kümenin son sırasıdır.
 function deliverySnapshot() {
+  const firstBoxTimeSeq = Math.max(1, Number(state.delivery.fileFromSeq) || 1);
+  const boxTimeBySeq = {};
+  state.boxTimes.slice(firstBoxTimeSeq - 1).forEach(function (at, index) {
+    if (at) boxTimeBySeq[firstBoxTimeSeq + index] = at;
+  });
   return {
     runId: startedAtMs,
     produced: Number(state.boxSeq) || 0,
@@ -897,7 +902,8 @@ function deliverySnapshot() {
     ntfyOk: Number(state.delivery.ntfyOk) || 0,
     ntfyFail: Number(state.delivery.ntfyFail) || 0,
     ntfyFailSeqs: state.delivery.ntfyFailSeqs.slice(-400),
-    boxTimes: state.boxTimes.slice(),
+    // Anahtar sıra numarasıdır; panelde ofset hesabı gerekmez.
+    boxTimeBySeq: boxTimeBySeq,
     fileFromSeq: Number(state.delivery.fileFromSeq) || 0,
     fileSeqCount: Number(state.delivery.fileSeqCount) || 0,
     fileCap: BOX_FILE_CAP

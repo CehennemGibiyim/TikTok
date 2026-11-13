@@ -2254,11 +2254,7 @@
       ['Ayar grubu', metricsNumber(groups.length), 'text-yellow-300',
         groups.length ? 'en iyi: ' + fmt(groups[0].boxesPer100) + ' kutu/100 deneme' : 'grup yok']
     ];
-    summary.innerHTML = cards.map(function (card) {
-      return '<div class="card p-4"><div class="stat-label">' + esc(card[0]) + '</div>' +
-        '<div class="stat-value ' + card[2] + '">' + card[1] + '</div>' +
-        '<div class="text-[10px] text-yellow-50/40 mt-1">' + esc(card[3]) + '</div></div>';
-    }).join('');
+    summary.innerHTML = funnelCardsHtml(cards);
 
     var buckets = Array.isArray(hourly.buckets) ? hourly.buckets.slice(-48) : [];
     var maxCount = 1;
@@ -2405,7 +2401,16 @@
     var failed = {};
     (d.ntfyFailSeqs || []).forEach(function (seq) { failed[Number(seq)] = true; });
     var fileFrom = Number(d.fileFromSeq) || 0;
-    var boxTimes = Array.isArray(d.boxTimes) ? d.boxTimes : [];
+    // Eski veride dizi + ofset gelebilir; tek biçim anahtarlı nesneye çevir.
+    var boxTimeBySeq = d.boxTimeBySeq && typeof d.boxTimeBySeq === 'object' && !Array.isArray(d.boxTimeBySeq)
+      ? d.boxTimeBySeq
+      : {};
+    if (!d.boxTimeBySeq && Array.isArray(d.boxTimes)) {
+      var from = Math.max(1, Number(d.boxTimesFromSeq) || 1);
+      d.boxTimes.forEach(function (at, index) {
+        if (at) boxTimeBySeq[from + index] = at;
+      });
+    }
     var ntfyGap = 0;
     var fileGap = 0;
     var panelGap = 0;
@@ -2417,7 +2422,7 @@
       // yalnızca ntfy hatası olmayan eski sıralar için ayrı sayılır.
       if (failed[seq]) ntfyGap += 1;
       else if (fileFrom > 0 && seq < fileFrom) fileGap += 1;
-      else if (wasPanelVisibleAt(Number(boxTimes[seq - 1]) || 0) === false) panelClosedGap += 1;
+      else if (wasPanelVisibleAt(Number(boxTimeBySeq[seq]) || 0) === false) panelClosedGap += 1;
       else panelGap += 1;
     }
 
@@ -2488,11 +2493,7 @@
       ['SSE yeniden bağlanma', fmt(s.sseReconnects), 'text-purple-300',
         fmt(s.sseErrors) + ' kopma · ' + (s.sseConnected ? 'şu an açık' : 'şu an kapalı')]
     ];
-    summary.innerHTML = cards.map(function (card) {
-      return '<div class="card p-4"><div class="stat-label">' + esc(card[0]) + '</div>' +
-        '<div class="stat-value ' + card[2] + '">' + card[1] + '</div>' +
-        '<div class="text-[10px] text-yellow-50/40 mt-1">' + esc(card[3]) + '</div></div>';
-    }).join('');
+    summary.innerHTML = funnelCardsHtml(cards);
 
     var rows = [
       ['ntfy hatası', s.ntfyGap, 'yayın başarısız; kutu panelde yok', 'text-red-300'],
@@ -2770,6 +2771,12 @@
     return total;
   }
 
+  function medianOf(values) {
+    if (!values || !values.length) return null;
+    var sorted = values.slice().sort(function (a, b) { return a - b; });
+    return sorted[Math.floor(sorted.length / 2)];
+  }
+
   function funnelStats() {
     var since = funnelSince();
     var now = Date.now();
@@ -2859,14 +2866,9 @@
     });
 
     Object.keys(kinds).forEach(function (kind) {
-      var kindReactions = kinds[kind].reactions;
-      kindReactions.sort(function (a, b) { return a - b; });
-      kinds[kind].median = kindReactions.length
-        ? kindReactions[Math.floor(kindReactions.length / 2)]
-        : null;
+      kinds[kind].median = medianOf(kinds[kind].reactions);
       delete kinds[kind].reactions;
     });
-    reactions.sort(function (a, b) { return a - b; });
     return {
       since: since,
       boxes: boxes,
@@ -2876,7 +2878,7 @@
       open: open,
       // Görülenler içinde toplanma oranı; görülen yoksa bilinmiyor.
       conversion: seen ? collected / seen : null,
-      median: reactions.length ? reactions[Math.floor(reactions.length / 2)] : null,
+      median: medianOf(reactions),
       // Maruz kalma: yalnızca panel görünürken gelen kutular.
       visibleBoxes: visibleBoxes,
       closedBoxes: closedBoxes,
@@ -2971,12 +2973,13 @@
     if (!el) return;
     if (!f.days || !f.days.length || !f.boxes) { el.innerHTML = ''; return; }
 
-    var header = '<div class="flex items-center gap-2 px-1 text-[10px] uppercase tracking-wide text-yellow-50/40">' +
-      '<span class="min-w-0 flex-1 truncate">gün</span>' +
-      '<span class="w-8 shrink-0 text-right truncate">kutu</span>' +
-      '<span class="w-10 shrink-0 text-right truncate">görüldü</span>' +
-      '<span class="w-12 shrink-0 text-right truncate">toplanan</span>' +
-      '<span class="w-11 shrink-0 text-right truncate">dönüşüm</span>' +
+    var dayGrid = 'grid grid-cols-[minmax(0,1fr)_2rem_2.5rem_3rem_2.75rem] gap-x-2 items-center px-1 text-[11px]';
+    var header = '<div class="' + dayGrid.replace('text-[11px]', 'text-[10px] uppercase tracking-wide text-yellow-50/40') + '">' +
+      '<span class="min-w-0 truncate">gün</span>' +
+      '<span class="text-right truncate">kutu</span>' +
+      '<span class="text-right truncate">görüldü</span>' +
+      '<span class="text-right truncate">toplanan</span>' +
+      '<span class="text-right truncate">dönüşüm</span>' +
       '</div>';
     var todayStart = new Date();
     todayStart.setHours(0, 0, 0, 0);
@@ -2987,12 +2990,12 @@
       var label = new Date(day.start).toLocaleDateString('tr-TR', {
         weekday: 'short', day: '2-digit', month: '2-digit'
       }) + (partial ? '*' : '');
-      return '<div class="flex items-center gap-2 rounded px-1 py-0.5 text-[11px] hover:bg-white/5">' +
-        '<span class="min-w-0 flex-1 truncate text-yellow-100">' + esc(label) + '</span>' +
-        '<span class="w-8 shrink-0 text-right font-mono">' + fmt(day.boxes) + '</span>' +
-        '<span class="w-10 shrink-0 text-right font-mono text-sky-300">' + fmt(day.seen) + '</span>' +
-        '<span class="w-12 shrink-0 text-right font-mono text-green-300">' + fmt(day.collected) + '</span>' +
-        '<span class="w-11 shrink-0 text-right font-mono ' + color + '">' +
+      return '<div class="' + dayGrid + ' rounded py-0.5 hover:bg-white/5">' +
+        '<span class="min-w-0 truncate text-yellow-100">' + esc(label) + '</span>' +
+        '<span class="text-right font-mono">' + fmt(day.boxes) + '</span>' +
+        '<span class="text-right font-mono text-sky-300">' + fmt(day.seen) + '</span>' +
+        '<span class="text-right font-mono text-green-300">' + fmt(day.collected) + '</span>' +
+        '<span class="text-right font-mono ' + color + '">' +
           (rate === null ? '—' : '%' + Math.round(rate * 100)) + '</span>' +
         '</div>';
     }).join('');
@@ -3011,13 +3014,14 @@
     var rows = order.filter(function (kind) { return f.kinds[kind] && f.kinds[kind].boxes > 0; });
     if (!rows.length) { el.innerHTML = ''; return; }
 
-    var header = '<div class="flex items-center gap-2 px-1 text-[10px] uppercase tracking-wide text-yellow-50/40">' +
-      '<span class="min-w-0 flex-1 truncate">tür</span>' +
-      '<span class="w-8 shrink-0 text-right truncate">kutu</span>' +
-      '<span class="w-10 shrink-0 text-right truncate">görüldü</span>' +
-      '<span class="w-8 shrink-0 text-right truncate">kaçtı</span>' +
-      '<span class="w-10 shrink-0 text-right truncate">kaçma</span>' +
-      '<span class="w-10 shrink-0 text-right truncate">medyan</span>' +
+    var kindGrid = 'grid grid-cols-[minmax(0,1fr)_2rem_2.5rem_2rem_2.5rem_2.5rem] gap-x-2 items-center px-1 text-[11px]';
+    var header = '<div class="' + kindGrid.replace('text-[11px]', 'text-[10px] uppercase tracking-wide text-yellow-50/40') + '">' +
+      '<span class="min-w-0 truncate">tür</span>' +
+      '<span class="text-right truncate">kutu</span>' +
+      '<span class="text-right truncate">görüldü</span>' +
+      '<span class="text-right truncate">kaçtı</span>' +
+      '<span class="text-right truncate">kaçma</span>' +
+      '<span class="text-right truncate">medyan</span>' +
       '</div>';
     var best = null;
     var body = rows.map(function (kind) {
@@ -3028,14 +3032,14 @@
         best = { kind: kind, rate: rate, seen: k.seen };
       }
       var color = rate === null ? 'text-yellow-50/30' : (rate >= 0.5 ? 'text-red-300' : 'text-yellow-50/70');
-      return '<div class="flex items-center gap-2 rounded px-1 py-0.5 text-[11px] hover:bg-white/5">' +
-        '<span class="min-w-0 flex-1 truncate text-yellow-100">' + meta.icon + ' ' + esc(meta.label) + '</span>' +
-        '<span class="w-8 shrink-0 text-right font-mono">' + fmt(k.boxes) + '</span>' +
-        '<span class="w-10 shrink-0 text-right font-mono text-sky-300">' + fmt(k.seen) + '</span>' +
-        '<span class="w-8 shrink-0 text-right font-mono text-red-300">' + fmt(k.missed) + '</span>' +
-        '<span class="w-10 shrink-0 text-right font-mono ' + color + '">' +
+      return '<div class="' + kindGrid + ' rounded py-0.5 hover:bg-white/5">' +
+        '<span class="min-w-0 truncate text-yellow-100">' + meta.icon + ' ' + esc(meta.label) + '</span>' +
+        '<span class="text-right font-mono">' + fmt(k.boxes) + '</span>' +
+        '<span class="text-right font-mono text-sky-300">' + fmt(k.seen) + '</span>' +
+        '<span class="text-right font-mono text-red-300">' + fmt(k.missed) + '</span>' +
+        '<span class="text-right font-mono ' + color + '">' +
           (rate === null ? '—' : '%' + Math.round(rate * 100)) + '</span>' +
-        '<span class="w-10 shrink-0 text-right font-mono text-yellow-50/70">' +
+        '<span class="text-right font-mono text-yellow-50/70">' +
           (k.median === null ? '—' : clock(k.median / 1000)) + '</span>' +
         '</div>';
     }).join('');
