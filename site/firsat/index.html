@@ -27,6 +27,7 @@
       <button data-tab="inventory" class="tab-btn">Envanter</button>
       <button data-tab="agencies" class="tab-btn">Ajanslar</button>
       <button data-tab="calc" class="tab-btn">Gelir</button>
+      <button data-tab="metrics" class="tab-btn">Ölçüm</button>
       <button data-tab="settings" class="tab-btn">Ayarlar</button>
     </nav>
   </div>
@@ -195,6 +196,42 @@
           <div class="flex justify-between border-t border-white/10 pt-3"><span class="text-yellow-50/60">TL karşılığı</span><span id="calcTry" class="font-black text-amber-400">₺0.00</span></div>
         </div>
       </div>
+    </div>
+  </section>
+
+  <!-- ========== ÖLÇÜM ========== -->
+  <section id="view-metrics" class="view hidden">
+    <div class="card p-5 mb-5">
+      <div class="flex flex-col md:flex-row md:items-start md:justify-between gap-2 mb-3">
+        <div>
+          <h2 class="section-title"><i data-lucide="bar-chart-3" class="w-5 h-5 text-amber-400"></i> Ölçüm</h2>
+          <p class="hint mt-1">
+            <code>scripts/quota-report.mjs</code> geçmiş <code>live.json</code> ve <code>boxes.json</code> commit'lerinden hesaplar;
+            panel yalnızca sunar. <b>kutu/saat</b> koşunun ölçülen süresinden, <b>kutu/5 dk oturum</b> başarılı bağlantı başına kutudan çıkar.
+            Yıldızlı (*) koşular yarım saatten kısa: kutu/saat az sayıda dakikadan türetildi.
+          </p>
+        </div>
+        <div class="text-[11px] text-yellow-50/40 text-right whitespace-nowrap" id="metricsUpdated">yükleniyor…</div>
+      </div>
+      <div id="metricsSummary" class="grid grid-cols-2 lg:grid-cols-4 gap-3"></div>
+    </div>
+
+    <div class="card p-5 mb-5">
+      <h2 class="section-title mb-1"><i data-lucide="bar-chart-2" class="w-5 h-5 text-yellow-400"></i> Saatlik kutu dağılımı</h2>
+      <p class="hint mb-3">Tekil kutular yakalandıkları saate yazıldı (son 48 saat).</p>
+      <div id="metricsHourly" class="space-y-1"></div>
+    </div>
+
+    <div class="card p-5 mb-5">
+      <h2 class="section-title mb-1"><i data-lucide="layers" class="w-5 h-5 text-purple-300"></i> Ayar grubu karşılaştırması</h2>
+      <p class="hint mb-3">Aynı bağlantı aralığı / dakikalık başlatma / keşif oranı / oda sayısı ile koşan turlar tek grupta; gruplar kutu/deneme büyükten küçüğe sıralı.</p>
+      <div class="overflow-x-auto"><table class="stream-table" id="metricsGroupsTable"></table></div>
+    </div>
+
+    <div class="card p-5">
+      <h2 class="section-title mb-1"><i data-lucide="list" class="w-5 h-5 text-green-300"></i> Koşu bazında</h2>
+      <p class="hint mb-3">Son 25 koşu: ayarlar, bağlantı denemesi, yakalanan kutu ve saatlik getiri.</p>
+      <div class="overflow-x-auto"><table class="stream-table" id="metricsRunsTable"></table></div>
     </div>
   </section>
 

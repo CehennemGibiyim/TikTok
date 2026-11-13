@@ -175,6 +175,25 @@ node index.js --once             # tek tur (deneme)
 `boxes.json` commit'lerinden de **saatlik kutu dağılımı** (son 24 saat, kutu kimliğine göre tekilleştirilmiş)
 çıkarır. Not: `boxes.json` yalnızca son 120 kutuyu tuttuğu için eski saatlerde sayı eksik olabilir.
 
+### Ölçüm sekmesi (`metrics.json`)
+
+Aynı sayılar panelde **Ölçüm** sekmesinde gösterilir. Rapor `--json` ile bunları
+`site/firsat/data/metrics.json` dosyasına yazar; panel dosyayı okur, hesabı tekrarlamaz:
+
+```bash
+node scripts/quota-report.mjs --json=site/firsat/data/metrics.json   # dosyaya yaz
+node scripts/quota-report.mjs --json                                 # stdout'a yaz
+node scripts/quota-report.mjs                                        # metin raporu (aynı sayılar)
+```
+
+`.github/workflows/metrics.yml` bu komutu **saatte bir** (ve elle çalıştırınca) `fetch-depth: 0`
+ile koşar, dosya değiştiyse commit eder. Sekmede dört bölüm var: özet kartları (ort. kutu/saat,
+son koşunun kutu/5 dk oturumu, karşılaştırılabilir koşu sayısı, ayar grubu sayısı), **saatlik kutu
+dağılımı** (son 48 saat, çubuklar), **ayar grubu karşılaştırması** (kutu/100 deneme, kutu/bağlantı,
+kutu/saat, ort. dinlenen oda) ve **koşu bazında** son 25 koşu. Yarım saatten kısa koşular `*` ile
+işaretlenir çünkü kutu/saat az sayıda dakikadan türetilir; ölçüm dosyası yoksa sekme bunu açıkça yazar.
+
+13 Kasım 2026 ölçümü (8 koşu):
 13 Kasım 2026 ölçümü (8 koşu):
 
 | Ayar | Koşu | Deneme | Başarı | Kutu | Kutu / 100 deneme | Ort. dinlenen oda |

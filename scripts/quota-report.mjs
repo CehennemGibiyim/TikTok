@@ -3,6 +3,12 @@
 // koşunun süresi üzerinden saatlik kutu getirisi ve 5 dakikalık dinleme oturumu başına kutu.
 // Ayrıca boxes.json commit'lerinden saatlik kutu dağılımı çıkarılır.
 import { execFileSync } from 'node:child_process';
+import { writeFileSync } from 'node:fs';
+
+// --json[=yol]: aynı ölçümleri panelin okuyacağı JSON olarak yazar (yol yoksa stdout).
+const jsonArg = process.argv.find((arg) => arg.startsWith('--json'));
+const jsonTarget = jsonArg ? (jsonArg.includes('=') ? jsonArg.split('=')[1] : true) : false;
+const print = jsonTarget ? () => {} : (...args) => print(...args);
 
 const REPO = process.cwd();
 const git = (...args) => execFileSync('git', ['-C', REPO, ...args], { maxBuffer: 64 * 1024 * 1024 }).toString();
@@ -93,16 +99,16 @@ for (const r of list) {
   groups.set(name, g);
 }
 
-console.log('commit:', liveShas.length, '| okunan:', parsed, '| hatali:', failed, '| karsilastirilabilir kosu:', list.length);
-console.log('');
-console.log('KOSU BAZINDA (son 25)');
+print('commit:', liveShas.length, '| okunan:', parsed, '| hatali:', failed, '| karsilastirilabilir kosu:', list.length);
+print('');
+print('KOSU BAZINDA (son 25)');
 for (const r of list.slice(-25)) {
   const per = r.attempts ? (r.boxes / r.attempts * 100).toFixed(2) : '0.00';
   const hours = hoursOf(r);
   const boxesPerSession = r.ok ? (r.boxes / r.ok).toFixed(2) : '-';
   // Yarım saatten kısa koşularda kutu/saat yalnızca birkaç dakikadan türetilir: işaretle.
   const short = hours > 0 && hours < 0.5 ? '*' : ' ';
-  console.log([
+  print([
     new Date(r.at).toISOString().slice(5, 16),
     'oda ' + String(r.cfg.rooms).padStart(2),
     'ara ' + String(r.cfg.gap).padStart(5),
@@ -119,15 +125,15 @@ for (const r of list.slice(-25)) {
   ].join(' '));
 }
 
-console.log('(* = koşu yarım saatten kısa; kutu/saat az sayıda dakikadan türetildi)');
-console.log('');
-console.log('AYAR GRUPLARI (kutu/deneme buyukten kucuge)');
+print('(* = koşu yarım saatten kısa; kutu/saat az sayıda dakikadan türetildi)');
+print('');
+print('AYAR GRUPLARI (kutu/deneme buyukten kucuge)');
 const rows = Array.from(groups.values()).sort((a, b) => (b.boxes / Math.max(1, b.attempts)) - (a.boxes / Math.max(1, a.attempts)));
 for (const g of rows) {
   const per100 = (g.boxes / Math.max(1, g.attempts) * 100).toFixed(2);
   const okRate = (g.ok / Math.max(1, g.attempts) * 100).toFixed(0);
   const boxesPerOk = (g.boxes / Math.max(1, g.ok)).toFixed(2);
-  console.log(
+  print(
     g.name.padEnd(56),
     'kosu ' + String(g.runs).padStart(2),
     '| deneme ' + String(g.attempts).padStart(5),
@@ -156,22 +162,79 @@ for (const sha of boxShas) {
   }
 }
 
-if (boxTimes.size) {
-  const perClockHour = new Map();
-  for (const t of boxTimes.values()) {
-    const key = new Date(t).toISOString().slice(0, 13);
-    perClockHour.set(key, (perClockHour.get(key) || 0) + 1);
-  }
-  const hours = Array.from(perClockHour.keys()).sort();
-  const total = boxTimes.size;
-  const spanHours = hours.length;
-  console.log('');
-  console.log('SAATLIK KUTU (boxes.json gecmisi, ' + boxCommits + ' commit, ' + total + ' tekil kutu, ' + spanHours + ' saat)');
-  console.log('ort ' + (total / Math.max(1, spanHours)).toFixed(1) + ' kutu/saat');
-  for (const hour of hours.slice(-24)) {
+const perClockHour = new Map();
+for (const t of boxTimes.values()) {
+  const key = new Date(t).toISOString().slice(0, 13);
+  perClockHour.set(key, (perClockHour.get(key) || 0) + 1);
+}
+const hourKeys = Array.from(perClockHour.keys()).sort();
+const boxTotal = boxTimes.size;
+const spanHours = hourKeys.length;
+
+if (boxTotal) {
+  print('');
+  print('SAATLIK KUTU (boxes.json gecmisi, ' + boxCommits + ' commit, ' + boxTotal + ' tekil kutu, ' + spanHours + ' saat)');
+  print('ort ' + (boxTotal / Math.max(1, spanHours)).toFixed(1) + ' kutu/saat');
+  for (const hour of hourKeys.slice(-24)) {
     const count = perClockHour.get(hour);
-    console.log(hour.replace('T', ' ') + ':00',
+    print(hour.replace('T', ' ') + ':00',
       String(count).padStart(3),
       '#'.repeat(Math.min(60, count)));
   }
+}
+
+// Panelin Ölçüm sekmesi bu JSON'u okur: aynı sayılar, sunum panelde.
+const json = {
+  generatedAt: new Date().toISOString(),
+  source: { commits: liveShas.length, parsed, failed, comparedRuns: list.length },
+  runs: list.slice(-40).map((r) => {
+    const hours = hoursOf(r);
+    const per = perHour(r.boxes, hours);
+    return {
+      at: new Date(r.at).toISOString(),
+      cfg: r.cfg,
+      profile: profile(r.cfg),
+      attempts: r.attempts,
+      ok: r.ok,
+      watching: r.watching,
+      boxes: r.boxes,
+      boxCoins: r.boxCoins,
+      hours: Math.round(hours * 100) / 100,
+      boxesPer100: Math.round((r.boxes / Math.max(1, r.attempts)) * 10000) / 100,
+      boxesPerHour: per === null ? null : Math.round(per * 10) / 10,
+      boxesPerSession: r.ok ? Math.round((r.boxes / r.ok) * 100) / 100 : null,
+      // Yarım saatten kısa koşu: kutu/saat az sayıda dakikadan türetildi.
+      short: hours > 0 && hours < 0.5
+    };
+  }),
+  groups: rows.map((g) => {
+    const per = perHour(g.boxes, g.hours);
+    return {
+      name: g.name,
+      profile: g.name.split(' | ')[0],
+      runs: g.runs,
+      attempts: g.attempts,
+      ok: g.ok,
+      okRate: Math.round((g.ok / Math.max(1, g.attempts)) * 100),
+      boxes: g.boxes,
+      boxCoins: g.boxCoins,
+      boxesPer100: Math.round((g.boxes / Math.max(1, g.attempts)) * 10000) / 100,
+      boxesPerOk: g.ok ? Math.round((g.boxes / g.ok) * 100) / 100 : null,
+      boxesPerHour: per === null ? null : Math.round(per * 10) / 10,
+      avgWatching: Math.round((g.watchMax / g.runs) * 10) / 10
+    };
+  }),
+  hourly: {
+    commits: boxCommits,
+    boxes: boxTotal,
+    hours: spanHours,
+    avgPerHour: Math.round((boxTotal / Math.max(1, spanHours)) * 10) / 10,
+    buckets: hourKeys.map((hour) => ({ hour, count: perClockHour.get(hour) }))
+  }
+};
+
+if (jsonTarget) {
+  const body = JSON.stringify(json, null, 2);
+  if (typeof jsonTarget === 'string') writeFileSync(jsonTarget, body + '\n');
+  else process.stdout.write(body);
 }

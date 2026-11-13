@@ -20,8 +20,17 @@
   var BACKUP_APP = 'tiktok-jeton-paneli';
   var BACKUP_VERSION = 2;
   // Panel sürümü ve sürüm geçmişi (Ayarlar'da gösterilir, yedeğe yazılır).
-  var APP_VERSION = '1.2.1';
+  var APP_VERSION = '1.3.0';
   var CHANGE_LOG = [
+    {
+      version: '1.3.0',
+      date: '2026-11-13',
+      items: [
+        'Ölçüm sekmesi: kutu/saat, kutu/5 dk oturum, ayar grubu karşılaştırması ve saatlik kutu dağılımı panelde.',
+        'Sayılar scripts/quota-report.mjs --json ile site/firsat/data/metrics.json dosyasına yazılıyor; panel yalnızca gösteriyor.',
+        'Saatlik metrics.yml iş akışı ölçüm dosyasını güncelliyor; sekme ölçüm yoksa nedenini yazıyor.'
+      ]
+    },
     {
       version: '1.2.1',
       date: '2026-11-13',

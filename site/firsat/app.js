@@ -50,6 +50,7 @@
   var audioCtx = null;
   var verified = {};
   var scanInfo = null;
+  var metricsInfo = null;
   // GitHub Pages, veri commit'lerini saatlerce geciktiriyor (build kotası).
   // Ham dosya her zaman güncel ve CORS açık: önce oradan okunur, olmazsa
   // Pages kopyasına düşülür.
@@ -59,6 +60,8 @@
   var poolUrl = RAW_DATA + 'targets.json';
   var poolFallback = 'data/targets.json';
   var boxesUrl = RAW_DATA + 'boxes.json';
+  // Ölçüm dosyası: scripts/quota-report.mjs --json=... çıktısı (panel yalnız sunar).
+  var metricsUrl = RAW_DATA + 'metrics.json';
   var boxesFallback = 'data/boxes.json';
   // Anlık kutu yayını: tarayıcı bu konuya yazar, panel SSE ile dinler.
   // Git commit/CDN gecikmesi (dakikalar) sandık penceresini kaçırıyordu.
@@ -219,6 +222,7 @@
     document.querySelectorAll('.tab-btn').forEach(function (button) {
       button.classList.toggle('active', button.getAttribute('data-tab') === tab);
     });
+    if (tab === 'metrics') refreshMetrics();
     if (window.lucide) lucide.createIcons();
   }
 
@@ -2067,6 +2071,125 @@
     el.className = 'hint mt-3 ' + (danger ? 'text-red-300' : 'text-yellow-50/60');
   }
 
+  // ---------- Ölçüm ----------
+  // Sayılar scripts/quota-report.mjs tarafından metrics.json'a yazılır: panel
+  // hesabı tekrarlamaz, yalnızca gösterir (aynı sayı iki yerde tutulmaz).
+
+  async function refreshMetrics() {
+    try {
+      metricsInfo = await fetchScanData(metricsUrl);
+    } catch (error) {
+      // Dosya henüz üretilmediyse mevcut değer korunur.
+      if (!metricsInfo) metricsInfo = null;
+    }
+    renderMetrics();
+  }
+
+  function metricsNumber(value, suffix) {
+    if (value === null || value === undefined) return '—';
+    return fmt(value) + (suffix || '');
+  }
+
+  function renderMetrics() {
+    var summary = $('metricsSummary');
+    if (!summary) return;
+    var m = metricsInfo;
+    var stamp = $('metricsUpdated');
+    if (!m) {
+      stamp.textContent = 'metrics.json okunamadı';
+      summary.innerHTML = '<div class="empty-state col-span-2 lg:col-span-4">Ölçüm dosyası yok. ' +
+        'Tarayıcı geçmişinden üretmek için: <code>node scripts/quota-report.mjs --json=site/firsat/data/metrics.json</code></div>';
+      $('metricsHourly').innerHTML = '';
+      $('metricsGroupsTable').innerHTML = '';
+      $('metricsRunsTable').innerHTML = '';
+      return;
+    }
+
+    var hourly = m.hourly || {};
+    var runs = Array.isArray(m.runs) ? m.runs : [];
+    var groups = Array.isArray(m.groups) ? m.groups : [];
+    var source = m.source || {};
+    var lastRun = runs.length ? runs[runs.length - 1] : null;
+
+    stamp.textContent = m.generatedAt
+      ? 'ölçüm: ' + new Date(m.generatedAt).toLocaleString('tr-TR') + ' (' + ago(new Date(m.generatedAt).getTime()) + ')'
+      : '';
+
+    var cards = [
+      ['Kutu / saat (ort.)', metricsNumber(hourly.avgPerHour), 'text-amber-400',
+        (hourly.boxes || 0) + ' tekil kutu · ' + (hourly.hours || 0) + ' saat'],
+      ['Kutu / 5 dk oturum', lastRun ? metricsNumber(lastRun.boxesPerSession) : '—', 'text-green-300',
+        lastRun ? 'son koşu · ' + (lastRun.ok || 0) + ' başarılı bağlantı' : 'koşu yok'],
+      ['Karşılaştırılabilir koşu', metricsNumber(source.comparedRuns), 'text-purple-300',
+        (source.commits || 0) + ' commit tarandı' + (source.failed ? ' · ' + source.failed + ' okunamadı' : '')],
+      ['Ayar grubu', metricsNumber(groups.length), 'text-yellow-300',
+        groups.length ? 'en iyi: ' + fmt(groups[0].boxesPer100) + ' kutu/100 deneme' : 'grup yok']
+    ];
+    summary.innerHTML = cards.map(function (card) {
+      return '<div class="card p-4"><div class="stat-label">' + esc(card[0]) + '</div>' +
+        '<div class="stat-value ' + card[2] + '">' + card[1] + '</div>' +
+        '<div class="text-[10px] text-yellow-50/40 mt-1">' + esc(card[3]) + '</div></div>';
+    }).join('');
+
+    var buckets = Array.isArray(hourly.buckets) ? hourly.buckets.slice(-48) : [];
+    var maxCount = 1;
+    buckets.forEach(function (bucket) { maxCount = Math.max(maxCount, Number(bucket.count) || 0); });
+    $('metricsHourly').innerHTML = buckets.length
+      ? buckets.map(function (bucket) {
+        var count = Number(bucket.count) || 0;
+        var width = Math.max(2, Math.round((count / maxCount) * 100));
+        var label = String(bucket.hour || '').replace('T', ' ');
+        var lastTwo = label.slice(-2);
+        return '<div class="flex items-center gap-2 text-[11px]">' +
+          '<span class="w-24 shrink-0 text-yellow-50/50 font-mono">' + esc(label.slice(0, 10)) + ' ' + esc(lastTwo) + ':00</span>' +
+          '<span class="w-8 shrink-0 text-right font-mono text-amber-300">' + count + '</span>' +
+          '<span class="flex-1 h-2 rounded bg-white/5 overflow-hidden"><span class="block h-full rounded bg-amber-500/70" style="width:' + width + '%"></span></span>' +
+          '</div>';
+      }).join('')
+      : '<div class="hint">Saatlik kutu geçmişi yok.</div>';
+
+    $('metricsGroupsTable').innerHTML = groups.length
+      ? '<thead><tr><th>Grup</th><th>Koşu</th><th>Deneme</th><th>Ok %</th>' +
+        '<th>Kutu</th><th>Kutu/100 deneme</th><th>Kutu/bağlantı</th><th>Kutu/saat</th><th>Ort. dinlenen</th></tr></thead><tbody>' +
+        groups.map(function (group) {
+          return '<tr>' +
+            '<td class="text-[11px]">' + esc(group.name) + '</td>' +
+            '<td>' + metricsNumber(group.runs) + '</td>' +
+            '<td>' + metricsNumber(group.attempts) + '</td>' +
+            '<td>' + metricsNumber(group.okRate, '%') + '</td>' +
+            '<td class="text-amber-300 font-bold">' + metricsNumber(group.boxes) + '</td>' +
+            '<td>' + metricsNumber(group.boxesPer100) + '</td>' +
+            '<td>' + metricsNumber(group.boxesPerOk) + '</td>' +
+            '<td>' + metricsNumber(group.boxesPerHour) + '</td>' +
+            '<td>' + metricsNumber(group.avgWatching) + '</td>' +
+            '</tr>';
+        }).join('') + '</tbody>'
+      : '<tbody><tr><td class="text-[11px] text-yellow-50/40">Karşılaştırılabilir koşu yok.</td></tr></tbody>';
+
+    var recent = runs.slice(-25).reverse();
+    $('metricsRunsTable').innerHTML = recent.length
+      ? '<thead><tr><th>Zaman</th><th>Ayarlar</th><th>Deneme</th><th>Ok</th><th>Dinlenen</th>' +
+        '<th>Kutu</th><th>Kutu/saat</th><th>Kutu/5 dk oturum</th></tr></thead><tbody>' +
+        recent.map(function (run) {
+          var cfg = run.cfg || {};
+          var when = run.at ? new Date(run.at) : null;
+          return '<tr>' +
+            '<td class="text-[11px] whitespace-nowrap">' + (when ? when.toLocaleString('tr-TR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' }) : '—') + '</td>' +
+            '<td class="text-[10px] text-yellow-50/50">' + esc(run.profile || '') + ' · oda ' + (cfg.rooms || '?') +
+              ' · ara ' + (cfg.gap || '?') + 'ms · dk ' + (cfg.starts || '?') + ' · oran ' + (cfg.probe === undefined ? '?' : cfg.probe) + '</td>' +
+            '<td>' + metricsNumber(run.attempts) + '</td>' +
+            '<td>' + metricsNumber(run.ok) + '</td>' +
+            '<td>' + metricsNumber(run.watching) + '</td>' +
+            '<td class="text-amber-300 font-bold">' + metricsNumber(run.boxes) + '</td>' +
+            '<td>' + metricsNumber(run.boxesPerHour) + (run.short ? '*' : '') + '</td>' +
+            '<td>' + metricsNumber(run.boxesPerSession) + '</td>' +
+            '</tr>';
+        }).join('') + '</tbody>'
+      : '<tbody><tr><td class="text-[11px] text-yellow-50/40">Ölçülmüş koşu yok.</td></tr></tbody>';
+
+    if (window.lucide) lucide.createIcons();
+  }
+
   function renderScanState(info) {
     var el = $('scanState');
     if (!el || !desktopApi) return;
@@ -2567,6 +2690,7 @@
     renderInventory();
     renderAgencies();
     renderCalc();
+    renderMetrics();
     renderSettings();
     if (window.lucide) lucide.createIcons();
   }
@@ -2803,6 +2927,9 @@
     // Kutular ayrı ve sık okunur: sandık penceresi kaçmasın.
     refreshBoxes();
     setInterval(refreshBoxes, 15000);
+    // Ölçüm dosyası saatlik güncellenir: 5 dakikada bir okumak yeter.
+    refreshMetrics();
+    setInterval(refreshMetrics, 300000);
     startBoxStream();
 
     // Bildirim izni: açılışta denenir, tarayıcı isterse ilk tıklamada tekrar sorulur.
