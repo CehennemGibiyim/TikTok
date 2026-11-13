@@ -204,7 +204,10 @@ Kartlar kutu/görüldü/toplandı/kaçtı sayılarını, toplanma oranını (top
 altında) ve medyan tepki süresini (toplanma − görülme; alt satırda) verir. Hemen altında **türe göre**
 satırlar (sandık / portal / zarf) aynı tanımlarla kutu, görüldü, kaçtı ve **kaçma oranını**
 (kaçan / görülen) gösterir; en yüksek oranlı tür ayrıca yazılır ve 5’ten az görülen varsa “az örnek”
-uyarısı düşülür. Alttaki çubuklar kaçan kutuların geldiği saati gösterir. Veri cihazda (IndexedDB/localStorage) tutulur ve hesap panelde yapılır,
+uyarısı düşülür. Ardından **gün gün** son 7 takvim günü gelir: her gün için kutu, görüldü, toplanan ve
+dönüşüm (toplanan / görülen). O gün hiç görülen yoksa dönüşüm “—” kalır; %50 altı dönüşüm kırmızı
+gösterilir, böylece kötü geçen gün tek bakışta ayrılır. Bugün ve kayıt ortasında başlayan ilk gün
+`*` ile “kısmi” işaretlenir (gün henüz dolmadığı için sayılar düşük görünebilir). Alttaki çubuklar kaçan kutuların geldiği saati gösterir. Veri cihazda (IndexedDB/localStorage) tutulur ve hesap panelde yapılır,
 çünkü kullanıcı işaretlemeleri tarayıcı geçmişinde yoktur. “Görüldü” alanı bu sürümle eklendi: ondan
 önceki kutular hunide sayılmaz, 7 gün içinde kendiliğinden arınır.
 

@@ -20,8 +20,16 @@
   var BACKUP_APP = 'tiktok-jeton-paneli';
   var BACKUP_VERSION = 2;
   // Panel sürümü ve sürüm geçmişi (Ayarlar'da gösterilir, yedeğe yazılır).
-  var APP_VERSION = '1.4.4';
+  var APP_VERSION = '1.4.5';
   var CHANGE_LOG = [
+    {
+      version: '1.4.5',
+      date: '2026-11-13',
+      items: [
+        'Kutu hunisine gün gün bakış eklendi: son 7 takvim gününün kutu, görüldü ve toplanan sayıları ile dönüşüm oranı.',
+        'Dönüşüm %50 altındaysa kırmızı gösterilir; o gün hiç görülen kutu yoksa oran “—” kalır. Bugün ve kayıt ortasında başlayan ilk gün kısmi (*) işaretlenir.'
+      ]
+    },
     {
       version: '1.4.4',
       date: '2026-11-13',

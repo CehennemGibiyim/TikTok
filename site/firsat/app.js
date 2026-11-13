@@ -2267,19 +2267,40 @@
     var reactions = [];
     var hours = [];
     var kinds = {};
+    var days = [];
+    var dayMap = {};
+    var today = new Date();
+    today.setHours(0, 0, 0, 0);
     for (var hour = 0; hour < 24; hour += 1) hours.push(0);
     Object.keys(KINDS).forEach(function (kind) {
       kinds[kind] = { boxes: 0, seen: 0, collected: 0, missed: 0, open: 0 };
     });
+    // Son 7 takvim günü; kayıt başlangıcından tamamen önceki günler boş satır olarak
+    // görünmesin diye düşürülür. Gün, kutunun geldiği yerel tarihtir.
+    for (var back = 6; back >= 0; back -= 1) {
+      var start = new Date(today);
+      start.setDate(today.getDate() - back);
+      var next = new Date(start);
+      next.setDate(start.getDate() + 1);
+      if (next.getTime() <= since) continue;
+      var day = { start: start.getTime(), end: next.getTime(), boxes: 0, seen: 0, collected: 0 };
+      days.push(day);
+      dayMap[day.start] = day;
+    }
 
     state.events.forEach(function (event) {
       if (!isFunnelBox(event) || Number(event.createdAt) < since) return;
       boxes += 1;
       var kind = kinds[event.kind];
       if (kind) kind.boxes += 1;
+      var eventDay = new Date(Number(event.createdAt));
+      eventDay.setHours(0, 0, 0, 0);
+      var day = dayMap[eventDay.getTime()];
+      if (day) day.boxes += 1;
       if (Number(event.seenAt) <= 0) return;
       seen += 1;
       if (kind) kind.seen += 1;
+      if (day) day.seen += 1;
       var outcome = funnelOutcome(event);
       if (outcome === 'open') {
         open += 1;
@@ -2291,6 +2312,7 @@
       } else if (outcome === 'collected') {
         collected += 1;
         if (kind) kind.collected += 1;
+        if (day) day.collected += 1;
         var diff = Number(event.collectedAt) - Number(event.seenAt);
         if (diff >= 0 && diff <= FUNNEL_WINDOW_MS) reactions.push(diff);
       }
@@ -2309,8 +2331,46 @@
       conversion: seen ? collected / seen : null,
       median: reactions.length ? reactions[Math.floor(reactions.length / 2)] : null,
       hours: hours,
-      kinds: kinds
+      kinds: kinds,
+      days: days
     };
+  }
+
+  // Gün gün bakış: son 7 günün kutu / görülen / toplanan sayıları ve dönüşümü.
+  // Dönüşümün paydası görülen kutudur; bir gün hiç görülmediyse oran bilinmiyor (—).
+  function renderFunnelDays(f) {
+    var el = $('funnelDays');
+    if (!el) return;
+    if (!f.days || !f.days.length) { el.innerHTML = ''; return; }
+
+    var header = '<div class="flex items-center gap-2 px-1 text-[10px] uppercase tracking-wide text-yellow-50/40">' +
+      '<span class="w-28 shrink-0">gün</span>' +
+      '<span class="w-10 text-right">kutu</span>' +
+      '<span class="w-14 text-right">görüldü</span>' +
+      '<span class="w-14 text-right">toplanan</span>' +
+      '<span class="w-16 text-right">dönüşüm</span>' +
+      '</div>';
+    var todayStart = new Date();
+    todayStart.setHours(0, 0, 0, 0);
+    var body = f.days.map(function (day) {
+      var rate = day.seen ? day.collected / day.seen : null;
+      var color = rate === null ? 'text-yellow-50/30' : (rate < 0.5 ? 'text-red-300' : 'text-green-300');
+      var partial = day.start < f.since || day.start === todayStart.getTime();
+      var label = new Date(day.start).toLocaleDateString('tr-TR', {
+        weekday: 'short', day: '2-digit', month: '2-digit'
+      }) + (partial ? '*' : '');
+      return '<div class="flex items-center gap-2 rounded px-1 py-0.5 text-[11px] hover:bg-white/5">' +
+        '<span class="w-28 shrink-0 truncate text-yellow-100">' + esc(label) + '</span>' +
+        '<span class="w-10 text-right font-mono">' + fmt(day.boxes) + '</span>' +
+        '<span class="w-14 text-right font-mono text-sky-300">' + fmt(day.seen) + '</span>' +
+        '<span class="w-14 text-right font-mono text-green-300">' + fmt(day.collected) + '</span>' +
+        '<span class="w-16 text-right font-mono ' + color + '">' +
+          (rate === null ? '—' : '%' + Math.round(rate * 100)) + '</span>' +
+        '</div>';
+    }).join('');
+    el.innerHTML = header + '<div class="space-y-0.5 mt-1">' + body + '</div>' +
+      '<p class="hint mt-2">Gün, kutunun geldiği yerel tarih; dönüşüm = toplanan / görülen. ' +
+      '* kısmi gün (bugün ya da kayıt başlangıcı).</p>';
   }
 
   // Tür kırılımı: hangi türün daha çok kaçtığı aynı huni tanımlarıyla görünsün.
@@ -2371,6 +2431,7 @@
       reaction.textContent = '';
       $('funnelHourly').innerHTML = '<div class="hint">Kaçırma kaydı yok.</div>';
       renderFunnelKinds(f);
+      renderFunnelDays(f);
       return;
     }
 
@@ -2392,6 +2453,7 @@
         '<div class="text-[10px] text-yellow-50/40 mt-1">' + esc(card[3]) + '</div></div>';
     }).join('');
     renderFunnelKinds(f);
+    renderFunnelDays(f);
 
     var lines = [];
     lines.push(f.median === null
