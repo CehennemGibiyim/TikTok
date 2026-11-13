@@ -1,20 +1,11 @@
 {
  "note": "Taranacak adresler. Keşif kendi bulduklarını buraya ekler; elle eklenenler korunur.",
- "probeRatio": 0.2,
+ "probeRatio": 0.25,
  "probeStats": {
-  "sessions": 44,
-  "withBox": 8
+  "sessions": 53,
+  "withBox": 10
  },
  "probeHistory": [
-  {
-   "at": 1794444325464,
-   "from": 25,
-   "to": 20,
-   "probeRate": 0,
-   "hotRate": 100,
-   "sessions": 8,
-   "boxSessions": 0
-  },
   {
    "at": 1794445078708,
    "from": 20,
@@ -365,6 +356,15 @@
    "hotRate": null,
    "sessions": 8,
    "boxSessions": 0
+  },
+  {
+   "at": 1794555365077,
+   "from": 20,
+   "to": 25,
+   "probeRate": 25,
+   "hotRate": null,
+   "sessions": 8,
+   "boxSessions": 2
   }
  ],
  "boxHourly": {
@@ -398,7 +398,8 @@
   "498483": 39,
   "498484": 15,
   "498485": 18,
-  "498486": 5
+  "498486": 5,
+  "498487": 3
  },
  "regionSweep": {
   "at": 0,
@@ -406,8 +407,138 @@
   "regions": {},
   "failed": []
  },
- "updatedAt": "2026-11-13T07:32:24.336Z",
+ "updatedAt": "2026-11-13T07:40:52.005Z",
  "targets": [
+  {
+   "username": "scarle.06",
+   "country": "HN",
+   "source": "discovery",
+   "roomId": "7707528589117328134",
+   "roomIdAt": 1794555629891,
+   "roomIdMiss": 0,
+   "boxEvents": 0,
+   "lastBoxAt": 0,
+   "lastWatchedAt": 0,
+   "addedAt": 1794555629891,
+   "lastSeenLiveAt": 0
+  },
+  {
+   "username": "manuholt_",
+   "country": "CO",
+   "source": "discovery",
+   "roomId": "7707547895545400070",
+   "roomIdAt": 1794555629891,
+   "roomIdMiss": 0,
+   "boxEvents": 0,
+   "lastBoxAt": 0,
+   "lastWatchedAt": 0,
+   "addedAt": 1794555629891,
+   "lastSeenLiveAt": 0
+  },
+  {
+   "username": "mimii_hernandez25",
+   "country": "MX",
+   "source": "discovery",
+   "roomId": "7707555734824864532",
+   "roomIdAt": 1794555629891,
+   "roomIdMiss": 0,
+   "boxEvents": 0,
+   "lastBoxAt": 0,
+   "lastWatchedAt": 0,
+   "addedAt": 1794555629891,
+   "lastSeenLiveAt": 0
+  },
+  {
+   "username": "katya_katya_712",
+   "country": "BY",
+   "source": "discovery",
+   "roomId": "7707550819667430165",
+   "roomIdAt": 1794555483587,
+   "roomIdMiss": 0,
+   "boxEvents": 0,
+   "lastBoxAt": 0,
+   "lastWatchedAt": 1794555622627,
+   "addedAt": 1794555483587,
+   "lastSeenLiveAt": 0
+  },
+  {
+   "username": "meryalaoui5",
+   "country": "ME",
+   "source": "discovery",
+   "roomId": "7707466762350775092",
+   "roomIdAt": 1794555344081,
+   "roomIdMiss": 0,
+   "boxEvents": 0,
+   "lastBoxAt": 0,
+   "lastWatchedAt": 1794555616502,
+   "addedAt": 1794555344081,
+   "lastSeenLiveAt": 0
+  },
+  {
+   "username": "m.odaily",
+   "country": "ME",
+   "source": "discovery",
+   "roomId": "7707523083984980756",
+   "roomIdAt": 1794555284675,
+   "roomIdMiss": 0,
+   "boxEvents": 0,
+   "lastBoxAt": 0,
+   "lastWatchedAt": 1794555604478,
+   "addedAt": 1794555284675,
+   "lastSeenLiveAt": 0
+  },
+  {
+   "username": "isabarton1",
+   "country": "DO",
+   "source": "discovery",
+   "roomId": "7707495861584169734",
+   "roomIdAt": 1794555284675,
+   "roomIdMiss": 0,
+   "boxEvents": 0,
+   "lastBoxAt": 0,
+   "lastWatchedAt": 1794555610117,
+   "addedAt": 1794555284675,
+   "lastSeenLiveAt": 0
+  },
+  {
+   "username": "runaruna.dayo",
+   "country": "JP",
+   "source": "discovery",
+   "roomId": "7707486758920882951",
+   "roomIdAt": 1794555226624,
+   "roomIdMiss": 1,
+   "boxEvents": 0,
+   "lastBoxAt": 0,
+   "lastWatchedAt": 0,
+   "addedAt": 1794555226624,
+   "lastSeenLiveAt": 0
+  },
+  {
+   "username": "zumi8_",
+   "country": "CO",
+   "source": "discovery",
+   "roomId": "7707548718627179285",
+   "roomIdAt": 1794555226624,
+   "roomIdMiss": 0,
+   "boxEvents": 0,
+   "lastBoxAt": 0,
+   "lastWatchedAt": 1794555544970,
+   "addedAt": 1794555226624,
+   "lastSeenLiveAt": 0
+  },
+  {
+   "username": "tataurs88",
+   "country": "RO",
+   "source": "discovery",
+   "roomId": "7707550675537890070",
+   "roomIdAt": 1794555226624,
+   "roomIdMiss": 0,
+   "boxEvents": 0,
+   "lastBoxAt": 0,
+   "lastWatchedAt": 1794555550952,
+   "addedAt": 1794555226624,
+   "lastSeenLiveAt": 0
+  },
   {
    "username": "zoya_official78",
    "country": "ME",
@@ -415,9 +546,9 @@
    "roomId": "7707541798478007041",
    "roomIdAt": 1794555132438,
    "roomIdMiss": 0,
-   "boxEvents": 0,
-   "lastBoxAt": 0,
-   "lastWatchedAt": 0,
+   "boxEvents": 1,
+   "lastBoxAt": 1794555526030,
+   "lastWatchedAt": 1794555467961,
    "addedAt": 1794555132438,
    "lastSeenLiveAt": 0
   },
@@ -430,7 +561,7 @@
    "roomIdMiss": 0,
    "boxEvents": 0,
    "lastBoxAt": 0,
-   "lastWatchedAt": 0,
+   "lastWatchedAt": 1794555475918,
    "addedAt": 1794555132438,
    "lastSeenLiveAt": 0
   },
@@ -443,7 +574,7 @@
    "roomIdMiss": 0,
    "boxEvents": 0,
    "lastBoxAt": 0,
-   "lastWatchedAt": 0,
+   "lastWatchedAt": 1794555462513,
    "addedAt": 1794555066359,
    "lastSeenLiveAt": 0
   },
@@ -456,7 +587,7 @@
    "roomIdMiss": 0,
    "boxEvents": 0,
    "lastBoxAt": 0,
-   "lastWatchedAt": 0,
+   "lastWatchedAt": 1794555455780,
    "addedAt": 1794554918248,
    "lastSeenLiveAt": 0
   },
@@ -469,7 +600,7 @@
    "roomIdMiss": 0,
    "boxEvents": 0,
    "lastBoxAt": 0,
-   "lastWatchedAt": 0,
+   "lastWatchedAt": 1794555408396,
    "addedAt": 1794554858135,
    "lastSeenLiveAt": 0
   },
@@ -482,7 +613,7 @@
    "roomIdMiss": 0,
    "boxEvents": 0,
    "lastBoxAt": 0,
-   "lastWatchedAt": 0,
+   "lastWatchedAt": 1794555432152,
    "addedAt": 1794554858135,
    "lastSeenLiveAt": 0
   },
@@ -495,7 +626,7 @@
    "roomIdMiss": 0,
    "boxEvents": 0,
    "lastBoxAt": 0,
-   "lastWatchedAt": 0,
+   "lastWatchedAt": 1794555402226,
    "addedAt": 1794554744963,
    "lastSeenLiveAt": 0
   },
@@ -508,7 +639,7 @@
    "roomIdMiss": 0,
    "boxEvents": 0,
    "lastBoxAt": 0,
-   "lastWatchedAt": 0,
+   "lastWatchedAt": 1794555395727,
    "addedAt": 1794554623054,
    "lastSeenLiveAt": 0
   },
@@ -521,7 +652,7 @@
    "roomIdMiss": 0,
    "boxEvents": 0,
    "lastBoxAt": 0,
-   "lastWatchedAt": 0,
+   "lastWatchedAt": 1794555370008,
    "addedAt": 1794554569803,
    "lastSeenLiveAt": 0
   },
@@ -532,9 +663,9 @@
    "roomId": "7707541624116529926",
    "roomIdAt": 1794554369186,
    "roomIdMiss": 0,
-   "boxEvents": 0,
-   "lastBoxAt": 0,
-   "lastWatchedAt": 0,
+   "boxEvents": 1,
+   "lastBoxAt": 1794555305688,
+   "lastWatchedAt": 1794555169076,
    "addedAt": 1794554369186,
    "lastSeenLiveAt": 0
   },
@@ -547,7 +678,7 @@
    "roomIdMiss": 0,
    "boxEvents": 0,
    "lastBoxAt": 0,
-   "lastWatchedAt": 0,
+   "lastWatchedAt": 1794555186895,
    "addedAt": 1794554369186,
    "lastSeenLiveAt": 0
   },
@@ -571,8 +702,8 @@
    "roomId": "7707550211115141908",
    "roomIdAt": 1794554307408,
    "roomIdMiss": 0,
-   "boxEvents": 0,
-   "lastBoxAt": 0,
+   "boxEvents": 1,
+   "lastBoxAt": 1794555172347,
    "lastWatchedAt": 1794555126099,
    "addedAt": 1794554307408,
    "lastSeenLiveAt": 0
@@ -583,7 +714,7 @@
    "source": "discovery",
    "roomId": "7707524380359756551",
    "roomIdAt": 1794554307408,
-   "roomIdMiss": 0,
+   "roomIdMiss": 1,
    "boxEvents": 0,
    "lastBoxAt": 0,
    "lastWatchedAt": 0,
@@ -596,7 +727,7 @@
    "source": "discovery",
    "roomId": "7707509597725379346",
    "roomIdAt": 1794554307408,
-   "roomIdMiss": 0,
+   "roomIdMiss": 1,
    "boxEvents": 0,
    "lastBoxAt": 0,
    "lastWatchedAt": 0,
@@ -612,7 +743,7 @@
    "roomIdMiss": 0,
    "boxEvents": 0,
    "lastBoxAt": 0,
-   "lastWatchedAt": 0,
+   "lastWatchedAt": 1794555162451,
    "addedAt": 1794554307408,
    "lastSeenLiveAt": 0
   },
@@ -20840,7 +20971,7 @@
    "roomIdMiss": 0,
    "boxEvents": 2,
    "lastBoxAt": 1794543981273,
-   "lastWatchedAt": 1794551362369,
+   "lastWatchedAt": 1794555214952,
    "addedAt": 1794448657500,
    "lastSeenLiveAt": 1794448853407
   },
