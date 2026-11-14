@@ -1,42 +1,19 @@
 {
- "scannedAt": "2026-11-14T09:52:17.055Z",
- "runId": 1794649357400,
+ "scannedAt": "2026-11-14T14:41:27.150Z",
+ "runId": 1794667287129,
  "delivery": {
-  "runId": 1794649357400,
-  "produced": 1,
-  "lastSeq": 1,
+  "runId": 1794667287129,
+  "produced": 0,
+  "lastSeq": 0,
   "duplicate": 0,
   "ntfyAttempts": 0,
   "ntfyOk": 0,
   "ntfyFail": 0,
   "ntfyFailSeqs": [],
-  "boxTimeBySeq": {
-   "1": 1794649937055
-  },
-  "fileFromSeq": 1,
-  "fileSeqCount": 1,
+  "boxTimeBySeq": {},
+  "fileFromSeq": 0,
+  "fileSeqCount": 0,
   "fileCap": 120
  },
- "boxes": [
-  {
-   "id": "hannahbenta_backup-env-7707962741948271381",
-   "seq": 1,
-   "runId": 1794649357400,
-   "t": 1794649937055,
-   "username": "hannahbenta_backup",
-   "kind": "chest",
-   "coins": 875,
-   "boxName": "Sandık",
-   "businessType": 20,
-   "boxType": "",
-   "shared": 500,
-   "participants": 0,
-   "viewers": 3684,
-   "durationSec": 30,
-   "unpackAt": 1794649966000,
-   "availableAt": 1794649966000,
-   "hasWindow": true,
-   "sessionSec": 124
-  }
- ]
+ "boxes": []
 }
