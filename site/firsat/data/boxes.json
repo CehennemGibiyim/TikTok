@@ -1,18 +1,37 @@
 {
- "scannedAt": "2026-11-13T19:12:30.488Z",
- "runId": 1794597150475,
+ "scannedAt": "2026-11-14T02:44:05.382Z",
+ "runId": 1794616210656,
  "delivery": {
-  "runId": 1794597150475,
-  "produced": 0,
-  "lastSeq": 0,
+  "runId": 1794616210656,
+  "produced": 1,
+  "lastSeq": 1,
   "duplicate": 0,
   "ntfyAttempts": 0,
   "ntfyOk": 0,
   "ntfyFail": 0,
   "ntfyFailSeqs": [],
-  "fileFromSeq": 0,
-  "fileSeqCount": 0,
+  "fileFromSeq": 1,
+  "fileSeqCount": 1,
   "fileCap": 120
  },
- "boxes": []
+ "boxes": [
+  {
+   "id": "daigrejalives-env-7707852413701278485",
+   "seq": 1,
+   "runId": 1794616210656,
+   "t": 1794624245382,
+   "username": "daigrejalives",
+   "kind": "chest",
+   "coins": 875,
+   "boxName": "Sandık",
+   "businessType": 20,
+   "boxType": "",
+   "shared": 500,
+   "durationSec": 29,
+   "unpackAt": 1794624274000,
+   "availableAt": 1794624274000,
+   "hasWindow": true,
+   "sessionSec": 44
+  }
+ ]
 }
