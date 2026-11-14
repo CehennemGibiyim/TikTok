@@ -9,6 +9,7 @@
 // Örnek satır (uygulamadan gelen ham mesaj da olur):
 //   {"username":"ornek","event":"envelope","envelopeInfo":{"businessType":20,"diamondCount":51,"envelopeId":"abc","secondsUntilOpen":60}}
 import fs from 'node:fs';
+import readline from 'node:readline';
 
 const args = new Map(process.argv.slice(2).map((item) => {
   const [key, ...rest] = item.replace(/^--/, '').split('=');
@@ -25,9 +26,6 @@ if (!KEY) {
   console.error('INGEST_TOKEN (ya da --key=...) gerekli.');
   process.exit(1);
 }
-
-const text = FILE === '-' ? fs.readFileSync(0, 'utf8') : fs.readFileSync(FILE, 'utf8');
-const lines = text.split('\n').map((line) => line.trim()).filter(Boolean);
 
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -57,7 +55,10 @@ async function sendOne(line) {
 let accepted = 0;
 let duplicated = 0;
 let failed = 0;
-for (const line of lines) {
+
+async function handleLine(raw) {
+  const line = String(raw || '').trim();
+  if (!line) return;
   const result = await sendOne(line);
   if (!result.ok) failed += 1;
   else if (result.duplicate) duplicated += 1;
@@ -66,5 +67,14 @@ for (const line of lines) {
   if (DELAY_MS > 0) await sleep(DELAY_MS);
 }
 
+if (FILE === '-') {
+  // adb logcat gibi canlı boru: satır geldikçe gönder, EOF bekleme.
+  const rl = readline.createInterface({ input: process.stdin, crlfDelay: Infinity });
+  for await (const line of rl) await handleLine(line);
+} else {
+  const text = fs.readFileSync(FILE, 'utf8');
+  for (const line of text.split('\n')) await handleLine(line);
+}
+
 console.log('kabul: ' + accepted + ' · yinelenen: ' + duplicated + ' · hatalı: ' + failed);
-process.exit(failed > 0 ? 1 : 0);
+process.exitCode = failed > 0 ? 1 : 0;
