@@ -456,6 +456,13 @@ function targetFor(username) {
   return state.targets.find((target) => target.username === username) || null;
 }
 
+// Panelden gelen hedefler keşif kayıtlarından farklıdır: oda kimliği
+// bulunamasa da sayfa doğrulaması veya doğrudan bağlayıcı denenir.
+function isManualWatchTarget(username) {
+  const target = targetFor(username);
+  return Boolean(target && /^(radar_manual|panel_watch|manual)$/.test(String(target.source || '')));
+}
+
 // Panelden eklenen adres havuzda yoksa başa alınır: bir sonraki poll turunda
 // canlılık kontrolü yapılır ve kutu gelirse normal dinleme akışına girer.
 function addWatchedTarget(raw, source) {
@@ -1705,9 +1712,13 @@ async function openConnectorWatcher(username, sessionSec) {
   if (!knownRoomId) {
     const page = await scrapeLiveInfo(username);
     if (!page.known) {
-      // Sayfa okunamadı (captcha/boş yanıt): oda kimliği yok, bağlayıcının kendi
-      // kazıması da bu IP'lerde hep boş dönüyor — denemek kotayı boşa yakıyordu.
-      throw new Error('sayfa doğrulanamadı' + (page.status ? ' (HTTP ' + page.status + ')' : ''));
+      // Sayfa okunamadı (captcha/boş yanıt). Keşif kayıtlarında bu deneme
+      // kotayı boşa yakacağı için vazgeçilir; panelden elle eklenen hedefte
+      // ise bağlayıcıyı doğrudan username ile denemek son şanstır.
+      if (!isManualWatchTarget(username)) {
+        throw new Error('sayfa doğrulanamadı' + (page.status ? ' (HTTP ' + page.status + ')' : ''));
+      }
+      log('manuel hedef sayfadan doğrulanamadı, bağlayıcı doğrudan denenecek:', username);
     }
     if (!page.live) {
       const offlineError = new Error('sayfada canlı oda yok');
@@ -1739,7 +1750,10 @@ async function openConnectorWatcher(username, sessionSec) {
   connection.on('superFanBox', (data) => { bump(); handleEnvelope(username, 'superFanBox', data); });
   connection.on('roomUser', (data) => {
     const record = state.streamers.get(username);
-    if (record && data && data.viewerCount) record.viewers = Number(data.viewerCount) || record.viewers;
+    // Bağlayıcı ham Webcast mesajını veriyor: güncel izleyici `total`,
+    // toplam izleyici `totalUser` alanında; `viewerCount` her zaman yok.
+    const count = Number(data && (data.total || data.totalUser || data.viewerCount)) || 0;
+    if (record && count) record.viewers = count;
   });
   connection.on('streamEnd', () => { markOffline(username); closeWatcher(username, 'yayın bitti'); });
   connection.on('disconnected', () => {
@@ -1751,7 +1765,12 @@ async function openConnectorWatcher(username, sessionSec) {
   await connection.connect(knownRoomId || undefined);
 
   const liveRecord = state.streamers.get(username);
-  if (liveRecord && connection.roomId) liveRecord.roomId = String(connection.roomId);
+  if (liveRecord && connection.roomId) {
+    liveRecord.roomId = String(connection.roomId);
+    // Bağlayıcının bulduğu kimlik sonraki oturumlarda sayfa kazımasını
+    // atlatır; manuel hedefte bu, tekrar tekrar doğrulama denemesini önler.
+    storeRoomId(username, String(connection.roomId));
+  }
 
   armWatcherTimer(watcher);
   log('dinleniyor', username);
@@ -2017,8 +2036,7 @@ async function maintainWatchers() {
     // Panelden elle eklenen hedef, keşif ucunda görünmediği için oda kimliği
     // boş kalabilir. Bu hedeflerde sayfayı bir kez doğrulayıp kimliği
     // kendimiz çıkarırız; keşif kayıtlarında ise kimliksiz oda boşa kotadır.
-    const target = targetFor(record.username);
-    const manualWatch = Boolean(target && /^(radar_manual|panel_watch|manual)$/.test(String(target.source || '')));
+    const manualWatch = isManualWatchTarget(record.username);
     if (!record.roomId && !manualWatch) return false;
     if (!strict) return true;
     if (manualWatch) return true;
