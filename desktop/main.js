@@ -38,7 +38,7 @@ const MIME = {
 };
 
 // Panelin ilk açılışta boş görünmemesi için depodaki son tarama verisi kopyalanır.
-const SEED_FILES = ['targets.json', 'live.json'];
+const SEED_FILES = ['targets.json', 'live.json', 'boxes.json'];
 
 let win = null;
 let server = null;
@@ -110,7 +110,7 @@ function startServer() {
       if (rel.endsWith('/')) rel += 'index.html';
 
       // Tarama verisi kullanıcı klasöründen okunur (uygulama dizini salt okunur).
-      const dataHit = rel.match(/^\/firsat\/data\/(live|targets)\.json$/);
+      const dataHit = rel.match(/^\/firsat\/data\/(live|targets|boxes)\.json$/);
       const root = dataHit ? DATA_DIR : SITE_DIR;
       const file = dataHit ? path.join(DATA_DIR, dataHit[1] + '.json') : path.join(SITE_DIR, rel);
 

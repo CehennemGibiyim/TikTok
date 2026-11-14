@@ -46,6 +46,24 @@ Object.keys(tabs).forEach(tabId => {
 // --- STORAGE & DATABASE (Kalıcı Hedef Yayıncılar) ---
 let trackedUsernames = [];
 
+// Statik/GitHub modu: tarayıcı arka uç çalıştıramadığı için keşif ve kutu
+// verisi site/firsat/data altındaki JSON dosyalarından okunur. WebSocket
+// bağlantısı varsa aynı veri akışına ek kanal olarak devam eder.
+const STATIC_DATA_BASES = [
+    'firsat/data/',
+    'https://raw.githubusercontent.com/CehennemGibiyim/TikTok/main/site/firsat/data/'
+];
+const AUTO_TARGET_LIMIT = 250;
+const AUTO_IGNORED_KEY = 'tiktok-radar-auto-ignored';
+const BOX_KIND_LABELS = { chest: 'Sandık', letter: 'Zarf / Mektup', portal: 'Portal' };
+let autoIgnored = [];
+try {
+    autoIgnored = JSON.parse(localStorage.getItem(AUTO_IGNORED_KEY) || '[]');
+    if (!Array.isArray(autoIgnored)) autoIgnored = [];
+} catch (e) { autoIgnored = []; }
+let staticSyncTimer = null;
+let staticDiscoveryTimer = null;
+
 function loadPersistedUsers() {
     try {
         if (fs.existsSync(usersFile)) {
@@ -107,6 +125,186 @@ function savePersistedUsers() {
         fs.writeFileSync(usersFile, JSON.stringify(trackedUsernames, null, 2));
         console.log(`[STORAGE] ${trackedUsernames.length} kullanıcı kaydedildi`);
     } catch(e) { console.error("[STORAGE] Kullanıcılar kaydedilemedi:", e); }
+}
+
+function saveAutoIgnored() {
+    try { localStorage.setItem(AUTO_IGNORED_KEY, JSON.stringify(autoIgnored.slice(-500))); } catch (e) { /* yoksay */ }
+}
+
+function setTrackedLive(username, live) {
+    const dot = document.getElementById(`status-${username}`);
+    if (!dot) return;
+    dot.className = live
+        ? 'w-2.5 h-2.5 rounded-full bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.8)]'
+        : 'w-2.5 h-2.5 rounded-full bg-yellow-500/50 shadow-[0_0_5px_rgba(250,204,21,0.5)] animate-pulse';
+    dot.title = live ? 'Canlı' : 'Bekliyor';
+}
+
+async function fetchStaticJson(name) {
+    let lastError = null;
+    for (const base of STATIC_DATA_BASES) {
+        try {
+            const response = await fetch(base + name + '?t=' + Date.now(), { cache: 'no-store' });
+            if (!response.ok) throw new Error('HTTP ' + response.status);
+            return await response.json();
+        } catch (error) {
+            lastError = error;
+        }
+    }
+    throw lastError || new Error('veri bulunamadı');
+}
+
+function staticLiveNames(data) {
+    const names = [];
+    const list = data && Array.isArray(data.streamers) ? data.streamers : [];
+    list.forEach(item => {
+        if (item && item.username && item.live === true) names.push(item.username);
+    });
+    return names;
+}
+
+function updateStaticModeStatus(data) {
+    const el = document.getElementById('radarDataMode');
+    if (!el) return;
+    const at = data && data.scannedAt
+        ? new Date(data.scannedAt).toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' })
+        : '';
+    el.textContent = 'Statik veri' + (at ? ' · son tarama ' + at : '') +
+        ' · hedef ' + trackedUsernames.length;
+}
+
+async function syncStaticTargets() {
+    let liveData = null;
+    try {
+        liveData = await fetchStaticJson('live.json');
+    } catch (error) {
+        // live.json yoksa targets.json'daki son canlı kayıtları dene.
+    }
+
+    let names = staticLiveNames(liveData);
+    if (!names.length) {
+        try {
+            const targetData = await fetchStaticJson('targets.json');
+            const recent = Date.now() - 6 * 3600 * 1000;
+            (targetData && Array.isArray(targetData.targets) ? targetData.targets : []).forEach(item => {
+                if (item && item.username && Number(item.lastSeenLiveAt) >= recent) names.push(item.username);
+            });
+        } catch (error) { /* veri yoksa sessizce bekle */ }
+    }
+
+    names = Array.from(new Set(names)).filter(Boolean).slice(0, AUTO_TARGET_LIMIT);
+    if (names.length) {
+        const added = await addNewTargets(names, { auto: true });
+        names.forEach(name => setTrackedLive(name, true));
+        if (added > 0) appendBotLog('🔎 Statik keşif: ' + added + ' yeni canlı yayıncı hedef listesine eklendi.');
+    }
+    updateStaticModeStatus(liveData);
+}
+
+function boxKindLabel(kind) {
+    return BOX_KIND_LABELS[kind] || 'Sandık';
+}
+
+function addChestRecord(chest) {
+    if (!chest || !chest.id || !chest.user) return;
+    if (chestsData.some(item => item.id === chest.id)) return;
+
+    chestsData.push(chest);
+    chestsTotalCounter += 1;
+    if (totalChestsFoundSpan) totalChestsFoundSpan.innerText = chestsTotalCounter;
+    generateChestQRCode(chest.id, chest.user);
+    renderChests();
+}
+
+function ingestStaticBox(box) {
+    const dropTime = Number(box && box.t) || 0;
+    if (!box || !box.username || !dropTime) return;
+    // Kutunun yakalama penceresi kısa; eski dosya kayıtlarını listeye doldurma.
+    if (Date.now() - dropTime > 15 * 60 * 1000) return;
+
+    const availableAt = Number(box.availableAt) || dropTime;
+    const rawDuration = Number(box.durationSec) || Math.max(0, (availableAt - dropTime) / 1000);
+    addChestRecord({
+        id: 'static_' + (box.id || (box.username + '_' + dropTime + '_' + (box.kind || 'chest'))),
+        user: box.username,
+        coins: Number(box.coins) || 0,
+        duration: rawDuration || 180,
+        hasDuration: rawDuration > 0,
+        dropTime: dropTime,
+        timeStr: new Date(dropTime).toLocaleTimeString('tr-TR'),
+        graceStartTime: null,
+        userCount: Number(box.shared) || 0,
+        kind: box.kind || 'chest',
+        boxName: box.boxName || ''
+    });
+}
+
+async function syncStaticBoxes() {
+    try {
+        const data = await fetchStaticJson('boxes.json');
+        const boxes = data && Array.isArray(data.boxes) ? data.boxes : [];
+        boxes.forEach(ingestStaticBox);
+    } catch (error) { /* kutu dosyası yoksa sessizce bekle */ }
+}
+
+async function discoverLiveChannels() {
+    try {
+        const controller = new AbortController();
+        const guard = setTimeout(() => controller.abort(), 8000);
+        let response;
+        try {
+            response = await fetch('https://api.tik.tools/api/live/top-channels?t=' + Date.now(), {
+                cache: 'no-store',
+                signal: controller.signal
+            });
+        } finally {
+            clearTimeout(guard);
+        }
+        if (!response.ok) throw new Error('HTTP ' + response.status);
+        const data = await response.json();
+        const channels = data && Array.isArray(data.channels) ? data.channels : [];
+        const names = channels.map(channel => channel && channel.uniqueId).filter(Boolean);
+        if (names.length) {
+            const added = await addNewTargets(Array.from(new Set(names)), { auto: true });
+            names.forEach(name => setTrackedLive(name, true));
+            if (added > 0) appendBotLog('🔎 Canlı keşif: ' + added + ' yeni yayıncı hedef listesine eklendi.');
+        }
+    } catch (error) { /* keşif ucu yoksa statik dosyalar devrede */ }
+}
+
+function applyStaticModeUI(force) {
+    if (!force && serverUrlFromUi()) return;
+    if (wsStatusBadge) {
+        wsStatusBadge.className = 'flex items-center space-x-2 px-3 py-1 rounded-full bg-green-500/10 border border-green-500/20 text-green-400';
+        wsStatusBadge.innerHTML = '<div class="w-2 h-2 rounded-full bg-green-500 shadow-[0_0_5px_rgba(34,197,94,0.8)]"></div><span class="text-xs font-bold">Statik</span>';
+    }
+    if (btnConnectWs) btnConnectWs.classList.add('hidden');
+    if (btnDisconnectWs) btnDisconnectWs.classList.add('hidden');
+    if (radarPulse) radarPulse.classList.remove('hidden');
+    const input = document.getElementById('wsUrl');
+    if (input) {
+        input.value = '';
+        input.placeholder = 'GitHub Actions / yerel tarama verisi';
+        input.readOnly = true;
+    }
+    const hint = document.getElementById('radarDataMode');
+    if (hint) {
+        hint.classList.remove('hidden');
+        hint.textContent = 'GitHub/yerel statik mod: keşif ve kutular firsat/data dosyalarından okunuyor.';
+    }
+}
+
+function startStaticDataSync() {
+    if (staticSyncTimer) return;
+    applyStaticModeUI();
+    syncStaticTargets();
+    syncStaticBoxes();
+    discoverLiveChannels();
+    staticSyncTimer = setInterval(function () {
+        syncStaticTargets();
+        syncStaticBoxes();
+    }, 30000);
+    staticDiscoveryTimer = setInterval(discoverLiveChannels, 60000);
 }
 
 // --- RADAR LOGIC (WebSocket) ---
@@ -174,7 +372,7 @@ function connectWebSocket() {
         : '';
 
     if (!url) {
-        appendBotLog('⚠️ Sunucu adresi yok. Ayarlardan arka uç adresini girin.');
+        applyStaticModeUI();
         return;
     }
 
@@ -203,6 +401,14 @@ function connectWebSocket() {
         btnDisconnectWs.classList.add('hidden');
         radarPulse.classList.add('hidden');
         if (renderInterval) clearInterval(renderInterval);
+        // Açıkça verilmiş bir arka uç yoksa aynı origin'e bağlanma denemesi
+        // statik moda düşer; GitHub Pages ve yerel dosya sunucusu böyle çalışır.
+        if (!explicitBackendConfigured()) {
+            applyStaticModeUI(true);
+            startStaticDataSync();
+            appendBotLog('📡 WebSocket yok; statik keşif ve kutu verisi kullanılıyor.');
+            return;
+        }
         scheduleServerReconnect();
     };
 
@@ -320,7 +526,26 @@ let reconnectTimer = null;
 let serverWaitTimer = null;
 let serverWaiters = [];
 
+function explicitBackendConfigured() {
+    if (typeof window.TIKTOK_BACKEND_URL === 'string' && window.TIKTOK_BACKEND_URL.trim()) return true;
+    try {
+        if ((localStorage.getItem('tiktok-radar-backend-url') || '').trim()) return true;
+    } catch (e) { /* yoksay */ }
+    const input = document.getElementById('wsUrl');
+    const value = (input && input.value ? input.value : '').trim();
+    if (!value) return false;
+    try { return new URL(value, location.href).host !== location.host; } catch (e) { return true; }
+}
+
 function serverUrlFromUi() {
+    // store-client statik GitHub Pages'te kendi origin'i arka uç saymaz.
+    // Böylece panel wss://kullanici.github.io adresine bağlanmaya çalışmaz.
+    if (window.RADAR_STORE && typeof window.RADAR_STORE.websocketUrl === 'function') {
+        try {
+            const resolved = window.RADAR_STORE.websocketUrl();
+            if (resolved !== undefined) return resolved || '';
+        } catch (e) { /* yoksay */ }
+    }
     const input = document.getElementById('wsUrl');
     const value = (input && input.value ? input.value : '').trim();
     if (value) return value;
@@ -408,29 +633,39 @@ function extractUsernames(text) {
     return validNames;
 }
 
-async function addNewTargets(namesArray) {
+async function addNewTargets(namesArray, options) {
+    const auto = Boolean(options && options.auto);
     let addedCount = 0;
     const newManualStreamers = [];
     
     namesArray.forEach(username => {
+        if (auto && autoIgnored.includes(username)) return;
+        if (auto && trackedUsernames.length >= AUTO_TARGET_LIMIT && !trackedUsernames.includes(username)) return;
         if (!trackedUsernames.includes(username)) {
             trackedUsernames.push(username);
-            renderTrackedUserUI(username);
+            renderTrackedUserUI(username, auto);
+            if (!auto && autoIgnored.includes(username)) {
+                autoIgnored = autoIgnored.filter(name => name !== username);
+                saveAutoIgnored();
+            }
             
-            // Manuel eklenen yayıncıyı scan.json'a da ekle
-            newManualStreamers.push({
-                username: username,
-                discoveredBy: 'manual',
-                discoveredAt: new Date().toISOString(),
-                lastLiveAt: new Date().toISOString(),
-                coinEventCount: 0,
-                isLive: false,
-                isAutoAdded: false,
-                status: 'active',
-                scanCount: 0,
-                manuallyAdded: true,
-                source: 'radar_manual'
-            });
+            // Yalnızca elle eklenen yayıncıyı scan.json'a da yaz; otomatik
+            // keşiftekiler WebSocket varsa yalnız add_user ile bildirilir.
+            if (!auto) {
+                newManualStreamers.push({
+                    username: username,
+                    discoveredBy: 'manual',
+                    discoveredAt: new Date().toISOString(),
+                    lastLiveAt: new Date().toISOString(),
+                    coinEventCount: 0,
+                    isLive: false,
+                    isAutoAdded: false,
+                    status: 'active',
+                    scanCount: 0,
+                    manuallyAdded: true,
+                    source: 'radar_manual'
+                });
+            }
             
             if (ws && ws.readyState === WebSocket.OPEN) {
                 ws.send(JSON.stringify({ action: 'add_user', username }));
@@ -484,7 +719,7 @@ function updateEmptyUsersText() {
     emptyUsersText.style.display = trackedUsernames.length === 0 ? 'block' : 'none';
 }
 
-function renderTrackedUserUI(username) {
+function renderTrackedUserUI(username, live) {
     if (!trackedUsersContainer) {
         console.warn(`[UI] trackedUsersContainer bulunamadı, @${username} render edilemedi`);
         return;
@@ -500,7 +735,7 @@ function renderTrackedUserUI(username) {
     div.className = "flex items-center justify-between bg-black/40 border border-white/5 rounded-xl p-3";
     div.innerHTML = `
         <div class="flex items-center space-x-3">
-            <div id="status-${username}" class="w-2.5 h-2.5 rounded-full bg-yellow-500/50 shadow-[0_0_5px_rgba(250,204,21,0.5)] animate-pulse"></div>
+            <div id="status-${username}" class="${live ? 'w-2.5 h-2.5 rounded-full bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.8)]' : 'w-2.5 h-2.5 rounded-full bg-yellow-500/50 shadow-[0_0_5px_rgba(250,204,21,0.5)] animate-pulse'}" title="${live ? 'Canlı' : 'Bekliyor'}"></div>
             <span class="font-medium text-yellow-50">@${username}</span>
         </div>
         <button class="text-red-400 hover:text-red-300 p-1 bg-red-500/10 rounded-lg transition-colors border border-red-500/20" onclick="removeTrackedUser('${username}')" title="Listeden Sil">
@@ -513,6 +748,10 @@ function renderTrackedUserUI(username) {
 
 window.removeTrackedUser = async function(username) {
     trackedUsernames = trackedUsernames.filter(u => u !== username);
+    if (!autoIgnored.includes(username)) {
+        autoIgnored.push(username);
+        saveAutoIgnored();
+    }
     const el = document.getElementById(`tracked-${username}`);
     if (el) el.remove();
     updateEmptyUsersText();
@@ -553,34 +792,28 @@ function generateChestQRCode(chestId, username) {
 }
 
 function handleNewChest(data) {
-    console.log(`[CHEST EVENT] Yeni sandık: @${data.user}, Jeton: ${data.data?.coins || 'bilinmiyor'}`, data);
-    
-    chestsTotalCounter++;
-    totalChestsFoundSpan.innerText = chestsTotalCounter;
-    
-    const chestId = 'chest_' + Date.now() + Math.floor(Math.random()*1000);
-    const coins = typeof data.data.coins === 'number' ? data.data.coins : parseInt(data.data.coins) || 0;
-    const duration = data.data.duration || 180;
-    const userCount = data.data.userCount || data.data.totalUsers || 0;
-    
-    chestsData.push({
+    const payload = data.data || {};
+    console.log(`[CHEST EVENT] Yeni kutu: @${data.user}, Jeton: ${payload.coins || 'bilinmiyor'}`, data);
+
+    const rawCoins = typeof payload.coins === 'number' ? payload.coins : parseInt(payload.coins) || 0;
+    const rawDuration = Number(payload.duration || payload.durationSec) || 0;
+    const chestId = data.id || ('chest_' + Date.now() + Math.floor(Math.random()*1000));
+
+    addChestRecord({
         id: chestId,
         user: data.user,
-        coins: coins,
-        duration: duration,
+        coins: rawCoins,
+        duration: rawDuration || 180,
+        hasDuration: rawDuration > 0,
         dropTime: Date.now(),
-        timeStr: data.data.time || new Date().toLocaleTimeString(),
+        timeStr: payload.time || new Date().toLocaleTimeString(),
         graceStartTime: null,
-        userCount: userCount
+        userCount: payload.userCount || payload.totalUsers || 0,
+        kind: data.kind || payload.kind || 'chest',
+        boxName: payload.boxName || ''
     });
-    
-    // QR kod oluştur
-    generateChestQRCode(chestId, data.user);
-    
-    // Log
-    appendBotLog(`🎁 [@${data.user}] Sandık: ${coins} jeton, ${userCount} kişi`);
-    
-    renderChests();
+
+    appendBotLog(`🎁 [@${data.user}] ${boxKindLabel(data.kind || payload.kind)}: ${rawCoins} jeton, ${payload.userCount || payload.totalUsers || 0} kişi`);
 }
 
 // Geri sayım timer'ı
@@ -695,7 +928,7 @@ function renderChests() {
                     </div>
                     <div>
                         <h4 class="font-bold text-white text-lg">@${chest.user}</h4>
-                        <p class="text-xs text-yellow-50/50">${chest.timeStr}</p>
+                        <p class="text-xs text-yellow-50/50">${chest.timeStr} · ${boxKindLabel(chest.kind)} · ${chest.hasDuration ? Math.round(chest.duration) + ' sn' : 'süre bilinmiyor'}</p>
                         ${chest.userCount > 0 ? `<p class="text-xs text-blue-400/80"><i data-lucide="users" class="w-3 h-3 inline mr-1"></i>${chest.userCount} kişiye paylaşıldı</p>` : ''}
                     </div>
                 </div>
@@ -1763,7 +1996,9 @@ renderSuggestedAgencies();
 setTimeout(function () {
     try {
         if (serverUrlFromUi() && (!ws || ws.readyState > WebSocket.OPEN)) connectWebSocket();
-    } catch (e) { /* yoksay */ }
+        else applyStaticModeUI();
+        startStaticDataSync();
+    } catch (e) { console.error('[STATIC] başlatılamadı:', e); }
 }, 600);
 // --- QR KOD TARAYICI (GLOBAL) ---
 let html5QrcodeScanner = null;

@@ -26,13 +26,19 @@ Sunucu, Docker, API anahtarı gerekmez: her şey GitHub Pages üzerinde statik �
 
 | Sekme | Ne yapar |
 |---|---|
-| **Radar** | Dinlenecek yayıncı listesi, canlı olay akışı (sunucu bağlanırsa) |
+| **Radar** | Dinlenecek yayıncı listesi; GitHub/yerel statik modda `firsat/data/live.json` ve `targets.json` ile otomatik dolar, WebSocket varsa ek canlı akış |
 | **Gelir** | Jeton → TikTok kesintisi → ajans komisyonu → yayıncı net kazancı, TL karşılığı ve pasta dağılımı |
 | **AI** | Yayın metni/sohbet analizi (sağlayıcı anahtarı verilirse) |
 | **Araçlar** | Yardımcı araçlar |
 | **Hesaplar** | Hesap envanteri (kullanıcı adı, şifre, ajans, jeton), arama, dışa aktarma. **Envanteri sıfırla** cihazdaki tüm kayıtları temizler |
 | **Ajanslar** | Ajans tanımı, komisyon, bağlı hesaplar ve liderlik tablosu |
-| **Jeton Avı** | Yayınlardaki sandık/zarf/portal olayları, fırsatlar, ülke özeti, QR |
+| **Jeton Avı** | Yayınlardaki sandık/zarf/portal olayları, fırsatlar, ülke özeti, QR; statik modda `firsat/data/boxes.json` tür/süre/jeton ile beslenir |
+
+Radar, GitHub Pages gibi sunucusuz ortamlarda `firsat/data/live.json` içindeki canlı yayıncıları
+hedef listesine ekler; `targets.json` son 6 saatte canlı görülenler için yedektir. Otomatik liste
+250 hedefle sınırlıdır ve kaldırdığınız otomatik hedefler geri eklenmez. Aynı köprü Windows
+localhost'ta da çalışır; açık bir WebSocket arka ucu varsa bağlantı ek kanal olarak korunur.
+`boxes.json` kayıtları kartlarda tür, süre ve jeton bilgisiyle gösterilir.
 
 ## Fırsatlar sayfası
 
