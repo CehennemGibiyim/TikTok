@@ -1,10 +1,10 @@
 {
-  "generatedAt": "2026-11-14T10:45:09.614Z",
+  "generatedAt": "2026-11-14T17:15:00.030Z",
   "source": {
-    "commits": 723,
-    "parsed": 716,
-    "failed": 7,
-    "comparedRuns": 23
+    "commits": 800,
+    "parsed": 792,
+    "failed": 8,
+    "comparedRuns": 25
   },
   "runs": [
     {
@@ -479,15 +479,57 @@
         "watchSec": 300
       },
       "profile": "agresif",
-      "attempts": 25,
+      "attempts": 26,
       "ok": 2,
       "watching": 1,
       "boxes": 1,
       "boxCoins": 875,
-      "hours": 0.93,
-      "boxesPer100": 4,
-      "boxesPerHour": 1.1,
+      "hours": 1,
+      "boxesPer100": 3.85,
+      "boxesPerHour": 1,
       "boxesPerSession": 0.5,
+      "short": false
+    },
+    {
+      "at": "2026-11-14T10:49:42.968Z",
+      "cfg": {
+        "rooms": 40,
+        "gap": 2000,
+        "starts": 12,
+        "probe": 0.3,
+        "watchSec": 300
+      },
+      "profile": "agresif",
+      "attempts": 96,
+      "ok": 1,
+      "watching": 1,
+      "boxes": 0,
+      "boxCoins": 0,
+      "hours": 3.86,
+      "boxesPer100": 0,
+      "boxesPerHour": 0,
+      "boxesPerSession": 0,
+      "short": false
+    },
+    {
+      "at": "2026-11-14T14:46:17.736Z",
+      "cfg": {
+        "rooms": 40,
+        "gap": 2000,
+        "starts": 12,
+        "probe": 0.3,
+        "watchSec": 300
+      },
+      "profile": "agresif",
+      "attempts": 62,
+      "ok": 0,
+      "watching": 0,
+      "boxes": 0,
+      "boxCoins": 0,
+      "hours": 2.4,
+      "boxesPer100": 0,
+      "boxesPerHour": 0,
+      "boxesPerSession": null,
       "short": false
     }
   ],
@@ -509,16 +551,16 @@
     {
       "name": "agresif | ara 2000ms, dk 12, oran 0.3, oda 40",
       "profile": "agresif",
-      "runs": 15,
-      "attempts": 1970,
-      "ok": 297,
-      "okRate": 15,
+      "runs": 17,
+      "attempts": 2129,
+      "ok": 298,
+      "okRate": 14,
       "boxes": 99,
       "boxCoins": 5101,
-      "boxesPer100": 5.03,
+      "boxesPer100": 4.65,
       "boxesPerOk": 0.33,
-      "boxesPerHour": 4.9,
-      "avgWatching": 5.1
+      "boxesPerHour": 3.7,
+      "avgWatching": 4.5
     },
     {
       "name": "guvenli | ara 4000ms, dk ?, oran ?, oda 32",
@@ -550,7 +592,7 @@
     }
   ],
   "hourly": {
-    "commits": 74,
+    "commits": 75,
     "boxes": 102,
     "hours": 13,
     "avgPerHour": 7.8,
