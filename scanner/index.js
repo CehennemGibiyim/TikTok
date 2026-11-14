@@ -2060,6 +2060,8 @@ async function maintainWatchers() {
   }
   live = live
     .sort((a, b) =>
+      // Panelden elle eklenenler keşif sırasına takılmadan önce denenir.
+      (isManualWatchTarget(b.username) ? 1 : 0) - (isManualWatchTarget(a.username) ? 1 : 0) ||
       // Kesin canlı olanlar önce denenir.
       (b.live ? 1 : 0) - (a.live ? 1 : 0) ||
       boxPriority(b, now) - boxPriority(a, now) ||
