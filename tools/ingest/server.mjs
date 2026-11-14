@@ -110,6 +110,14 @@ function normalize(input) {
     : (endMs && createAt ? Math.max(0, Math.round((endMs - createAt) / 1000)) : 0);
 
   const envelopeId = String(info.envelopeId || box.envelopeId || '').trim();
+  const participants = Number(
+    info.voteCount || info.participantCount || info.joinedCount ||
+    info.viewerJoinCount || info.participants || 0
+  ) || 0;
+  const viewers = Number(
+    (input && (input.viewers || input.viewerCount)) || info.viewers || info.viewerCount || 0
+  ) || 0;
+  const roomId = String((input && input.roomId) || info.roomId || '').trim();
   const name = BOX_NAMES[businessType] ||
     String(info.boxTitle || info.boxName || '').trim() ||
     { chest: 'Sandık', portal: 'Portal', letter: 'Zarf' }[kind];
@@ -126,6 +134,9 @@ function normalize(input) {
       businessType,
       boxType: String(info.boxType || input.boxType || ''),
       shared: Number(info.peopleCount || info.recipientCount || 0) || 0,
+      participants,
+      viewers,
+      roomId,
       durationSec,
       unpackAt: endMs,
       availableAt: endMs,

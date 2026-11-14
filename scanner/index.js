@@ -493,6 +493,16 @@ function addWatchedTarget(raw, source) {
     lastRequestedAt: Date.now()
   };
   state.targets.unshift(target);
+  // Havuzdaki hedefin durum kaydı yoksa dinleme döngüsü onu bir sonraki
+  // turda görebilsin diye "canlı olabilir" olarak ekle. Böylece panelden
+  // eklenen yayıncı, 4.581 hedefli tarama turunun sonunu beklemez.
+  if (!state.streamers.has(username)) {
+    state.streamers.set(username, {
+      username, country: '', live: false, liveUnknown: true, startTime: 0, title: '',
+      viewers: 0, coins: 0, gifts: 0, lastGiftAt: 0, lastGiftName: '',
+      lastSeenLiveAt: 0, reason: '', checkedAt: 0, roomId: '', roomIdAt: 0
+    });
+  }
   state.targetsDirty = true;
   log('izleme isteği havuza eklendi:', username);
   return target;
@@ -900,6 +910,7 @@ function recordEvent(username, data) {
     boxName: data.boxName || data.giftName || '',
     businessType: Math.max(0, Math.round(Number(data.businessType) || 0)),
     boxType: data.boxType || '',
+    roomId: String(data.roomId || ''),
     sender: data.sender || '',
     senderName: data.senderName || data.sender || '',
     // Zarf/sandıkta gerçek kişi sayısı ve açılışa kalan süre varsa yazılır.
@@ -950,6 +961,7 @@ function publishBox(event) {
     boxName: event.boxName || event.giftName || '',
     businessType: event.businessType || 0,
     boxType: event.boxType || '',
+    roomId: event.roomId || '',
     shared: event.shared || 0,
     participants: event.participants || 0,
     viewers: event.viewers || 0,
@@ -1020,6 +1032,7 @@ function writeBoxes() {
     boxName: event.boxName || event.giftName || '',
     businessType: event.businessType || 0,
     boxType: event.boxType || '',
+    roomId: event.roomId || '',
     shared: event.shared || 0,
     participants: event.participants || 0,
     viewers: event.viewers || 0,
@@ -1419,7 +1432,7 @@ function handleEnvelope(username, eventName, data) {
   // “Kaç izleyici katıldı” kazanansayısından ayrı bir alandır; TikTok bunu
   // her kutuda göndermiyor. Bilinen adaylar varsa karta taşınır, yoksa 0 kalır.
   const participants = Number(
-    info.participantCount || info.joinedCount || info.joinCount ||
+    info.voteCount || info.participantCount || info.joinedCount || info.joinCount ||
     info.viewerJoinCount || info.participants || 0
   ) || 0;
   const liveRecord = state.streamers.get(username);
@@ -1487,6 +1500,8 @@ function handleEnvelope(username, eventName, data) {
     // Kutu: jeton bildirilmemişse 0 ile yazılır, panel "bilinmiyor" der.
     allowZero: true,
     envelopeId,
+    // Telefonda uygulamayı doğrudan açmak için bağlayıcının bulduğu oda kimliği.
+    roomId: String((liveRecord && liveRecord.roomId) || ''),
     shared: people,
     participants,
     viewers,
@@ -2533,8 +2548,37 @@ function commitData() {
 
 // ---------- ana döngü ----------
 
+// Elle eklenen hedefler, 4.581 adreslik tarama turunun sonunu beklemeden
+// dinleme döngüsüne girer. Kayıt "canlı olabilir"dir; bağlayıcı yayını
+// doğrular, kapalıysa normal ceza/geri çekilme uygulanır.
+function seedManualStreamers() {
+  state.targets.forEach((target) => {
+    if (!/^(radar_manual|panel_watch|manual)$/.test(String(target.source || ''))) return;
+    if (state.streamers.has(target.username)) return;
+    state.streamers.set(target.username, {
+      username: target.username,
+      country: target.country || '',
+      live: false,
+      liveUnknown: true,
+      startTime: 0,
+      title: '',
+      viewers: 0,
+      coins: 0,
+      gifts: 0,
+      lastGiftAt: 0,
+      lastGiftName: '',
+      lastSeenLiveAt: Number(target.lastSeenLiveAt) || 0,
+      reason: '',
+      checkedAt: 0,
+      roomId: target.roomId || '',
+      roomIdAt: Number(target.roomIdAt) || 0
+    });
+  });
+}
+
 async function main() {
   state.targets = loadTargets();
+  seedManualStreamers();
   if (state.targets.length === 0) {
     log('uyarı: site/firsat/data/targets.json boş — taranacak adres yok.');
   }

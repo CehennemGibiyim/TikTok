@@ -71,6 +71,10 @@ try {
 let staticSyncTimer = null;
 // live.json'daki yayıncı kuralı: ortalama jeton/kazanan ve kutu aralığı.
 const staticRules = new Map();
+// Panelden elle eklenen hedefler targets.json'dan seyrek okunur (1,8 MB'lık
+// dosyayı her 30 saniyede indirmemek için 5 dakikalık önbellek).
+let staticManualNames = [];
+let staticManualFetchedAt = 0;
 let staticDiscoveryTimer = null;
 
 function loadPersistedUsers() {
@@ -198,6 +202,20 @@ function updateStaticModeStatus(data) {
         ' · hedef ' + trackedUsernames.length;
 }
 
+async function loadStaticManualNames() {
+    if (Date.now() - staticManualFetchedAt < 5 * 60 * 1000) return staticManualNames;
+    try {
+        const data = await fetchStaticJson('targets.json');
+        staticManualNames = (data && Array.isArray(data.targets) ? data.targets : [])
+            .filter(item => item && item.username && /^(radar_manual|panel_watch|manual)$/.test(String(item.source || '')))
+            .map(item => item.username);
+        staticManualFetchedAt = Date.now();
+    } catch (error) {
+        // Dosya yoksa önceki liste korunur.
+    }
+    return staticManualNames;
+}
+
 async function syncStaticTargets() {
     let liveData = null;
     try {
@@ -208,6 +226,12 @@ async function syncStaticTargets() {
 
     noteStaticRules(liveData);
     let names = staticLiveNames(liveData);
+
+    // Panelden elle eklenen / izleme isteği bırakılan yayıncılar otomatik
+    // keşif sınırına ve "kaldırıldı" listesine takılmaz. Haris gibi canlı
+    // ama kutusu geç gelen yayıncılar radardan düşmesin.
+    const manual = Array.from(new Set(await loadStaticManualNames())).filter(Boolean);
+
     if (!names.length) {
         try {
             const targetData = await fetchStaticJson('targets.json');
@@ -218,12 +242,21 @@ async function syncStaticTargets() {
         } catch (error) { /* veri yoksa sessizce bekle */ }
     }
 
-    names = Array.from(new Set(names)).filter(Boolean).slice(0, AUTO_TARGET_LIMIT);
-    if (names.length) {
-        const added = await addNewTargets(names, { auto: true });
-        names.forEach(name => setTrackedLive(name, true));
+    const manualSet = new Set(manual);
+    const auto = Array.from(new Set(names))
+        .filter(name => name && !manualSet.has(name))
+        .slice(0, Math.max(0, AUTO_TARGET_LIMIT - manual.length));
+
+    if (manual.length) {
+        const addedManual = await addNewTargets(manual, { auto: false, silent: true });
+        if (addedManual > 0) appendBotLog('🎯 Elle izlenen ' + addedManual + ' yayıncı radara geri eklendi.');
+    }
+    if (auto.length) {
+        const added = await addNewTargets(auto, { auto: true });
         if (added > 0) appendBotLog('🔎 Statik keşif: ' + added + ' yeni canlı yayıncı hedef listesine eklendi.');
     }
+    const liveNames = new Set(names);
+    manual.concat(auto).forEach(name => setTrackedLive(name, liveNames.has(name)));
     updateStaticModeStatus(liveData);
 }
 
@@ -272,7 +305,8 @@ function ingestStaticBox(box) {
         participants: Number(box.participants) || Number(box.joined) || 0,
         rule: staticRules.get(String(box.username).toLowerCase()) || null,
         kind: box.kind || 'chest',
-        boxName: box.boxName || ''
+        boxName: box.boxName || '',
+        roomId: String(box.roomId || '')
     });
 }
 
@@ -706,13 +740,15 @@ function extractUsernames(text) {
 
 async function addNewTargets(namesArray, options) {
     const auto = Boolean(options && options.auto);
+    const force = Boolean(options && options.force);
+    const silent = Boolean(options && options.silent);
     let addedCount = 0;
     const newManualStreamers = [];
     const manualAdded = [];
     
     namesArray.forEach(username => {
-        if (auto && autoIgnored.includes(username)) return;
-        if (auto && trackedUsernames.length >= AUTO_TARGET_LIMIT && !trackedUsernames.includes(username)) return;
+        if (auto && !force && autoIgnored.includes(username)) return;
+        if (auto && !force && trackedUsernames.length >= AUTO_TARGET_LIMIT && !trackedUsernames.includes(username)) return;
         if (!trackedUsernames.includes(username)) {
             trackedUsernames.push(username);
             renderTrackedUserUI(username, auto);
@@ -752,7 +788,7 @@ async function addNewTargets(namesArray, options) {
         await savePersistedUsers();
         // Statik modda tarayıcı scanner'ın belleğine yazamaz; izleme isteği
         // ntfy üzerinden bir sonraki tarama turuna taşınır.
-        manualAdded.forEach(publishWatchRequest);
+        if (!silent) manualAdded.forEach(publishWatchRequest);
         
         // Yeni eklenen yayıncıları scan.json'a senkronize et
         if (ws && ws.readyState === WebSocket.OPEN && newManualStreamers.length > 0) {

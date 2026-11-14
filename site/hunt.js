@@ -93,6 +93,34 @@
     return state.sessions[username] || {};
   }
 
+  // Telefonda TikTok uygulamasında açmak için oda kimliğiyle derin bağlantı.
+  // Kimlik yoksa uydurulmaz; QR her zaman web yayınına düşer.
+  function roomIdOf(value) {
+    return String(value || '').replace(/[^0-9]/g, '');
+  }
+
+  function appSchemeUrl(roomId, platform) {
+    var id = roomIdOf(roomId);
+    if (!id) return '';
+    var scheme = platform === 'ios' ? 'snssdk1233' : 'snssdk1128';
+    return scheme + '://live?room_id=' + id + '&from=webview&refer=web';
+  }
+
+  function androidIntentUrl(roomId, fallbackUrl) {
+    var id = roomIdOf(roomId);
+    if (!id) return '';
+    return 'intent://live?room_id=' + id + '&from=webview&refer=web#Intent;' +
+      'package=com.zhiliaoapp.musically;scheme=snssdk1128;' +
+      'S.browser_fallback_url=' + encodeURIComponent(fallbackUrl) + ';end';
+  }
+
+  function roomIdFor(username) {
+    var session = sessionOf(username);
+    if (session && session.roomId) return String(session.roomId);
+    var target = state.targets.find(function (item) { return item.username === username; });
+    return target && target.roomId ? String(target.roomId) : '';
+  }
+
   function liveSeconds(session) {
     if (!session || !session.startedAt) return 0;
     var started = new Date(session.startedAt).getTime();
@@ -304,7 +332,7 @@
         return;
       }
       var qrButton = event.target.closest('[data-hunt-qr]');
-      if (qrButton) openQr(qrButton.getAttribute('data-hunt-qr'));
+      if (qrButton) openQr(qrButton.getAttribute('data-hunt-qr'), qrButton.getAttribute('data-hunt-room'));
     });
 
     var opportunities = document.getElementById('huntOpportunityList');
@@ -320,7 +348,7 @@
         return;
       }
       var qrButton = event.target.closest('[data-hunt-qr]');
-      if (qrButton) openQr(qrButton.getAttribute('data-hunt-qr'));
+      if (qrButton) openQr(qrButton.getAttribute('data-hunt-qr'), qrButton.getAttribute('data-hunt-room'));
     });
   }
 
@@ -517,9 +545,10 @@
 
   // ---------- QR ----------
 
-  function openQr(username) {
+  function openQr(username, roomId) {
     if (!username) return;
     var url = liveUrl(username);
+    var id = roomIdOf(roomId || roomIdFor(username));
 
     if (!qrModal) {
       qrModal = document.createElement('div');
@@ -531,6 +560,7 @@
         '  <h3 id="huntQrTitle" class="text-lg font-bold text-yellow-100 mb-1">Yayına git</h3>',
         '  <p class="text-[11px] text-yellow-50/50 mb-4">Telefonunla okut, TikTok yayını doğrudan açılır.</p>',
         '  <div id="huntQrBox" class="bg-white rounded-xl p-3 flex items-center justify-center min-h-[220px]"></div>',
+        '  <div id="huntQrApps" class="mt-3 flex flex-wrap gap-2"></div>',
         '  <a id="huntQrLink" href="#" target="_blank" rel="noopener" class="block mt-4 text-center text-xs text-yellow-300 underline break-all"></a>',
         '</div>'
       ].join('');
@@ -549,6 +579,18 @@
     var link = qrModal.querySelector('#huntQrLink');
     link.href = url;
     link.textContent = url;
+
+    var apps = qrModal.querySelector('#huntQrApps');
+    if (apps) {
+      apps.innerHTML = '';
+      if (id) {
+        apps.innerHTML =
+          '<a href="' + escapeHtml(androidIntentUrl(id, url)) + '" class="text-[11px] px-2.5 py-1.5 rounded-lg bg-green-500/15 hover:bg-green-500/30 border border-green-500/30 text-green-300">📱 Android uygulamada aç</a>' +
+          '<a href="' + escapeHtml(appSchemeUrl(id, 'ios')) + '" class="text-[11px] px-2.5 py-1.5 rounded-lg bg-white/10 hover:bg-white/20 border border-white/20 text-yellow-100">🍏 iPhone/iPad uygulamada aç</a>';
+      } else {
+        apps.innerHTML = '<p class="text-[11px] text-yellow-50/50">Oda kimliği henüz yok; QR web yayınını açar.</p>';
+      }
+    }
 
     if (window.QRCode) {
       new window.QRCode(box, {
@@ -680,7 +722,7 @@
         '  <td class="py-2.5 pr-3 text-xs text-pink-300">' + formatCoins(totalsData.letters || 0) + '</td>',
         '  <td class="py-2.5 pr-3 text-xs font-bold text-amber-400">' + formatCoins(totalsData.coins || 0) + '</td>',
         '  <td class="py-2.5 pr-2 text-right whitespace-nowrap">',
-        '    <button data-hunt-qr="' + escapeHtml(target.username) + '" title="QR ile yayına git" class="text-[11px] px-2 py-1 rounded bg-yellow-500/10 hover:bg-yellow-500/25 border border-yellow-500/25 text-yellow-300 mr-1"><i data-lucide="qr-code" class="w-3.5 h-3.5 inline"></i></button>',
+        '    <button data-hunt-qr="' + escapeHtml(target.username) + '" data-hunt-room="' + escapeHtml(session.roomId || target.roomId || '') + '" title="QR ile yayına git" class="text-[11px] px-2 py-1 rounded bg-yellow-500/10 hover:bg-yellow-500/25 border border-yellow-500/25 text-yellow-300 mr-1"><i data-lucide="qr-code" class="w-3.5 h-3.5 inline"></i></button>',
         '    <button data-hunt-remove="' + escapeHtml(target.username) + '" class="text-[11px] px-2 py-1 rounded bg-red-500/10 hover:bg-red-500/25 border border-red-500/20 text-red-400">Kaldır</button>',
         '  </td>',
         '</tr>'
@@ -757,7 +799,7 @@
         '  <div class="text-[10px] text-yellow-50/40 mb-1">' + flagOf(event.region) + ' ' + escapeHtml(countryName(event.region)) + ' · ' + new Date(event.at).toLocaleTimeString('tr-TR') + '</div>',
         '  <div class="text-[11px] ' + (urgent ? 'text-red-300 font-bold' : 'text-yellow-50/60') + '" data-hunt-remaining="' + (event.kind === 'letter' ? event.expiresAt : event.availableAt) + '" data-hunt-kind="' + event.kind + '">' + timeLabel + '</div>',
         '  <div class="flex items-center gap-2 mt-3">',
-        '    <button data-hunt-qr="' + escapeHtml(event.username) + '" class="text-[11px] px-2.5 py-1.5 rounded-lg bg-yellow-500/15 hover:bg-yellow-500/30 border border-yellow-500/30 text-yellow-300">QR / Yayına git</button>',
+        '    <button data-hunt-qr="' + escapeHtml(event.username) + '" data-hunt-room="' + escapeHtml(event.roomId || roomIdFor(event.username)) + '" class="text-[11px] px-2.5 py-1.5 rounded-lg bg-yellow-500/15 hover:bg-yellow-500/30 border border-yellow-500/30 text-yellow-300">QR / Yayına git</button>',
         '    <button data-hunt-collect="' + escapeHtml(event.id) + '" class="text-[11px] px-2.5 py-1.5 rounded-lg bg-green-500/15 hover:bg-green-500/30 border border-green-500/30 text-green-300">Topladım</button>',
         '    <button data-hunt-dismiss="' + escapeHtml(event.id) + '" class="text-[11px] px-2 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 text-yellow-50/40">Kaçtı</button>',
         '  </div>',
