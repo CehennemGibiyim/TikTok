@@ -2014,10 +2014,14 @@ async function maintainWatchers() {
     now - Number(record.roomIdAt) < CONFIG.roomIdFreshMs;
   const candidateFilter = (strict) => (record) => {
     if (!record.live && !record.liveUnknown) return false;
-    // Kimlik yoksa bağlanmak boşa: sayfa/API doğrulaması bu IP'lerde
-    // "sayfada canlı oda yok" diyor ve her deneme kota harcıyor.
-    if (!record.roomId) return false;
+    // Panelden elle eklenen hedef, keşif ucunda görünmediği için oda kimliği
+    // boş kalabilir. Bu hedeflerde sayfayı bir kez doğrulayıp kimliği
+    // kendimiz çıkarırız; keşif kayıtlarında ise kimliksiz oda boşa kotadır.
+    const target = targetFor(record.username);
+    const manualWatch = Boolean(target && /^(radar_manual|panel_watch|manual)$/.test(String(target.source || '')));
+    if (!record.roomId && !manualWatch) return false;
     if (!strict) return true;
+    if (manualWatch) return true;
     return hasFreshRoomId(record);
   };
   // Bağlanılamayan oda bir süre listeye alınmaz (boşa kota harcanmasın).
