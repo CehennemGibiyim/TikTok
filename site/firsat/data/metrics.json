@@ -1,10 +1,10 @@
 {
-  "generatedAt": "2026-11-13T22:04:38.251Z",
+  "generatedAt": "2026-11-14T02:35:07.484Z",
   "source": {
-    "commits": 638,
-    "parsed": 631,
+    "commits": 675,
+    "parsed": 668,
     "failed": 7,
-    "comparedRuns": 18
+    "comparedRuns": 19
   },
   "runs": [
     {
@@ -374,12 +374,33 @@
         "watchSec": 300
       },
       "profile": "agresif",
-      "attempts": 75,
-      "ok": 3,
+      "attempts": 100,
+      "ok": 4,
       "watching": 1,
       "boxes": 0,
       "boxCoins": 0,
-      "hours": 2.72,
+      "hours": 3.72,
+      "boxesPer100": 0,
+      "boxesPerHour": 0,
+      "boxesPerSession": 0,
+      "short": false
+    },
+    {
+      "at": "2026-11-14T00:30:49.569Z",
+      "cfg": {
+        "rooms": 40,
+        "gap": 2000,
+        "starts": 12,
+        "probe": 0.3,
+        "watchSec": 300
+      },
+      "profile": "agresif",
+      "attempts": 54,
+      "ok": 4,
+      "watching": 1,
+      "boxes": 0,
+      "boxCoins": 0,
+      "hours": 2.04,
       "boxesPer100": 0,
       "boxesPerHour": 0,
       "boxesPerSession": 0,
@@ -404,16 +425,16 @@
     {
       "name": "agresif | ara 2000ms, dk 12, oran 0.3, oda 40",
       "profile": "agresif",
-      "runs": 10,
-      "attempts": 1794,
-      "ok": 282,
-      "okRate": 16,
+      "runs": 11,
+      "attempts": 1873,
+      "ok": 287,
+      "okRate": 15,
       "boxes": 93,
       "boxCoins": 3351,
-      "boxesPer100": 5.18,
-      "boxesPerOk": 0.33,
-      "boxesPerHour": 6.7,
-      "avgWatching": 7.2
+      "boxesPer100": 4.97,
+      "boxesPerOk": 0.32,
+      "boxesPerHour": 5.5,
+      "avgWatching": 6.6
     },
     {
       "name": "guvenli | ara 4000ms, dk ?, oran ?, oda 32",
