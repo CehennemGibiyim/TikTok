@@ -2443,6 +2443,9 @@ function flush(force) {
     saveTargets();
   }
   if (!force && now - state.lastFlush < 20000) return;
+  // Koşu başında henüz hiç tarama yapılmadıysa boş live.json yazıp önceki
+  // canlı listesini silme; ilk gerçek turdan sonra güncellenir.
+  if (state.streamers.size === 0 && state.polls === 0) return;
   state.lastFlush = now;
   const data = snapshot();
   fs.mkdirSync(DATA_DIR, { recursive: true });
