@@ -202,7 +202,13 @@ async function syncStaticTargets() {
 }
 
 function boxKindLabel(kind) {
-    return BOX_KIND_LABELS[kind] || 'Sandık';
+    return BOX_KIND_LABELS[kind] || (kind ? String(kind) : 'Sandık');
+}
+
+function boxClock(ts) {
+    const value = Number(ts) || 0;
+    if (!value) return '';
+    return new Date(value).toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' });
 }
 
 function addChestRecord(chest) {
@@ -223,13 +229,15 @@ function ingestStaticBox(box) {
     if (Date.now() - dropTime > 15 * 60 * 1000) return;
 
     const availableAt = Number(box.availableAt) || dropTime;
-    const rawDuration = Number(box.durationSec) || Math.max(0, (availableAt - dropTime) / 1000);
+    const durationSec = Number(box.durationSec) || Math.max(0, (availableAt - dropTime) / 1000);
     addChestRecord({
         id: 'static_' + (box.id || (box.username + '_' + dropTime + '_' + (box.kind || 'chest'))),
         user: box.username,
         coins: Number(box.coins) || 0,
-        duration: rawDuration || 180,
-        hasDuration: rawDuration > 0,
+        duration: durationSec || 180,
+        durationSec: durationSec,
+        availableAt: availableAt,
+        hasDuration: durationSec > 0,
         dropTime: dropTime,
         timeStr: new Date(dropTime).toLocaleTimeString('tr-TR'),
         graceStartTime: null,
@@ -797,6 +805,8 @@ function handleNewChest(data) {
 
     const rawCoins = typeof payload.coins === 'number' ? payload.coins : parseInt(payload.coins) || 0;
     const rawDuration = Number(payload.duration || payload.durationSec) || 0;
+    const dropTime = Date.now();
+    const availableAt = Number(payload.availableAt) || (dropTime + (rawDuration || 180) * 1000);
     const chestId = data.id || ('chest_' + Date.now() + Math.floor(Math.random()*1000));
 
     addChestRecord({
@@ -804,8 +814,10 @@ function handleNewChest(data) {
         user: data.user,
         coins: rawCoins,
         duration: rawDuration || 180,
+        durationSec: rawDuration,
+        availableAt: availableAt,
         hasDuration: rawDuration > 0,
-        dropTime: Date.now(),
+        dropTime: dropTime,
         timeStr: payload.time || new Date().toLocaleTimeString(),
         graceStartTime: null,
         userCount: payload.userCount || payload.totalUsers || 0,
@@ -919,6 +931,11 @@ function renderChests() {
         div.className = `chest-anim bg-black/60 border ${containerBorder} rounded-2xl p-4 relative overflow-hidden transition-all`;
         
         const qrCodeData = chestQRCodes.get(chest.id);
+        const durationText = chest.hasDuration
+            ? (Math.round((Number(chest.durationSec) || chest.duration) * 10) / 10) + ' sn'
+            : 'süre bilinmiyor';
+        const availableText = boxClock(chest.availableAt);
+        const openText = availableText ? ' · ' + availableText + ' açılır' : '';
         
         div.innerHTML = `
             <div class="flex items-start justify-between mb-3 relative z-10">
@@ -928,7 +945,7 @@ function renderChests() {
                     </div>
                     <div>
                         <h4 class="font-bold text-white text-lg">@${chest.user}</h4>
-                        <p class="text-xs text-yellow-50/50">${chest.timeStr} · ${boxKindLabel(chest.kind)} · ${chest.hasDuration ? Math.round(chest.duration) + ' sn' : 'süre bilinmiyor'}</p>
+                        <p class="text-xs text-yellow-50/50">${chest.timeStr} · ${boxKindLabel(chest.kind)} · ${durationText}${openText}</p>
                         ${chest.userCount > 0 ? `<p class="text-xs text-blue-400/80"><i data-lucide="users" class="w-3 h-3 inline mr-1"></i>${chest.userCount} kişiye paylaşıldı</p>` : ''}
                     </div>
                 </div>

@@ -38,7 +38,7 @@ Radar, GitHub Pages gibi sunucusuz ortamlarda `firsat/data/live.json` içindeki 
 hedef listesine ekler; `targets.json` son 6 saatte canlı görülenler için yedektir. Otomatik liste
 250 hedefle sınırlıdır ve kaldırdığınız otomatik hedefler geri eklenmez. Aynı köprü Windows
 localhost'ta da çalışır; açık bir WebSocket arka ucu varsa bağlantı ek kanal olarak korunur.
-`boxes.json` kayıtları kartlarda tür, süre ve jeton bilgisiyle gösterilir.
+`boxes.json` kayıtları kartlarda tür, `durationSec` süresi, `availableAt` açılma saati ve jeton bilgisiyle gösterilir.
 
 ## Fırsatlar sayfası
 
