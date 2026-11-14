@@ -56,12 +56,21 @@ const STATIC_DATA_BASES = [
 const AUTO_TARGET_LIMIT = 250;
 const AUTO_IGNORED_KEY = 'tiktok-radar-auto-ignored';
 const BOX_KIND_LABELS = { chest: 'Sandık', letter: 'Zarf / Mektup', portal: 'Portal' };
+// Tarayıcıdan manuel hedef eklenince scanner'ın görmesi için aynı ntfy
+// hattına izleme isteği bırakılır. Kutu yayını ayrı konuda akar.
+const WATCH_TOPIC = 'cehennem-tiktok-radar-watch-7f3a91';
+const WATCH_KEY = 'XQMPSwldDoS26gnVIV1ClCyb';
+const BOX_STREAM_TOPIC = 'cehennem-tiktok-firsat-7f3a91';
+const BOX_STREAM_KEY = 'XQMPSwldDoS26gnVIV1ClCyb';
+let boxStream = null;
 let autoIgnored = [];
 try {
     autoIgnored = JSON.parse(localStorage.getItem(AUTO_IGNORED_KEY) || '[]');
     if (!Array.isArray(autoIgnored)) autoIgnored = [];
 } catch (e) { autoIgnored = []; }
 let staticSyncTimer = null;
+// live.json'daki yayıncı kuralı: ortalama jeton/kazanan ve kutu aralığı.
+const staticRules = new Map();
 let staticDiscoveryTimer = null;
 
 function loadPersistedUsers() {
@@ -154,6 +163,22 @@ async function fetchStaticJson(name) {
     throw lastError || new Error('veri bulunamadı');
 }
 
+function noteStaticRules(data) {
+    staticRules.clear();
+    const list = data && Array.isArray(data.streamers) ? data.streamers : [];
+    list.forEach(item => {
+        if (!item || !item.username) return;
+        const boxes = Number(item.boxCount) || 0;
+        if (!boxes) return;
+        staticRules.set(String(item.username).toLowerCase(), {
+            boxes: boxes,
+            avgCoins: Number(item.avgCoins) || 0,
+            avgShared: Number(item.avgShared) || 0,
+            intervalMin: Number(item.boxIntervalMin) || 0
+        });
+    });
+}
+
 function staticLiveNames(data) {
     const names = [];
     const list = data && Array.isArray(data.streamers) ? data.streamers : [];
@@ -181,6 +206,7 @@ async function syncStaticTargets() {
         // live.json yoksa targets.json'daki son canlı kayıtları dene.
     }
 
+    noteStaticRules(liveData);
     let names = staticLiveNames(liveData);
     if (!names.length) {
         try {
@@ -241,7 +267,10 @@ function ingestStaticBox(box) {
         dropTime: dropTime,
         timeStr: new Date(dropTime).toLocaleTimeString('tr-TR'),
         graceStartTime: null,
-        userCount: Number(box.shared) || 0,
+        userCount: Number(box.shared) || Number(box.winners) || 0,
+        viewers: Number(box.viewers) || Number(box.viewerCount) || 0,
+        participants: Number(box.participants) || Number(box.joined) || 0,
+        rule: staticRules.get(String(box.username).toLowerCase()) || null,
         kind: box.kind || 'chest',
         boxName: box.boxName || ''
     });
@@ -302,12 +331,46 @@ function applyStaticModeUI(force) {
     }
 }
 
+function publishWatchRequest(username) {
+    if (!username) return;
+    const payload = {
+        key: WATCH_KEY,
+        event: 'watch_request',
+        action: 'add',
+        username: username,
+        at: Date.now()
+    };
+    fetch('https://ntfy.sh/' + encodeURIComponent(WATCH_TOPIC), {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+        keepalive: true
+    }).catch(function () { /* akış yoksa yerel hedef yine çalışır */ });
+}
+
+function startBoxStream() {
+    if (boxStream || typeof EventSource !== 'function') return;
+    try {
+        boxStream = new EventSource('https://ntfy.sh/' + encodeURIComponent(BOX_STREAM_TOPIC) + '/sse');
+        boxStream.addEventListener('message', function (message) {
+            try {
+                const outer = JSON.parse(message.data || '{}');
+                if (outer.event && outer.event !== 'message') return;
+                const box = outer.message ? JSON.parse(outer.message) : outer;
+                if (!box || box.key !== BOX_STREAM_KEY || !box.username || !box.id) return;
+                ingestStaticBox(box);
+            } catch (error) { /* bozuk mesaj yok sayılır */ }
+        });
+    } catch (error) { /* SSE yoksa 30 sn'lik dosya okuması devrede */ }
+}
+
 function startStaticDataSync() {
     if (staticSyncTimer) return;
     applyStaticModeUI();
     syncStaticTargets();
     syncStaticBoxes();
     discoverLiveChannels();
+    startBoxStream();
     staticSyncTimer = setInterval(function () {
         syncStaticTargets();
         syncStaticBoxes();
@@ -645,6 +708,7 @@ async function addNewTargets(namesArray, options) {
     const auto = Boolean(options && options.auto);
     let addedCount = 0;
     const newManualStreamers = [];
+    const manualAdded = [];
     
     namesArray.forEach(username => {
         if (auto && autoIgnored.includes(username)) return;
@@ -660,6 +724,7 @@ async function addNewTargets(namesArray, options) {
             // Yalnızca elle eklenen yayıncıyı scan.json'a da yaz; otomatik
             // keşiftekiler WebSocket varsa yalnız add_user ile bildirilir.
             if (!auto) {
+                manualAdded.push(username);
                 newManualStreamers.push({
                     username: username,
                     discoveredBy: 'manual',
@@ -685,6 +750,9 @@ async function addNewTargets(namesArray, options) {
     if (addedCount > 0) {
         updateEmptyUsersText();
         await savePersistedUsers();
+        // Statik modda tarayıcı scanner'ın belleğine yazamaz; izleme isteği
+        // ntfy üzerinden bir sonraki tarama turuna taşınır.
+        manualAdded.forEach(publishWatchRequest);
         
         // Yeni eklenen yayıncıları scan.json'a senkronize et
         if (ws && ws.readyState === WebSocket.OPEN && newManualStreamers.length > 0) {
@@ -820,7 +888,9 @@ function handleNewChest(data) {
         dropTime: dropTime,
         timeStr: payload.time || new Date().toLocaleTimeString(),
         graceStartTime: null,
-        userCount: payload.userCount || payload.totalUsers || 0,
+        userCount: payload.userCount || payload.totalUsers || payload.shared || 0,
+        viewers: Number(payload.viewers || payload.viewerCount) || 0,
+        participants: Number(payload.participants || payload.joined) || 0,
         kind: data.kind || payload.kind || 'chest',
         boxName: payload.boxName || ''
     });
@@ -936,6 +1006,17 @@ function renderChests() {
             : 'süre bilinmiyor';
         const availableText = boxClock(chest.availableAt);
         const openText = availableText ? ' · ' + availableText + ' açılır' : '';
+        const audience = [];
+        if (chest.participants > 0) audience.push(chest.participants + ' izleyici katıldı');
+        if (chest.userCount > 0) audience.push(chest.userCount + ' kazanan');
+        if (chest.viewers > 0) audience.push(chest.viewers + ' izleyici');
+        const audienceText = audience.length ? audience.join(' · ') : '';
+        const rule = chest.rule;
+        const ruleBits = [];
+        if (rule && rule.avgCoins > 0) ruleBits.push('~' + rule.avgCoins + ' jeton');
+        if (rule && rule.avgShared > 0) ruleBits.push('~' + rule.avgShared + ' kazanan');
+        if (rule && rule.intervalMin > 0) ruleBits.push('~' + rule.intervalMin + ' dk');
+        const ruleText = ruleBits.length ? ruleBits.join(' · ') : '';
         
         div.innerHTML = `
             <div class="flex items-start justify-between mb-3 relative z-10">
@@ -946,7 +1027,8 @@ function renderChests() {
                     <div>
                         <h4 class="font-bold text-white text-lg">@${chest.user}</h4>
                         <p class="text-xs text-yellow-50/50">${chest.timeStr} · ${boxKindLabel(chest.kind)} · ${durationText}${openText}</p>
-                        ${chest.userCount > 0 ? `<p class="text-xs text-blue-400/80"><i data-lucide="users" class="w-3 h-3 inline mr-1"></i>${chest.userCount} kişiye paylaşıldı</p>` : ''}
+                        ${audienceText ? `<p class="text-xs text-blue-400/80"><i data-lucide="users" class="w-3 h-3 inline mr-1"></i>${audienceText}</p>` : ''}
+                        ${ruleText ? `<p class="text-xs text-purple-300/80"><i data-lucide="repeat" class="w-3 h-3 inline mr-1"></i>Yayıncı kuralı: ${ruleText}</p>` : ''}
                     </div>
                 </div>
                 <div class="flex flex-col items-end">

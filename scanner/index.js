@@ -59,6 +59,8 @@ const CONFIG = {
   // Panel aynı konuya abone olur (site/firsat/app.js → BOX_TOPIC).
   ntfy: readArg('ntfy', 1) ? true : false,
   ntfyTopic: String(readArg('ntfy-topic', 'cehennem-tiktok-firsat-7f3a91')),
+  // Panelden elle eklenen hedefler bu ayrı konuya izleme isteği bırakır.
+  watchTopic: String(readArg('watch-topic', 'cehennem-tiktok-radar-watch-7f3a91')),
   // Konu herkese açık: sahte kutu yayınlanamasın diye paylaşılan anahtar.
   // Paneldeki BOX_KEY ile aynı olmalı (değiştirirsen iki tarafı birlikte değiştir).
   ntfyKey: String(readArg('ntfy-key', process.env.NTFY_KEY || 'XQMPSwldDoS26gnVIV1ClCyb')),
@@ -210,7 +212,10 @@ const state = {
   regionSweepRunning: false,
   discoveredTotal: 0,
   lastError: null,
-  polls: 0
+  polls: 0,
+  // Panelden gelen manuel izleme istekleri: ayrı ntfy konusu, son mesaj kimliği.
+  watchSince: 'all',
+  lastWatchPoll: 0
 };
 
 function log(...args) {
@@ -431,6 +436,9 @@ function loadTargets() {
         boxEvents: (typeof item === 'object' && item && Number(item.boxEvents)) || 0,
         boxCoinSum: (typeof item === 'object' && item && Number(item.boxCoinSum)) || 0,
         boxCoinsSeen: (typeof item === 'object' && item && Number(item.boxCoinsSeen)) || 0,
+        boxSharedSum: (typeof item === 'object' && item && Number(item.boxSharedSum)) || 0,
+        boxSharedSeen: (typeof item === 'object' && item && Number(item.boxSharedSeen)) || 0,
+        firstBoxAt: (typeof item === 'object' && item && Number(item.firstBoxAt)) || 0,
         lastBoxAt: (typeof item === 'object' && item && Number(item.lastBoxAt)) || 0,
         lastWatchedAt: (typeof item === 'object' && item && Number(item.lastWatchedAt)) || 0,
         addedAt: (typeof item === 'object' && item && Number(item.addedAt)) || 0,
@@ -446,6 +454,78 @@ function loadTargets() {
 
 function targetFor(username) {
   return state.targets.find((target) => target.username === username) || null;
+}
+
+// Panelden eklenen adres havuzda yoksa başa alınır: bir sonraki poll turunda
+// canlılık kontrolü yapılır ve kutu gelirse normal dinleme akışına girer.
+function addWatchedTarget(raw, source) {
+  const username = cleanUsername(raw);
+  if (!username) return null;
+  const existing = targetFor(username);
+  if (existing) {
+    existing.lastRequestedAt = Date.now();
+    return null;
+  }
+  const target = {
+    username,
+    country: '',
+    source: source || 'panel_watch',
+    roomId: '',
+    roomIdAt: 0,
+    roomIdMiss: 0,
+    boxEvents: 0,
+    boxCoinSum: 0,
+    boxCoinsSeen: 0,
+    boxSharedSum: 0,
+    boxSharedSeen: 0,
+    firstBoxAt: 0,
+    lastBoxAt: 0,
+    lastWatchedAt: 0,
+    addedAt: Date.now(),
+    lastSeenLiveAt: 0,
+    lastRequestedAt: Date.now()
+  };
+  state.targets.unshift(target);
+  state.targetsDirty = true;
+  log('izleme isteği havuza eklendi:', username);
+  return target;
+}
+
+// Ayrı ntfy konusunu kısa aralıklarla yoklar. Kutu konusundaki yoğun akışa
+// karışmaz; yalnızca panelin bıraktığı watch_request mesajlarını okur.
+async function pollWatchRequests() {
+  if (!CONFIG.watchTopic || Date.now() - state.lastWatchPoll < 60000) return;
+  state.lastWatchPoll = Date.now();
+  try {
+    const url = 'https://ntfy.sh/' + encodeURIComponent(CONFIG.watchTopic) +
+      '/json?poll=1&since=' + encodeURIComponent(state.watchSince || 'all');
+    const response = await fetch(url, {
+      headers: { 'User-Agent': UA, Accept: 'application/x-ndjson, application/json' },
+      signal: AbortSignal.timeout(8000)
+    });
+    if (!response.ok) return;
+    const text = await response.text();
+    let lastId = state.watchSince;
+    text.split(/\r?\n/).forEach((line) => {
+      if (!line.trim()) return;
+      let message;
+      try { message = JSON.parse(line); } catch (error) { return; }
+      if (message && message.id) lastId = message.id;
+      if (!message || message.event !== 'message') return;
+      let payload;
+      try { payload = message.message ? JSON.parse(message.message) : message; } catch (error) { return; }
+      // Eski panel sürümü gövdeyi {message: ...} diye sarmış olabilir; onu da aç.
+      if (payload && payload.message && typeof payload.message === 'string') {
+        try { payload = JSON.parse(payload.message); } catch (error) { /* ham gövde kullanılır */ }
+      }
+      if (!payload || payload.key !== CONFIG.ntfyKey) return;
+      if (payload.event !== 'watch_request' || payload.action !== 'add') return;
+      addWatchedTarget(payload.username, 'panel_watch');
+    });
+    state.watchSince = lastId || state.watchSince;
+  } catch (error) {
+    // Ağ yoksa sessizce bekle; mevcut hedeflerle tarama sürer.
+  }
 }
 
 function saveTargets() {
@@ -470,6 +550,9 @@ function saveTargets() {
         boxEvents: 0,
         boxCoinSum: 0,
         boxCoinsSeen: 0,
+        boxSharedSum: 0,
+        boxSharedSeen: 0,
+        firstBoxAt: 0,
         lastBoxAt: 0,
         lastWatchedAt: 0,
         addedAt: Number(item && item.addedAt) || Date.now(),
@@ -511,6 +594,9 @@ function saveTargets() {
       boxEvents: target.boxEvents || 0,
       boxCoinSum: target.boxCoinSum || 0,
       boxCoinsSeen: target.boxCoinsSeen || 0,
+      boxSharedSum: target.boxSharedSum || 0,
+      boxSharedSeen: target.boxSharedSeen || 0,
+      firstBoxAt: target.firstBoxAt || 0,
       lastBoxAt: target.lastBoxAt || 0,
       lastWatchedAt: target.lastWatchedAt || 0,
       addedAt: target.addedAt || 0,
@@ -811,6 +897,8 @@ function recordEvent(username, data) {
     senderName: data.senderName || data.sender || '',
     // Zarf/sandıkta gerçek kişi sayısı ve açılışa kalan süre varsa yazılır.
     shared: Math.max(0, Math.round(Number(data.shared) || 0)),
+    participants: Math.max(0, Math.round(Number(data.participants) || 0)),
+    viewers: Math.max(0, Math.round(Number(data.viewers) || 0)),
     durationSec: Math.max(0, Math.round(Number(data.durationSec) || 0)),
     // TikTok'un bildirdiği açılış anı (ms). Yoksa hesaplanmaz.
     unpackAt: Math.max(0, Math.round(Number(data.unpackAt) || 0)),
@@ -856,6 +944,8 @@ function publishBox(event) {
     businessType: event.businessType || 0,
     boxType: event.boxType || '',
     shared: event.shared || 0,
+    participants: event.participants || 0,
+    viewers: event.viewers || 0,
     durationSec: event.durationSec || 0,
     unpackAt: event.unpackAt || 0,
     availableAt: event.availableAt || 0,
@@ -924,6 +1014,8 @@ function writeBoxes() {
     businessType: event.businessType || 0,
     boxType: event.boxType || '',
     shared: event.shared || 0,
+    participants: event.participants || 0,
+    viewers: event.viewers || 0,
     durationSec: event.durationSec || 0,
     unpackAt: event.unpackAt || 0,
     availableAt: event.availableAt || 0,
@@ -1317,6 +1409,14 @@ function handleEnvelope(username, eventName, data) {
   const picked = boxCoins(info, box);
   const coins = picked.coins;
   const people = Number(info.peopleCount || info.recipientCount || box.canOpen) || 0;
+  // “Kaç izleyici katıldı” kazanansayısından ayrı bir alandır; TikTok bunu
+  // her kutuda göndermiyor. Bilinen adaylar varsa karta taşınır, yoksa 0 kalır.
+  const participants = Number(
+    info.participantCount || info.joinedCount || info.joinCount ||
+    info.viewerJoinCount || info.participants || 0
+  ) || 0;
+  const liveRecord = state.streamers.get(username);
+  const viewers = Number(liveRecord && liveRecord.viewers) || 0;
   const nowMs = Date.now();
   const timing = boxTiming(info, box, nowMs);
   const openIn = timing.durationSec;
@@ -1365,6 +1465,11 @@ function handleEnvelope(username, eventName, data) {
       boxTarget.boxCoinSum = (Number(boxTarget.boxCoinSum) || 0) + coins;
       boxTarget.boxCoinsSeen = (Number(boxTarget.boxCoinsSeen) || 0) + 1;
     }
+    if (people > 0) {
+      boxTarget.boxSharedSum = (Number(boxTarget.boxSharedSum) || 0) + people;
+      boxTarget.boxSharedSeen = (Number(boxTarget.boxSharedSeen) || 0) + 1;
+    }
+    if (!boxTarget.firstBoxAt) boxTarget.firstBoxAt = Date.now();
     boxTarget.lastBoxAt = Date.now();
     state.targetsDirty = true;
   }
@@ -1376,6 +1481,8 @@ function handleEnvelope(username, eventName, data) {
     allowZero: true,
     envelopeId,
     shared: people,
+    participants,
+    viewers,
     // Açılış anı ve pencere süresi TikTok'un kendi mesajından gelir.
     durationSec: timing.durationSec,
     availableAt: timing.endMs,
@@ -1465,7 +1572,8 @@ function handleConnectorGift(username, data) {
     boxName: name,
     businessType: 0,
     boxType: '',
-    sender
+    sender,
+    viewers: Number((state.streamers.get(username) || {}).viewers) || 0
   });
 }
 
@@ -1742,8 +1850,15 @@ function publisherScore(target, now = Date.now()) {
   const seen = Number(target && target.boxCoinsSeen) || 0;
   const sum = Number(target && target.boxCoinSum) || 0;
   const avgCoins = seen > 0 ? Math.round(sum / seen) : null;
+  const sharedSeen = Number(target && target.boxSharedSeen) || 0;
+  const sharedSum = Number(target && target.boxSharedSum) || 0;
+  const avgShared = sharedSeen > 0 ? Math.round(sharedSum / sharedSeen) : null;
+  const firstBoxAt = Number(target && target.firstBoxAt) || 0;
   const lastBoxAt = Number(target && target.lastBoxAt) || 0;
-  if (!boxes) return { score: 0, boxes: 0, avgCoins: null, lastBoxAt: 0 };
+  const intervalMin = boxes > 1 && firstBoxAt && lastBoxAt
+    ? Math.round(((lastBoxAt - firstBoxAt) / 60000 / (boxes - 1)) * 10) / 10
+    : null;
+  if (!boxes) return { score: 0, boxes: 0, avgCoins: null, avgShared: null, intervalMin: null, lastBoxAt: 0 };
   const volume = 1 - Math.exp(-boxes / 3);
   const coins = avgCoins === null ? 0.5 : Math.min(1, avgCoins / 100);
   const days = lastBoxAt ? Math.max(0, (now - lastBoxAt) / 86400000) : Infinity;
@@ -1753,6 +1868,8 @@ function publisherScore(target, now = Date.now()) {
     score: Math.max(0, Math.min(100, score)),
     boxes,
     avgCoins,
+    avgShared,
+    intervalMin,
     lastBoxAt
   };
 }
@@ -2194,6 +2311,10 @@ function snapshot() {
         // Hiç kutu yoksa skor null yazılır: panel "0" ile "bilinmiyor"u ayırır.
         boxCount: info.boxes,
         avgCoins: info.avgCoins,
+        // Yayıncının tekrar eden kutusu: ortalama jeton, kazanan ve aralık.
+        // Panel bunu “kural” satırı olarak gösterir; veri yoksa null kalır.
+        avgShared: info.avgShared,
+        boxIntervalMin: info.intervalMin,
         score: info.boxes ? info.score : null
       };
     });
@@ -2401,6 +2522,7 @@ async function main() {
         // Keşif burada da çalışır: tarama turu 4 dakikada bir döndüğü için
         // keşif de 4 dakikaya sıkışıyordu, oysa yeni yayınlar her 30 saniyede
         // bulunabiliyor. Taze oda kimliği = gerçekten yayında olan aday.
+        await pollWatchRequests();
         await discoverLive();
         await maintainWatchers();
       } catch (error) {
