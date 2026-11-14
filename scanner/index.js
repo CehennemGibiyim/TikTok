@@ -1721,11 +1721,18 @@ async function openConnectorWatcher(username, sessionSec) {
       log('manuel hedef sayfadan doğrulanamadı, bağlayıcı doğrudan denenecek:', username);
     }
     if (!page.live) {
-      const offlineError = new Error('sayfada canlı oda yok');
-      offlineError.offline = true;
-      throw offlineError;
+      // Sayfa captcha/gecikme yüzünden yayını kapalı gösterebilir. Keşif
+      // kayıtlarında bu kesin offline sayılır; panel hedefinde bağlayıcıya
+      // son bir şans verilir (bağlayıcı da kapalıysa offline işaretlenir).
+      if (!isManualWatchTarget(username)) {
+        const offlineError = new Error('sayfada canlı oda yok');
+        offlineError.offline = true;
+        throw offlineError;
+      }
+      log('manuel hedef sayfada kapalı görünüyor, bağlayıcı denenecek:', username);
+    } else {
+      knownRoomId = page.roomId || '';
     }
-    knownRoomId = page.roomId || '';
     if (knownRoomId) storeRoomId(username, knownRoomId);
   }
 
