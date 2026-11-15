@@ -1,20 +1,11 @@
 {
  "note": "Taranacak adresler. Keşif kendi bulduklarını buraya ekler; elle eklenenler korunur.",
- "probeRatio": 0.25,
+ "probeRatio": 0.3,
  "probeStats": {
-  "sessions": 39,
+  "sessions": 40,
   "withBox": 5
  },
  "probeHistory": [
-  {
-   "at": 1794525137353,
-   "from": 25,
-   "to": 20,
-   "probeRate": 13,
-   "hotRate": 100,
-   "sessions": 8,
-   "boxSessions": 1
-  },
   {
    "at": 1794525516293,
    "from": 20,
@@ -365,6 +356,15 @@
    "hotRate": null,
    "sessions": 8,
    "boxSessions": 1
+  },
+  {
+   "at": 1794751357489,
+   "from": 25,
+   "to": 30,
+   "probeRate": 25,
+   "hotRate": null,
+   "sessions": 8,
+   "boxSessions": 2
   }
  ],
  "boxHourly": {
@@ -382,7 +382,7 @@
   "498539": 1,
   "498540": 14,
   "498541": 32,
-  "498542": 1
+  "498542": 2
  },
  "watchHourly": {
   "498512": 1,
@@ -448,15 +448,15 @@
     12,
     4,
     4,
-    88
+    89
    ],
    "watchMin": [
-    116.25101666666667,
-    115,
-    114.99991666666666,
-    18.708233333333343,
-    16.11703333333333,
-    839.3753833333333
+    118.25101666666667,
+    117,
+    116.99991666666666,
+    19.70825000000001,
+    17.11703333333333,
+    919.5430833333332
    ]
   }
  },
@@ -466,7 +466,7 @@
   "regions": {},
   "failed": []
  },
- "updatedAt": "2026-11-15T14:01:47.324Z",
+ "updatedAt": "2026-11-15T14:06:55.631Z",
  "targets": [
   {
    "username": "haris",
@@ -65599,13 +65599,13 @@
    "roomId": "7708387738411617046",
    "roomIdAt": 1794749992885,
    "roomIdMiss": 0,
-   "boxEvents": 27,
-   "boxCoinSum": 686,
-   "boxCoinsSeen": 17,
-   "boxSharedSum": 433,
-   "boxSharedSeen": 17,
+   "boxEvents": 28,
+   "boxCoinSum": 737,
+   "boxCoinsSeen": 18,
+   "boxSharedSum": 463,
+   "boxSharedSeen": 18,
    "firstBoxAt": 1794746498355,
-   "lastBoxAt": 1794751224342,
+   "lastBoxAt": 1794751546796,
    "lastWatchedAt": 1794749992885,
    "addedAt": 1794538424413,
    "lastSeenLiveAt": 1794569965208
