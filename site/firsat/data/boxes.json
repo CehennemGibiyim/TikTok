@@ -1,13 +1,13 @@
 {
- "scannedAt": "2026-11-15T14:11:08.624Z",
+ "scannedAt": "2026-11-15T14:14:47.014Z",
  "runId": 1794742479319,
  "delivery": {
   "runId": 1794742479319,
-  "produced": 51,
-  "lastSeq": 51,
-  "duplicate": 54,
-  "ntfyAttempts": 50,
-  "ntfyOk": 50,
+  "produced": 52,
+  "lastSeq": 52,
+  "duplicate": 55,
+  "ntfyAttempts": 51,
+  "ntfyOk": 51,
   "ntfyFail": 0,
   "ntfyFailSeqs": [],
   "boxTimeBySeq": {
@@ -61,13 +61,35 @@
    "48": 1794751224342,
    "49": 1794751546796,
    "50": 1794751825893,
-   "51": 1794751868624
+   "51": 1794751868624,
+   "52": 1794752087014
   },
   "fileFromSeq": 1,
-  "fileSeqCount": 51,
+  "fileSeqCount": 52,
   "fileCap": 120
  },
  "boxes": [
+  {
+   "id": "unachan11150-env-7708376793669307143",
+   "seq": 52,
+   "runId": 1794742479319,
+   "t": 1794752087014,
+   "username": "unachan11150",
+   "kind": "letter",
+   "coins": 20,
+   "boxName": "Zarf",
+   "businessType": 1,
+   "boxType": "",
+   "roomId": "7708367523608742677",
+   "shared": 16,
+   "participants": 0,
+   "viewers": 11,
+   "durationSec": 179,
+   "unpackAt": 1794752265000,
+   "availableAt": 1794752265000,
+   "hasWindow": true,
+   "sessionSec": 5881
+  },
   {
    "id": "ttttt6196-env-7708400541022063382",
    "seq": 51,
