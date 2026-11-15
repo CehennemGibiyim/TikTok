@@ -2122,12 +2122,13 @@ async function maintainWatchers() {
       live = relaxed;
     }
   }
+  // Sıra: canlı + manuel (3), canlı keşif (2), manuel ama şu an kapalı (1).
+  // Böylece kapalı manuel hedefler, taze canlı keşif odalarının önünü kesmez.
+  const roomPriority = (record) => (record.live ? 2 : 0) +
+    (isManualWatchTarget(record.username) ? 1 : 0);
   live = live
     .sort((a, b) =>
-      // Panelden elle eklenenler keşif sırasına takılmadan önce denenir.
-      (isManualWatchTarget(b.username) ? 1 : 0) - (isManualWatchTarget(a.username) ? 1 : 0) ||
-      // Kesin canlı olanlar önce denenir.
-      (b.live ? 1 : 0) - (a.live ? 1 : 0) ||
+      roomPriority(b) - roomPriority(a) ||
       boxPriority(b, now) - boxPriority(a, now) ||
       // Oda kimliği bilinen oda bağlanabiliyor: onu öne al.
       (b.roomId ? 1 : 0) - (a.roomId ? 1 : 0) ||
