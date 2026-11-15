@@ -1344,7 +1344,7 @@ function loadConnector() {
 const BOX_NAMES = { 9: 'Portal', 19: 'Süper Fan Kutusu', 20: 'Sandık', 21: 'Zarf' };
 
 function envelopeName(kind, info) {
-  const bt = Number(info && info.businessType) || 0;
+  const bt = Number(info && (info.businessType || info.envelopeType || info.type)) || 0;
   const raw = String((info && (info.boxType || info.displayKey || info.textKey)) || '').trim();
   if (BOX_NAMES[bt]) return BOX_NAMES[bt];
   if (raw && raw !== 'yok') return raw;
@@ -1352,7 +1352,7 @@ function envelopeName(kind, info) {
 }
 
 function envelopeKind(eventName, info) {
-  const bt = Number(info && info.businessType) || 0;
+  const bt = Number(info && (info.businessType || info.envelopeType || info.type)) || 0;
   const text = String(eventName || '') + ' ' + String(
     (info && (info.boxType || info.envelopeScene || info.textKey || info.displayKey)) || ''
   );
@@ -1371,9 +1371,11 @@ function boxTiming(info, box, now) {
     if (num > 1e12) return Math.round(num / 1000);
     return num > 1e9 ? Math.round(num) : 0;
   };
-  const unpackAt = seconds(info.unpackAt || box.unpackAt);
-  const createAt = seconds(info.createAt || box.createAt);
-  const openIn = Number(info.secondsUntilOpen) || 0;
+  // connector v1 eski alanları `canOpen` / `timestamp`, v2 ise `unpackAt` /
+  // `createAt` kullanıyor. İkisi de aynı kutu penceresine çevrilir.
+  const unpackAt = seconds(info.unpackAt || box.unpackAt || box.canOpen);
+  const createAt = seconds(info.createAt || box.createAt || box.timestamp);
+  const openIn = Number(info.secondsUntilOpen || box.secondsUntilOpen || box.duration) || 0;
   let endMs = 0;
   if (unpackAt) endMs = unpackAt * 1000;
   else if (openIn > 0) endMs = now + openIn * 1000;
@@ -1382,6 +1384,8 @@ function boxTiming(info, box, now) {
   if (endMs) {
     const startMs = createAt ? createAt * 1000 : Math.min(now, endMs);
     durationSec = Math.max(0, Math.round((endMs - startMs) / 1000));
+  } else if (box.duration) {
+    durationSec = Math.max(0, Math.round(Number(box.duration) || 0));
   }
   return { endMs, durationSec, unpackAt: endMs || 0 };
 }
@@ -1395,16 +1399,36 @@ function boxCoins(info, box) {
   for (const source of [info, box]) {
     if (!source || typeof source !== 'object') continue;
     for (const field of BOX_COIN_FIELDS) {
-      const value = Number(source[field]);
-      if (Number.isInteger(value) && value > 0 && value <= MAX_BOX_COINS) return { coins: value, field };
+      const raw = source[field];
+      if (raw === undefined || raw === null || raw === '') continue;
+      const value = Number(raw);
+      // 0 da bilinen bir değerdir: referans sistem gibi "0 jeton" yazılır,
+      // "bilinmiyor" yalnızca alan hiç gelmediğinde kullanılır.
+      if (Number.isInteger(value) && value >= 0 && value <= MAX_BOX_COINS) return { coins: value, field };
     }
   }
   return { coins: 0, field: '' };
 }
 
+function boxPeople(info, box) {
+  const fields = ['peopleCount', 'recipientCount', 'people', 'participants',
+    'joinedCount', 'joinCount', 'viewerJoinCount'];
+  for (const source of [info, box]) {
+    if (!source || typeof source !== 'object') continue;
+    for (const field of fields) {
+      const raw = source[field];
+      if (raw === undefined || raw === null || raw === '') continue;
+      const value = Number(raw);
+      if (Number.isInteger(value) && value >= 0) return value;
+    }
+  }
+  return 0;
+}
+
 function handleEnvelope(username, eventName, data) {
   const info = (data && (data.envelopeInfo || data)) || {};
-  const box = (data && data.treasureBoxData) || info.treasureBoxData || {};
+  const box = (data && data.treasureBoxData) || info.treasureBoxData ||
+    (data && data.treasure) || info.treasure || {};
 
   state.envelopeStats.seen += 1;
 
@@ -1428,12 +1452,13 @@ function handleEnvelope(username, eventName, data) {
 
   const picked = boxCoins(info, box);
   const coins = picked.coins;
-  const people = Number(info.peopleCount || info.recipientCount || box.canOpen) || 0;
+  const people = boxPeople(info, box);
   // “Kaç izleyici katıldı” kazanansayısından ayrı bir alandır; TikTok bunu
   // her kutuda göndermiyor. Bilinen adaylar varsa karta taşınır, yoksa 0 kalır.
   const participants = Number(
     info.voteCount || info.participantCount || info.joinedCount || info.joinCount ||
-    info.viewerJoinCount || info.participants || 0
+    info.viewerJoinCount || info.participants ||
+    box.voteCount || box.participantCount || box.participants || 0
   ) || 0;
   const liveRecord = state.streamers.get(username);
   const viewers = Number(liveRecord && liveRecord.viewers) || 0;
@@ -1453,7 +1478,7 @@ function handleEnvelope(username, eventName, data) {
 
   // TikTok'un bildirdiği kutu türleri. Jeton alanı boş gelse bile kutu gerçektir
   // (süper fan kutusu 0 jeton / 0 kişi bildiriyor): bunlar yazılır.
-  const bt = Number(info.businessType) || 0;
+  const bt = Number(info.businessType || info.envelopeType || box.businessType || box.type) || 0;
   const knownBox = bt === 1 || bt === 4 || bt === 9 || bt === 19 || bt === 20 || bt === 21;
   // İçi boş bildirim (tür de yok, jeton da yok) fırsat değildir.
   if (coins <= 0 && people <= 0 && !knownBox) {
@@ -1461,8 +1486,11 @@ function handleEnvelope(username, eventName, data) {
     return;
   }
 
-  const kind = envelopeKind(eventName, info);
-  const name = envelopeName(kind, info);
+  // Eski connector türü yalnızca `treasureBoxData.type` içinde taşıyabilir:
+  // kutu alanlarını info ile birleştir, info değerleri öncelikli kalsın.
+  const kindInfo = Object.assign({}, box, info);
+  const kind = envelopeKind(eventName, kindInfo);
+  const name = envelopeName(kind, kindInfo);
   countBoxHour(Date.now());
   const boxRecord = state.streamers.get(username);
   if (boxRecord) boxRecord.boxes = (Number(boxRecord.boxes) || 0) + 1;
@@ -1501,7 +1529,9 @@ function handleEnvelope(username, eventName, data) {
     allowZero: true,
     envelopeId,
     // Telefonda uygulamayı doğrudan açmak için bağlayıcının bulduğu oda kimliği.
-    roomId: String((liveRecord && liveRecord.roomId) || ''),
+    // Bağlayıcı oda kimliğini vermediyse envelope'un kendi roomId alanı
+    // telefonda uygulamayı doğrudan açmak için yedek olarak kullanılır.
+    roomId: String((liveRecord && liveRecord.roomId) || info.roomId || (data && data.roomId) || ''),
     shared: people,
     participants,
     viewers,
@@ -1511,7 +1541,7 @@ function handleEnvelope(username, eventName, data) {
     unpackAt: timing.unpackAt,
     giftName: name,
     boxName: name,
-    businessType: Number(info.businessType) || 0,
+    businessType: Number(kindInfo.businessType || kindInfo.type) || 0,
     boxType: boxType === 'yok' ? '' : boxType,
     sender: info.sendUserName || '',
     senderName: info.sendUserName || info.senderName || '',
@@ -1700,9 +1730,12 @@ function storeRoomId(username, roomId) {
   }
 }
 
-async function openConnectorWatcher(username, sessionSec) {
+async function openConnectorWatcher(username, sessionSec, onConnectStart) {
   const lib = loadConnector();
-  if (!lib || !lib.TikTokLiveConnection) throw new Error('tiktok-live-connector yok');
+  // connector v2 `TikTokLiveConnection`, eski sürüm `WebcastPushConnection`
+  // adını kullanıyor; referans sistemdeki gibi ikisi de desteklenir.
+  const Conn = lib && (lib.TikTokLiveConnection || lib.WebcastPushConnection);
+  if (!Conn) throw new Error('tiktok-live-connector yok');
 
   // Keşiften gelen oda kimliği: TikTok'un "oda kimliği" ucu bu IP'lerde boş
   // dönüyor, bu yüzden bağlantı "Room ID from all sources" hatasıyla düşüyordu.
@@ -1751,7 +1784,7 @@ async function openConnectorWatcher(username, sessionSec) {
     if (knownRoomId) storeRoomId(username, knownRoomId);
   }
 
-  const connection = new lib.TikTokLiveConnection(username, {
+  const connection = new Conn(username, {
     processInitialData: false,
     fetchRoomInfoOnConnect: true
   });
@@ -1784,6 +1817,7 @@ async function openConnectorWatcher(username, sessionSec) {
   });
   connection.on('error', (error) => { state.lastError = username + ': ' + ((error && error.message) || 'bağlantı hatası'); });
 
+  if (onConnectStart) onConnectStart();
   await connection.connect(knownRoomId || undefined);
 
   const liveRecord = state.streamers.get(username);
@@ -1798,10 +1832,10 @@ async function openConnectorWatcher(username, sessionSec) {
   log('dinleniyor', username);
 }
 
-async function openWatcher(username, sessionSec) {
+async function openWatcher(username, sessionSec, onConnectStart) {
   if (CONFIG.connector) {
     try {
-      await openConnectorWatcher(username, sessionSec);
+      await openConnectorWatcher(username, sessionSec, onConnectStart);
       return;
     } catch (error) {
       if (isOfflineError(error)) {
@@ -1833,6 +1867,7 @@ async function openWatcher(username, sessionSec) {
     throw error;
   }
   const WS = wsFactory();
+  if (onConnectStart) onConnectStart();
   const socket = new WS('wss://api.tik.tools?uniqueId=' + encodeURIComponent(username) +
     '&jwtKey=' + encodeURIComponent(token));
 
@@ -2053,12 +2088,19 @@ async function maintainWatchers() {
   // keşif ucundan gelen (yani gerçekten yayında olan) odalar önceliklidir.
   const hasFreshRoomId = (record) => Boolean(record.roomId) && Number(record.roomIdAt) &&
     now - Number(record.roomIdAt) < CONFIG.roomIdFreshMs;
+  // Keşif kaydı eskiyse yayın çoktan bitmiş olabilir: böyle bir odaya bağlanmak
+  // saatlik kotayı boşa yakar. Yalnızca son `live-stale-sec` içinde görülen
+  // canlı kayıtlar adaydır; panelden elle eklenenler her zaman denenebilir.
+  const isFreshLive = (record) => Boolean(record.live) &&
+    now - (Number(record.lastSeenLiveAt) || 0) < CONFIG.liveStaleSec * 1000;
   const candidateFilter = (strict) => (record) => {
-    if (!record.live && !record.liveUnknown) return false;
+    const manualWatch = isManualWatchTarget(record.username);
+    if (!manualWatch && !record.live && !record.liveUnknown) return false;
+    // Eski canlı kayıtları keşifte tut; yalnız taze olanlara bağlan.
+    if (!manualWatch && record.live && !isFreshLive(record)) return false;
     // Panelden elle eklenen hedef, keşif ucunda görünmediği için oda kimliği
     // boş kalabilir. Bu hedeflerde sayfayı bir kez doğrulayıp kimliği
     // kendimiz çıkarırız; keşif kayıtlarında ise kimliksiz oda boşa kotadır.
-    const manualWatch = isManualWatchTarget(record.username);
     if (!record.roomId && !manualWatch) return false;
     if (!strict) return true;
     if (manualWatch) return true;
@@ -2107,7 +2149,13 @@ async function maintainWatchers() {
   while (state.rooms.size < target && Date.now() < fillDeadline) {
     const step = connectBudget();
     if (step.remaining === 0) break;
-    const gapLeft = step.gapMs - (Date.now() - state.lastConnectAt);
+    // İlk dolum: saatlik bütçe saat boyunca yayıldığında 12 oda bile 30 dakika
+    // sürüyordu. Asgari canlı kapasite (min-rooms) taban aralıkla hızlıca
+    // doldurulur; kalan odalar saatlik bütçeye yayılmaya devam eder.
+    const fillGap = state.rooms.size < Math.min(CONFIG.minRooms, target)
+      ? CONFIG.connectGapMs
+      : step.gapMs;
+    const gapLeft = fillGap - (Date.now() - state.lastConnectAt);
     if (gapLeft > 0) {
       await sleep(Math.min(gapLeft, 2000));
       continue;
@@ -2143,10 +2191,18 @@ async function maintainWatchers() {
     if (state.recent.length > 200) state.recent.shift();
 
     state.connectStats.attempts += 1;
-    state.connectStarts.push(Date.now());
-    state.hourStarts.push(Date.now());
+    // Saatlik/dakikalık kota yalnızca gerçek bir TikTok bağlantısı
+    // başlatıldığında yazılır. Sayfa doğrulamasında kalan "yayında değil"
+    // denemeleri bütçeyi tüketmez; canlı odalara yer kalır.
+    let connectStarted = false;
+    const markConnectStart = () => {
+      if (connectStarted) return;
+      connectStarted = true;
+      state.connectStarts.push(Date.now());
+      state.hourStarts.push(Date.now());
+    };
     try {
-      await openWatcher(pick.record.username, sessionSec);
+      await openWatcher(pick.record.username, sessionSec, markConnectStart);
       state.lastConnectAt = Date.now();
       state.connectFailures = 0;
       state.connectStats.ok += 1;
@@ -2770,7 +2826,10 @@ if (process.env.SCANNER_SELFTEST === '1') {
       envelopeId: 'e6', businessType: 19, diamondCount: 0, peopleCount: 0,
       createAt: String(Math.floor(Date.now() / 1000)), unpackAt: Math.floor(Date.now() / 1000) + 60
     } } }],
-    ['boş zarf bildirimi', { event: 'envelope', data: { envelopeInfo: { envelopeId: 'e3', action: 'hide', boxType: 'spark_box', coins: null, recipientCount: null } } }]
+    ['boş zarf bildirimi', { event: 'envelope', data: { envelopeInfo: { envelopeId: 'e3', action: 'hide', boxType: 'spark_box', coins: null, recipientCount: null } } }],
+    ['eski connector sandığı (treasureBoxData)', { event: 'envelope', data: { treasureBoxData: {
+      coins: 875, type: 20, timestamp: Date.now() - 180000, canOpen: Date.now()
+    } } }]
   ];
   // Oda seçimi: aday / sıcak / normal önceliği.
   const nowMs = Date.now();
