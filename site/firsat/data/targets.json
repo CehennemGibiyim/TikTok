@@ -2,19 +2,10 @@
  "note": "Taranacak adresler. Keşif kendi bulduklarını buraya ekler; elle eklenenler korunur.",
  "probeRatio": 0.2,
  "probeStats": {
-  "sessions": 14,
+  "sessions": 17,
   "withBox": 0
  },
  "probeHistory": [
-  {
-   "at": 1794520374807,
-   "from": 20,
-   "to": 25,
-   "probeRate": 25,
-   "hotRate": null,
-   "sessions": 8,
-   "boxSessions": 2
-  },
   {
    "at": 1794521346324,
    "from": 25,
@@ -365,6 +356,15 @@
    "hotRate": null,
    "sessions": 8,
    "boxSessions": 0
+  },
+  {
+   "at": 1794746503251,
+   "from": 20,
+   "to": 20,
+   "probeRate": 0,
+   "hotRate": null,
+   "sessions": 8,
+   "boxSessions": 0
   }
  ],
  "boxHourly": {
@@ -382,7 +382,7 @@
   "498534": 34,
   "498535": 3,
   "498539": 1,
-  "498540": 4
+  "498540": 6
  },
  "watchHourly": {
   "498512": 1,
@@ -400,7 +400,7 @@
   "498534": 8,
   "498535": 7,
   "498539": 8,
-  "498540": 8
+  "498540": 10
  },
  "boxMinuteDays": {
   "2026-11-13": {
@@ -443,18 +443,18 @@
    "boxMinutes": [
     9,
     11,
-    11,
+    12,
     3,
     3,
-    66
+    67
    ],
    "watchMin": [
-    84.61515,
-    84,
-    83.99995,
-    10.696700000000003,
-    9.117033333333334,
-    414.4806
+    89.61515,
+    89,
+    88.99995,
+    12.696750000000005,
+    11.117033333333334,
+    531.7214166666666
    ]
   }
  },
@@ -464,7 +464,7 @@
   "regions": {},
   "failed": []
  },
- "updatedAt": "2026-11-15T12:39:39.716Z",
+ "updatedAt": "2026-11-15T12:46:17.240Z",
  "targets": [
   {
    "username": "haris",
@@ -26429,13 +26429,13 @@
    "roomId": "7708298751999216416",
    "roomIdAt": 1794742484000,
    "roomIdMiss": 0,
-   "boxEvents": 0,
-   "boxCoinSum": 0,
-   "boxCoinsSeen": 0,
-   "boxSharedSum": 0,
-   "boxSharedSeen": 0,
-   "firstBoxAt": 0,
-   "lastBoxAt": 0,
+   "boxEvents": 1,
+   "boxCoinSum": 200,
+   "boxCoinsSeen": 1,
+   "boxSharedSum": 80,
+   "boxSharedSeen": 1,
+   "firstBoxAt": 1794746505407,
+   "lastBoxAt": 1794746505407,
    "lastWatchedAt": 1794742484001,
    "addedAt": 1794647735412,
    "lastSeenLiveAt": 1794648150956
@@ -63056,8 +63056,8 @@
    "username": "mugen_siba",
    "country": "JP",
    "source": "discovery",
-   "roomId": "7707512774284823317",
-   "roomIdAt": 1794546972141,
+   "roomId": "7708351757814598406",
+   "roomIdAt": 1794746382915,
    "roomIdMiss": 0,
    "boxEvents": 1,
    "boxCoinSum": 0,
@@ -63066,7 +63066,7 @@
    "boxSharedSeen": 0,
    "firstBoxAt": 0,
    "lastBoxAt": 1794547551290,
-   "lastWatchedAt": 1794547031895,
+   "lastWatchedAt": 1794746382915,
    "addedAt": 1794546972141,
    "lastSeenLiveAt": 1794575615378
   },
@@ -65597,13 +65597,13 @@
    "roomId": "7708344577635207958",
    "roomIdAt": 1794746376590,
    "roomIdMiss": 0,
-   "boxEvents": 1,
-   "boxCoinSum": 0,
-   "boxCoinsSeen": 0,
-   "boxSharedSum": 0,
-   "boxSharedSeen": 0,
-   "firstBoxAt": 0,
-   "lastBoxAt": 1794539254087,
+   "boxEvents": 2,
+   "boxCoinSum": 93,
+   "boxCoinsSeen": 1,
+   "boxSharedSum": 54,
+   "boxSharedSeen": 1,
+   "firstBoxAt": 1794746498355,
+   "lastBoxAt": 1794746498355,
    "lastWatchedAt": 1794746376590,
    "addedAt": 1794538424413,
    "lastSeenLiveAt": 1794569965208
@@ -75440,8 +75440,8 @@
    "username": "roxana.9805",
    "country": "TJ",
    "source": "discovery",
-   "roomId": "7707355061940243232",
-   "roomIdAt": 1794509116313,
+   "roomId": "7708354167101868832",
+   "roomIdAt": 1794746623248,
    "roomIdMiss": 0,
    "boxEvents": 0,
    "boxCoinSum": 0,
@@ -75450,7 +75450,7 @@
    "boxSharedSeen": 0,
    "firstBoxAt": 0,
    "lastBoxAt": 0,
-   "lastWatchedAt": 0,
+   "lastWatchedAt": 1794746623249,
    "addedAt": 1794509116313,
    "lastSeenLiveAt": 1794517695433
   },
@@ -76142,8 +76142,8 @@
    "username": "tanialive1",
    "country": "BD",
    "source": "discovery",
-   "roomId": "7708347134710680341",
-   "roomIdAt": 1794743317395,
+   "roomId": "7708371474007821076",
+   "roomIdAt": 1794746632630,
    "roomIdMiss": 0,
    "boxEvents": 0,
    "boxCoinSum": 0,
@@ -76152,7 +76152,7 @@
    "boxSharedSeen": 0,
    "firstBoxAt": 0,
    "lastBoxAt": 0,
-   "lastWatchedAt": 1794743317395,
+   "lastWatchedAt": 1794746632630,
    "addedAt": 1794507566634,
    "lastSeenLiveAt": 1794703003916
   },
