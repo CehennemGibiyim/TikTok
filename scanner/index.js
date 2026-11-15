@@ -1751,6 +1751,10 @@ async function openConnectorWatcher(username, sessionSec, onConnectStart) {
   const useRecordRoom = recordRoomId && recordRoomAt > targetRoomAt;
   const rawRoomId = useRecordRoom ? recordRoomId : (targetRoomId || recordRoomId);
   const roomIdAt = useRecordRoom ? recordRoomAt : (targetRoomAt || recordRoomAt);
+  // api-live bu kaydı taze "canlı" işaretlediyse sayfa doğrulaması beklemeden
+  // bağlayıcı doğrudan denenir; referans sistem de böyle çalışıyor.
+  const trustedLive = Boolean(recordInfo.live) &&
+    Date.now() - (Number(recordInfo.lastSeenLiveAt) || 0) < CONFIG.liveStaleSec * 1000;
 
   // 1) Keşiften gelen TAZE oda kimliği varsa doğrudan bağlanılır. Keşif ucu
   //    (tik.tools top-channels) yalnızca yayındaki odaları taze kimlikleriyle
@@ -1762,8 +1766,9 @@ async function openConnectorWatcher(username, sessionSec, onConnectStart) {
   let knownRoomId = freshRoomId;
 
   // 2) Kimlik yoksa/eskimişse sayfadan doğrula: yayın kapalıysa hiç bağlanmayız,
-  //    böylece günlük bağlantı kotası ölü odalara yanmaz.
-  if (!knownRoomId) {
+  //    böylece günlük bağlantı kotası ölü odalara yanmaz. Taze canlı kayıtta
+  //    sayfa atlanır; bağlayıcı oda kimliğini kendisi bulur.
+  if (!knownRoomId && !trustedLive) {
     const page = await scrapeLiveInfo(username);
     if (!page.known) {
       // Sayfa okunamadı (captcha/boş yanıt). Keşif kayıtlarında bu deneme
@@ -2132,9 +2137,13 @@ async function maintainWatchers() {
   // canlı manuel ama kimliksiz (5), canlı keşif kimliksiz (4), kapalı manuel (1).
   // Kimliksiz manuel hedef bağlayıcıda "Room ID" hatası verip kotayı yakıyor;
   // bu yüzden gerçekten bağlanabilir taze kimlikli odalar önce denenir.
-  const roomPriority = (record) => (record.live ? 4 : 0) +
-    (hasFreshRoomId(record) ? 2 : 0) +
-    (isManualWatchTarget(record.username) ? 1 : 0);
+  const roomPriority = (record) => {
+    const manual = isManualWatchTarget(record.username);
+    let score = (record.live ? 4 : 0) + (record.roomId ? 2 : 0);
+    // Kimliksiz manuel hedef bağlayıcıda sık hata veriyor: canlı keşfin arkasına düş.
+    if (manual) score += record.roomId ? 1 : -1;
+    return score;
+  };
   live = live
     .sort((a, b) =>
       roomPriority(b) - roomPriority(a) ||
