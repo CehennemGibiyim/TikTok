@@ -1,26 +1,48 @@
 {
- "scannedAt": "2026-11-15T18:25:24.103Z",
+ "scannedAt": "2026-11-15T18:31:42.632Z",
  "runId": 1794765693606,
  "delivery": {
   "runId": 1794765693606,
-  "produced": 4,
-  "lastSeq": 4,
+  "produced": 5,
+  "lastSeq": 5,
   "duplicate": 2,
-  "ntfyAttempts": 3,
-  "ntfyOk": 3,
+  "ntfyAttempts": 4,
+  "ntfyOk": 4,
   "ntfyFail": 0,
   "ntfyFailSeqs": [],
   "boxTimeBySeq": {
    "1": 1794765967926,
    "2": 1794766571225,
    "3": 1794766599556,
-   "4": 1794767124103
+   "4": 1794767124103,
+   "5": 1794767502632
   },
   "fileFromSeq": 1,
-  "fileSeqCount": 4,
+  "fileSeqCount": 5,
   "fileCap": 120
  },
  "boxes": [
+  {
+   "id": "roxana.9805-env-7708467708719663894",
+   "seq": 5,
+   "runId": 1794765693606,
+   "t": 1794767502632,
+   "username": "roxana.9805",
+   "kind": "chest",
+   "coins": 9,
+   "boxName": "Sandık",
+   "businessType": 20,
+   "boxType": "",
+   "roomId": "7708448529668213536",
+   "shared": 7,
+   "participants": 0,
+   "viewers": 12,
+   "durationSec": 29,
+   "unpackAt": 1794767531000,
+   "availableAt": 1794767531000,
+   "hasWindow": true,
+   "sessionSec": 1585
+  },
   {
    "id": "weronikadorowicz-env-7708466075222477600",
    "seq": 4,
