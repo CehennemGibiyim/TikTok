@@ -2019,7 +2019,10 @@ function pickRoom(options) {
   if (!free.length) return null;
 
   // Hiç dinlenmemiş adaylar: keşifte yeni bulunan, sıcak listede olmayanlar.
-  const untouched = free.filter((record) => !watchedAt(record));
+  // Kimliksiz manuel hedef deneme (probe) sırasına girmesin; bağlayıcıda
+  // "Room ID" hatası verip canlı keşif odalarının önünü kesiyor.
+  const untouched = free.filter((record) => !watchedAt(record) &&
+    (record.roomId || !isManualWatchTarget(record.username)));
   const probeRoom = probing < probeBudget ? untouched[0] : null;
 
   const hotRoom = free.find((record) =>
