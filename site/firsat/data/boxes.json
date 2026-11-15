@@ -1,19 +1,65 @@
 {
- "scannedAt": "2026-11-14T18:35:25.287Z",
- "runId": 1794681325258,
+ "scannedAt": "2026-11-15T01:42:12.152Z",
+ "runId": 1794698805128,
  "delivery": {
-  "runId": 1794681325258,
-  "produced": 0,
-  "lastSeq": 0,
+  "runId": 1794698805128,
+  "produced": 2,
+  "lastSeq": 2,
   "duplicate": 0,
-  "ntfyAttempts": 0,
-  "ntfyOk": 0,
+  "ntfyAttempts": 1,
+  "ntfyOk": 1,
   "ntfyFail": 0,
   "ntfyFailSeqs": [],
-  "boxTimeBySeq": {},
-  "fileFromSeq": 0,
-  "fileSeqCount": 0,
+  "boxTimeBySeq": {
+   "1": 1794706872288,
+   "2": 1794706932152
+  },
+  "fileFromSeq": 1,
+  "fileSeqCount": 2,
   "fileCap": 120
  },
- "boxes": []
+ "boxes": [
+  {
+   "id": "joelh_ec-env-7708163897270160146",
+   "seq": 2,
+   "runId": 1794698805128,
+   "t": 1794706932152,
+   "username": "joelh_ec",
+   "kind": "letter",
+   "coins": 0,
+   "boxName": "Zarf",
+   "businessType": 21,
+   "boxType": "",
+   "roomId": "7708202536248052498",
+   "shared": 0,
+   "participants": 0,
+   "viewers": 7733,
+   "durationSec": 0,
+   "unpackAt": 0,
+   "availableAt": 1794706932152,
+   "hasWindow": false,
+   "sessionSec": 103
+  },
+  {
+   "id": "joelh_ec-env-7708206901456898834",
+   "seq": 1,
+   "runId": 1794698805128,
+   "t": 1794706872288,
+   "username": "joelh_ec",
+   "kind": "chest",
+   "coins": 0,
+   "boxName": "Sandık",
+   "businessType": 20,
+   "boxType": "",
+   "roomId": "7708202536248052498",
+   "shared": 0,
+   "participants": 0,
+   "viewers": 7181,
+   "durationSec": 0,
+   "unpackAt": 0,
+   "availableAt": 1794706872288,
+   "hasWindow": false,
+   "sessionSec": 43
+  }
+ ]
 }
