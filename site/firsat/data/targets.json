@@ -1,20 +1,11 @@
 {
  "note": "Taranacak adresler. Keşif kendi bulduklarını buraya ekler; elle eklenenler korunur.",
- "probeRatio": 0.35,
+ "probeRatio": 0.4,
  "probeStats": {
-  "sessions": 31,
-  "withBox": 8
+  "sessions": 36,
+  "withBox": 9
  },
  "probeHistory": [
-  {
-   "at": 1794543356667,
-   "from": 20,
-   "to": 20,
-   "probeRate": 13,
-   "hotRate": null,
-   "sessions": 8,
-   "boxSessions": 1
-  },
   {
    "at": 1794545850216,
    "from": 20,
@@ -365,6 +356,15 @@
    "hotRate": null,
    "sessions": 8,
    "boxSessions": 2
+  },
+  {
+   "at": 1794770524182,
+   "from": 35,
+   "to": 40,
+   "probeRate": 63,
+   "hotRate": null,
+   "sessions": 8,
+   "boxSessions": 5
   }
  ],
  "boxHourly": {
@@ -383,7 +383,7 @@
   "498542": 41,
   "498543": 9,
   "498546": 5,
-  "498547": 22
+  "498547": 27
  },
  "watchHourly": {
   "498512": 1,
@@ -447,17 +447,17 @@
   },
   "2026-11-15": {
    "boxMinutes": [
-    37,
-    18,
-    20,
+    39,
+    19,
+    21,
     5,
     4,
-    138
+    139
    ],
    "watchMin": [
-    180.25101666666666,
-    178.34601666666666,
-    177.99981666666673,
+    185.25101666666666,
+    183.34601666666666,
+    182.99980000000008,
     25.708650000000024,
     23.11703333333333,
     1154.6367
@@ -470,7 +470,7 @@
   "regions": {},
   "failed": []
  },
- "updatedAt": "2026-11-15T19:21:39.912Z",
+ "updatedAt": "2026-11-15T19:26:46.916Z",
  "targets": [
   {
    "username": "haris",
@@ -9170,17 +9170,17 @@
    "username": "maestro_maestro___",
    "country": "UA",
    "source": "discovery",
-   "roomId": "7708171308136499986",
-   "roomIdAt": 1794703235959,
+   "roomId": "7708463740483603207",
+   "roomIdAt": 1794770604188,
    "roomIdMiss": 0,
-   "boxEvents": 0,
-   "boxCoinSum": 0,
-   "boxCoinsSeen": 0,
-   "boxSharedSum": 0,
-   "boxSharedSeen": 0,
-   "firstBoxAt": 0,
-   "lastBoxAt": 0,
-   "lastWatchedAt": 0,
+   "boxEvents": 4,
+   "boxCoinSum": 320,
+   "boxCoinsSeen": 2,
+   "boxSharedSum": 317,
+   "boxSharedSeen": 2,
+   "firstBoxAt": 1794770614450,
+   "lastBoxAt": 1794770741165,
+   "lastWatchedAt": 1794770604188,
    "addedAt": 1794703235959,
    "lastSeenLiveAt": 1794703834482
   },
@@ -18638,8 +18638,8 @@
    "username": "dohyoung2570",
    "country": "KR",
    "source": "discovery",
-   "roomId": "7708023851287907080",
-   "roomIdAt": 1794682290443,
+   "roomId": "7708412630041430792",
+   "roomIdAt": 1794770600908,
    "roomIdMiss": 0,
    "boxEvents": 0,
    "boxCoinSum": 0,
@@ -18648,7 +18648,7 @@
    "boxSharedSeen": 0,
    "firstBoxAt": 0,
    "lastBoxAt": 0,
-   "lastWatchedAt": 0,
+   "lastWatchedAt": 1794770600908,
    "addedAt": 1794682290444,
    "lastSeenLiveAt": 1794683570685
   },
@@ -41102,8 +41102,8 @@
    "username": "reshmamaryam1305",
    "country": "ME",
    "source": "discovery",
-   "roomId": "7707725428961708806",
-   "roomIdAt": 1794599842482,
+   "roomId": "7708467723310959361",
+   "roomIdAt": 1794770591289,
    "roomIdMiss": 0,
    "boxEvents": 0,
    "boxCoinSum": 0,
@@ -41112,7 +41112,7 @@
    "boxSharedSeen": 0,
    "firstBoxAt": 0,
    "lastBoxAt": 0,
-   "lastWatchedAt": 0,
+   "lastWatchedAt": 1794770591289,
    "addedAt": 1794599842482,
    "lastSeenLiveAt": 1794645583397
   },
@@ -65834,8 +65834,8 @@
    "username": "zainnazry",
    "country": "GB",
    "source": "discovery",
-   "roomId": "7707431436478909206",
-   "roomIdAt": 1794537760915,
+   "roomId": "7708459939517205250",
+   "roomIdAt": 1794770596222,
    "roomIdMiss": 0,
    "boxEvents": 0,
    "boxCoinSum": 0,
@@ -65844,7 +65844,7 @@
    "boxSharedSeen": 0,
    "firstBoxAt": 0,
    "lastBoxAt": 0,
-   "lastWatchedAt": 0,
+   "lastWatchedAt": 1794770596222,
    "addedAt": 1794537760915,
    "lastSeenLiveAt": 1794545432853
   },
@@ -75449,13 +75449,13 @@
    "roomId": "7708448529668213536",
    "roomIdAt": 1794765920571,
    "roomIdMiss": 0,
-   "boxEvents": 3,
-   "boxCoinSum": 22,
-   "boxCoinsSeen": 3,
-   "boxSharedSum": 17,
-   "boxSharedSeen": 3,
+   "boxEvents": 4,
+   "boxCoinSum": 30,
+   "boxCoinsSeen": 4,
+   "boxSharedSum": 23,
+   "boxSharedSeen": 4,
    "firstBoxAt": 1794746842431,
-   "lastBoxAt": 1794770361090,
+   "lastBoxAt": 1794770679122,
    "lastWatchedAt": 1794765920571,
    "addedAt": 1794509116313,
    "lastSeenLiveAt": 1794517695433
@@ -95096,7 +95096,7 @@
    "lastBoxAt": 0,
    "lastWatchedAt": 0,
    "addedAt": 1794429343539,
-   "lastSeenLiveAt": 0
+   "lastSeenLiveAt": 1794770724375
   },
   {
    "username": "geradoresbrascuba",
