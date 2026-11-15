@@ -20,8 +20,19 @@
   var BACKUP_APP = 'tiktok-jeton-paneli';
   var BACKUP_VERSION = 2;
   // Panel sürümü ve sürüm geçmişi (Ayarlar'da gösterilir, yedeğe yazılır).
-  var APP_VERSION = '1.4.18';
+  var APP_VERSION = '1.4.19';
   var CHANGE_LOG = [
+    {
+      version: '1.4.19',
+      date: '2026-11-15',
+      items: [
+        "Windows uygulaması tam paneli açar; Fırsatlar aynı pencerede açılır.",
+        "Windows tarayıcısı GitHub ile aynı ayarlara geçti: 12 kalıcı oda, 2 saatlik oturum, dakikada 4 bağlantı ve 25/saat bütçe.",
+        "Canlı dinleme kalıcı bağlantıya geçti; sandık, zarf ve portal eski treasureBoxData alanları ve 0 jetonla da kaydediliyor.",
+        "Kimliksiz manuel hedefler ve kapalı odalar canlı keşfin önünü kesmiyor; taze oda kimliği önce deneniyor.",
+        "Dakikalık TikTok bağlantı sınırı saatlik bütçeden ayrıldı; sınırda 60 saniye yeni bağlantı açılmıyor."
+      ]
+    },
     {
       version: '1.4.18',
       date: '2026-11-13',
