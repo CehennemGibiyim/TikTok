@@ -1,24 +1,46 @@
 {
- "scannedAt": "2026-11-15T01:42:12.152Z",
+ "scannedAt": "2026-11-15T01:43:08.199Z",
  "runId": 1794698805128,
  "delivery": {
   "runId": 1794698805128,
-  "produced": 2,
-  "lastSeq": 2,
+  "produced": 3,
+  "lastSeq": 3,
   "duplicate": 0,
-  "ntfyAttempts": 1,
-  "ntfyOk": 1,
+  "ntfyAttempts": 2,
+  "ntfyOk": 2,
   "ntfyFail": 0,
   "ntfyFailSeqs": [],
   "boxTimeBySeq": {
    "1": 1794706872288,
-   "2": 1794706932152
+   "2": 1794706932152,
+   "3": 1794706988199
   },
   "fileFromSeq": 1,
-  "fileSeqCount": 2,
+  "fileSeqCount": 3,
   "fileCap": 120
  },
  "boxes": [
+  {
+   "id": "joelh_ec-env-7708172084935314183",
+   "seq": 3,
+   "runId": 1794698805128,
+   "t": 1794706988199,
+   "username": "joelh_ec",
+   "kind": "letter",
+   "coins": 0,
+   "boxName": "Zarf",
+   "businessType": 21,
+   "boxType": "",
+   "roomId": "7708202536248052498",
+   "shared": 0,
+   "participants": 0,
+   "viewers": 7516,
+   "durationSec": 0,
+   "unpackAt": 0,
+   "availableAt": 1794706988199,
+   "hasWindow": false,
+   "sessionSec": 159
+  },
   {
    "id": "joelh_ec-env-7708163897270160146",
    "seq": 2,
