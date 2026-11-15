@@ -1,10 +1,10 @@
 {
-  "generatedAt": "2026-11-14T21:38:25.043Z",
+  "generatedAt": "2026-11-15T02:02:14.104Z",
   "source": {
-    "commits": 852,
-    "parsed": 843,
+    "commits": 892,
+    "parsed": 883,
     "failed": 9,
-    "comparedRuns": 26
+    "comparedRuns": 27
   },
   "runs": [
     {
@@ -542,15 +542,36 @@
         "watchSec": 300
       },
       "profile": "agresif",
-      "attempts": 75,
+      "attempts": 97,
       "ok": 2,
       "watching": 0,
       "boxes": 0,
       "boxCoins": 0,
-      "hours": 2.91,
+      "hours": 3.81,
       "boxesPer100": 0,
       "boxesPerHour": 0,
       "boxesPerSession": 0,
+      "short": false
+    },
+    {
+      "at": "2026-11-14T23:27:21.284Z",
+      "cfg": {
+        "rooms": 40,
+        "gap": 2000,
+        "starts": 12,
+        "probe": 0.3,
+        "watchSec": 300
+      },
+      "profile": "agresif",
+      "attempts": 64,
+      "ok": 3,
+      "watching": 1,
+      "boxes": 3,
+      "boxCoins": 0,
+      "hours": 2.47,
+      "boxesPer100": 4.69,
+      "boxesPerHour": 1.2,
+      "boxesPerSession": 1,
       "short": false
     }
   ],
@@ -572,16 +593,16 @@
     {
       "name": "agresif | ara 2000ms, dk 12, oran 0.3, oda 40",
       "profile": "agresif",
-      "runs": 18,
-      "attempts": 2238,
-      "ok": 300,
+      "runs": 19,
+      "attempts": 2324,
+      "ok": 303,
       "okRate": 13,
-      "boxes": 99,
+      "boxes": 102,
       "boxCoins": 5101,
-      "boxesPer100": 4.42,
-      "boxesPerOk": 0.33,
-      "boxesPerHour": 3.2,
-      "avgWatching": 4.3
+      "boxesPer100": 4.39,
+      "boxesPerOk": 0.34,
+      "boxesPerHour": 3,
+      "avgWatching": 4.1
     },
     {
       "name": "guvenli | ara 4000ms, dk ?, oran ?, oda 32",
@@ -613,10 +634,10 @@
     }
   ],
   "hourly": {
-    "commits": 76,
-    "boxes": 102,
-    "hours": 13,
-    "avgPerHour": 7.8,
+    "commits": 78,
+    "boxes": 105,
+    "hours": 14,
+    "avgPerHour": 7.5,
     "buckets": [
       {
         "hour": "2026-11-13T04",
@@ -668,6 +689,10 @@
       },
       {
         "hour": "2026-11-14T09",
+        "count": 3
+      },
+      {
+        "hour": "2026-11-15T01",
         "count": 3
       }
     ]
