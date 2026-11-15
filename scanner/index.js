@@ -1743,8 +1743,14 @@ async function openConnectorWatcher(username, sessionSec, onConnectStart) {
   // için yalnızca son 45 dakikada doğrulanmış kimlik kullanılır.
   const targetInfo = targetFor(username) || {};
   const recordInfo = state.streamers.get(username) || {};
-  const rawRoomId = String(targetInfo.roomId || recordInfo.roomId || '').trim();
-  const roomIdAt = Number(targetInfo.roomIdAt || recordInfo.roomIdAt || 0);
+  // İki kayıt farklı zamanlarda güncellenebiliyor: en yeni oda kimliğini seç.
+  const targetRoomId = String(targetInfo.roomId || '').trim();
+  const recordRoomId = String(recordInfo.roomId || '').trim();
+  const targetRoomAt = Number(targetInfo.roomIdAt) || 0;
+  const recordRoomAt = Number(recordInfo.roomIdAt) || 0;
+  const useRecordRoom = recordRoomId && recordRoomAt > targetRoomAt;
+  const rawRoomId = useRecordRoom ? recordRoomId : (targetRoomId || recordRoomId);
+  const roomIdAt = useRecordRoom ? recordRoomAt : (targetRoomAt || recordRoomAt);
 
   // 1) Keşiften gelen TAZE oda kimliği varsa doğrudan bağlanılır. Keşif ucu
   //    (tik.tools top-channels) yalnızca yayındaki odaları taze kimlikleriyle
@@ -2347,6 +2353,10 @@ async function pollTargets() {
       if (status.roomId) {
         record.roomId = String(status.roomId);
         record.roomIdAt = Date.now();
+        // Hedef kaydı da tazelenir: seçim ve bağlayıcı en yeni kimliği kullanır.
+        target.roomId = String(status.roomId);
+        target.roomIdAt = record.roomIdAt;
+        state.targetsDirty = true;
       }
       if (status.startTime) record.startTime = status.startTime;
       if (status.title) record.title = status.title;
