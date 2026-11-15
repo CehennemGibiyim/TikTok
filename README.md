@@ -433,12 +433,16 @@ python3 -m http.server 8080
 
 ## Windows uygulaması (kurulum + güncelleme)
 
-`desktop/` altındaki Electron kabuğu paneli ve tarayıcıyı tek kurulumda toplar.
+`desktop/` altındaki Electron kabuğu tam paneli ve tarayıcıyı tek kurulumda toplar.
 
 - **Kurulum:** GitHub **Releases** → `TikTok-Sandik-Radari-<sürüm>-x64.exe`. Kurulum imzasız olduğu için
   Windows SmartScreen "bilinmeyen yayıncı" uyarısı gösterebilir (Ek bilgi → Yine de çalıştır).
+- **Tam panel:** Uygulama Radar / Gelir / Hesaplar / Ajanslar / Jeton Avı sekmeleriyle açılır. Üstteki
+  **Fırsatlar** bağlantısı aynı pencerede açılır; harici tarayıcıya çıkmaz.
 - **Tarama bu bilgisayarda:** uygulama açıkken tarayıcı sürekli çalışır, veriyi
   `%APPDATA%\TikTok Sandık Radarı\data` klasörüne yazar. GitHub Actions sırası ve paylaşılan IP sınırı yoktur.
+  12 kalıcı oda, 2 saatlik oturum ve dakikada 4 bağlantı ile çalışır; 32 oda + 10 dk oturum
+  saatlik bağlantı bütçesine sığmadığı için bu ayar kullanılmıyor.
 - **Güncelleme:** **Ayarlar → Uygulama ve güncellemeler** kartı. "Güncellemeleri denetle" yeni sürümü
   indirir, uygulama kapanırken (veya "İndir ve kur" ile hemen) kurar. Açılışta denetim varsayılan olarak açıktır.
 - **Yeni sürüm yayınlama:** adım adım kontrol listesi → [Yeni sürüm çıkarma](#yeni-sürüm-çıkarma-kontrol-listesi).

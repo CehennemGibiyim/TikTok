@@ -170,8 +170,12 @@ function startScanner() {
   const args = [
     entry,
     // Süresiz çalışır: uygulama açık kaldıkça tarama sürer.
-    '--minutes=0', '--watch=1', '--watch-rooms=32', '--watch-sec=600',
-    '--connect-gap=4000', '--min-rooms=8', '--discover-sec=60',
+    // GitHub sürümüyle aynı ayarlar: 12 kalıcı oda, 2 saatlik oturum.
+    // 32 oda + 10 dk oturum saatlik 25 bağlantı bütçesine sığmıyordu.
+    '--minutes=0', '--watch=1', '--watch-rooms=12', '--watch-sec=7200',
+    '--starts-per-min=4', '--hour-budget=25', '--connect-gap=4000',
+    '--min-rooms=8', '--probe-ratio=0.10', '--discover-sec=60',
+    '--room-id-only=1', '--live-stale-sec=900',
     '--max-pool=6000', '--concurrency=12', '--poll=120',
     // Yerelde git yok: commit kapalı.
     '--commit=0'
@@ -360,13 +364,22 @@ async function createWindow() {
     }
   });
   win.setMenuBarVisibility(false);
+
+  // Uygulama tam paneli açar (Radar / Gelir / Hesaplar / Ajanslar / Jeton Avı).
+  // Paneldeki “Fırsatlar” bağlantısı target=_blank olsa da aynı yerel sunucuda
+  // kalır; harici siteye çıkmak yerine aynı pencerede açılır.
+  const origin = 'http://127.0.0.1:' + port;
   win.webContents.setWindowOpenHandler(({ url }) => {
+    if (url.startsWith(origin + '/')) {
+      win.loadURL(url);
+      return { action: 'deny' };
+    }
     shell.openExternal(url);
     return { action: 'deny' };
   });
   win.on('closed', () => { win = null; });
 
-  await win.loadURL('http://127.0.0.1:' + port + '/firsat/');
+  await win.loadURL(origin + '/');
 }
 
 function registerIpc() {
