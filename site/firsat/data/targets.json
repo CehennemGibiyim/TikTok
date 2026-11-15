@@ -1,20 +1,11 @@
 {
  "note": "Taranacak adresler. Keşif kendi bulduklarını buraya ekler; elle eklenenler korunur.",
- "probeRatio": 0.2,
+ "probeRatio": 0.25,
  "probeStats": {
-  "sessions": 63,
-  "withBox": 8
+  "sessions": 64,
+  "withBox": 9
  },
  "probeHistory": [
-  {
-   "at": 1794518335490,
-   "from": 10,
-   "to": 20,
-   "probeRate": 25,
-   "hotRate": null,
-   "sessions": 8,
-   "boxSessions": 2
-  },
   {
    "at": 1794518906953,
    "from": 20,
@@ -365,6 +356,15 @@
    "hotRate": null,
    "sessions": 8,
    "boxSessions": 1
+  },
+  {
+   "at": 1794725411257,
+   "from": 20,
+   "to": 25,
+   "probeRate": 25,
+   "hotRate": null,
+   "sessions": 8,
+   "boxSessions": 2
   }
  ],
  "boxHourly": {
@@ -383,7 +383,7 @@
   "498531": 47,
   "498532": 9,
   "498533": 2,
-  "498534": 18
+  "498534": 25
  },
  "watchHourly": {
   "498512": 1,
@@ -440,16 +440,16 @@
   "2026-11-15": {
    "boxMinutes": [
     9,
-    8,
     9,
+    10,
     3,
     3,
-    47
+    52
    ],
    "watchMin": [
-    67.61515,
-    67,
-    66.99995,
+    68.61515,
+    68,
+    67.99995,
     8.696583333333333,
     7.1170333333333335,
     391.00635
@@ -462,7 +462,7 @@
   "regions": {},
   "failed": []
  },
- "updatedAt": "2026-11-15T06:46:20.801Z",
+ "updatedAt": "2026-11-15T06:51:26.224Z",
  "targets": [
   {
    "username": "eylldru",
@@ -5475,13 +5475,13 @@
    "roomId": "7708252450574109462",
    "roomIdAt": 1794723746573,
    "roomIdMiss": 0,
-   "boxEvents": 0,
-   "boxCoinSum": 0,
-   "boxCoinsSeen": 0,
-   "boxSharedSum": 0,
-   "boxSharedSeen": 0,
-   "firstBoxAt": 0,
-   "lastBoxAt": 0,
+   "boxEvents": 1,
+   "boxCoinSum": 88,
+   "boxCoinsSeen": 1,
+   "boxSharedSum": 63,
+   "boxSharedSeen": 1,
+   "firstBoxAt": 1794725375535,
+   "lastBoxAt": 1794725375535,
    "lastWatchedAt": 1794723746573,
    "addedAt": 1794711258198,
    "lastSeenLiveAt": 1794711499902
@@ -9684,17 +9684,17 @@
    "username": "chantalgehl",
    "country": "DE",
    "source": "discovery",
-   "roomId": "7708178580949175073",
-   "roomIdAt": 1794702504811,
+   "roomId": "7708275763472042784",
+   "roomIdAt": 1794725234397,
    "roomIdMiss": 0,
-   "boxEvents": 0,
+   "boxEvents": 2,
    "boxCoinSum": 0,
    "boxCoinsSeen": 0,
    "boxSharedSum": 0,
    "boxSharedSeen": 0,
-   "firstBoxAt": 0,
-   "lastBoxAt": 0,
-   "lastWatchedAt": 0,
+   "firstBoxAt": 1794725307576,
+   "lastBoxAt": 1794725397032,
+   "lastWatchedAt": 1794725234397,
    "addedAt": 1794702504811,
    "lastSeenLiveAt": 1794703834482
   },
@@ -28335,13 +28335,13 @@
    "roomId": "7708230409679178497",
    "roomIdAt": 1794724510049,
    "roomIdMiss": 0,
-   "boxEvents": 14,
-   "boxCoinSum": 160,
-   "boxCoinsSeen": 8,
-   "boxSharedSum": 128,
-   "boxSharedSeen": 8,
+   "boxEvents": 18,
+   "boxCoinSum": 240,
+   "boxCoinsSeen": 12,
+   "boxSharedSum": 192,
+   "boxSharedSeen": 12,
    "firstBoxAt": 1794723989805,
-   "lastBoxAt": 1794724992034,
+   "lastBoxAt": 1794725463140,
    "lastWatchedAt": 1794724510049,
    "addedAt": 1794629429780,
    "lastSeenLiveAt": 1794645312356
