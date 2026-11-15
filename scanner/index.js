@@ -2122,9 +2122,12 @@ async function maintainWatchers() {
       live = relaxed;
     }
   }
-  // Sıra: canlı + manuel (3), canlı keşif (2), manuel ama şu an kapalı (1).
-  // Böylece kapalı manuel hedefler, taze canlı keşif odalarının önünü kesmez.
-  const roomPriority = (record) => (record.live ? 2 : 0) +
+  // Sıra: canlı + taze oda kimliği + manuel (7), canlı + taze kimlik (6),
+  // canlı manuel ama kimliksiz (5), canlı keşif kimliksiz (4), kapalı manuel (1).
+  // Kimliksiz manuel hedef bağlayıcıda "Room ID" hatası verip kotayı yakıyor;
+  // bu yüzden gerçekten bağlanabilir taze kimlikli odalar önce denenir.
+  const roomPriority = (record) => (record.live ? 4 : 0) +
+    (hasFreshRoomId(record) ? 2 : 0) +
     (isManualWatchTarget(record.username) ? 1 : 0);
   live = live
     .sort((a, b) =>
