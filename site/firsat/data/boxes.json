@@ -1,23 +1,45 @@
 {
- "scannedAt": "2026-11-15T11:59:06.276Z",
+ "scannedAt": "2026-11-15T12:02:43.426Z",
  "runId": 1794742479319,
  "delivery": {
   "runId": 1794742479319,
-  "produced": 1,
-  "lastSeq": 1,
+  "produced": 2,
+  "lastSeq": 2,
   "duplicate": 0,
-  "ntfyAttempts": 0,
-  "ntfyOk": 0,
+  "ntfyAttempts": 1,
+  "ntfyOk": 1,
   "ntfyFail": 0,
   "ntfyFailSeqs": [],
   "boxTimeBySeq": {
-   "1": 1794743946276
+   "1": 1794743946276,
+   "2": 1794744163426
   },
   "fileFromSeq": 1,
-  "fileSeqCount": 1,
+  "fileSeqCount": 2,
   "fileCap": 120
  },
  "boxes": [
+  {
+   "id": "romanioli3-env-7708362585477532436",
+   "seq": 2,
+   "runId": 1794742479319,
+   "t": 1794744163426,
+   "username": "romanioli3",
+   "kind": "letter",
+   "coins": 0,
+   "boxName": "Zarf",
+   "businessType": 1,
+   "boxType": "",
+   "roomId": "7708353245044312884",
+   "shared": 0,
+   "participants": 0,
+   "viewers": 1009,
+   "durationSec": 0,
+   "unpackAt": 0,
+   "availableAt": 1794744163426,
+   "hasWindow": false,
+   "sessionSec": 326
+  },
   {
    "id": "romanioli3-env-7708281018269928212",
    "seq": 1,
