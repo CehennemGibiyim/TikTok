@@ -2,19 +2,10 @@
  "note": "Taranacak adresler. Keşif kendi bulduklarını buraya ekler; elle eklenenler korunur.",
  "probeRatio": 0.35,
  "probeStats": {
-  "sessions": 63,
+  "sessions": 64,
   "withBox": 9
  },
  "probeHistory": [
-  {
-   "at": 1794535083893,
-   "from": 20,
-   "to": 25,
-   "probeRate": 50,
-   "hotRate": null,
-   "sessions": 8,
-   "boxSessions": 4
-  },
   {
    "at": 1794538908621,
    "from": 25,
@@ -365,6 +356,15 @@
    "hotRate": null,
    "sessions": 8,
    "boxSessions": 1
+  },
+  {
+   "at": 1794755719198,
+   "from": 35,
+   "to": 35,
+   "probeRate": 13,
+   "hotRate": null,
+   "sessions": 8,
+   "boxSessions": 1
   }
  ],
  "boxHourly": {
@@ -382,7 +382,7 @@
   "498540": 14,
   "498541": 32,
   "498542": 41,
-  "498543": 4
+  "498543": 7
  },
  "watchHourly": {
   "498512": 1,
@@ -449,13 +449,13 @@
     17,
     5,
     4,
-    120
+    123
    ],
    "watchMin": [
-    144.25101666666666,
-    143,
-    142.99985000000004,
-    22.70843333333335,
+    145.25101666666666,
+    144,
+    143.99985000000004,
+    22.708450000000017,
     20.11703333333333,
     1110.2489833333332
    ]
@@ -467,7 +467,7 @@
   "regions": {},
   "failed": []
  },
- "updatedAt": "2026-11-15T15:12:01.079Z",
+ "updatedAt": "2026-11-15T15:17:06.516Z",
  "targets": [
   {
    "username": "haris",
@@ -54656,13 +54656,13 @@
    "roomId": "7708378083530656544",
    "roomIdAt": 1794753652790,
    "roomIdMiss": 0,
-   "boxEvents": 18,
-   "boxCoinSum": 2322,
-   "boxCoinsSeen": 12,
-   "boxSharedSum": 1636,
-   "boxSharedSeen": 12,
+   "boxEvents": 20,
+   "boxCoinSum": 2752,
+   "boxCoinsSeen": 14,
+   "boxSharedSum": 1930,
+   "boxSharedSeen": 14,
    "firstBoxAt": 1794750254163,
-   "lastBoxAt": 1794755475138,
+   "lastBoxAt": 1794755809617,
    "lastWatchedAt": 1794753652790,
    "addedAt": 1794570960876,
    "lastSeenLiveAt": 1794575615377
@@ -65600,13 +65600,13 @@
    "roomId": "7708387738411617046",
    "roomIdAt": 1794749992885,
    "roomIdMiss": 0,
-   "boxEvents": 43,
-   "boxCoinSum": 1182,
-   "boxCoinsSeen": 33,
-   "boxSharedSum": 780,
-   "boxSharedSeen": 33,
+   "boxEvents": 44,
+   "boxCoinSum": 1237,
+   "boxCoinsSeen": 34,
+   "boxSharedSum": 819,
+   "boxSharedSeen": 34,
    "firstBoxAt": 1794746498355,
-   "lastBoxAt": 1794754466443,
+   "lastBoxAt": 1794755787515,
    "lastWatchedAt": 1794749992885,
    "addedAt": 1794538424413,
    "lastSeenLiveAt": 1794569965208
