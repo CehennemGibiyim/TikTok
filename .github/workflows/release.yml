@@ -3,9 +3,17 @@ name: 🖥️ Windows Kurulum Paketi
 # Windows için NSIS kurulum dosyası + otomatik güncelleme dosyalarını üretir.
 # Etiket (v1.0.0) atınca ya da elle çalıştırınca GitHub sürümüne yükler:
 # kurulu uygulama güncellemeyi buradan alır.
+#
+# Elle çalıştırmada "publish" işaretlenmezse yalnız artifact üretilir; böylece
+# yarım kalmış bir sürüm yayınlanmaz. Etiket push'unda her zaman yayınlanır.
 
 on:
   workflow_dispatch:
+    inputs:
+      publish:
+        description: 'Paketi GitHub sürümüne de yükle'
+        type: boolean
+        default: false
   push:
     tags:
       - 'v*'
@@ -36,10 +44,10 @@ jobs:
         run: npm ci --prefix desktop --no-audit --no-fund
 
       - name: 📦 Kurulum paketi
-        # --publish always: kurulum dosyası + latest.yml GitHub sürümüne yazılır.
-        run: npm run dist --prefix desktop -- --publish always
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        # electron-builder'a yayın yaptırmıyoruz: aynı sürümü iki kez yüklemeye
+        # çalışıp "Published releases must have a valid tag" hatası veriyordu.
+        # Yükleme aşağıdaki tek adımda, tüm dosyalar birlikte yapılır.
+        run: npm run dist --prefix desktop -- --publish never
 
       - name: 📤 Yedek (artifact)
         uses: actions/upload-artifact@v4
@@ -49,3 +57,26 @@ jobs:
             desktop/dist/*.exe
             desktop/dist/latest.yml
           if-no-files-found: error
+
+      - name: 🚀 GitHub sürümüne yükle
+        if: ${{ github.event_name == 'push' || inputs.publish == true }}
+        shell: bash
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          VERSION=$(node -p "require('./desktop/package.json').version")
+          TAG="v${VERSION}"
+          FILES=(
+            "desktop/dist/TikTok-Sandik-Radari-${VERSION}-x64.exe"
+            "desktop/dist/latest.yml"
+          )
+          if gh release view "$TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            # Var olan sürüm yeniden çalıştırıldıysa dosyaları değiştir.
+            gh release upload "$TAG" "${FILES[@]}" --clobber --repo "$GITHUB_REPOSITORY"
+          else
+            gh release create "$TAG" "${FILES[@]}" \
+              --repo "$GITHUB_REPOSITORY" \
+              --title "$VERSION" \
+              --notes "Windows kurulum paketi v${VERSION}"
+          fi
