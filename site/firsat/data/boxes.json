@@ -1,13 +1,13 @@
 {
- "scannedAt": "2026-11-15T04:50:51.429Z",
+ "scannedAt": "2026-11-15T05:03:11.019Z",
  "runId": 1794712651952,
  "delivery": {
   "runId": 1794712651952,
-  "produced": 55,
-  "lastSeq": 55,
-  "duplicate": 36,
-  "ntfyAttempts": 54,
-  "ntfyOk": 54,
+  "produced": 56,
+  "lastSeq": 56,
+  "duplicate": 37,
+  "ntfyAttempts": 55,
+  "ntfyOk": 55,
   "ntfyFail": 0,
   "ntfyFailSeqs": [],
   "boxTimeBySeq": {
@@ -65,13 +65,35 @@
    "52": 1794716933619,
    "53": 1794716935873,
    "54": 1794717259688,
-   "55": 1794718251429
+   "55": 1794718251429,
+   "56": 1794718991019
   },
   "fileFromSeq": 1,
-  "fileSeqCount": 55,
+  "fileSeqCount": 56,
   "fileCap": 120
  },
  "boxes": [
+  {
+   "id": "lg4ng.x-env-4199715907334",
+   "seq": 56,
+   "runId": 1794712651952,
+   "t": 1794718991019,
+   "username": "lg4ng.x",
+   "kind": "chest",
+   "coins": 0,
+   "boxName": "Süper Fan Kutusu",
+   "businessType": 19,
+   "boxType": "",
+   "roomId": "7708218808561847047",
+   "shared": 1,
+   "participants": 0,
+   "viewers": 1626,
+   "durationSec": 180,
+   "unpackAt": 1794719170000,
+   "availableAt": 1794719170000,
+   "hasWindow": true,
+   "sessionSec": 2600
+  },
   {
    "id": "mascarpone777-env-7708256097223740182",
    "seq": 55,
