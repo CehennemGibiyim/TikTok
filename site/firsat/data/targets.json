@@ -2,19 +2,10 @@
  "note": "Taranacak adresler. Keşif kendi bulduklarını buraya ekler; elle eklenenler korunur.",
  "probeRatio": 0.3,
  "probeStats": {
-  "sessions": 12,
-  "withBox": 0
+  "sessions": 16,
+  "withBox": 1
  },
  "probeHistory": [
-  {
-   "at": 1794539467253,
-   "from": 20,
-   "to": 25,
-   "probeRate": 25,
-   "hotRate": null,
-   "sessions": 8,
-   "boxSessions": 2
-  },
   {
    "at": 1794542842750,
    "from": 25,
@@ -365,6 +356,15 @@
    "hotRate": null,
    "sessions": 8,
    "boxSessions": 0
+  },
+  {
+   "at": 1794767180007,
+   "from": 30,
+   "to": 30,
+   "probeRate": 13,
+   "hotRate": null,
+   "sessions": 8,
+   "boxSessions": 1
   }
  ],
  "boxHourly": {
@@ -382,7 +382,7 @@
   "498541": 32,
   "498542": 41,
   "498543": 9,
-  "498546": 3
+  "498546": 4
  },
  "watchHourly": {
   "498512": 1,
@@ -447,18 +447,18 @@
    "boxMinutes": [
     30,
     16,
-    17,
+    18,
     5,
     4,
     126
    ],
    "watchMin": [
-    159.25101666666666,
-    158,
-    157.99985000000004,
-    23.708566666666687,
-    21.11703333333333,
-    1120.37035
+    164.25101666666666,
+    163,
+    162.99985000000004,
+    24.708600000000022,
+    22.11703333333333,
+    1134.2466666666667
    ]
   }
  },
@@ -468,7 +468,7 @@
   "regions": {},
   "failed": []
  },
- "updatedAt": "2026-11-15T18:21:17.524Z",
+ "updatedAt": "2026-11-15T18:26:43.478Z",
  "targets": [
   {
    "username": "haris",
@@ -26430,9 +26430,9 @@
    "username": "harisfarmer2",
    "country": "",
    "source": "radar_manual",
-   "roomId": "7708298751999216416",
-   "roomIdAt": 1794753458731,
-   "roomIdMiss": 1,
+   "roomId": "",
+   "roomIdAt": 0,
+   "roomIdMiss": 0,
    "boxEvents": 4,
    "boxCoinSum": 650,
    "boxCoinsSeen": 4,
@@ -35214,17 +35214,17 @@
    "username": "weronikadorowicz",
    "country": "PL",
    "source": "discovery",
-   "roomId": "7707753081726847777",
-   "roomIdAt": 1794610241294,
+   "roomId": "7708449505208732448",
+   "roomIdAt": 1794766994119,
    "roomIdMiss": 0,
-   "boxEvents": 0,
-   "boxCoinSum": 0,
-   "boxCoinsSeen": 0,
-   "boxSharedSum": 0,
-   "boxSharedSeen": 0,
-   "firstBoxAt": 0,
-   "lastBoxAt": 0,
-   "lastWatchedAt": 0,
+   "boxEvents": 1,
+   "boxCoinSum": 60,
+   "boxCoinsSeen": 1,
+   "boxSharedSum": 43,
+   "boxSharedSeen": 1,
+   "firstBoxAt": 1794767124103,
+   "lastBoxAt": 1794767124103,
+   "lastWatchedAt": 1794766994119,
    "addedAt": 1794610241294,
    "lastSeenLiveAt": 1794616249536
   },
@@ -40920,8 +40920,8 @@
    "username": "jay_g2e",
    "country": "KR",
    "source": "discovery",
-   "roomId": "7707737734902795016",
-   "roomIdAt": 1794600115731,
+   "roomId": "7708448248310106888",
+   "roomIdAt": 1794766997998,
    "roomIdMiss": 0,
    "boxEvents": 0,
    "boxCoinSum": 0,
@@ -40930,7 +40930,7 @@
    "boxSharedSeen": 0,
    "firstBoxAt": 0,
    "lastBoxAt": 0,
-   "lastWatchedAt": 0,
+   "lastWatchedAt": 1794766997998,
    "addedAt": 1794600115731,
    "lastSeenLiveAt": 1794603622894
   },
@@ -48750,8 +48750,8 @@
    "username": "the_warrios.foundation",
    "country": "KE",
    "source": "discovery",
-   "roomId": "7707675980956994311",
-   "roomIdAt": 1794585346454,
+   "roomId": "7708456506629016341",
+   "roomIdAt": 1794766989373,
    "roomIdMiss": 0,
    "boxEvents": 0,
    "boxCoinSum": 0,
@@ -48760,7 +48760,7 @@
    "boxSharedSeen": 0,
    "firstBoxAt": 0,
    "lastBoxAt": 0,
-   "lastWatchedAt": 0,
+   "lastWatchedAt": 1794766989373,
    "addedAt": 1794585346454,
    "lastSeenLiveAt": 1794645583397
   },
@@ -55116,7 +55116,7 @@
    "lastBoxAt": 0,
    "lastWatchedAt": 1794570403035,
    "addedAt": 1794570365163,
-   "lastSeenLiveAt": 0
+   "lastSeenLiveAt": 1794767128148
   },
   {
    "username": "laagvliet",
@@ -55458,7 +55458,7 @@
    "lastBoxAt": 0,
    "lastWatchedAt": 1794570007306,
    "addedAt": 1794569929102,
-   "lastSeenLiveAt": 0
+   "lastSeenLiveAt": 1794767128148
   },
   {
    "username": "vikinginvik",
@@ -55854,7 +55854,7 @@
    "lastBoxAt": 0,
    "lastWatchedAt": 0,
    "addedAt": 1794559474083,
-   "lastSeenLiveAt": 0
+   "lastSeenLiveAt": 1794767128148
   },
   {
    "username": "dianijeager",
@@ -58050,7 +58050,7 @@
    "lastBoxAt": 1794555810421,
    "lastWatchedAt": 1794555475918,
    "addedAt": 1794555132438,
-   "lastSeenLiveAt": 0
+   "lastSeenLiveAt": 1794767128148
   },
   {
    "username": "meduza0330",
@@ -59076,7 +59076,7 @@
    "lastBoxAt": 0,
    "lastWatchedAt": 0,
    "addedAt": 1794552780588,
-   "lastSeenLiveAt": 0
+   "lastSeenLiveAt": 1794767128148
   },
   {
    "username": "mansurik.xxl",
@@ -59094,7 +59094,7 @@
    "lastBoxAt": 0,
    "lastWatchedAt": 0,
    "addedAt": 1794552780588,
-   "lastSeenLiveAt": 0
+   "lastSeenLiveAt": 1794767128148
   },
   {
    "username": "soykatherinruiz",
@@ -60480,7 +60480,7 @@
    "lastBoxAt": 0,
    "lastWatchedAt": 0,
    "addedAt": 1794550384675,
-   "lastSeenLiveAt": 0
+   "lastSeenLiveAt": 1794767128149
   },
   {
    "username": "044deli_qadin209",
@@ -61632,7 +61632,7 @@
    "lastBoxAt": 0,
    "lastWatchedAt": 0,
    "addedAt": 1794548490607,
-   "lastSeenLiveAt": 0
+   "lastSeenLiveAt": 1794767128149
   },
   {
    "username": "1.7makenzy",
