@@ -1,13 +1,13 @@
 {
- "scannedAt": "2026-11-16T01:45:23.470Z",
+ "scannedAt": "2026-11-16T02:39:01.971Z",
  "runId": 1794785795475,
  "delivery": {
   "runId": 1794785795475,
-  "produced": 14,
-  "lastSeq": 14,
+  "produced": 15,
+  "lastSeq": 15,
   "duplicate": 10,
-  "ntfyAttempts": 13,
-  "ntfyOk": 13,
+  "ntfyAttempts": 14,
+  "ntfyOk": 14,
   "ntfyFail": 0,
   "ntfyFailSeqs": [],
   "boxTimeBySeq": {
@@ -24,13 +24,35 @@
    "11": 1794790032784,
    "12": 1794793160036,
    "13": 1794793520973,
-   "14": 1794793523470
+   "14": 1794793523470,
+   "15": 1794796741971
   },
   "fileFromSeq": 1,
-  "fileSeqCount": 14,
+  "fileSeqCount": 15,
   "fileCap": 120
  },
  "boxes": [
+  {
+   "id": "rai.sukuna-env-7708547000639752967",
+   "seq": 15,
+   "runId": 1794785795475,
+   "t": 1794796741971,
+   "username": "rai.sukuna",
+   "kind": "letter",
+   "coins": 0,
+   "boxName": "Zarf",
+   "businessType": 1,
+   "boxType": "",
+   "roomId": "7708505445878631175",
+   "shared": 0,
+   "participants": 0,
+   "viewers": 23,
+   "durationSec": 0,
+   "unpackAt": 0,
+   "availableAt": 1794796741971,
+   "hasWindow": false,
+   "sessionSec": 15
+  },
   {
    "id": "rkayxbl-env-7708553056330484502",
    "seq": 14,
