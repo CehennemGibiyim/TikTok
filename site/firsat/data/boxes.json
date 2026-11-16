@@ -1,13 +1,13 @@
 {
- "scannedAt": "2026-11-16T12:42:13.703Z",
+ "scannedAt": "2026-11-16T12:47:37.998Z",
  "runId": 1794830892149,
  "delivery": {
   "runId": 1794830892149,
-  "produced": 7,
-  "lastSeq": 7,
-  "duplicate": 6,
-  "ntfyAttempts": 6,
-  "ntfyOk": 6,
+  "produced": 8,
+  "lastSeq": 8,
+  "duplicate": 7,
+  "ntfyAttempts": 7,
+  "ntfyOk": 7,
   "ntfyFail": 0,
   "ntfyFailSeqs": [],
   "boxTimeBySeq": {
@@ -17,13 +17,35 @@
    "4": 1794831961222,
    "5": 1794832289257,
    "6": 1794832609898,
-   "7": 1794832933703
+   "7": 1794832933703,
+   "8": 1794833257997
   },
   "fileFromSeq": 1,
-  "fileSeqCount": 7,
+  "fileSeqCount": 8,
   "fileCap": 120
  },
  "boxes": [
+  {
+   "id": "harisfarmer2-env-7708750101405141793",
+   "seq": 8,
+   "runId": 1794830892149,
+   "t": 1794833257997,
+   "username": "harisfarmer2",
+   "kind": "chest",
+   "coins": 520,
+   "boxName": "Sandık",
+   "businessType": 20,
+   "boxType": "",
+   "roomId": "7708699263051500321",
+   "shared": 372,
+   "participants": 0,
+   "viewers": 621,
+   "durationSec": 30,
+   "unpackAt": 1794833287000,
+   "availableAt": 1794833287000,
+   "hasWindow": true,
+   "sessionSec": 2364
+  },
   {
    "id": "harisfarmer2-env-7708748675270920993",
    "seq": 7,
