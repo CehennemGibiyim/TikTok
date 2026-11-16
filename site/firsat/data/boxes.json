@@ -1,13 +1,13 @@
 {
- "scannedAt": "2026-11-16T14:06:40.282Z",
+ "scannedAt": "2026-11-16T14:13:10.381Z",
  "runId": 1794830892149,
  "delivery": {
   "runId": 1794830892149,
-  "produced": 19,
-  "lastSeq": 19,
-  "duplicate": 17,
-  "ntfyAttempts": 18,
-  "ntfyOk": 18,
+  "produced": 20,
+  "lastSeq": 20,
+  "duplicate": 18,
+  "ntfyAttempts": 19,
+  "ntfyOk": 19,
   "ntfyFail": 0,
   "ntfyFailSeqs": [],
   "boxTimeBySeq": {
@@ -29,13 +29,35 @@
    "16": 1794835900662,
    "17": 1794836227359,
    "18": 1794836547135,
-   "19": 1794838000282
+   "19": 1794838000282,
+   "20": 1794838390381
   },
   "fileFromSeq": 1,
-  "fileSeqCount": 19,
+  "fileSeqCount": 20,
   "fileCap": 120
  },
  "boxes": [
+  {
+   "id": "nobledemmy-env-7708759953984604934",
+   "seq": 20,
+   "runId": 1794830892149,
+   "t": 1794838390381,
+   "username": "nobledemmy",
+   "kind": "letter",
+   "coins": 120,
+   "boxName": "Zarf",
+   "businessType": 4,
+   "boxType": "",
+   "roomId": "7708682551317711622",
+   "shared": 80,
+   "participants": 0,
+   "viewers": 56,
+   "durationSec": 299,
+   "unpackAt": 1794838689000,
+   "availableAt": 1794838689000,
+   "hasWindow": true,
+   "sessionSec": 3596
+  },
   {
    "id": "nobledemmy-env-7708770473961884437",
    "seq": 19,
