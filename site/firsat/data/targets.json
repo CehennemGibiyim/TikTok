@@ -1,20 +1,11 @@
 {
  "note": "Taranacak adresler. Keşif kendi bulduklarını buraya ekler; elle eklenenler korunur.",
- "probeRatio": 0.5,
+ "probeRatio": 0.55,
  "probeStats": {
-  "sessions": 47,
+  "sessions": 53,
   "withBox": 7
  },
  "probeHistory": [
-  {
-   "at": 1794583790592,
-   "from": 35,
-   "to": 30,
-   "probeRate": 0,
-   "hotRate": null,
-   "sessions": 8,
-   "boxSessions": 0
-  },
   {
    "at": 1794595581984,
    "from": 30,
@@ -365,6 +356,15 @@
    "hotRate": null,
    "sessions": 8,
    "boxSessions": 0
+  },
+  {
+   "at": 1794807028913,
+   "from": 50,
+   "to": 55,
+   "probeRate": 25,
+   "hotRate": null,
+   "sessions": 8,
+   "boxSessions": 2
   }
  ],
  "boxHourly": {
@@ -421,7 +421,7 @@
   "498554": 4,
   "498555": 8,
   "498556": 7,
-  "498557": 3
+  "498557": 6
  },
  "boxMinuteDays": {
   "2026-11-13": {
@@ -488,10 +488,10 @@
     0
    ],
    "watchMin": [
-    92.35703333333333,
-    91.8769,
-    90.62575,
-    3.4114666666666706,
+    98.35703333333333,
+    97.8769,
+    96.62575,
+    3.412533333333337,
     1,
     115.00001666666667
    ]
@@ -503,7 +503,7 @@
   "regions": {},
   "failed": []
  },
- "updatedAt": "2026-11-16T05:30:23.711Z",
+ "updatedAt": "2026-11-16T05:35:02.530Z",
  "targets": [
   {
    "username": "haris",
@@ -32767,7 +32767,7 @@
    "source": "discovery",
    "roomId": "7707813518103350034",
    "roomIdAt": 1794618993333,
-   "roomIdMiss": 0,
+   "roomIdMiss": 1,
    "boxEvents": 0,
    "boxCoinSum": 0,
    "boxCoinsSeen": 0,
@@ -33089,8 +33089,8 @@
    "username": "angelesmoren_",
    "country": "PY",
    "source": "discovery",
-   "roomId": "7707790878207986450",
-   "roomIdAt": 1794618414292,
+   "roomId": "7708613503354997522",
+   "roomIdAt": 1794807108975,
    "roomIdMiss": 0,
    "boxEvents": 0,
    "boxCoinSum": 0,
@@ -33099,7 +33099,7 @@
    "boxSharedSeen": 0,
    "firstBoxAt": 0,
    "lastBoxAt": 0,
-   "lastWatchedAt": 0,
+   "lastWatchedAt": 1794807108975,
    "addedAt": 1794618414292,
    "lastSeenLiveAt": 1794620181874
   },
@@ -57731,8 +57731,8 @@
    "username": "mirandachateauu",
    "country": "MX",
    "source": "discovery",
-   "roomId": "7707524302279838485",
-   "roomIdAt": 1794555811988,
+   "roomId": "7708624101117676309",
+   "roomIdAt": 1794807158333,
    "roomIdMiss": 0,
    "boxEvents": 0,
    "boxCoinSum": 0,
@@ -57741,7 +57741,7 @@
    "boxSharedSeen": 0,
    "firstBoxAt": 0,
    "lastBoxAt": 0,
-   "lastWatchedAt": 0,
+   "lastWatchedAt": 1794807158333,
    "addedAt": 1794555811988,
    "lastSeenLiveAt": 0
   },
@@ -101165,8 +101165,8 @@
    "username": "familymoneygang",
    "country": "PF",
    "source": "discovery",
-   "roomId": "7706948128100535072",
-   "roomIdAt": 1794417184910,
+   "roomId": "7708615546866764576",
+   "roomIdAt": 1794807154458,
    "roomIdMiss": 0,
    "boxEvents": 0,
    "boxCoinSum": 0,
@@ -101175,7 +101175,7 @@
    "boxSharedSeen": 0,
    "firstBoxAt": 0,
    "lastBoxAt": 0,
-   "lastWatchedAt": 0,
+   "lastWatchedAt": 1794807154458,
    "addedAt": 1794416519484,
    "lastSeenLiveAt": 1794417184910
   },
