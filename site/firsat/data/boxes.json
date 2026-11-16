@@ -1,13 +1,13 @@
 {
- "scannedAt": "2026-11-16T14:20:18.018Z",
+ "scannedAt": "2026-11-16T14:58:29.810Z",
  "runId": 1794830892149,
  "delivery": {
   "runId": 1794830892149,
-  "produced": 22,
-  "lastSeq": 22,
-  "duplicate": 18,
-  "ntfyAttempts": 21,
-  "ntfyOk": 21,
+  "produced": 23,
+  "lastSeq": 23,
+  "duplicate": 22,
+  "ntfyAttempts": 22,
+  "ntfyOk": 22,
   "ntfyFail": 0,
   "ntfyFailSeqs": [],
   "boxTimeBySeq": {
@@ -32,13 +32,35 @@
    "19": 1794838000282,
    "20": 1794838390381,
    "21": 1794838753539,
-   "22": 1794838818018
+   "22": 1794838818018,
+   "23": 1794841109809
   },
   "fileFromSeq": 1,
-  "fileSeqCount": 22,
+  "fileSeqCount": 23,
   "fileCap": 120
  },
  "boxes": [
+  {
+   "id": "nobledemmy-env-7708783848334789428",
+   "seq": 23,
+   "runId": 1794830892149,
+   "t": 1794841109809,
+   "username": "nobledemmy",
+   "kind": "chest",
+   "coins": 37,
+   "boxName": "Sandık",
+   "businessType": 20,
+   "boxType": "",
+   "roomId": "7708682551317711622",
+   "shared": 27,
+   "participants": 0,
+   "viewers": 46,
+   "durationSec": 29,
+   "unpackAt": 1794841138000,
+   "availableAt": 1794841138000,
+   "hasWindow": true,
+   "sessionSec": 6316
+  },
   {
    "id": "atila_official-env-7708756824732224278",
    "seq": 22,
