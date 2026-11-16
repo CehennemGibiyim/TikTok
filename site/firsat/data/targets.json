@@ -1,20 +1,11 @@
 {
  "note": "Taranacak adresler. Keşif kendi bulduklarını buraya ekler; elle eklenenler korunur.",
- "probeRatio": 0.55,
+ "probeRatio": 0.6,
  "probeStats": {
-  "sessions": 14,
-  "withBox": 3
+  "sessions": 21,
+  "withBox": 4
  },
  "probeHistory": [
-  {
-   "at": 1794576093840,
-   "from": 30,
-   "to": 35,
-   "probeRate": 38,
-   "hotRate": null,
-   "sessions": 8,
-   "boxSessions": 3
-  },
   {
    "at": 1794576676976,
    "from": 35,
@@ -365,6 +356,15 @@
    "hotRate": null,
    "sessions": 8,
    "boxSessions": 1
+  },
+  {
+   "at": 1794800467125,
+   "from": 55,
+   "to": 60,
+   "probeRate": 38,
+   "hotRate": null,
+   "sessions": 8,
+   "boxSessions": 3
   }
  ],
  "boxHourly": {
@@ -389,7 +389,7 @@
   "498552": 7,
   "498553": 3,
   "498554": 2,
-  "498555": 3
+  "498555": 4
  },
  "watchHourly": {
   "498512": 1,
@@ -419,7 +419,7 @@
   "498552": 8,
   "498553": 4,
   "498554": 4,
-  "498555": 7
+  "498555": 8
  },
  "boxMinuteDays": {
   "2026-11-13": {
@@ -478,7 +478,7 @@
   },
   "2026-11-16": {
    "boxMinutes": [
-    4,
+    5,
     7,
     1,
     0,
@@ -486,10 +486,10 @@
     0
    ],
    "watchMin": [
-    58.357033333333334,
-    57.8769,
-    56.90375,
-    2.4111166666666684,
+    65.35703333333333,
+    64.8769,
+    63.90375,
+    2.4112000000000022,
     0,
     0
    ]
@@ -501,7 +501,7 @@
   "regions": {},
   "failed": []
  },
- "updatedAt": "2026-11-16T03:37:53.508Z",
+ "updatedAt": "2026-11-16T03:44:35.513Z",
  "targets": [
   {
    "username": "haris",
@@ -6825,8 +6825,8 @@
    "username": "kingmauritan",
    "country": "ME",
    "source": "discovery",
-   "roomId": "7708192639002872583",
-   "roomIdAt": 1794707819589,
+   "roomId": "7708568478482991890",
+   "roomIdAt": 1794800298734,
    "roomIdMiss": 0,
    "boxEvents": 0,
    "boxCoinSum": 0,
@@ -6835,7 +6835,7 @@
    "boxSharedSeen": 0,
    "firstBoxAt": 0,
    "lastBoxAt": 0,
-   "lastWatchedAt": 0,
+   "lastWatchedAt": 1794800298734,
    "addedAt": 1794707819589,
    "lastSeenLiveAt": 1794709141819
   },
@@ -98409,8 +98409,8 @@
    "username": "trystzn",
    "country": "CA",
    "source": "discovery",
-   "roomId": "7706946102641756935",
-   "roomIdAt": 1794424437019,
+   "roomId": "7708603301017324295",
+   "roomIdAt": 1794800345188,
    "roomIdMiss": 0,
    "boxEvents": 0,
    "boxCoinSum": 0,
@@ -98419,7 +98419,7 @@
    "boxSharedSeen": 0,
    "firstBoxAt": 0,
    "lastBoxAt": 0,
-   "lastWatchedAt": 0,
+   "lastWatchedAt": 1794800345189,
    "addedAt": 1794423631136,
    "lastSeenLiveAt": 1794424437019
   },
