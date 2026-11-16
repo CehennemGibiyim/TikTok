@@ -1,20 +1,11 @@
 {
  "note": "Taranacak adresler. Keşif kendi bulduklarını buraya ekler; elle eklenenler korunur.",
- "probeRatio": 0.6,
+ "probeRatio": 0.55,
  "probeStats": {
-  "sessions": 55,
+  "sessions": 56,
   "withBox": 11
  },
  "probeHistory": [
-  {
-   "at": 1794574453631,
-   "from": 30,
-   "to": 30,
-   "probeRate": 13,
-   "hotRate": null,
-   "sessions": 8,
-   "boxSessions": 1
-  },
   {
    "at": 1794574942851,
    "from": 30,
@@ -365,6 +356,15 @@
    "hotRate": null,
    "sessions": 8,
    "boxSessions": 2
+  },
+  {
+   "at": 1794798495412,
+   "from": 60,
+   "to": 55,
+   "probeRate": 0,
+   "hotRate": null,
+   "sessions": 8,
+   "boxSessions": 0
   }
  ],
  "boxHourly": {
@@ -418,7 +418,8 @@
   "498551": 8,
   "498552": 8,
   "498553": 4,
-  "498554": 4
+  "498554": 4,
+  "498555": 1
  },
  "boxMinuteDays": {
   "2026-11-13": {
@@ -485,10 +486,10 @@
     0
    ],
    "watchMin": [
-    44,
-    43.8769,
-    42.90375,
-    2.4110500000000012,
+    45,
+    44.8769,
+    43.90375,
+    2.411083333333335,
     0,
     0
    ]
@@ -500,7 +501,7 @@
   "regions": {},
   "failed": []
  },
- "updatedAt": "2026-11-16T03:04:15.316Z",
+ "updatedAt": "2026-11-16T03:09:23.419Z",
  "targets": [
   {
    "username": "haris",
