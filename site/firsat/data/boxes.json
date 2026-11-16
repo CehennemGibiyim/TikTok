@@ -1,13 +1,13 @@
 {
- "scannedAt": "2026-11-16T02:39:01.971Z",
+ "scannedAt": "2026-11-16T02:40:05.852Z",
  "runId": 1794785795475,
  "delivery": {
   "runId": 1794785795475,
-  "produced": 15,
-  "lastSeq": 15,
+  "produced": 16,
+  "lastSeq": 16,
   "duplicate": 10,
-  "ntfyAttempts": 14,
-  "ntfyOk": 14,
+  "ntfyAttempts": 15,
+  "ntfyOk": 15,
   "ntfyFail": 0,
   "ntfyFailSeqs": [],
   "boxTimeBySeq": {
@@ -25,13 +25,35 @@
    "12": 1794793160036,
    "13": 1794793520973,
    "14": 1794793523470,
-   "15": 1794796741971
+   "15": 1794796741971,
+   "16": 1794796805852
   },
   "fileFromSeq": 1,
-  "fileSeqCount": 15,
+  "fileSeqCount": 16,
   "fileCap": 120
  },
  "boxes": [
+  {
+   "id": "auguste_kontaut-env-7708593093402299158",
+   "seq": 16,
+   "runId": 1794785795475,
+   "t": 1794796805852,
+   "username": "auguste_kontaut",
+   "kind": "chest",
+   "coins": 0,
+   "boxName": "Sandık",
+   "businessType": 20,
+   "boxType": "",
+   "roomId": "7708541427659180822",
+   "shared": 0,
+   "participants": 0,
+   "viewers": 41,
+   "durationSec": 0,
+   "unpackAt": 0,
+   "availableAt": 1794796805852,
+   "hasWindow": false,
+   "sessionSec": 23
+  },
   {
    "id": "rai.sukuna-env-7708547000639752967",
    "seq": 15,
