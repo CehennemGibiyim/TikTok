@@ -1,13 +1,13 @@
 {
- "scannedAt": "2026-11-16T14:19:13.539Z",
+ "scannedAt": "2026-11-16T14:20:18.018Z",
  "runId": 1794830892149,
  "delivery": {
   "runId": 1794830892149,
-  "produced": 21,
-  "lastSeq": 21,
+  "produced": 22,
+  "lastSeq": 22,
   "duplicate": 18,
-  "ntfyAttempts": 20,
-  "ntfyOk": 20,
+  "ntfyAttempts": 21,
+  "ntfyOk": 21,
   "ntfyFail": 0,
   "ntfyFailSeqs": [],
   "boxTimeBySeq": {
@@ -31,13 +31,35 @@
    "18": 1794836547135,
    "19": 1794838000282,
    "20": 1794838390381,
-   "21": 1794838753539
+   "21": 1794838753539,
+   "22": 1794838818018
   },
   "fileFromSeq": 1,
-  "fileSeqCount": 21,
+  "fileSeqCount": 22,
   "fileCap": 120
  },
  "boxes": [
+  {
+   "id": "atila_official-env-7708756824732224278",
+   "seq": 22,
+   "runId": 1794830892149,
+   "t": 1794838818018,
+   "username": "atila_official",
+   "kind": "letter",
+   "coins": 100,
+   "boxName": "Zarf",
+   "businessType": 1,
+   "boxType": "",
+   "roomId": "7708727552814222103",
+   "shared": 10,
+   "participants": 0,
+   "viewers": 181,
+   "durationSec": 299,
+   "unpackAt": 1794839112000,
+   "availableAt": 1794839112000,
+   "hasWindow": true,
+   "sessionSec": 4020
+  },
   {
    "id": "nobledemmy-env-7708760036906601222",
    "seq": 21,
