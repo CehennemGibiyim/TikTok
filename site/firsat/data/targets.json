@@ -2,28 +2,10 @@
  "note": "Taranacak adresler. Keşif kendi bulduklarını buraya ekler; elle eklenenler korunur.",
  "probeRatio": 0.6,
  "probeStats": {
-  "sessions": 15,
-  "withBox": 5
+  "sessions": 24,
+  "withBox": 6
  },
  "probeHistory": [
-  {
-   "at": 1794555365077,
-   "from": 20,
-   "to": 25,
-   "probeRate": 25,
-   "hotRate": null,
-   "sessions": 8,
-   "boxSessions": 2
-  },
-  {
-   "at": 1794555782966,
-   "from": 25,
-   "to": 25,
-   "probeRate": 13,
-   "hotRate": null,
-   "sessions": 8,
-   "boxSessions": 1
-  },
   {
    "at": 1794558956981,
    "from": 25,
@@ -365,6 +347,24 @@
    "hotRate": null,
    "sessions": 8,
    "boxSessions": 3
+  },
+  {
+   "at": 1794789700949,
+   "from": 60,
+   "to": 60,
+   "probeRate": 25,
+   "hotRate": null,
+   "sessions": 8,
+   "boxSessions": 2
+  },
+  {
+   "at": 1794790015085,
+   "from": 60,
+   "to": 60,
+   "probeRate": 13,
+   "hotRate": null,
+   "sessions": 8,
+   "boxSessions": 1
   }
  ],
  "boxHourly": {
@@ -387,7 +387,7 @@
   "498548": 19,
   "498549": 28,
   "498551": 4,
-  "498552": 5
+  "498552": 7
  },
  "watchHourly": {
   "498512": 1,
@@ -414,7 +414,7 @@
   "498548": 7,
   "498549": 7,
   "498551": 8,
-  "498552": 6
+  "498552": 8
  },
  "boxMinuteDays": {
   "2026-11-13": {
@@ -474,17 +474,17 @@
   "2026-11-16": {
    "boxMinutes": [
     0,
-    2,
+    4,
     0,
     0,
     0,
     0
    ],
    "watchMin": [
-    4,
-    4,
-    4,
-    0.000050000000000238744,
+    13,
+    13,
+    13,
+    0.011466666666666944,
     0,
     0
    ]
@@ -496,7 +496,7 @@
   "regions": {},
   "failed": []
  },
- "updatedAt": "2026-11-16T00:41:38.316Z",
+ "updatedAt": "2026-11-16T00:48:11.287Z",
  "targets": [
   {
    "username": "haris",
@@ -2158,17 +2158,17 @@
    "username": "k4buli_official_07",
    "country": "TR",
    "source": "discovery",
-   "roomId": "7708224722827365141",
-   "roomIdAt": 1794719746345,
+   "roomId": "7708540058181045013",
+   "roomIdAt": 1794789965931,
    "roomIdMiss": 0,
-   "boxEvents": 0,
+   "boxEvents": 1,
    "boxCoinSum": 0,
    "boxCoinsSeen": 0,
    "boxSharedSum": 0,
    "boxSharedSeen": 0,
-   "firstBoxAt": 0,
-   "lastBoxAt": 0,
-   "lastWatchedAt": 0,
+   "firstBoxAt": 1794790032784,
+   "lastBoxAt": 1794790032784,
+   "lastWatchedAt": 1794789965931,
    "addedAt": 1794719746345,
    "lastSeenLiveAt": 1794785840950
   },
@@ -3961,13 +3961,13 @@
    "roomId": "7708548365184781069",
    "roomIdAt": 1794789637392,
    "roomIdMiss": 0,
-   "boxEvents": 0,
-   "boxCoinSum": 0,
-   "boxCoinsSeen": 0,
-   "boxSharedSum": 0,
-   "boxSharedSeen": 0,
-   "firstBoxAt": 0,
-   "lastBoxAt": 0,
+   "boxEvents": 1,
+   "boxCoinSum": 4,
+   "boxCoinsSeen": 1,
+   "boxSharedSum": 3,
+   "boxSharedSeen": 1,
+   "firstBoxAt": 1794789710903,
+   "lastBoxAt": 1794789710903,
    "lastWatchedAt": 1794789637392,
    "addedAt": 1794716804935,
    "lastSeenLiveAt": 0
@@ -8404,8 +8404,8 @@
    "username": "mistyqp",
    "country": "PL",
    "source": "discovery",
-   "roomId": "7708169949516909344",
-   "roomIdAt": 1794704584236,
+   "roomId": "7708559921142336288",
+   "roomIdAt": 1794789700548,
    "roomIdMiss": 0,
    "boxEvents": 0,
    "boxCoinSum": 0,
@@ -8414,7 +8414,7 @@
    "boxSharedSeen": 0,
    "firstBoxAt": 0,
    "lastBoxAt": 0,
-   "lastWatchedAt": 0,
+   "lastWatchedAt": 1794789700548,
    "addedAt": 1794704584236,
    "lastSeenLiveAt": 1794706627984
   },
@@ -34630,8 +34630,8 @@
    "username": "jenny2.501",
    "country": "LT",
    "source": "discovery",
-   "roomId": "7707784849423076117",
-   "roomIdAt": 1794616472783,
+   "roomId": "7708542993343138580",
+   "roomIdAt": 1794789704820,
    "roomIdMiss": 0,
    "boxEvents": 0,
    "boxCoinSum": 0,
@@ -34640,7 +34640,7 @@
    "boxSharedSeen": 0,
    "firstBoxAt": 0,
    "lastBoxAt": 0,
-   "lastWatchedAt": 0,
+   "lastWatchedAt": 1794789704820,
    "addedAt": 1794616472783,
    "lastSeenLiveAt": 1794618218748
   },
