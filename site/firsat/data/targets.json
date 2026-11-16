@@ -2,19 +2,10 @@
  "note": "Taranacak adresler. Keşif kendi bulduklarını buraya ekler; elle eklenenler korunur.",
  "probeRatio": 0.6,
  "probeStats": {
-  "sessions": 39,
+  "sessions": 41,
   "withBox": 9
  },
  "probeHistory": [
-  {
-   "at": 1794570451731,
-   "from": 30,
-   "to": 35,
-   "probeRate": 25,
-   "hotRate": null,
-   "sessions": 8,
-   "boxSessions": 2
-  },
   {
    "at": 1794574203282,
    "from": 35,
@@ -365,6 +356,15 @@
    "hotRate": null,
    "sessions": 8,
    "boxSessions": 2
+  },
+  {
+   "at": 1794794257708,
+   "from": 60,
+   "to": 60,
+   "probeRate": 13,
+   "hotRate": null,
+   "sessions": 8,
+   "boxSessions": 1
   }
  ],
  "boxHourly": {
@@ -483,10 +483,10 @@
     0
    ],
    "watchMin": [
-    28,
-    28,
-    27.90375,
-    2.4109000000000003,
+    30,
+    30,
+    29.90375,
+    2.410933333333334,
     0,
     0
    ]
@@ -498,7 +498,7 @@
   "regions": {},
   "failed": []
  },
- "updatedAt": "2026-11-16T01:53:37.715Z",
+ "updatedAt": "2026-11-16T01:58:51.426Z",
  "targets": [
   {
    "username": "haris",
@@ -9504,8 +9504,8 @@
    "username": "kaylakreynes",
    "country": "ES",
    "source": "discovery",
-   "roomId": "7708171535223540511",
-   "roomIdAt": 1794702777214,
+   "roomId": "7708538267134200607",
+   "roomIdAt": 1794794080472,
    "roomIdMiss": 0,
    "boxEvents": 0,
    "boxCoinSum": 0,
@@ -9514,7 +9514,7 @@
    "boxSharedSeen": 0,
    "firstBoxAt": 0,
    "lastBoxAt": 0,
-   "lastWatchedAt": 0,
+   "lastWatchedAt": 1794794080472,
    "addedAt": 1794702777214,
    "lastSeenLiveAt": 1794703834482
   },
