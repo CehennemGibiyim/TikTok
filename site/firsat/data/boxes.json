@@ -1,13 +1,13 @@
 {
- "scannedAt": "2026-11-17T07:28:42.518Z",
+ "scannedAt": "2026-11-17T07:29:39.475Z",
  "runId": 1794892652387,
  "delivery": {
   "runId": 1794892652387,
-  "produced": 8,
-  "lastSeq": 8,
+  "produced": 9,
+  "lastSeq": 9,
   "duplicate": 4,
-  "ntfyAttempts": 7,
-  "ntfyOk": 7,
+  "ntfyAttempts": 8,
+  "ntfyOk": 8,
   "ntfyFail": 0,
   "ntfyFailSeqs": [],
   "boxTimeBySeq": {
@@ -18,13 +18,35 @@
    "5": 1794896286529,
    "6": 1794896699071,
    "7": 1794896958592,
-   "8": 1794900522518
+   "8": 1794900522518,
+   "9": 1794900579475
   },
   "fileFromSeq": 1,
-  "fileSeqCount": 8,
+  "fileSeqCount": 9,
   "fileCap": 120
  },
  "boxes": [
+  {
+   "id": "hadhoud122-env-7708989688586177301",
+   "seq": 9,
+   "runId": 1794892652387,
+   "t": 1794900579475,
+   "username": "hadhoud122",
+   "kind": "letter",
+   "coins": 0,
+   "boxName": "Zarf",
+   "businessType": 4,
+   "boxType": "",
+   "roomId": "7709002813606726420",
+   "shared": 0,
+   "participants": 0,
+   "viewers": 154,
+   "durationSec": 0,
+   "unpackAt": 0,
+   "availableAt": 1794900579475,
+   "hasWindow": false,
+   "sessionSec": 147
+  },
   {
    "id": "hadhoud122-env-7708968500467387156",
    "seq": 8,

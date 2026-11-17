@@ -2,19 +2,10 @@
  "note": "Taranacak adresler. Keşif kendi bulduklarını buraya ekler; elle eklenenler korunur.",
  "probeRatio": 0.5,
  "probeStats": {
-  "sessions": 44,
-  "withBox": 5
+  "sessions": 49,
+  "withBox": 6
  },
  "probeHistory": [
-  {
-   "at": 1794753573152,
-   "from": 30,
-   "to": 35,
-   "probeRate": 25,
-   "hotRate": null,
-   "sessions": 8,
-   "boxSessions": 2
-  },
   {
    "at": 1794754104055,
    "from": 35,
@@ -365,6 +356,15 @@
    "hotRate": null,
    "sessions": 8,
    "boxSessions": 0
+  },
+  {
+   "at": 1794900662147,
+   "from": 50,
+   "to": 50,
+   "probeRate": 13,
+   "hotRate": null,
+   "sessions": 8,
+   "boxSessions": 1
   }
  ],
  "boxHourly": {
@@ -396,7 +396,7 @@
   "498578": 4,
   "498581": 4,
   "498582": 3,
-  "498583": 1
+  "498583": 2
  },
  "watchHourly": {
   "498535": 7,
@@ -508,16 +508,16 @@
    "boxMinutes": [
     3,
     5,
-    5,
+    6,
     1,
     0,
     1
    ],
    "watchMin": [
-    56,
-    55.07783333333333,
-    53.33415,
-    1.0227000000000022,
+    61,
+    60.07783333333333,
+    58.334133333333334,
+    1.0227500000000025,
     1,
     7.258849999999999
    ]
@@ -529,7 +529,7 @@
   "regions": {},
   "failed": []
  },
- "updatedAt": "2026-11-17T07:29:24.149Z",
+ "updatedAt": "2026-11-17T07:33:32.746Z",
  "targets": [
   {
    "username": "haris",
@@ -26044,13 +26044,13 @@
    "roomId": "7709002813606726420",
    "roomIdAt": 1794900434870,
    "roomIdMiss": 0,
-   "boxEvents": 1,
+   "boxEvents": 2,
    "boxCoinSum": 120,
    "boxCoinsSeen": 1,
    "boxSharedSum": 80,
    "boxSharedSeen": 1,
    "firstBoxAt": 1794900522517,
-   "lastBoxAt": 1794900522517,
+   "lastBoxAt": 1794900579474,
    "lastWatchedAt": 1794900434870,
    "addedAt": 1794649472164,
    "lastSeenLiveAt": 1794653382938
