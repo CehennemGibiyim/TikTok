@@ -1,33 +1,12 @@
 {
-  "generatedAt": "2026-11-15T02:02:14.104Z",
+  "generatedAt": "2026-11-17T13:43:27.740Z",
   "source": {
-    "commits": 892,
-    "parsed": 883,
-    "failed": 9,
-    "comparedRuns": 27
+    "commits": 1278,
+    "parsed": 1268,
+    "failed": 10,
+    "comparedRuns": 41
   },
   "runs": [
-    {
-      "at": "2026-11-11T23:40:48.993Z",
-      "cfg": {
-        "rooms": 32,
-        "gap": 4000,
-        "starts": 0,
-        "probe": 0,
-        "watchSec": 600
-      },
-      "profile": "guvenli",
-      "attempts": 159,
-      "ok": 97,
-      "watching": 13,
-      "boxes": 41,
-      "boxCoins": 13872,
-      "hours": 3.66,
-      "boxesPer100": 25.79,
-      "boxesPerHour": 11.2,
-      "boxesPerSession": 0.42,
-      "short": false
-    },
     {
       "at": "2026-11-12T04:25:54.664Z",
       "cfg": {
@@ -563,19 +542,327 @@
         "watchSec": 300
       },
       "profile": "agresif",
-      "attempts": 64,
+      "attempts": 73,
       "ok": 3,
       "watching": 1,
       "boxes": 3,
       "boxCoins": 0,
-      "hours": 2.47,
-      "boxesPer100": 4.69,
-      "boxesPerHour": 1.2,
+      "hours": 2.86,
+      "boxesPer100": 4.11,
+      "boxesPerHour": 1,
       "boxesPerSession": 1,
+      "short": false
+    },
+    {
+      "at": "2026-11-15T02:23:43.802Z",
+      "cfg": {
+        "rooms": 25,
+        "gap": 2000,
+        "starts": 12,
+        "probe": 0.1,
+        "watchSec": 7200
+      },
+      "profile": "agresif",
+      "attempts": 3,
+      "ok": 0,
+      "watching": 0,
+      "boxes": 0,
+      "boxCoins": 0,
+      "hours": 0.01,
+      "boxesPer100": 0,
+      "boxesPerHour": null,
+      "boxesPerSession": null,
+      "short": true
+    },
+    {
+      "at": "2026-11-15T02:31:47.174Z",
+      "cfg": {
+        "rooms": 25,
+        "gap": 2000,
+        "starts": 12,
+        "probe": 0.1,
+        "watchSec": 7200
+      },
+      "profile": "agresif",
+      "attempts": 3,
+      "ok": 0,
+      "watching": 0,
+      "boxes": 0,
+      "boxCoins": 0,
+      "hours": 0.01,
+      "boxesPer100": 0,
+      "boxesPerHour": null,
+      "boxesPerSession": null,
+      "short": true
+    },
+    {
+      "at": "2026-11-15T02:39:41.519Z",
+      "cfg": {
+        "rooms": 25,
+        "gap": 2000,
+        "starts": 12,
+        "probe": 0.1,
+        "watchSec": 7200
+      },
+      "profile": "agresif",
+      "attempts": 10,
+      "ok": 2,
+      "watching": 2,
+      "boxes": 0,
+      "boxCoins": 0,
+      "hours": 0.08,
+      "boxesPer100": 0,
+      "boxesPerHour": 0,
+      "boxesPerSession": 0,
+      "short": true
+    },
+    {
+      "at": "2026-11-15T02:49:42.004Z",
+      "cfg": {
+        "rooms": 25,
+        "gap": 2000,
+        "starts": 12,
+        "probe": 0.1,
+        "watchSec": 7200
+      },
+      "profile": "agresif",
+      "attempts": 3,
+      "ok": 0,
+      "watching": 0,
+      "boxes": 0,
+      "boxCoins": 0,
+      "hours": 0.01,
+      "boxesPer100": 0,
+      "boxesPerHour": null,
+      "boxesPerSession": null,
+      "short": true
+    },
+    {
+      "at": "2026-11-15T02:57:36.449Z",
+      "cfg": {
+        "rooms": 25,
+        "gap": 2000,
+        "starts": 12,
+        "probe": 0.1,
+        "watchSec": 7200
+      },
+      "profile": "agresif",
+      "attempts": 10,
+      "ok": 5,
+      "watching": 5,
+      "boxes": 0,
+      "boxCoins": 0,
+      "hours": 0.08,
+      "boxesPer100": 0,
+      "boxesPerHour": 0,
+      "boxesPerSession": 0,
+      "short": true
+    },
+    {
+      "at": "2026-11-15T03:07:41.307Z",
+      "cfg": {
+        "rooms": 12,
+        "gap": 2000,
+        "starts": 4,
+        "probe": 0.1,
+        "watchSec": 7200
+      },
+      "profile": "agresif",
+      "attempts": 3,
+      "ok": 0,
+      "watching": 0,
+      "boxes": 0,
+      "boxCoins": 0,
+      "hours": 0.01,
+      "boxesPer100": 0,
+      "boxesPerHour": null,
+      "boxesPerSession": null,
+      "short": true
+    },
+    {
+      "at": "2026-11-15T03:18:15.128Z",
+      "cfg": {
+        "rooms": 12,
+        "gap": 2000,
+        "starts": 4,
+        "probe": 0.1,
+        "watchSec": 7200
+      },
+      "profile": "agresif",
+      "attempts": 99,
+      "ok": 84,
+      "watching": 8,
+      "boxes": 94,
+      "boxCoins": 1715,
+      "hours": 3.77,
+      "boxesPer100": 94.95,
+      "boxesPerHour": 25,
+      "boxesPerSession": 1.12,
+      "short": false
+    },
+    {
+      "at": "2026-11-15T11:35:08.791Z",
+      "cfg": {
+        "rooms": 12,
+        "gap": 2000,
+        "starts": 4,
+        "probe": 0.1,
+        "watchSec": 7200
+      },
+      "profile": "agresif",
+      "attempts": 99,
+      "ok": 81,
+      "watching": 8,
+      "boxes": 97,
+      "boxCoins": 5272,
+      "hours": 3.78,
+      "boxesPer100": 97.98,
+      "boxesPerHour": 25.7,
+      "boxesPerSession": 1.2,
+      "short": false
+    },
+    {
+      "at": "2026-11-15T18:01:33.635Z",
+      "cfg": {
+        "rooms": 12,
+        "gap": 2000,
+        "starts": 4,
+        "probe": 0.1,
+        "watchSec": 7200
+      },
+      "profile": "agresif",
+      "attempts": 98,
+      "ok": 89,
+      "watching": 8,
+      "boxes": 91,
+      "boxCoins": 18293,
+      "hours": 3.9,
+      "boxesPer100": 92.86,
+      "boxesPerHour": 23.4,
+      "boxesPerSession": 1.02,
+      "short": false
+    },
+    {
+      "at": "2026-11-15T23:37:20.955Z",
+      "cfg": {
+        "rooms": 12,
+        "gap": 2000,
+        "starts": 4,
+        "probe": 0.1,
+        "watchSec": 7200
+      },
+      "profile": "agresif",
+      "attempts": 70,
+      "ok": 59,
+      "watching": 6,
+      "boxes": 16,
+      "boxCoins": 538,
+      "hours": 3.75,
+      "boxesPer100": 22.86,
+      "boxesPerHour": 4.3,
+      "boxesPerSession": 0.27,
+      "short": false
+    },
+    {
+      "at": "2026-11-16T03:31:57.695Z",
+      "cfg": {
+        "rooms": 12,
+        "gap": 2000,
+        "starts": 4,
+        "probe": 0.1,
+        "watchSec": 7200
+      },
+      "profile": "agresif",
+      "attempts": 100,
+      "ok": 89,
+      "watching": 8,
+      "boxes": 19,
+      "boxCoins": 614,
+      "hours": 3.72,
+      "boxesPer100": 19,
+      "boxesPerHour": 5.1,
+      "boxesPerSession": 0.21,
+      "short": false
+    },
+    {
+      "at": "2026-11-16T12:08:43.675Z",
+      "cfg": {
+        "rooms": 12,
+        "gap": 2000,
+        "starts": 4,
+        "probe": 0.1,
+        "watchSec": 7200
+      },
+      "profile": "agresif",
+      "attempts": 48,
+      "ok": 38,
+      "watching": 8,
+      "boxes": 25,
+      "boxCoins": 12258,
+      "hours": 3.76,
+      "boxesPer100": 52.08,
+      "boxesPerHour": 6.6,
+      "boxesPerSession": 0.66,
+      "short": false
+    },
+    {
+      "at": "2026-11-16T23:52:57.517Z",
+      "cfg": {
+        "rooms": 12,
+        "gap": 2000,
+        "starts": 4,
+        "probe": 0.1,
+        "watchSec": 7200
+      },
+      "profile": "agresif",
+      "attempts": 24,
+      "ok": 20,
+      "watching": 4,
+      "boxes": 8,
+      "boxCoins": 1375,
+      "hours": 3.72,
+      "boxesPer100": 33.33,
+      "boxesPerHour": 2.2,
+      "boxesPerSession": 0.4,
+      "short": false
+    },
+    {
+      "at": "2026-11-17T05:18:06.293Z",
+      "cfg": {
+        "rooms": 12,
+        "gap": 2000,
+        "starts": 4,
+        "probe": 0.1,
+        "watchSec": 7200
+      },
+      "profile": "agresif",
+      "attempts": 100,
+      "ok": 79,
+      "watching": 5,
+      "boxes": 19,
+      "boxCoins": 1059,
+      "hours": 3.78,
+      "boxesPer100": 19,
+      "boxesPerHour": 5,
+      "boxesPerSession": 0.24,
       "short": false
     }
   ],
   "groups": [
+    {
+      "name": "agresif | ara 2000ms, dk 4, oran 0.1, oda 12",
+      "profile": "agresif",
+      "runs": 9,
+      "attempts": 641,
+      "ok": 539,
+      "okRate": 84,
+      "boxes": 369,
+      "boxCoins": 41124,
+      "boxesPer100": 57.57,
+      "boxesPerOk": 0.68,
+      "boxesPerHour": 12.2,
+      "avgWatching": 6.1
+    },
     {
       "name": "agresif | ara 2000ms, dk 12, oran 0.3, oda 32",
       "profile": "agresif",
@@ -594,14 +881,14 @@
       "name": "agresif | ara 2000ms, dk 12, oran 0.3, oda 40",
       "profile": "agresif",
       "runs": 19,
-      "attempts": 2324,
+      "attempts": 2333,
       "ok": 303,
       "okRate": 13,
       "boxes": 102,
       "boxCoins": 5101,
-      "boxesPer100": 4.39,
+      "boxesPer100": 4.37,
       "boxesPerOk": 0.34,
-      "boxesPerHour": 3,
+      "boxesPerHour": 2.9,
       "avgWatching": 4.1
     },
     {
@@ -631,13 +918,27 @@
       "boxesPerOk": 0.47,
       "boxesPerHour": 9.8,
       "avgWatching": 12.5
+    },
+    {
+      "name": "agresif | ara 2000ms, dk 12, oran 0.1, oda 25",
+      "profile": "agresif",
+      "runs": 5,
+      "attempts": 29,
+      "ok": 7,
+      "okRate": 24,
+      "boxes": 0,
+      "boxCoins": 0,
+      "boxesPer100": 0,
+      "boxesPerOk": 0,
+      "boxesPerHour": 0,
+      "avgWatching": 1.4
     }
   ],
   "hourly": {
-    "commits": 78,
-    "boxes": 105,
-    "hours": 14,
-    "avgPerHour": 7.5,
+    "commits": 228,
+    "boxes": 475,
+    "hours": 48,
+    "avgPerHour": 9.9,
     "buckets": [
       {
         "hour": "2026-11-13T04",
@@ -694,6 +995,142 @@
       {
         "hour": "2026-11-15T01",
         "count": 3
+      },
+      {
+        "hour": "2026-11-15T03",
+        "count": 47
+      },
+      {
+        "hour": "2026-11-15T04",
+        "count": 9
+      },
+      {
+        "hour": "2026-11-15T05",
+        "count": 2
+      },
+      {
+        "hour": "2026-11-15T06",
+        "count": 34
+      },
+      {
+        "hour": "2026-11-15T07",
+        "count": 3
+      },
+      {
+        "hour": "2026-11-15T11",
+        "count": 1
+      },
+      {
+        "hour": "2026-11-15T12",
+        "count": 14
+      },
+      {
+        "hour": "2026-11-15T13",
+        "count": 32
+      },
+      {
+        "hour": "2026-11-15T14",
+        "count": 41
+      },
+      {
+        "hour": "2026-11-15T15",
+        "count": 9
+      },
+      {
+        "hour": "2026-11-15T18",
+        "count": 5
+      },
+      {
+        "hour": "2026-11-15T19",
+        "count": 39
+      },
+      {
+        "hour": "2026-11-15T20",
+        "count": 19
+      },
+      {
+        "hour": "2026-11-15T21",
+        "count": 28
+      },
+      {
+        "hour": "2026-11-15T23",
+        "count": 4
+      },
+      {
+        "hour": "2026-11-16T00",
+        "count": 7
+      },
+      {
+        "hour": "2026-11-16T01",
+        "count": 3
+      },
+      {
+        "hour": "2026-11-16T02",
+        "count": 2
+      },
+      {
+        "hour": "2026-11-16T03",
+        "count": 4
+      },
+      {
+        "hour": "2026-11-16T04",
+        "count": 5
+      },
+      {
+        "hour": "2026-11-16T05",
+        "count": 1
+      },
+      {
+        "hour": "2026-11-16T06",
+        "count": 7
+      },
+      {
+        "hour": "2026-11-16T07",
+        "count": 2
+      },
+      {
+        "hour": "2026-11-16T12",
+        "count": 10
+      },
+      {
+        "hour": "2026-11-16T13",
+        "count": 8
+      },
+      {
+        "hour": "2026-11-16T14",
+        "count": 5
+      },
+      {
+        "hour": "2026-11-16T15",
+        "count": 2
+      },
+      {
+        "hour": "2026-11-16T23",
+        "count": 1
+      },
+      {
+        "hour": "2026-11-17T00",
+        "count": 3
+      },
+      {
+        "hour": "2026-11-17T02",
+        "count": 4
+      },
+      {
+        "hour": "2026-11-17T05",
+        "count": 4
+      },
+      {
+        "hour": "2026-11-17T06",
+        "count": 3
+      },
+      {
+        "hour": "2026-11-17T07",
+        "count": 4
+      },
+      {
+        "hour": "2026-11-17T08",
+        "count": 8
       }
     ]
   }
