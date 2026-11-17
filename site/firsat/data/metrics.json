@@ -1,10 +1,10 @@
 {
-  "generatedAt": "2026-11-16T20:37:13.157Z",
+  "generatedAt": "2026-11-17T04:04:24.207Z",
   "source": {
-    "commits": 1186,
-    "parsed": 1176,
+    "commits": 1232,
+    "parsed": 1222,
     "failed": 10,
-    "comparedRuns": 39
+    "comparedRuns": 40
   },
   "runs": [
     {
@@ -825,22 +825,43 @@
       "boxesPerHour": 6.6,
       "boxesPerSession": 0.66,
       "short": false
+    },
+    {
+      "at": "2026-11-16T23:52:57.517Z",
+      "cfg": {
+        "rooms": 12,
+        "gap": 2000,
+        "starts": 4,
+        "probe": 0.1,
+        "watchSec": 7200
+      },
+      "profile": "agresif",
+      "attempts": 24,
+      "ok": 20,
+      "watching": 4,
+      "boxes": 8,
+      "boxCoins": 1375,
+      "hours": 3.72,
+      "boxesPer100": 33.33,
+      "boxesPerHour": 2.2,
+      "boxesPerSession": 0.4,
+      "short": false
     }
   ],
   "groups": [
     {
       "name": "agresif | ara 2000ms, dk 4, oran 0.1, oda 12",
       "profile": "agresif",
-      "runs": 7,
-      "attempts": 517,
-      "ok": 440,
+      "runs": 8,
+      "attempts": 541,
+      "ok": 460,
       "okRate": 85,
-      "boxes": 342,
-      "boxCoins": 38690,
-      "boxesPer100": 66.15,
-      "boxesPerOk": 0.78,
-      "boxesPerHour": 15.1,
-      "avgWatching": 6.6
+      "boxes": 350,
+      "boxCoins": 40065,
+      "boxesPer100": 64.7,
+      "boxesPerOk": 0.76,
+      "boxesPerHour": 13.3,
+      "avgWatching": 6.3
     },
     {
       "name": "agresif | ara 2000ms, dk 12, oran 0.3, oda 32",
@@ -914,10 +935,10 @@
     }
   ],
   "hourly": {
-    "commits": 212,
-    "boxes": 448,
-    "hours": 41,
-    "avgPerHour": 10.9,
+    "commits": 216,
+    "boxes": 456,
+    "hours": 44,
+    "avgPerHour": 10.4,
     "buckets": [
       {
         "hour": "2026-11-13T04",
@@ -1082,6 +1103,18 @@
       {
         "hour": "2026-11-16T15",
         "count": 2
+      },
+      {
+        "hour": "2026-11-16T23",
+        "count": 1
+      },
+      {
+        "hour": "2026-11-17T00",
+        "count": 3
+      },
+      {
+        "hour": "2026-11-17T02",
+        "count": 4
       }
     ]
   }
