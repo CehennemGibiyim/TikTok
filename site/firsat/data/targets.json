@@ -1,20 +1,11 @@
 {
  "note": "Taranacak adresler. Keşif kendi bulduklarını buraya ekler; elle eklenenler korunur.",
- "probeRatio": 0.5,
+ "probeRatio": 0.55,
  "probeStats": {
-  "sessions": 5,
-  "withBox": 1
+  "sessions": 11,
+  "withBox": 2
  },
  "probeHistory": [
-  {
-   "at": 1794723853776,
-   "from": 20,
-   "to": 20,
-   "probeRate": 13,
-   "hotRate": null,
-   "sessions": 8,
-   "boxSessions": 1
-  },
   {
    "at": 1794725411257,
    "from": 20,
@@ -365,6 +356,15 @@
    "hotRate": null,
    "sessions": 8,
    "boxSessions": 2
+  },
+  {
+   "at": 1794876932768,
+   "from": 50,
+   "to": 55,
+   "probeRate": 25,
+   "hotRate": null,
+   "sessions": 8,
+   "boxSessions": 2
   }
  ],
  "boxHourly": {
@@ -396,7 +396,8 @@
   "498565": 8,
   "498566": 5,
   "498567": 2,
-  "498575": 1
+  "498575": 1,
+  "498576": 3
  },
  "watchHourly": {
   "498528": 1,
@@ -504,6 +505,24 @@
     5,
     448.1628666666667
    ]
+  },
+  "2026-11-17": {
+   "boxMinutes": [
+    0,
+    0,
+    3,
+    0,
+    0,
+    0
+   ],
+   "watchMin": [
+    6,
+    5.654333333333334,
+    5,
+    0.000016666666666746248,
+    0,
+    0
+   ]
   }
  },
  "regionSweep": {
@@ -512,7 +531,7 @@
   "regions": {},
   "failed": []
  },
- "updatedAt": "2026-11-17T00:53:15.408Z",
+ "updatedAt": "2026-11-17T00:57:51.852Z",
  "targets": [
   {
    "username": "haris",
@@ -34556,8 +34575,8 @@
    "username": "estefanysiguenas",
    "country": "DO",
    "source": "discovery",
-   "roomId": "7707798786227784469",
-   "roomIdAt": 1794616502973,
+   "roomId": "7708824817307486997",
+   "roomIdAt": 1794876812902,
    "roomIdMiss": 0,
    "boxEvents": 0,
    "boxCoinSum": 0,
@@ -34566,7 +34585,7 @@
    "boxSharedSeen": 0,
    "firstBoxAt": 0,
    "lastBoxAt": 0,
-   "lastWatchedAt": 0,
+   "lastWatchedAt": 1794876812902,
    "addedAt": 1794616502973,
    "lastSeenLiveAt": 1794618218748
   },
@@ -92213,13 +92232,13 @@
    "roomId": "7708885008538962694",
    "roomIdAt": 1794876746605,
    "roomIdMiss": 0,
-   "boxEvents": 0,
-   "boxCoinSum": 0,
-   "boxCoinsSeen": 0,
-   "boxSharedSum": 0,
-   "boxSharedSeen": 0,
-   "firstBoxAt": 0,
-   "lastBoxAt": 0,
+   "boxEvents": 3,
+   "boxCoinSum": 100,
+   "boxCoinsSeen": 1,
+   "boxSharedSum": 100,
+   "boxSharedSeen": 1,
+   "firstBoxAt": 1794876870728,
+   "lastBoxAt": 1794876916277,
    "lastWatchedAt": 1794876746606,
    "addedAt": 1794434763469,
    "lastSeenLiveAt": 1794440017184
@@ -99986,8 +100005,8 @@
    "username": "patytody",
    "country": "PT",
    "source": "discovery",
-   "roomId": "7706972012283644694",
-   "roomIdAt": 1794421949680,
+   "roomId": "7708872722018093846",
+   "roomIdAt": 1794876806019,
    "roomIdMiss": 0,
    "boxEvents": 0,
    "boxCoinSum": 0,
@@ -99996,7 +100015,7 @@
    "boxSharedSeen": 0,
    "firstBoxAt": 0,
    "lastBoxAt": 0,
-   "lastWatchedAt": 0,
+   "lastWatchedAt": 1794876806019,
    "addedAt": 1794421926744,
    "lastSeenLiveAt": 1794421949680
   },
