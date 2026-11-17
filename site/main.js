@@ -272,7 +272,25 @@ function boxClock(ts) {
 
 function addChestRecord(chest) {
     if (!chest || !chest.id || !chest.user) return;
-    if (chestsData.some(item => item.id === chest.id)) return;
+    const existing = chestsData.find(item => item.id === chest.id);
+    if (existing) {
+        // Aynı kutu önce fakir, sonra ayrıntılı gelebilir: boş alanları doldur.
+        ['coins', 'durationSec', 'availableAt', 'hasDuration', 'hasWindow', 'userCount',
+            'viewers', 'participants', 'businessType', 'boxType', 'boxName', 'roomId'].forEach(key => {
+            const value = chest[key];
+            if (value !== undefined && value !== null && value !== '' && Number(value) !== 0 && !existing[key]) {
+                existing[key] = value;
+            }
+        });
+        if (chest.hasDuration) {
+            existing.durationSec = chest.durationSec || existing.durationSec;
+            existing.duration = existing.durationSec || existing.duration;
+            existing.hasDuration = true;
+        }
+        if (chest.hasWindow) existing.hasWindow = true;
+        renderChests();
+        return;
+    }
 
     chestsData.push(chest);
     chestsTotalCounter += 1;
@@ -287,8 +305,9 @@ function ingestStaticBox(box) {
     // Kutunun yakalama penceresi kısa; eski dosya kayıtlarını listeye doldurma.
     if (Date.now() - dropTime > 15 * 60 * 1000) return;
 
-    const availableAt = Number(box.availableAt) || dropTime;
-    const durationSec = Number(box.durationSec) || Math.max(0, (availableAt - dropTime) / 1000);
+    const rawEnd = Number(box.availableAt) || Number(box.unpackAt) || 0;
+    const durationSec = Number(box.durationSec) || (rawEnd ? Math.max(0, (rawEnd - dropTime) / 1000) : 0);
+    const availableAt = rawEnd || (durationSec ? dropTime + durationSec * 1000 : dropTime);
     addChestRecord({
         id: 'static_' + (box.id || (box.username + '_' + dropTime + '_' + (box.kind || 'chest'))),
         user: box.username,
@@ -297,15 +316,18 @@ function ingestStaticBox(box) {
         durationSec: durationSec,
         availableAt: availableAt,
         hasDuration: durationSec > 0,
+        hasWindow: Boolean(box.hasWindow) || Number(box.unpackAt) > 0 || rawEnd > 0,
         dropTime: dropTime,
         timeStr: new Date(dropTime).toLocaleTimeString('tr-TR'),
         graceStartTime: null,
-        userCount: Number(box.shared) || Number(box.winners) || 0,
+        userCount: Number(box.shared) || Number(box.winners) || Number(box.winnerCount) || 0,
         viewers: Number(box.viewers) || Number(box.viewerCount) || 0,
         participants: Number(box.participants) || Number(box.joined) || 0,
         rule: staticRules.get(String(box.username).toLowerCase()) || null,
         kind: box.kind || 'chest',
         boxName: box.boxName || '',
+        boxType: String(box.boxType || ''),
+        businessType: Number(box.businessType) || 0,
         roomId: String(box.roomId || '')
     });
 }
@@ -452,7 +474,7 @@ function startChestTimerEngine() {
                     needsRender = true;
                 }
                 const graceElapsed = now - chest.graceStartTime;
-                if (graceElapsed > 180000) { 
+                if (graceElapsed > HUNG_TTL_MS) {
                     needsRender = true;
                     return false; 
                 }
@@ -873,9 +895,40 @@ window.removeTrackedUser = async function(username) {
 };
 
 function formatTimeRemaining(seconds) {
-    const m = Math.floor(seconds / 60);
-    const s = Math.floor(seconds % 60);
+    const safe = Math.max(0, Number(seconds) || 0);
+    const m = Math.floor(safe / 60);
+    const s = Math.floor(safe % 60);
     return `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+}
+
+// Referans canlı radarla aynı davranış: açılan kutu hemen silinmez, kısa süre
+// "bekleyen sandık" olarak kalır. 15 dakika sonra kendiliğinden düşer.
+const HUNG_TTL_MS = 15 * 60 * 1000;
+
+function chestWinnerSlots(chest) {
+    return Math.max(0, Number(chest && chest.userCount) || 0);
+}
+
+function chestViewers(chest) {
+    return Math.max(0, Number(chest && chest.viewers) || 0);
+}
+
+function chestParticipants(chest) {
+    return Math.max(0, Number(chest && chest.participants) || 0);
+}
+
+// Altın kutu yalnızca TikTok'un bildirdiği tür/ad alanında görülürse işaretlenir.
+// Bilinmeyen kutuya "normal" denmez.
+function chestIsGold(chest) {
+    const text = [chest && chest.boxType, chest && chest.boxName].filter(Boolean).join(' ').toLowerCase();
+    return /(^|[^a-z])(gold|golden|alt[ıi]n)([^a-z]|$)/.test(text);
+}
+
+function chestRatio(chest) {
+    const slots = chestWinnerSlots(chest);
+    const coins = Number(chest && chest.coins) || 0;
+    if (!slots || !coins) return '';
+    return (coins / slots).toFixed(2) + ' jeton / kişi';
 }
 
 // QR Code cache
@@ -910,7 +963,8 @@ function handleNewChest(data) {
     const rawCoins = typeof payload.coins === 'number' ? payload.coins : parseInt(payload.coins) || 0;
     const rawDuration = Number(payload.duration || payload.durationSec) || 0;
     const dropTime = Date.now();
-    const availableAt = Number(payload.availableAt) || (dropTime + (rawDuration || 180) * 1000);
+    const rawEnd = Number(payload.availableAt) || Number(payload.unpackAt) || 0;
+    const availableAt = rawEnd || (dropTime + (rawDuration || 180) * 1000);
     const chestId = data.id || ('chest_' + Date.now() + Math.floor(Math.random()*1000));
 
     addChestRecord({
@@ -921,14 +975,18 @@ function handleNewChest(data) {
         durationSec: rawDuration,
         availableAt: availableAt,
         hasDuration: rawDuration > 0,
+        hasWindow: Boolean(payload.hasWindow) || Number(payload.unpackAt) > 0 || rawEnd > 0,
         dropTime: dropTime,
         timeStr: payload.time || new Date().toLocaleTimeString(),
         graceStartTime: null,
-        userCount: payload.userCount || payload.totalUsers || payload.shared || 0,
+        userCount: payload.userCount || payload.totalUsers || payload.shared || payload.winnerCount || 0,
         viewers: Number(payload.viewers || payload.viewerCount) || 0,
         participants: Number(payload.participants || payload.joined) || 0,
         kind: data.kind || payload.kind || 'chest',
-        boxName: payload.boxName || ''
+        boxName: payload.boxName || '',
+        boxType: String(payload.boxType || ''),
+        businessType: Number(payload.businessType) || 0,
+        roomId: String(payload.roomId || '')
     });
 
     appendBotLog(`🎁 [@${data.user}] ${boxKindLabel(data.kind || payload.kind)}: ${rawCoins} jeton, ${payload.userCount || payload.totalUsers || 0} kişi`);
@@ -948,8 +1006,8 @@ setInterval(() => {
             chest.graceStartTime = now;
         }
         
-        // Grace period (3 dakika) sonrası sil
-        if (chest.graceStartTime && (now - chest.graceStartTime) > 180000) {
+        // Referans sistem gibi: açılan kutu 15 dakika "bekleyen" kalır, sonra düşer.
+        if (chest.graceStartTime && (now - chest.graceStartTime) > HUNG_TTL_MS) {
             toRemove.push(chest.id);
         }
     });
@@ -974,7 +1032,9 @@ function updateChestCountdowns() {
         
         const countdownEl = document.getElementById(`countdown-${chest.id}`);
         if (countdownEl) {
-            countdownEl.textContent = formatTimeRemaining(remaining);
+            countdownEl.textContent = remaining > 0
+                ? formatTimeRemaining(remaining)
+                : 'BEKLEYEN SANDIK +' + formatTimeRemaining(chest.graceStartTime ? (now - chest.graceStartTime) / 1000 : 0);
         }
     });
 }
@@ -1020,33 +1080,40 @@ function renderChests() {
         let containerBorder = 'border-yellow-500/20';
         
         if (isExpired) {
-            const graceElapsed = now - chest.graceStartTime;
-            const graceRemainingSeconds = Math.max(0, Math.floor((180000 - graceElapsed) / 1000));
+            const graceElapsed = Math.max(0, now - (chest.graceStartTime || now));
+            const graceRemainingSeconds = Math.max(0, Math.floor((HUNG_TTL_MS - graceElapsed) / 1000));
             containerBorder = 'border-red-500/50 bg-red-500/5';
             statusBadge = `
                 <div class="flex flex-col items-end">
-                    <span class="bg-red-500 text-white text-xs px-2 py-0.5 rounded font-bold animate-pulse">KONTROL ET!</span>
-                    <span class="text-[10px] text-red-400/70 mt-1">${graceRemainingSeconds}sn sonra silinecek</span>
+                    <span class="bg-red-500 text-white text-xs px-2 py-0.5 rounded font-bold animate-pulse">BEKLEYEN SANDIK</span>
+                    <span class="text-[10px] text-red-400/70 mt-1">+${formatTimeRemaining(graceElapsed / 1000)} · ${formatTimeRemaining(graceRemainingSeconds)} sonra düşer</span>
                 </div>
             `;
         } else {
-            statusBadge = `<span class="bg-yellow-500/20 text-yellow-400 border border-yellow-500/30 text-xs px-2 py-1 rounded font-bold flex items-center"><i data-lucide="clock" class="w-3 h-3 mr-1"></i> ${formatTimeRemaining(remaining)}</span>`;
+            const urgentClass = remaining <= 60 ? 'bg-red-500 text-white animate-pulse' : 'bg-yellow-500/20 text-yellow-400 border border-yellow-500/30';
+            statusBadge = `<span class="${urgentClass} text-xs px-2 py-1 rounded font-bold flex items-center"><i data-lucide="clock" class="w-3 h-3 mr-1"></i> ${formatTimeRemaining(remaining)}</span>`;
         }
 
         const div = document.createElement('div');
         div.className = `chest-anim bg-black/60 border ${containerBorder} rounded-2xl p-4 relative overflow-hidden transition-all`;
         
         const qrCodeData = chestQRCodes.get(chest.id);
+        const slots = chestWinnerSlots(chest);
+        const viewers = chestViewers(chest);
+        const participants = chestParticipants(chest);
+        const ratioText = chestRatio(chest);
+        const gold = chestIsGold(chest);
         const durationText = chest.hasDuration
             ? (Math.round((Number(chest.durationSec) || chest.duration) * 10) / 10) + ' sn'
             : 'süre bilinmiyor';
         const availableText = boxClock(chest.availableAt);
-        const openText = availableText ? ' · ' + availableText + ' açılır' : '';
+        const openText = chest.hasWindow && availableText ? ' · ' + availableText + ' açılır' : '';
         const audience = [];
-        if (chest.participants > 0) audience.push(chest.participants + ' izleyici katıldı');
-        if (chest.userCount > 0) audience.push(chest.userCount + ' kazanan');
-        if (chest.viewers > 0) audience.push(chest.viewers + ' izleyici');
+        if (participants > 0) audience.push(participants + ' katılımcı');
+        if (slots > 0) audience.push(slots + ' kişiye paylaşıldı');
+        if (viewers > 0) audience.push(viewers + ' izleyici');
         const audienceText = audience.length ? audience.join(' · ') : '';
+        const lowAudience = slots > 0 && viewers > 0 && viewers < slots;
         const rule = chest.rule;
         const ruleBits = [];
         if (rule && rule.avgCoins > 0) ruleBits.push('~' + rule.avgCoins + ' jeton');
@@ -1061,22 +1128,29 @@ function renderChests() {
                         <i data-lucide="box" class="w-5 h-5 text-black"></i>
                     </div>
                     <div>
-                        <h4 class="font-bold text-white text-lg">@${chest.user}</h4>
+                        <h4 class="font-bold text-white text-lg">@${chest.user}
+                            ${gold ? '<span class="ml-2 align-middle text-[10px] bg-amber-500/20 text-amber-300 border border-amber-500/40 px-1.5 py-0.5 rounded">ALTIN</span>' : ''}
+                            ${lowAudience ? '<span class="ml-1 align-middle text-[10px] bg-blue-500/20 text-blue-300 border border-blue-500/40 px-1.5 py-0.5 rounded">İZLEYİCİ &lt; KONTENJAN</span>' : ''}
+                        </h4>
                         <p class="text-xs text-yellow-50/50">${chest.timeStr} · ${boxKindLabel(chest.kind)} · ${durationText}${openText}</p>
                         ${audienceText ? `<p class="text-xs text-blue-400/80"><i data-lucide="users" class="w-3 h-3 inline mr-1"></i>${audienceText}</p>` : ''}
+                        ${ratioText ? `<p class="text-xs text-emerald-300/80"><i data-lucide="scale" class="w-3 h-3 inline mr-1"></i>Oran: ${ratioText}</p>` : ''}
                         ${ruleText ? `<p class="text-xs text-purple-300/80"><i data-lucide="repeat" class="w-3 h-3 inline mr-1"></i>Yayıncı kuralı: ${ruleText}</p>` : ''}
                     </div>
                 </div>
                 <div class="flex flex-col items-end">
                     ${statusBadge}
-                    <span id="countdown-${chest.id}" class="text-xs text-yellow-400/70 mt-1 font-mono">${formatTimeRemaining(remaining)}</span>
+                    <span id="countdown-${chest.id}" class="text-xs text-yellow-400/70 mt-1 font-mono">${isExpired ? 'açıldı' : formatTimeRemaining(remaining)}</span>
                 </div>
             </div>
             
             <div class="flex items-center justify-between bg-black/40 rounded-xl p-3 border border-white/5 relative z-10 mb-3">
                 <div class="flex items-center">
                     <i data-lucide="coins" class="w-5 h-5 text-yellow-400 mr-2"></i>
-                    <span class="font-black text-xl text-yellow-400">${chest.coins > 0 ? chest.coins + ' Jeton' : 'Bilinmiyor'}</span>
+                    <div>
+                        <span class="font-black text-xl text-yellow-400">${chest.coins > 0 ? chest.coins + ' Jeton' : 'Bilinmiyor'}</span>
+                        ${ratioText ? `<p class="text-[10px] text-emerald-300/80">${ratioText}</p>` : ''}
+                    </div>
                 </div>
                 <div class="flex gap-2">
                     <a href="https://www.tiktok.com/@${chest.user}/live" target="_blank" class="bg-yellow-500 hover:bg-yellow-400 text-black px-4 py-1.5 rounded-lg font-bold text-sm transition-colors shadow-[0_0_10px_rgba(250,204,21,0.2)] flex items-center">

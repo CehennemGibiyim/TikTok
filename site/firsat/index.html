@@ -30,6 +30,7 @@
       <button data-tab="metrics" class="tab-btn">Ölçüm</button>
       <button data-tab="settings" class="tab-btn">Ayarlar</button>
     </nav>
+    <a href="../live/" class="chip chip-amber" title="Sandık, zarf ve bekleyen kutu canlı listesi">📡 Canlı Radar</a>
   </div>
 </header>
 
@@ -109,7 +110,7 @@
       <div class="flex flex-col md:flex-row md:items-start md:justify-between gap-3 mb-4">
         <div>
           <h2 class="section-title"><i data-lucide="gift" class="w-5 h-5 text-amber-400"></i> Fırsatlar <span id="opportunityCount" class="badge ml-2">0</span></h2>
-          <p class="hint mt-1">Yalnızca toplanabilir kazanç olayları: sandık, portal, zarf. Yayıncıya atılan sıradan hediyeler buraya yazılmaz. Pencere kapanınca sandık, portal ve zarf, Ayarlar'daki süre kadar (varsayılan 15 dakika) "KONTROL ET" olarak listede kalır, sonra kendiliğinden düşer.</p>
+          <p class="hint mt-1">Yalnızca toplanabilir kazanç olayları: sandık, portal, zarf. Yayıncıya atılan sıradan hediyeler buraya yazılmaz. Pencere kapanınca sandık, portal ve zarf, Ayarlar'daki süre kadar (varsayılan 15 dakika) "BEKLEYEN SANDIK" olarak listede kalır, sonra kendiliğinden düşer.</p>
           <div id="oppFilters" class="flex flex-wrap gap-1 mt-2"></div>
           <div id="boxDiag" class="hint mt-2"></div>
         </div>
@@ -314,7 +315,7 @@
         <input id="inactiveDays" type="number" min="1" class="input mb-3">
         <label class="label">Penceresi kapanan kutu listede kaç dakika kalsın?</label>
         <input id="chestKeepMin" type="number" min="0" max="120" step="1" class="input mb-3">
-        <p class="hint mb-3">Sandık, portal ve zarf penceresi kapandıktan sonra bu süre kadar "KONTROL ET" olarak durur, sonra kendiliğinden düşer. 0 = hemen düşsün. Varsayılan 15 dakika.</p>
+        <p class="hint mb-3">Sandık, portal ve zarf penceresi kapandıktan sonra bu süre kadar "BEKLEYEN SANDIK" olarak durur, sonra kendiliğinden düşer. 0 = hemen düşsün. Varsayılan 15 dakika.</p>
         <label class="flex items-center gap-2 text-sm text-yellow-50/70 mb-3">
           <input id="notifyToggle" type="checkbox" class="w-4 h-4 accent-yellow-500">
           Zarfın süresi dolmadan tarayıcı bildirimi göster

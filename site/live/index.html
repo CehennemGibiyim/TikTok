@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Canlı Sandık Radarı · Yerel</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<header class="topbar">
+  <div class="brand">
+    <div class="brand-mark">₺</div>
+    <div>
+      <div class="brand-title">Canlı Sandık Radarı <span>YEREL</span></div>
+      <div class="brand-sub">Kendi TikTok bağlantımız · sandık, zarf ve çanta olayları</div>
+    </div>
+  </div>
+  <div class="top-status">
+    <span id="dataStatus" class="status-pill">veri bekleniyor</span>
+    <span id="updatedAt" class="muted">—</span>
+    <a href="../" class="nav-link">Panele dön</a>
+  </div>
+</header>
+
+<main class="wrap">
+  <section class="stats" id="stats">
+    <div class="stat"><span class="stat-label">Canlı yayın</span><strong id="statLive">—</strong><small id="statLiveNote">tarama</small></div>
+    <div class="stat"><span class="stat-label">Dinlenen oda</span><strong id="statWatching">—</strong><small id="statWatchingNote">bağlantı</small></div>
+    <div class="stat"><span class="stat-label">Aktif sandık</span><strong id="statActive" class="gold">—</strong><small>açılmayı bekleyen</small></div>
+    <div class="stat"><span class="stat-label">Bekleyen</span><strong id="statHung" class="red">—</strong><small>açıldı, süre doldu</small></div>
+    <div class="stat"><span class="stat-label">Zarf / çanta</span><strong id="statBag" class="blue">—</strong><small>listede</small></div>
+  </section>
+
+  <section class="control-card">
+    <div class="tabs" role="tablist" aria-label="Kutu türü">
+      <button class="tab active" data-tab="chest" role="tab">▣ Sandıklar <b id="countChest">0</b></button>
+      <button class="tab" data-tab="bag" role="tab">✉ Zarflar <b id="countBag">0</b></button>
+      <button class="tab" data-tab="hung" role="tab">◷ Bekleyen <b id="countHung">0</b></button>
+      <button class="tab" data-tab="all" role="tab">Tümü <b id="countAll">0</b></button>
+    </div>
+
+    <div class="toolbar">
+      <div class="toolbar-left">
+        <label class="sr-only" for="presetMode">Hazır filtre</label>
+        <select id="presetMode" title="Hazır filtre">
+          <option value="all">Hazır filtre yok</option>
+          <option value="c2016">20/16 · oran 1.2–1.25</option>
+          <option value="cgold">Altın sandık</option>
+          <option value="cr1">Oran 1 · 300 jetona kadar</option>
+          <option value="cr2">Oran ≥ 2</option>
+          <option value="cr4">Oran ≥ 4</option>
+          <option value="cluck">Lucky picks · oran ≥ 7</option>
+          <option value="chung">Bekleyen sandıklar</option>
+          <option value="b2">Zarf LV 2–10</option>
+          <option value="b1">Zarf LV 1</option>
+          <option value="b0">Zarf LV 0</option>
+        </select>
+        <label class="sr-only" for="sortMode">Sıralama</label>
+        <select id="sortMode">
+          <option value="time">⏳ Açılışa yakın</option>
+          <option value="coins">🪙 En çok jeton</option>
+          <option value="ratio">📊 En yüksek oran</option>
+          <option value="viewers">👥 İzleyici (az → çok)</option>
+        </select>
+        <button id="soundBtn" class="ghost" type="button" aria-pressed="false">🔔 Ses kapalı</button>
+        <button id="viewMode" class="ghost" type="button" aria-pressed="false" title="Kartların yeri sabit kalır">▦ Sabit</button>
+      </div>
+      <div class="toolbar-right">
+        <span id="resultCount" class="muted">0 kutu</span>
+        <button id="refreshBtn" class="ghost" type="button">↻ Yenile</button>
+      </div>
+    </div>
+
+    <details class="filters" id="filterBox">
+      <summary>Gelişmiş filtreler <span id="filterCount" class="filter-count">0</span></summary>
+      <div class="filter-grid">
+        <label>Minimum jeton
+          <input id="minCoins" type="number" min="0" step="1" inputmode="numeric" placeholder="0">
+        </label>
+        <label>Minimum oran (jeton / kişi)
+          <input id="minRatio" type="number" min="0" step="0.1" inputmode="decimal" placeholder="örn. 1.5">
+        </label>
+        <label>Minimum kalan süre (sn)
+          <input id="minSeconds" type="number" min="0" step="5" inputmode="numeric" placeholder="0">
+        </label>
+        <label>Zarf seviyesi
+          <select id="bagLevel">
+            <option value="">Tümü</option>
+            <option value="0">0</option><option value="1">1</option><option value="2">2</option>
+            <option value="3">3</option><option value="4">4</option><option value="5">5</option>
+            <option value="6">6</option><option value="7">7</option><option value="8">8</option>
+            <option value="9">9</option><option value="10">10</option>
+          </select>
+        </label>
+      </div>
+      <div class="checks">
+        <label><input id="lowView" type="checkbox"> İzleyici &lt; kontenjan</label>
+        <label><input id="typeNormal" type="checkbox" checked> Normal sandık</label>
+        <label><input id="typeGold" type="checkbox" checked> Altın sandık</label>
+        <label><input id="stateActive" type="checkbox" checked> Aktif</label>
+        <label><input id="stateHung" type="checkbox" checked> Bekleyen</label>
+        <button id="resetFilters" class="link-btn" type="button">Filtreleri sıfırla</button>
+      </div>
+      <p class="hint">Süre ve kazanan alanları TikTok bildiriminden gelmiyorsa “bilinmiyor” kalır; değer uydurulmaz. Bekleyen sandık açılıştan sonra 15 dakika listede tutulur.</p>
+    </details>
+  </section>
+
+  <section id="cards" class="cards" aria-live="polite"></section>
+
+  <div id="empty" class="empty" hidden>
+    <div class="empty-icon">📡</div>
+    <h2 id="emptyTitle">Eşleşen canlı oda bekleniyor</h2>
+    <p id="emptyNote">Tarayıcı yeni sandık/zarf yakaladığında burada belirir. Veri dosyası 10 saniyede bir yenilenir.</p>
+  </div>
+
+  <details class="howto">
+    <summary>Manuel toplama adımları · sistem ne yapar, ne yapmaz?</summary>
+    <ol>
+      <li><b>Canlıya git</b> ile yayını aç. Karttaki süre TikTok'un açılış anına göre bir hatırlatıcıdır; uygulamada olay hâlâ görünüyorsa katıl.</li>
+      <li><b>Sandık:</b> açılış anında TikTok'taki sandığa dokun. Kazanan kontenjanı ve oran yalnızca seçim içindir; kazanç garantisi değildir.</li>
+      <li><b>Zarf / çanta:</b> yöntem <b>yorum</b> ise yorum metnini kopyala, <b>paylaşım</b> ise paylaş, <b>katılım</b> ise katıl. Çekiliş saatini kaçırma.</li>
+      <li>Bu sayfa yalnızca bulur, gösterir ve sesli hatırlatır. TikTok hesabına girmez, otomatik katılmaz, kutu toplamaz.</li>
+    </ol>
+  </details>
+
+  <footer class="foot">
+    <span>Veri: <code>firsat/data/boxes.json</code> + canlı akış</span>
+    <span>Yalnızca kendi tarayıcımızın verisi · özel API kullanılmaz</span>
+  </footer>
+</main>
+
+<script src="../shared/reward-engine.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

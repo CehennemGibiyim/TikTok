@@ -4,6 +4,7 @@
 |---|---|
 | Panel | https://cehennemgibiyim.github.io/TikTok/ |
 | Fırsatlar (av aracı) | https://cehennemgibiyim.github.io/TikTok/firsat/ |
+| Canlı Radar | https://cehennemgibiyim.github.io/TikTok/live/ |
 
 Sunucu, Docker, API anahtarı gerekmez: her şey GitHub Pages üzerinde statik çalışır, veri tarayıcıda
 (IndexedDB / localStorage) durur. Canlı dinleme işini tarayıcı yapamadığı için (TikTok imza + CORS)
@@ -77,6 +78,11 @@ WebSocket açarak yapılır — TikTok'un oda kimliği arama ucu bulut IP'lerind
   (panelde `backoffRooms` olarak görünür).
 - Bağlanan odada `gift`, `envelope` ve `superFanBox` olayları dinlenir; gelen kutu jeton alanı boş gelse bile
   yazılır (panel "jeton bilinmiyor" der) ve türü `businessType` ile belirlenir.
+- **Oturumlu bağlantı (isteğe bağlı):** bazı sandık/zarf mesajları anonim bağlantıda gelmeyebilir. TikTok hesabının
+  `sessionid` ve `tt-target-idc` cookie değerlerini `TIKTOK_SESSION_ID` / `TIKTOK_TT_TARGET_IDC` ortam değişkenlerine
+  koyarsan connector v2 oturumlu WebSocket açar. Değerler loglanmaz/repoya yazılmaz; `authenticateWs` oturum bilgisini
+  imza servisine ilettiği için yalnızca kendi hesabında ve bu riski kabul ediyorsan kullan.
+- **Canlı önceliği:** havuzda 6.000 adres olsa da her turda önce taze canlı hedefler, sonra hiç sorgulanmamışlar, en son süresi gelen çevrimdışılar sorgulanır. Çevrimdışı hedef 15 dakikadan başlayıp 6 saate kadar geri çekilir (`--offline-base-sec`, `--offline-max-sec`); süresi gelmeyen çevrimdışı hiç istek yemez. Doğrulanamayan hedef 2 dakika sonra yeniden denenir (`--unknown-retry-sec`).
 - **Aday süzgeci (`--room-id-only=1`):** doğrulanamayan odaya yalnızca taze oda kimliği varsa bağlanılır.
   Keşif ucu yalnızca gerçekten yayında olan kanalları döndürdüğü için bu, boşa bağlantı ve kota harcamayı keser.
 - **"Canlı" etiketi tazelik ister (`--live-stale-sec=900`):** api-live bulut IP'lerinde sürekli boş döndüğü için
@@ -429,6 +435,7 @@ cd site
 python3 -m http.server 8080
 # http://localhost:8080        panel
 # http://localhost:8080/firsat/ av aracı
+# http://localhost:8080/live/   canlı sandık + zarf radarı
 ```
 
 ## Windows uygulaması (kurulum + güncelleme)

@@ -81,6 +81,11 @@ const CONFIG = {
   tiktools: readArg('tiktools', 0) ? true : false,
   watchSec: Number(readArg('watch-sec', 300)),
   watchRooms: Number(readArg('watch-rooms', 8)),
+  // Çevrimdışı hedefler her turda sorgulanmaz: 15 dk ile başlar, 6 saate kadar
+  // geri çekilir. Canlı hedefler her turda önceliklidir.
+  offlineBaseSec: Number(readArg('offline-base-sec', 900)),
+  offlineMaxSec: Number(readArg('offline-max-sec', 21600)),
+  unknownRetrySec: Number(readArg('unknown-retry-sec', 120)),
   // Bağlantılar arası en az boşluk: hız sınırına çarpmadan sırayla açılır.
   connectGapMs: Number(readArg('connect-gap', 4000)),
   // Dakikada en fazla kaç yeni bağlantı başlatılır (Euler: "too many connections
@@ -213,6 +218,7 @@ const state = {
   discoveredTotal: 0,
   lastError: null,
   polls: 0,
+  pollQueue: { live: 0, due: 0, skipped: 0, selected: 0 },
   // Panelden gelen manuel izleme istekleri: ayrı ntfy konusu, son mesaj kimliği.
   watchSince: 'all',
   lastWatchPoll: 0
@@ -442,7 +448,10 @@ function loadTargets() {
         lastBoxAt: (typeof item === 'object' && item && Number(item.lastBoxAt)) || 0,
         lastWatchedAt: (typeof item === 'object' && item && Number(item.lastWatchedAt)) || 0,
         addedAt: (typeof item === 'object' && item && Number(item.addedAt)) || 0,
-        lastSeenLiveAt: (typeof item === 'object' && item && Number(item.lastSeenLiveAt)) || 0
+        lastSeenLiveAt: (typeof item === 'object' && item && Number(item.lastSeenLiveAt)) || 0,
+        lastPollAt: (typeof item === 'object' && item && Number(item.lastPollAt)) || 0,
+        offlineChecks: (typeof item === 'object' && item && Number(item.offlineChecks)) || 0,
+        nextPollAt: (typeof item === 'object' && item && Number(item.nextPollAt)) || 0
       });
     });
     return out;
@@ -490,7 +499,10 @@ function addWatchedTarget(raw, source) {
     lastWatchedAt: 0,
     addedAt: Date.now(),
     lastSeenLiveAt: 0,
-    lastRequestedAt: Date.now()
+    lastRequestedAt: Date.now(),
+    lastPollAt: 0,
+    offlineChecks: 0,
+    nextPollAt: 0
   };
   state.targets.unshift(target);
   // Havuzdaki hedefin durum kaydı yoksa dinleme döngüsü onu bir sonraki
@@ -573,7 +585,10 @@ function saveTargets() {
         lastBoxAt: 0,
         lastWatchedAt: 0,
         addedAt: Number(item && item.addedAt) || Date.now(),
-        lastSeenLiveAt: Number(item && item.lastSeenLiveAt) || 0
+        lastSeenLiveAt: Number(item && item.lastSeenLiveAt) || 0,
+        lastPollAt: Number(item && item.lastPollAt) || 0,
+        offlineChecks: Number(item && item.offlineChecks) || 0,
+        nextPollAt: Number(item && item.nextPollAt) || 0
       });
     });
     trimPool();
@@ -617,7 +632,10 @@ function saveTargets() {
       lastBoxAt: target.lastBoxAt || 0,
       lastWatchedAt: target.lastWatchedAt || 0,
       addedAt: target.addedAt || 0,
-      lastSeenLiveAt: target.lastSeenLiveAt || 0
+      lastSeenLiveAt: target.lastSeenLiveAt || 0,
+      lastPollAt: target.lastPollAt || 0,
+      offlineChecks: target.offlineChecks || 0,
+      nextPollAt: target.nextPollAt || 0
     }))
   };
   fs.mkdirSync(DATA_DIR, { recursive: true });
@@ -898,6 +916,7 @@ function recordEvent(username, data) {
   state.boxTimes[seq - 1] = Date.now();
   const event = {
     id,
+    rewardEventId: data.rewardEventId || id,
     seq,
     runId: startedAtMs,
     t: Date.now(),
@@ -924,6 +943,21 @@ function recordEvent(username, data) {
     hasWindow: Math.max(0, Math.round(Number(data.availableAt) || 0)) > 0,
     availableAt: Math.max(0, Math.round(Number(data.availableAt) || 0)) ||
       Date.now() + Math.max(0, Math.round(Number(data.durationSec) || 0)) * 1000,
+    // Yerel canlı radarın kullandığı normalize alanlar. expiringAt bilinmiyorsa
+    // 0 kalır; panel 15 dakikalık yerel "bekleyen" penceresini kendi uygular.
+    opensAt: Math.max(0, Math.round(Number(data.availableAt) || 0)),
+    expiresAt: Math.max(0, Math.round(Number(data.expiresAt) || 0)),
+    winnerSlots: Math.max(0, Math.round(Number(data.shared) || 0)),
+    viewerCount: Math.max(0, Math.round(Number(data.viewers) || 0)),
+    participantCount: Math.max(0, Math.round(Number(data.participants) || 0)),
+    ratioBasis: 'winner_slots',
+    chestType: data.chestType === 'gold' ? 'gold' : 'normal',
+    bagLevel: Math.max(0, Math.round(Number(data.bagLevel) || 0)),
+    bagLevelKnown: data.bagLevelKnown === true,
+    bagMethod: Math.max(0, Math.round(Number(data.bagMethod) || 0)),
+    bagComment: data.bagComment || '',
+    participantStatus: data.participantStatus || '',
+    eventLabel: data.eventLabel || data.boxName || data.giftName || '',
     source: 'scan',
     // Dinleme oturumunun kaçıncı saniyesinde düştü; oturum dışıysa bilinmiyor.
     sessionSec: data.sessionSec === null || data.sessionSec === undefined
@@ -943,6 +977,103 @@ function recordEvent(username, data) {
   // Kutu anında hızlı dosyaya yazılır: commit beklemeden panel görebilsin.
   writeBoxes();
   publishBox(event);
+}
+
+// TikTok Goody Bag (iyi dilek çantası) mesajı bağlayıcı sürümüne göre
+// `decodedData` içinde ayrı bir olay olarak gelebilir. Alanlar yoksa olay
+// uydurulmaz; yalnızca gerçekten gelen kimlik/jeton/kişi alanları kullanılır.
+function goodyBagValue(data, names) {
+  for (const name of names) {
+    const value = data && data[name];
+    if (value !== undefined && value !== null && value !== '') return value;
+  }
+  return undefined;
+}
+
+function goodyBagMethod(data) {
+  const participation = (data && (data.participation || data.participant)) || {};
+  const code = Number(participation.methodCode || data.methodCode || data.joinMethod) || 0;
+  if (code) return code;
+  const method = String(participation.method || data.method || data.joinMethod || '').toLowerCase();
+  if (method === 'comment') return 1;
+  if (method === 'share') return 2;
+  return method ? 3 : 0;
+}
+
+function handleGoodyBag(username, eventName, data) {
+  if (!data || typeof data !== 'object') return;
+  const bag = data.goodyBag || data.goodyBagInfo || data.bag || data;
+  const bagId = goodyBagValue(bag, ['goodyBagId', 'goody_bag_id', 'bagId', 'id']);
+  if (!bagId) return;
+  const bagKey = String(bagId);
+  const now = Date.now();
+  const rawAction = String(goodyBagValue(bag, ['action']) || '').toLowerCase();
+  const messageType = Number(goodyBagValue(bag, ['messageType', 'type'])) || 0;
+  const action = rawAction || (messageType === 2 ? 'joined' : messageType === 3 ? 'winners' : 'sent');
+  const coins = Math.max(0, Math.round(Number(goodyBagValue(bag, ['totalCoins', 'coins', 'diamondCount'])) || 0));
+  const participants = Math.max(0, Math.round(Number(goodyBagValue(bag, ['participantCount', 'participants', 'voteCount'])) || 0));
+  const slots = Math.max(0, Math.round(Number(goodyBagValue(bag, ['winnerCount', 'winnerSlots', 'shared', 'peopleCount'])) || 0));
+  const countdownMin = Math.max(0, Math.round(Number(goodyBagValue(bag, ['countdownMinutes', 'countdown'])) || 0));
+  const openAtRaw = Number(goodyBagValue(bag, ['openAt', 'opensAt', 'unpackAt'])) || 0;
+  const openAt = openAtRaw > 100000000000 ? openAtRaw : openAtRaw * 1000;
+  const opensAt = openAt || (countdownMin ? now + countdownMin * 60000 : 0);
+  const ended = action === 'winners';
+  const method = goodyBagMethod(bag);
+  const participation = (bag && (bag.participation || bag.participant)) || {};
+  const comment = String(goodyBagValue(bag, ['keyword', 'comment', 'bagComment']) ||
+    participation.keyword || participation.comment || '').slice(0, 200);
+  const record = state.streamers.get(username);
+  const viewers = Number(record && record.viewers) || 0;
+  const existing = state.events.find((event) =>
+    event.username === username && String(event.rewardEventId) === bagKey
+  );
+  if (existing) {
+    if (coins) existing.coins = coins;
+    if (participants) {
+      existing.participants = participants;
+      existing.participantCount = participants;
+    }
+    if (slots) existing.shared = slots;
+    if (viewers) {
+      existing.viewers = viewers;
+      existing.viewerCount = viewers;
+    }
+    if (method) existing.bagMethod = method;
+    if (comment) existing.bagComment = comment;
+    if (opensAt) {
+      existing.opensAt = opensAt;
+      existing.availableAt = opensAt;
+      existing.hasWindow = true;
+    }
+    existing.expiresAt = ended ? now : (opensAt || existing.expiresAt || now + 15 * 60000);
+    existing.participantStatus = ended ? 'ended' : 'joined';
+    writeBoxes();
+    publishBox(existing);
+    return;
+  }
+  if (ended) return;
+  recordEvent(username, {
+    envelopeId: 'goody-' + bagKey,
+    rewardEventId: bagKey,
+    kind: 'letter',
+    allowZero: true,
+    coins,
+    shared: slots,
+    participants,
+    viewers,
+    durationSec: opensAt ? Math.max(0, Math.round((opensAt - now) / 1000)) : countdownMin * 60,
+    availableAt: opensAt,
+    expiresAt: opensAt || now + 15 * 60000,
+    bagLevel: Math.max(0, Math.round(Number(goodyBagValue(bag, ['bagLevel', 'level'])) || 0)),
+    bagLevelKnown: goodyBagValue(bag, ['bagLevel', 'level']) !== undefined,
+    bagMethod: method,
+    bagComment: comment,
+    participantStatus: 'joined',
+    eventLabel: 'Goody Bag',
+    boxName: 'Goody Bag',
+    giftName: 'Goody Bag',
+    businessType: 21
+  });
 }
 
 // Anlık yayın (ntfy.sh): panel SSE ile dinler, kutu saniyeler içinde düşer.
@@ -969,6 +1100,19 @@ function publishBox(event) {
     unpackAt: event.unpackAt || 0,
     availableAt: event.availableAt || 0,
     hasWindow: Boolean(event.hasWindow),
+    opensAt: event.opensAt || event.availableAt || 0,
+    expiresAt: event.expiresAt || 0,
+    winnerSlots: event.winnerSlots || event.shared || 0,
+    viewerCount: event.viewerCount || event.viewers || 0,
+    participantCount: event.participantCount || event.participants || 0,
+    ratioBasis: event.ratioBasis || 'winner_slots',
+    chestType: event.chestType || 'normal',
+    bagLevel: event.bagLevel || 0,
+    bagLevelKnown: event.bagLevelKnown === true,
+    bagMethod: event.bagMethod || 0,
+    bagComment: event.bagComment || '',
+    participantStatus: event.participantStatus || '',
+    eventLabel: event.eventLabel || event.boxName || event.giftName || '',
     sessionSec: event.sessionSec === undefined ? null : event.sessionSec
   };
   state.delivery.ntfyAttempts += 1;
@@ -1040,6 +1184,19 @@ function writeBoxes() {
     unpackAt: event.unpackAt || 0,
     availableAt: event.availableAt || 0,
     hasWindow: Boolean(event.hasWindow),
+    opensAt: event.opensAt || event.availableAt || 0,
+    expiresAt: event.expiresAt || 0,
+    winnerSlots: event.winnerSlots || event.shared || 0,
+    viewerCount: event.viewerCount || event.viewers || 0,
+    participantCount: event.participantCount || event.participants || 0,
+    ratioBasis: event.ratioBasis || 'winner_slots',
+    chestType: event.chestType || 'normal',
+    bagLevel: event.bagLevel || 0,
+    bagLevelKnown: event.bagLevelKnown === true,
+    bagMethod: event.bagMethod || 0,
+    bagComment: event.bagComment || '',
+    participantStatus: event.participantStatus || '',
+    eventLabel: event.eventLabel || event.boxName || event.giftName || '',
     sessionSec: event.sessionSec === undefined ? null : event.sessionSec
   }));
   // Dosya penceresi: bu anki son 120 kutunun en eski sırası. Panel, eksik
@@ -1074,6 +1231,11 @@ function writeBoxes() {
 // girişsiz çalışıyor ama tek soket + 10 dk oturum veriyor, bu yüzden odalar sırayla dinlenir.
 
 const TIKTOOLS_KEY = process.env.TIKTOOLS_KEY || 'your_api_key';
+// İsteğe bağlı oturumlu bağlantı. Anonim bağlantıda bazı sandık/zarf
+// mesajları hiç gelmeyebilir; oturum bilgisi yalnızca ortam değişkeninden
+// okunur, loglanmaz ve repoya yazılmaz.
+const TIKTOK_SESSION_ID = String(process.env.TIKTOK_SESSION_ID || '').trim();
+const TIKTOK_TT_TARGET_IDC = String(process.env.TIKTOK_TT_TARGET_IDC || '').trim();
 
 function wsFactory() {
   if (typeof WebSocket === 'function') return WebSocket;
@@ -1362,6 +1524,38 @@ function envelopeKind(eventName, info) {
   return 'letter';
 }
 
+// TikTok'un iyi dilek çantası / zarf alanları her sürümde aynı adla gelmiyor.
+// Yalnızca bilinen adaylar okunur; alan yoksa 0 / boş kalır.
+function bagFields(info, box) {
+  const pick = (names) => {
+    for (const source of [info, box]) {
+      if (!source || typeof source !== 'object') continue;
+      for (const name of names) {
+        const value = source[name];
+        if (value !== undefined && value !== null && value !== '') return value;
+      }
+    }
+    return undefined;
+  };
+  const level = pick(['bagLevel', 'bag_level', 'goodyBagLevel', 'goody_bag_level']);
+  const method = pick(['bagMethod', 'bag_method', 'joinMethod', 'join_method']);
+  const comment = pick(['bagComment', 'bag_comment', 'commentKeyword', 'comment_keyword']);
+  const status = pick(['participantStatus', 'participant_status']);
+  return {
+    level: Math.max(0, Math.round(Number(level) || 0)),
+    levelKnown: level !== undefined && level !== null && level !== '',
+    method: Math.max(0, Math.round(Number(method) || 0)),
+    comment: typeof comment === 'string' ? comment.slice(0, 200) : '',
+    participantStatus: typeof status === 'string' ? status.slice(0, 24) : ''
+  };
+}
+
+function envelopeChestType(info, box) {
+  const raw = [info && info.boxType, info && info.displayKey, info && info.textKey,
+    box && box.boxType, box && box.displayKey].filter(Boolean).join(' ');
+  return /(^|[^a-z])(gold|golden|alt[ıi]n)([^a-z]|$)/i.test(raw) ? 'gold' : 'normal';
+}
+
 // Kutunun gerçek zamanı: TikTok mesajı açılış anını (unpackAt) ve paylaşım
 // anını (createAt) saniye olarak taşır. Bunlar yoksa secondsUntilOpen gibi
 // alanlara bakılır; hiçbiri yoksa süre uydurulmaz (0 kalır).
@@ -1462,6 +1656,8 @@ function handleEnvelope(username, eventName, data) {
   ) || 0;
   const liveRecord = state.streamers.get(username);
   const viewers = Number(liveRecord && liveRecord.viewers) || 0;
+  const bags = bagFields(info, box);
+  const chestType = envelopeChestType(info, box);
   const nowMs = Date.now();
   const timing = boxTiming(info, box, nowMs);
   const openIn = timing.durationSec;
@@ -1539,6 +1735,14 @@ function handleEnvelope(username, eventName, data) {
     durationSec: timing.durationSec,
     availableAt: timing.endMs,
     unpackAt: timing.unpackAt,
+    // Zarf/çanta alanları: yalnızca olayda varsa dolar.
+    chestType,
+    bagLevel: bags.level,
+    bagMethod: bags.method,
+    bagComment: bags.comment,
+    participantStatus: bags.participantStatus,
+    eventLabel: name,
+    rewardEventId: envelopeId,
     giftName: name,
     boxName: name,
     businessType: Number(kindInfo.businessType || kindInfo.type) || 0,
@@ -1795,10 +1999,27 @@ async function openConnectorWatcher(username, sessionSec, onConnectStart) {
     if (knownRoomId) storeRoomId(username, knownRoomId);
   }
 
-  const connection = new Conn(username, {
+  const connectionOptions = {
     processInitialData: false,
     fetchRoomInfoOnConnect: true
-  });
+  };
+  // Yalnızca iki cookie birlikte varsa ve connector v2 ise oturum eklenir.
+  // authenticateWs oturum bilgisini imza servisine iletir; bu yüzden
+  // varsayılan kapalıdır ve yalnızca kullanıcı env ile açarsa çalışır.
+  if (lib.TikTokLiveConnection && TIKTOK_SESSION_ID && TIKTOK_TT_TARGET_IDC) {
+    connectionOptions.authenticateWs = true;
+    connectionOptions.session = {
+      cookie: {
+        type: 'cookie',
+        value: {
+          sessionId: TIKTOK_SESSION_ID,
+          ttTargetIdc: TIKTOK_TT_TARGET_IDC
+        }
+      }
+    };
+    log('oturumlu bağlantı açık:', username);
+  }
+  const connection = new Conn(username, connectionOptions);
 
   const watcher = {
     username, connection, startedAt: Date.now(), messages: 0, timer: null, kind: 'connector',
@@ -1814,6 +2035,13 @@ async function openConnectorWatcher(username, sessionSec, onConnectStart) {
   connection.on('like', bump);
   connection.on('envelope', (data) => { bump(); handleEnvelope(username, 'envelope', data); });
   connection.on('superFanBox', (data) => { bump(); handleEnvelope(username, 'superFanBox', data); });
+  // Bağlayıcı yeni sürümlerinde Goody Bag ayrı bir decodedData olayıdır.
+  // Bilinmeyen sürümlerde hiç gelmez; bu durumda kutu/zarf akışı bozulmaz.
+  connection.on('decodedData', (eventName, data) => {
+    if (!/goody.?bag|goodie.?bag/i.test(String(eventName || ''))) return;
+    bump();
+    handleGoodyBag(username, eventName, data);
+  });
   connection.on('roomUser', (data) => {
     const record = state.streamers.get(username);
     // Bağlayıcı ham Webcast mesajını veriyor: güncel izleyici `total`,
@@ -2321,15 +2549,84 @@ async function maintainWatchers() {
 
 // ---------- 3) tarama turu ----------
 
+// Canlı hedef taze mi? state.streamers kaydı varsa o, yoksa dosyadaki
+// lastSeenLiveAt kullanılır. Böylece çevrimdışı bir hedef eski "canlı"
+// damgasıyla sonsuza kadar öne alınmaz.
+function targetLiveFresh(target, now) {
+  const record = state.streamers.get(target.username);
+  const seen = record
+    ? Number(record.lastSeenLiveAt || 0)
+    : Number(target.lastSeenLiveAt || 0);
+  const live = record ? Boolean(record.live) : Boolean(target.lastSeenLiveAt);
+  return live && seen > 0 && now - seen < CONFIG.liveStaleSec * 1000;
+}
+
+// Çevrimdışı hedefin bir sonraki sorgu aralığı: 15 dk, 30 dk, 1 saat ...
+// En fazla 6 saat. Amaç 6.000 hedefin hepsini her turda yoklamamak.
+function offlineBackoffMs(target) {
+  const tries = Math.max(0, Number(target.offlineChecks) || 0);
+  const base = Math.max(60, Number(CONFIG.offlineBaseSec) || 900) * 1000;
+  const max = Math.max(base, Number(CONFIG.offlineMaxSec) || 21600) * 1000;
+  return Math.min(max, base * Math.pow(2, Math.min(8, tries)));
+}
+
+function markTargetPolled(target, status, now) {
+  target.lastPollAt = now;
+  if (status && status.live) {
+    target.offlineChecks = 0;
+    target.lastSeenLiveAt = now;
+    target.nextPollAt = now + 30000;
+  } else if (status && status.unknown) {
+    // Doğrulanamayan hedef cezalandırılmaz; kısa süre sonra yeniden denenir.
+    target.nextPollAt = now + Math.max(30, Number(CONFIG.unknownRetrySec) || 120) * 1000;
+  } else {
+    // İlk çevrimdışı sonuç 15 dk bekletir; sonraki her turda süre ikiye katlanır.
+    const nextTries = Math.min(12, (Number(target.offlineChecks) || 0) + 1);
+    target.offlineChecks = nextTries;
+    target.nextPollAt = now + offlineBackoffMs({ offlineChecks: nextTries - 1 });
+  }
+  state.targetsDirty = true;
+}
+
+// Canlılar her turda önce, sonra hiç sorgulanmamışlar, sonra süresi gelmiş
+// çevrimdışılar. Süresi gelmemiş çevrimdışılar hiç istek yemez.
+function selectPollTargets(all, now, limit) {
+  const live = [];
+  const unchecked = [];
+  const due = [];
+  const skipped = [];
+  all.forEach((target) => {
+    if (!target || !target.username) return;
+    if (targetLiveFresh(target, now)) live.push(target);
+    else if (!target.lastPollAt) unchecked.push(target);
+    else if (!target.nextPollAt || target.nextPollAt <= now) due.push(target);
+    else skipped.push(target);
+  });
+  const byAge = (a, b) => (Number(a.lastPollAt) || 0) - (Number(b.lastPollAt) || 0);
+  live.sort(byAge);
+  unchecked.sort(byAge);
+  due.sort(byAge);
+  const queue = live.concat(unchecked, due);
+  const selected = limit > 0 ? queue.slice(0, limit) : queue;
+  state.pollQueue = {
+    live: live.length,
+    due: due.length + unchecked.length,
+    skipped: skipped.length + Math.max(0, queue.length - selected.length),
+    selected: selected.length
+  };
+  return selected;
+}
+
 async function pollTargets() {
-  // Havuz büyükse hepsi her turda yoklanmaz: sırayla dilim dilim yoklanır.
-  // 2400 adresi her 2 dakikada sorgulamak taramayı ağırlaştırıp dinlemeyi yavaşlatıyordu.
+  // Havuz büyükse hepsi her turda yoklanmaz: önce taze canlılar, sonra
+  // hiç sorgulanmamışlar, sonra süresi gelen çevrimdışılar.
   const all = state.targets;
-  let targets = all;
-  if (CONFIG.pollBatch > 0 && all.length > CONFIG.pollBatch) {
-    const start = (state.polls * CONFIG.pollBatch) % all.length;
-    targets = [];
-    for (let i = 0; i < CONFIG.pollBatch; i += 1) targets.push(all[(start + i) % all.length]);
+  const targets = selectPollTargets(all, Date.now(), CONFIG.pollBatch);
+  if (!targets.length) {
+    log('tur', state.polls + 1, '· havuz', all.length,
+      '· canlı', state.pollQueue.live, '· atlanan', state.pollQueue.skipped);
+    state.polls += 1;
+    return;
   }
   state.polls += 1;
   let liveCount = 0;
@@ -2351,6 +2648,7 @@ async function pollTargets() {
 
     const seenBefore = Boolean(record.checkedAt);
     record.checkedAt = Date.now();
+    markTargetPolled(target, status, Date.now());
     record.reason = status.live ? '' : (status.reason || '');
     if (status.unknown) {
       // Doğrulanamadı: canlı/offline bilgisi değiştirilmez, ama "olabilir"
@@ -2392,7 +2690,9 @@ async function pollTargets() {
     }
   });
 
-  log('tur', state.polls, '· havuz', targets.length, '· canlı', liveCount, '· dinlenen', state.rooms.size);
+  log('tur', state.polls, '· sorgu', targets.length, '/', all.length,
+    '· canlı', liveCount, '· canlı-hedef', state.pollQueue.live,
+    '· atlanan', state.pollQueue.skipped, '· dinlenen', state.rooms.size);
 }
 
 // ---------- çıktı ----------
@@ -2545,6 +2845,12 @@ function snapshot() {
       closeReasons: state.closeReasons,
       cooldownLeftSec: Math.max(0, Math.round((state.connectorCooldownUntil - Date.now()) / 1000)),
       polls: state.polls,
+      pollQueue: {
+        live: Number(state.pollQueue.live) || 0,
+        due: Number(state.pollQueue.due) || 0,
+        skipped: Number(state.pollQueue.skipped) || 0,
+        selected: Number(state.pollQueue.selected) || 0
+      },
       minutesLeft: CONFIG.minutes > 0 ? Math.max(0, Math.round((deadline - Date.now()) / 60000)) : null,
       lastError: state.lastError,
       envelopes: state.envelopeStats,
@@ -3003,6 +3309,37 @@ if (process.env.SCANNER_SELFTEST === '1') {
     ['attempts', 'ok', 'failed', 'rateLimited', 'offline', 'errors']
       .map((key) => key + ':' + (key in (diag.connectStats || {}) ? 'var' : 'YOK')).join(' '));
 
+  // Hedef seçimi: canlı önce, sonra hiç sorgulanmamış, sonra süresi gelen
+  // çevrimdışı; süresi gelmemiş çevrimdışı hiç sorgulanmaz.
+  (() => {
+    const now = Date.now();
+    const savedTargets = state.targets;
+    const savedStreamers = state.streamers;
+    const savedQueue = state.pollQueue;
+    const live = { username: 'live_target', lastPollAt: now - 60000, nextPollAt: 0, offlineChecks: 0 };
+    const unchecked = { username: 'new_target', lastPollAt: 0, nextPollAt: 0, offlineChecks: 0 };
+    const due = { username: 'offline_due', lastPollAt: now - 3600000, nextPollAt: now - 1000, offlineChecks: 2 };
+    const future = { username: 'offline_future', lastPollAt: now - 3600000, nextPollAt: now + 3600000, offlineChecks: 2 };
+    state.targets = [future, due, unchecked, live];
+    state.streamers = new Map([['live_target', {
+      username: 'live_target', live: true, lastSeenLiveAt: now - 60000
+    }]]);
+    const picked = selectPollTargets(state.targets, now, 3).map((t) => t.username);
+    const offlineProbe = {};
+    markTargetPolled(offlineProbe, { live: false }, now);
+    const firstGap = Math.round((offlineProbe.nextPollAt - now) / 60000);
+    const ok = picked[0] === 'live_target' && picked[1] === 'new_target' &&
+      picked[2] === 'offline_due' && !picked.includes('offline_future') && firstGap === 15;
+    console.log('HEDEF SEÇİMİ →', picked.join(','),
+      '· atlanan', state.pollQueue.skipped, '· çevrimdışı aralık',
+      firstGap + '/' + Math.round(offlineBackoffMs({ offlineChecks: 4 }) / 60000) + ' dk',
+      ok ? '· GEÇTİ' : '· BAŞARISIZ');
+    if (!ok) process.exitCode = 1;
+    state.targets = savedTargets;
+    state.streamers = savedStreamers;
+    state.pollQueue = savedQueue;
+  })();
+
   frames.forEach(([label, frame]) => {
     const before = state.events.length;
     handleStreamMessage('test_user', JSON.stringify(frame));
@@ -3014,6 +3351,26 @@ if (process.env.SCANNER_SELFTEST === '1') {
         ` · kutu: ${added.boxName || '-'} (tür ${added.businessType || 0})`
       : `ATLADI ${label}`);
   });
+
+  // Goody Bag: bağlayıcı bu olayı decodedData ile verirse aynı kimlikle
+  // gelen katılım güncellemeleri tek kartta birleşmeli.
+  handleGoodyBag('test_user', 'WebcastGoodyBagMessage', {
+    action: 'sent', goodyBagId: 'bag_selftest_1', totalCoins: 500,
+    winnerCount: 5, participantCount: 10, countdownMinutes: 2,
+    participation: { methodCode: 1, keyword: 'gel' }
+  });
+  handleGoodyBag('test_user', 'WebcastGoodyBagMessage', {
+    action: 'joined', goodyBagId: 'bag_selftest_1', participantCount: 42
+  });
+  const goody = state.events.filter((event) => event.rewardEventId === 'bag_selftest_1');
+  const goodyOk = goody.length === 1 && goody[0].kind === 'letter' &&
+    goody[0].participants === 42 && goody[0].bagMethod === 1 &&
+    goody[0].bagComment === 'gel' && goody[0].coins === 500;
+  console.log('GOODY BAG →', goody.length, 'kart ·', goody[0] &&
+    (goody[0].coins + ' jeton · ' + goody[0].participants + ' katılımcı · yöntem ' +
+      goody[0].bagMethod + ' · "' + goody[0].bagComment + '"'),
+    goodyOk ? '· GEÇTİ' : '· BAŞARISIZ');
+  if (!goodyOk) process.exitCode = 1;
 
   // Günlük ülke taraması: sahte yanıtla, ağa ve diske dokunmadan denenir.
   (async () => {

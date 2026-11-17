@@ -1,0 +1,21 @@
+{
+  "name": "tiktok-radar-local-api",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "node src/index.js",
+    "dev": "node --watch src/index.js",
+    "check": "node --check src/index.js",
+    "test": "node --test ../../tests/local-api-ingest.test.mjs ../../tests/local-api-ntfy.test.mjs"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "dependencies": {
+    "express": "^4.21.2",
+    "pg": "^8.13.1",
+    "redis": "^4.7.0",
+    "ws": "^8.18.0"
+  }
+}

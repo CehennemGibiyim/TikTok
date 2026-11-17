@@ -1,0 +1,13 @@
+{
+  "name": "tiktok-radar-local-collector",
+  "version": "0.1.0",
+  "private": true,
+  "type": "commonjs",
+  "scripts": {
+    "start": "node index.js",
+    "once": "node index.js --once"
+  },
+  "engines": {
+    "node": ">=22"
+  }
+}

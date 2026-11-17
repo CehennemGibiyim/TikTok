@@ -342,6 +342,19 @@
             changed = true;
           }
         }
+        // Kutu önce fakir, sonra ayrıntılı gelebildiği için eksik alanlar tamamlanır.
+        if (!Number(existing.participants) && Number(item.participants)) {
+          existing.participants = Number(item.participants);
+          changed = true;
+        }
+        if (!Number(existing.viewers) && Number(item.viewers)) {
+          existing.viewers = Number(item.viewers);
+          changed = true;
+        }
+        if (!existing.boxType && item.boxType) {
+          existing.boxType = item.boxType;
+          changed = true;
+        }
         return;
       }
       var username = cleanUsername(item.username);
@@ -377,6 +390,8 @@
         hasWindow: Boolean(item.hasWindow) || Number(item.unpackAt) > 0,
         expiresAt: 0,
         shared: Number(item.shared) || 0,
+        participants: Number(item.participants) || 0,
+        viewers: Number(item.viewers) || 0,
         status: 'pending',
         // Görülme (huni) alanı: kutu Fırsatlar listesinde çizilince doldurulur.
         seenAt: 0,
@@ -1683,14 +1698,27 @@
       }
 
       var shared = Number(event.shared) || 0;
+      var participants = Number(event.participants) || 0;
+      var viewers = Number(event.viewers) || 0;
+      var ratioText = (shared > 0 && Number(event.coins) > 0)
+        ? (Number(event.coins) / shared).toFixed(2) + ' jeton / kişi' : '';
+      var chestType = String(event.boxType || '') + ' ' + String(event.boxName || '');
+      var isGold = /(^|[^a-z])(gold|golden|alt[ıi]n)([^a-z]|$)/i.test(chestType);
+      var lowAudience = shared > 0 && viewers > 0 && viewers < shared;
+      var audienceBits = [];
+      if (participants > 0) audienceBits.push(participants + ' katılımcı');
+      if (shared > 0) audienceBits.push(shared + ' kişiye paylaşıldı');
+      if (viewers > 0) audienceBits.push(viewers + ' izleyici');
 
       return [
         '<div class="opp-card ' + (urgent ? 'opp-urgent' : '') + '">',
         '  <div class="flex items-center justify-between mb-2">',
-        '    <span class="flex items-center gap-1"><span class="kind-badge ' + meta.cls + '">' + meta.icon + ' ' + meta.label + '</span>' +
+        '    <span class="flex items-center gap-1 flex-wrap"><span class="kind-badge ' + meta.cls + '">' + meta.icon + ' ' + meta.label + '</span>' +
           (event.auto ? '<span class="kind-badge kind-live">CANLI</span>' : '') +
+          (isGold ? '<span class="chip chip-amber !py-0 !text-[10px]" title="TikTok kutu türü altın olarak bildirildi">ALTIN</span>' : '') +
+          (lowAudience ? '<span class="chip !py-0 !text-[10px]" title="İzleyici sayısı kazanan kontenjanından az">İZLEYİCİ &lt; KONTENJAN</span>' : '') +
           (opensIn !== null && opensIn <= 0
-            ? '<span class="chip chip-danger !py-0 !text-[10px]">KONTROL ET</span>' : '') +
+            ? '<span class="chip chip-danger !py-0 !text-[10px]">BEKLEYEN SANDIK</span>' : '') +
           '</span>',
         '    <span class="font-black text-amber-400" title="Kutunun toplam jeton değeri (TikTok bildirimi). Açan kişi başına düşen pay daha azdır.">' +
           (Number(event.coins) > 0
@@ -1702,6 +1730,11 @@
         '  <div class="text-[10px] text-yellow-50/40">' + (event.country ? flag(event.country) + ' ' + esc(countryName(event.country)) + ' · ' : '') + new Date(event.createdAt).toLocaleTimeString('tr-TR') +
           (endAt ? ' → ' + new Date(endAt).toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' }) + ' açılır' : '') +
           (shared > 1 ? ' · ' + shared + ' kişiye' : '') + '</div>',
+        (ratioText || audienceBits.length
+          ? '  <div class="text-[10px] text-emerald-300/80 mt-0.5">' +
+            (audienceBits.length ? esc(audienceBits.join(' · ')) : '') +
+            (ratioText ? (audienceBits.length ? ' · ' : '') + 'oran ' + esc(ratioText) : '') + '</div>'
+          : ''),
         '  <div class="text-[10px] text-yellow-50/50 mt-0.5">Kutu: <b>' + esc(event.boxName || event.giftName || 'Kutu') + '</b>' + (Number(event.businessType) ? ' · tür kodu ' + Number(event.businessType) : '') + (event.senderName && event.senderName !== event.username ? ' · paylaşan @' + esc(event.senderName) : '') + (event.boxType ? ' · ' + esc(event.boxType) : '') + '</div>',
         '  <div class="text-[11px] mt-1 ' + (urgent ? 'text-red-300 font-bold' : 'text-yellow-50/60') + '" data-countdown="' + (endAt || 0) + '" data-kind="' + event.kind + '" data-duration="' + (Number(event.durationSec) || 0) + '">' + timeText + '</div>',
         '  <div class="flex gap-2 mt-3">',
