@@ -1,13 +1,13 @@
 {
- "scannedAt": "2026-11-17T08:24:05.296Z",
+ "scannedAt": "2026-11-17T08:37:23.705Z",
  "runId": 1794892652387,
  "delivery": {
   "runId": 1794892652387,
-  "produced": 18,
-  "lastSeq": 18,
+  "produced": 19,
+  "lastSeq": 19,
   "duplicate": 5,
-  "ntfyAttempts": 17,
-  "ntfyOk": 17,
+  "ntfyAttempts": 18,
+  "ntfyOk": 18,
   "ntfyFail": 0,
   "ntfyFailSeqs": [],
   "boxTimeBySeq": {
@@ -28,13 +28,35 @@
    "15": 1794903799484,
    "16": 1794903803454,
    "17": 1794903842399,
-   "18": 1794903845296
+   "18": 1794903845296,
+   "19": 1794904643705
   },
   "fileFromSeq": 1,
-  "fileSeqCount": 18,
+  "fileSeqCount": 19,
   "fileCap": 120
  },
  "boxes": [
+  {
+   "id": "dav81777-env-7709056320338627336",
+   "seq": 19,
+   "runId": 1794892652387,
+   "t": 1794904643705,
+   "username": "dav81777",
+   "kind": "chest",
+   "coins": 0,
+   "boxName": "Sandık",
+   "businessType": 20,
+   "boxType": "",
+   "roomId": "7709045191591643905",
+   "shared": 0,
+   "participants": 0,
+   "viewers": 91,
+   "durationSec": 0,
+   "unpackAt": 0,
+   "availableAt": 1794904643705,
+   "hasWindow": false,
+   "sessionSec": 47
+  },
   {
    "id": "ulises.multiverso-env-7709014208382700296",
    "seq": 18,
