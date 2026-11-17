@@ -1,24 +1,46 @@
 {
- "scannedAt": "2026-11-17T05:28:18.211Z",
+ "scannedAt": "2026-11-17T05:31:09.615Z",
  "runId": 1794892652387,
  "delivery": {
   "runId": 1794892652387,
-  "produced": 2,
-  "lastSeq": 2,
-  "duplicate": 0,
-  "ntfyAttempts": 1,
-  "ntfyOk": 1,
+  "produced": 3,
+  "lastSeq": 3,
+  "duplicate": 1,
+  "ntfyAttempts": 2,
+  "ntfyOk": 2,
   "ntfyFail": 0,
   "ntfyFailSeqs": [],
   "boxTimeBySeq": {
    "1": 1794893245341,
-   "2": 1794893298211
+   "2": 1794893298211,
+   "3": 1794893469614
   },
   "fileFromSeq": 1,
-  "fileSeqCount": 2,
+  "fileSeqCount": 3,
   "fileCap": 120
  },
  "boxes": [
+  {
+   "id": "mascarpone777-env-7709008658310531862",
+   "seq": 3,
+   "runId": 1794892652387,
+   "t": 1794893469614,
+   "username": "mascarpone777",
+   "kind": "chest",
+   "coins": 168,
+   "boxName": "Sandık",
+   "businessType": 20,
+   "boxType": "",
+   "roomId": "7708868346087443222",
+   "shared": 120,
+   "participants": 0,
+   "viewers": 200,
+   "durationSec": 30,
+   "unpackAt": 1794893499000,
+   "availableAt": 1794893499000,
+   "hasWindow": true,
+   "sessionSec": 181
+  },
   {
    "id": "clarita05mora-env-7709007977763687220",
    "seq": 2,
