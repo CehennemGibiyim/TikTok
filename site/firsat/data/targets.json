@@ -2,19 +2,10 @@
  "note": "Taranacak adresler. Keşif kendi bulduklarını buraya ekler; elle eklenenler korunur.",
  "probeRatio": 0.55,
  "probeStats": {
-  "sessions": 22,
-  "withBox": 4
+  "sessions": 29,
+  "withBox": 5
  },
  "probeHistory": [
-  {
-   "at": 1794749191126,
-   "from": 20,
-   "to": 25,
-   "probeRate": 25,
-   "hotRate": null,
-   "sessions": 8,
-   "boxSessions": 2
-  },
   {
    "at": 1794750337848,
    "from": 25,
@@ -365,6 +356,15 @@
    "hotRate": null,
    "sessions": 8,
    "boxSessions": 1
+  },
+  {
+   "at": 1794896998044,
+   "from": 55,
+   "to": 55,
+   "probeRate": 13,
+   "hotRate": null,
+   "sessions": 8,
+   "boxSessions": 1
   }
  ],
  "boxHourly": {
@@ -396,7 +396,7 @@
   "498576": 3,
   "498578": 4,
   "498581": 4,
-  "498582": 2
+  "498582": 3
  },
  "watchHourly": {
   "498534": 8,
@@ -429,7 +429,7 @@
   "498578": 3,
   "498579": 1,
   "498581": 8,
-  "498582": 7
+  "498582": 8
  },
  "boxMinuteDays": {
   "2026-11-13": {
@@ -507,17 +507,17 @@
   "2026-11-17": {
    "boxMinutes": [
     3,
-    3,
+    4,
     5,
     1,
     0,
     1
    ],
    "watchMin": [
-    35,
-    34.07783333333333,
-    32.99998333333333,
-    1.0002166666666679,
+    41,
+    40.07783333333333,
+    38.33415,
+    1.0002666666666682,
     1,
     7.258849999999999
    ]
@@ -529,7 +529,7 @@
   "regions": {},
   "failed": []
  },
- "updatedAt": "2026-11-17T06:28:52.637Z",
+ "updatedAt": "2026-11-17T06:34:03.401Z",
  "targets": [
   {
    "username": "haris",
@@ -36790,13 +36790,13 @@
    "roomId": "7708973773789825813",
    "roomIdAt": 1794896888836,
    "roomIdMiss": 0,
-   "boxEvents": 0,
-   "boxCoinSum": 0,
-   "boxCoinsSeen": 0,
-   "boxSharedSum": 0,
-   "boxSharedSeen": 0,
-   "firstBoxAt": 0,
-   "lastBoxAt": 0,
+   "boxEvents": 1,
+   "boxCoinSum": 37,
+   "boxCoinsSeen": 1,
+   "boxSharedSum": 27,
+   "boxSharedSeen": 1,
+   "firstBoxAt": 1794896958591,
+   "lastBoxAt": 1794896958591,
    "lastWatchedAt": 1794896888836,
    "addedAt": 1794608716744,
    "lastSeenLiveAt": 1794688799860
