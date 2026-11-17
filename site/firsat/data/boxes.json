@@ -1,13 +1,13 @@
 {
- "scannedAt": "2026-11-17T07:37:23.223Z",
+ "scannedAt": "2026-11-17T07:57:35.080Z",
  "runId": 1794892652387,
  "delivery": {
   "runId": 1794892652387,
-  "produced": 10,
-  "lastSeq": 10,
-  "duplicate": 4,
-  "ntfyAttempts": 9,
-  "ntfyOk": 9,
+  "produced": 11,
+  "lastSeq": 11,
+  "duplicate": 5,
+  "ntfyAttempts": 10,
+  "ntfyOk": 10,
   "ntfyFail": 0,
   "ntfyFailSeqs": [],
   "boxTimeBySeq": {
@@ -20,13 +20,35 @@
    "7": 1794896958592,
    "8": 1794900522518,
    "9": 1794900579475,
-   "10": 1794901043223
+   "10": 1794901043223,
+   "11": 1794902255079
   },
   "fileFromSeq": 1,
-  "fileSeqCount": 10,
+  "fileSeqCount": 11,
   "fileCap": 120
  },
  "boxes": [
+  {
+   "id": "ulises.multiverso-env-7709023122351033140",
+   "seq": 11,
+   "runId": 1794892652387,
+   "t": 1794902255079,
+   "username": "ulises.multiverso",
+   "kind": "letter",
+   "coins": 50,
+   "boxName": "Zarf",
+   "businessType": 1,
+   "boxType": "",
+   "roomId": "7709023883076078388",
+   "shared": 30,
+   "participants": 0,
+   "viewers": 300,
+   "durationSec": 180,
+   "unpackAt": 1794902434000,
+   "availableAt": 1794902434000,
+   "hasWindow": true,
+   "sessionSec": 23
+  },
   {
    "id": "andreasteinfeliu-env-7709041175021816598",
    "seq": 10,
