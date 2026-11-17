@@ -1,20 +1,11 @@
 {
  "note": "Taranacak adresler. Keşif kendi bulduklarını buraya ekler; elle eklenenler korunur.",
- "probeRatio": 0.6,
+ "probeRatio": 0.55,
  "probeStats": {
-  "sessions": 67,
+  "sessions": 72,
   "withBox": 10
  },
  "probeHistory": [
-  {
-   "at": 1794766351094,
-   "from": 35,
-   "to": 30,
-   "probeRate": 0,
-   "hotRate": null,
-   "sessions": 8,
-   "boxSessions": 0
-  },
   {
    "at": 1794767180007,
    "from": 30,
@@ -365,6 +356,15 @@
    "hotRate": null,
    "sessions": 8,
    "boxSessions": 2
+  },
+  {
+   "at": 1794904266208,
+   "from": 60,
+   "to": 55,
+   "probeRate": 0,
+   "hotRate": null,
+   "sessions": 8,
+   "boxSessions": 0
   }
  ],
  "boxHourly": {
@@ -429,7 +429,7 @@
   "498581": 8,
   "498582": 8,
   "498583": 6,
-  "498584": 4
+  "498584": 5
  },
  "boxMinuteDays": {
   "2026-11-13": {
@@ -514,10 +514,10 @@
     1
    ],
    "watchMin": [
-    78.0512,
-    76.69861666666667,
-    74.33411666666666,
-    1.0228833333333367,
+    82.93934999999999,
+    80.69861666666667,
+    78.33411666666666,
+    1.0229166666666702,
     1,
     7.258849999999999
    ]
@@ -529,7 +529,7 @@
   "regions": {},
   "failed": []
  },
- "updatedAt": "2026-11-17T08:30:07.306Z",
+ "updatedAt": "2026-11-17T08:35:07.138Z",
  "targets": [
   {
    "username": "haris",
@@ -57103,7 +57103,7 @@
    "lastBoxAt": 0,
    "lastWatchedAt": 0,
    "addedAt": 1794557454500,
-   "lastSeenLiveAt": 0
+   "lastSeenLiveAt": 1794904250639
   },
   {
    "username": "theakoi700537",
