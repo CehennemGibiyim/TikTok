@@ -84,10 +84,13 @@ async function findCanonicalId(pool, event) {
     if (exact.rowCount) return exact.rows[0].id;
   }
   if (!event.creator || event.opens_at_ms <= 0) return null;
+  // Aralık biçimi, bileşik indeksin (kind, creator, room_id, opens_at_ms)
+  // üzerinde aralık taraması yapmasını sağlar; ABS() ifadesi indekslenemez.
   const near = await pool.query(`
     SELECT id FROM events
     WHERE kind = $1 AND creator = $2 AND room_id = $3
-      AND opens_at_ms > 0 AND ABS(opens_at_ms - $4) <= $5
+      AND opens_at_ms > 0
+      AND opens_at_ms BETWEEN $4::bigint - $5::bigint AND $4::bigint + $5::bigint
     ORDER BY updated_at DESC LIMIT 1
   `, [event.kind, event.creator, event.room_id, event.opens_at_ms, CONTENT_TOLERANCE_MS]);
   return near.rowCount ? near.rows[0].id : null;

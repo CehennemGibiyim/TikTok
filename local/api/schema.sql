@@ -31,3 +31,6 @@ CREATE UNIQUE INDEX IF NOT EXISTS events_content_fingerprint_key ON events (cont
 
 CREATE INDEX IF NOT EXISTS events_expiry_idx ON events (expires_at_ms);
 CREATE INDEX IF NOT EXISTS events_kind_idx ON events (kind);
+-- Toleranslı kimlik araması: eşitlik önekleri + açılış zamanı aralığı.
+CREATE INDEX IF NOT EXISTS events_identity_lookup_idx
+  ON events (kind, creator, room_id, opens_at_ms);
