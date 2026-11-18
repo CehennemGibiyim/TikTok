@@ -18,9 +18,16 @@ CREATE TABLE IF NOT EXISTS events (
   country_code TEXT,
   rank_label TEXT,
   event_label TEXT,
+  content_fingerprint TEXT,
   created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
   updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
+
+-- Var olan kurulumlar için: içerik parmak izi ve tekillik kuralı.
+-- Eski satırların parmak izi NULL kalır (Postgres'te NULL'lar çakışmaz);
+-- ilk güncellemede hesaplanır.
+ALTER TABLE events ADD COLUMN IF NOT EXISTS content_fingerprint TEXT;
+CREATE UNIQUE INDEX IF NOT EXISTS events_content_fingerprint_key ON events (content_fingerprint);
 
 CREATE INDEX IF NOT EXISTS events_expiry_idx ON events (expires_at_ms);
 CREATE INDEX IF NOT EXISTS events_kind_idx ON events (kind);

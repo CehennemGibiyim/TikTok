@@ -183,7 +183,10 @@
     if (filters.minCoins > 0 && reward.totalCoins < filters.minCoins) return false;
     var r = ratio(reward);
     if (filters.minRatio !== null && filters.minRatio !== undefined && (r === null || r < filters.minRatio)) return false;
+    if (filters.maxRatio !== null && filters.maxRatio !== undefined && (r === null || r > filters.maxRatio)) return false;
     if (filters.maxCoins !== null && filters.maxCoins !== undefined && reward.totalCoins > filters.maxCoins) return false;
+    if (filters.minViewers > 0 && reward.viewerCount < filters.minViewers) return false;
+    if (filters.maxViewers !== null && filters.maxViewers !== undefined && reward.viewerCount > filters.maxViewers) return false;
     if (filters.lowView && reward.eventKind === 'chest') {
       if (reward.viewerCount <= 0 || reward.winnerCount <= 0 || reward.viewerCount >= reward.winnerCount) return false;
     }
@@ -253,7 +256,7 @@
       return active && r !== null && r >= 1.2 - PRESET_EPS && r <= 1.25 + PRESET_EPS && reward.totalCoins >= 20;
     }
     if (preset === 'cgold') return active && reward.chestType === 'gold';
-    if (preset === 'cr1') return active && reward.totalCoins === reward.winnerCount && reward.totalCoins <= 300;
+    if (preset === 'cr1') return active && reward.totalCoins === reward.winnerCount;
     if (preset === 'cr2') return active && r !== null && r >= 2 - PRESET_EPS;
     if (preset === 'cr4') return active && r !== null && r >= 4 - PRESET_EPS;
     if (preset === 'cluck') return active && r !== null && r >= 7 - PRESET_EPS;
@@ -282,8 +285,11 @@
       : null;
     return {
       minCoins: Math.max(0, Math.min(1e9, Number(raw.minCoins) || 0)),
-      minRatio: numOrNull(raw.minRatio),
       maxCoins: numOrNull(raw.maxCoins),
+      minRatio: numOrNull(raw.minRatio),
+      maxRatio: numOrNull(raw.maxRatio),
+      minViewers: Math.max(0, Math.min(1e9, Math.floor(Number(raw.minViewers) || 0))),
+      maxViewers: numOrNull(raw.maxViewers),
       minSeconds: Math.max(0, Math.min(86400, Math.floor(Number(raw.minSeconds) || 0))),
       lowView: raw.lowView === true,
       levels: levels,

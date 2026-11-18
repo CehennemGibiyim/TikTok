@@ -41,6 +41,9 @@ services:
       NTFY_KEY: ${NTFY_KEY:-}
       NTFY_BASE_URL: ${NTFY_BASE_URL:-https://ntfy.sh}
       NTFY_RECONNECT_MS: ${NTFY_RECONNECT_MS:-5000}
+      TIKTOOL_API_KEY: ${TIKTOOL_API_KEY:-}
+      TIKTOOL_ROOMS: ${TIKTOOL_ROOMS:-}
+      TIKTOOL_MAX_ROOMS: ${TIKTOOL_MAX_ROOMS:-3}
     depends_on:
       db:
         condition: service_healthy

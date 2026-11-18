@@ -103,6 +103,19 @@ curl -X POST http://127.0.0.1:3001/ingest \
 
 `GET /api/events/stream` yerel istemciler için SSE'dir: bağlantıda `snapshot`, sonra `event`/`removed` olayları ve 15 saniyede bir keepalive gönderir.
 
+Panel SSE'yi WebSocket ile birlikte dinler. Bağlantı koparsa 1→30 saniye artan aralıkla kendisi yeniden bağlanır; son snapshot'ın saati, kaynağı (SSE/WebSocket/REST) ve olay sayısı panelde görünür. Aynı olay iki kanaldan da gelirse kimlik + içerik imzası aynı olduğu için ikinci kez uygulanmaz ve "yinelenen atlandı" sayacına yazılır. Snapshot'lar sunucu saatine göre sıralanır, geç gelen eski snapshot daha yenisini ezmez.
+
+### tiktok-live-api (TikTool) kaynağı
+
+Yönetilen WebSocket kaynağıdır; self-hosted scanner'ın imzalama/bağlantı sorunlarına karşı yedek yol sağlar. `TIKTOOL_API_KEY` ve `TIKTOOL_ROOMS` (virgülle ayrılmış kullanıcı adları) doluysa API her oda için `tiktok-live-api` istemcisi açar; `TIKTOOL_MAX_ROOMS` (varsayılan 3) eşzamanlı bağlantıyı sınırlar.
+
+- Dinlenen olaylar: `envelope` ve `envelopePortal`. Kutular aynı `/ingest` normalizasyonundan geçer (`source: tiktool`), yayıncı odanın `uniqueId`'sidir ve `envelopeId`den üretilen kaynak kimliği scanner/ntfy/collector ile aynı kanonik satıra düşer.
+- `businessType` yoksa olay zarf (bag) sayılır; `businessType` 19/20 sandık, 21 zarf. Tanınmayan gövde (ör. `envelopeId` yok) reddedilir, tahmin edilmez.
+- Sayaçlar `GET /api/health` içindeki `tiktool` altında: `enabled`, `rooms`, `connected`, `events`, `boxes`, `rejected`, `lastError`, `lastEventAt`, `lastConnectedAt`. Anahtar yoksa blok `enabled: false` kalır ve API'nin geri kalanı değişmeden çalışır.
+- Ücretsiz Sandbox 7 gün, 3 eşzamanlı WebSocket, bağlantı başına 2 saat ile sınırlıdır; üretim için ücretli plan ve daha uzun oturumlar gerekir. TikTok kullanıcı adları Sandbox'ta maskelenebilir.
+
+Aynı kutu başka bir yoldan gelirse içerik parmak iziyle aynı satıra birleşir; tolerans dışındaki fark ayrı satır kalır ve `identity` denetiminde görünür.
+
 ### Dedupe
 
 Üç kaynak aynı **kaynak kutu kimliğini** kullanır; collector'ın `scanner:` öneki normalize edilir. Kimlik varsa `box:<hash>` ID'si buradan üretilir; böylece:
@@ -113,7 +126,26 @@ curl -X POST http://127.0.0.1:3001/ingest \
 
 aynı satıra düşer. Kaynak kimliği yoksa `room_id | creator | kind | açılış (saniye) | total_coins | winner_count` içerik anahtarına düşülür.
 
-Bu, değer güncellemelerini de tek kayıtta tutar: ntfy 0 jetonla gelip collector 210 jetonla gelirse satır bölünmez; `upsert` sıfır olmayan alanları korur. Farklı kimlikli iki kutu ise ayrı kalır.
+Bu, değer güncellemelerini de tek kayıtta tutar: ntfy 0 jetonla gelip collector 210 jetonla gelirse satır bölünmez; `upsert` sıfır olmayan alanları korur.
+
+### Yazma anında içerik parmak izi
+
+Kaynak kimliğinden bağımsız olarak her olay `oda | yayıncı | tür | açılış penceresi (5 sn)` parmak iziyle yazılır (`events.content_fingerprint`, tekillik indeksli). Depolar önce birebir parmak izini, sonra taban + ±5 sn içindeki açılış zamanını arar; bulursa gelen olayın kendi kimliği yerine mevcut kanonik satırı günceller. Böylece aynı kutu farklı kaynak kimlikleriyle (`scanner:` öneki, ntfy'nin ayrı id'si, boş kimlik) ikinci satır açamaz; tolerans dışındaki açılış gerçekten ayrı kutu sayılır.
+
+- Açılış zamanı kimliğin parçası olduğu için satırda **ilk bilinen değerde sabitlenir**; sonraki mesajlar onu kaydırmaz (0 → gerçek değer yine güncellenir).
+- Jeton/kontenjan farkı ve yayıncı büyük/küçük harfi parmak izini bölmez.
+- Eski kurulumlarda `content_fingerprint` NULL kalır (Postgres'te NULL'lar tekilliği ihlal etmez); satır ilk güncellemesinde doldurulur. Eşzamanlı iki yazma aynı parmak izini üretirse `23505` yakalanır ve kazanan satıra birleşilir.
+- Aynı kural bellek içi depoda birebir uygulanır; API testleri iki deponun ortak sözleşmesini koşar.
+
+### Kimlik denetimi
+
+Dedupe'ın iki üretim hatası `/api/stats` içindeki `identity` altında sayaç ve örnek kayıtla görünür:
+
+- `keyCollisions` / `key_collision`: aynı kanonik kimliğe düşen iki **farklı** kutu. Örnek, hangi alanların değiştiğini (`kind`, `creator`, `room_id`, `opens_at_ms`) ve iki kaynağı (`before.source` → `after.source`) gösterir. Jeton/kontenjan farkı çakışma sayılmaz; o beklenen değer güncellemesidir.
+- `splitRows` / `split_rows`: aynı yayıncı, oda ve türe sahip kutunun iki farklı kimlikle gelmesi. Depo bunu yazma anında tek satırda birleştirir; sayaç yine de kanıt üretir, eski satırlar ve eşzamanlı yarışlarda satır gerçekten iki tane kalabilir. Açılış zamanları **±5 sn tolerans** içinde eşleşir (kaynaklar aynı kutuyu birkaç saniye farklı bildirebiliyor); örnek iki kimliği, kaynaklarını, zaman farkını (`timeDeltaMs`) ve kullanılan `toleranceMs` değerini gösterir. `toleranceMs: 0` tam eşleşme ister; tolerans dışındaki fark ayrı kutu sayılır.
+- `rows`: denetlenen toplam yazma, `samples`: en fazla 5 son örnek, `trackedKeys`: bellek içi izlenen kimlik sayısı (`maxTracked` ile sınırlı).
+
+Sayaçlar süreç içidir (yeniden başlatmada sıfırlanır), hiçbir kaydı sessizce birleştirmez veya silmez. Her yeni bulgu ayrıca sunucu günlüğüne `[identity] {…}` biçiminde tek satır JSON olarak yazılır; sayaç ve örnekler kaybolsa da üretimde kanıt günlükte kalır (sıradan değer güncellemeleri günlük üretmez). Panelde "Kimlik denetimi" şeridi bu sayıları ve son örnekleri gösterir; sıfırdan farklıysa şerit vurgulanır. `GET /api/health` yalnızca üç sayacı (`rows`, `keyCollisions`, `splitRows`) taşır.
 
 `GET /api/health` içinde `ingest.enabled` ve `ntfy` sayaçları (`connected`, `messages`, `accepted`, `duplicates`, `rejected`, `lastError`) görünür.
 
@@ -161,7 +193,7 @@ Olayı siler ve WebSocket istemcilerine `removed` yayınlar.
 
 ### `GET /api/stats`
 
-Toplam olay, aktif sandık, bekleyen sandık, zarf, yayıncı ve toplam jeton sayıları.
+Toplam olay, aktif sandık, bekleyen sandık, zarf, yayıncı ve toplam jeton sayıları (`stats`), ayrıca kanonik kimlik denetimi (`identity`: `rows`, `keyCollisions`, `splitRows`, `samples`, `trackedKeys`).
 
 ### `WS /ws`
 
@@ -173,12 +205,22 @@ WebSocket ve API, aynı kaynak dışından gelen tarayıcı isteklerini reddeder
 
 ## Testler
 
-Postgres/Redis gerektirmeyen normalize, dedupe ve ntfy SSE testleri:
+Postgres/Redis gerektirmeyen normalize, dedupe, ntfy SSE ve API seviyesinde akış testleri:
 
 ```bash
 cd local/api
 npm test
 ```
+
+API kodu test edilebilir olsun diye üç parçaya ayrıldı:
+
+- `src/events.js` — saf doğrulama/normalizasyon (`normalizeEvent`, `deriveRow`);
+- `src/api.js` — `createApi({ store, publish, config })`: HTTP, WebSocket, SSE ve ntfy kaynağı; depolama enjekte edilir;
+- `src/store-pg.js` — `listEvents`/`stats`/`upsertEvent`/`removeEvent` sözleşmesinin Postgres uygulaması; `src/index.js` yalnızca bunları bağlar;
+- `src/tiktool.js` — `tiktok-live-api` kaynağı (`envelope`/`envelopePortal` → `/ingest` gövdesi); istemci fabrikası enjekte edilebilir;
+- `src/identity-audit.js` — kanonik anahtar çakışması ve iki kimlikli satır sayaçları.
+
+`tests/local-api-pipeline.test.mjs` gerçek uçları bellek içi depoyla çalıştırır ve parmak izi tekilliğini hem API hem doğrudan depo sözleşmesiyle sınar: collector `POST /api/events`, `/ingest` ve ntfy SSE aynı kutuyu ürettiğinde tek satır kalır; kaynak kimliği (önek, boşluk, büyük harf, boş kimlik), içerik anahtarı (saniye yuvarlaması, tür, oda, jeton) ve kimlik denetimi sayaçları ayrıca sınanır. `tests/tiktool-source.test.mjs` sahte bir istemciyle envelope → kutu dönüşümünü, tek satır birleşmesini ve kaynak sayaçlarını doğrular; gerçek TikTool servisine bağlanmaz. `tests/dedupe-regression.test.mjs`, `tests/fixtures/captured-dedupe.ndjson` içindeki gerçek yakalama biçimlerini (ham mitm, collector, ntfy) uçtan uca geçirip beklenen satır, split ve çakışma sayılarını sabitler; fikstürdeki her kayıt kendi `accepted`/`duplicates` beklentisini taşır.
 
 ## Veri modeli notları
 

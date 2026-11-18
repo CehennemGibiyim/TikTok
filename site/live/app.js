@@ -2,6 +2,9 @@
 
 (function () {
   var Engine = window.RewardEngine;
+  var Policy = window.NotifyPolicy || null;
+  var BoxMath = window.BoxMath || null;
+  var OutcomeReport = window.OutcomeReport || null;
   var BOXES_URL = '../firsat/data/boxes.json';
   var LIVE_URL = '../firsat/data/live.json';
   var BOX_STREAM_TOPIC = 'cehennem-tiktok-firsat-7f3a91';
@@ -9,6 +12,10 @@
   var FILTER_KEY = 'tiktok-live-radar-filters-v1';
   var SOUND_KEY = 'tiktok-live-radar-sound';
   var TAB_KEY = 'tiktok-live-radar-tab';
+  var NOTIFY_KEY = 'tiktok-live-radar-notify-v1';
+  var OUTCOME_KEY = 'tiktok-live-radar-outcomes-v1';
+  // Bildirilecek kutu "yeni" sayılmalı: sayfa açılışındaki eski kayıtlar atlanır.
+  var NOTIFY_FRESH_MS = 5 * 60 * 1000;
 
   var state = {
     raw: new Map(),
@@ -20,13 +27,24 @@
     fixedIds: [],
     creatorCounts: new Map(),
     filters: loadFilters(),
+    roomQuery: '',
+    boxesScannedAt: 0,
     sound: false,
+    notify: loadNotify(),
+    notified: new Set(),
+    notifyReady: false,
+    notifiedCount: 0,
+    quietActive: false,
+    outcomes: loadOutcomes(),
+    outcomeSig: '',
     lastBoxAt: 0,
     lastFetchOk: false,
     current: [],
     lastIds: '',
     beeped: new Set(),
     stream: null,
+    streamOpen: false,
+    streamError: false,
     lastError: ''
   };
 
@@ -35,18 +53,44 @@
     empty: document.getElementById('empty'),
     emptyTitle: document.getElementById('emptyTitle'),
     emptyNote: document.getElementById('emptyNote'),
-    dataStatus: document.getElementById('dataStatus'),
+    fileStatus: document.getElementById('fileStatus'),
+    streamStatus: document.getElementById('streamStatus'),
     updatedAt: document.getElementById('updatedAt'),
     resultCount: document.getElementById('resultCount'),
     filterCount: document.getElementById('filterCount'),
     soundBtn: document.getElementById('soundBtn'),
+    notifyBtn: document.getElementById('notifyBtn'),
+    notifyScore: document.getElementById('notifyScore'),
+    quietStart: document.getElementById('quietStart'),
+    quietEnd: document.getElementById('quietEnd'),
+    notifyState: document.getElementById('notifyState'),
+    notifyHint: document.getElementById('notifyHint'),
+    outcomePick: document.getElementById('outcomePick'),
+    outcomePerWinner: document.getElementById('outcomePerWinner'),
+    outcomeWon: document.getElementById('outcomeWon'),
+    outcomeSave: document.getElementById('outcomeSave'),
+    outcomeClear: document.getElementById('outcomeClear'),
+    outcomeHint: document.getElementById('outcomeHint'),
+    outcomeReport: document.getElementById('outcomeReport'),
+    outcomeCount: document.getElementById('outcomeCount'),
     sortMode: document.getElementById('sortMode'),
     presetMode: document.getElementById('presetMode'),
     viewMode: document.getElementById('viewMode'),
     minCoins: document.getElementById('minCoins'),
+    maxCoins: document.getElementById('maxCoins'),
     minRatio: document.getElementById('minRatio'),
+    maxRatio: document.getElementById('maxRatio'),
+    minViewers: document.getElementById('minViewers'),
+    maxViewers: document.getElementById('maxViewers'),
     minSeconds: document.getElementById('minSeconds'),
     bagLevel: document.getElementById('bagLevel'),
+    sourceNote: document.getElementById('sourceNote'),
+    sourceLive: document.getElementById('sourceLive'),
+    sourceRooms: document.getElementById('sourceRooms'),
+    sourceBoxes: document.getElementById('sourceBoxes'),
+    roomCount: document.getElementById('roomCount'),
+    roomList: document.getElementById('roomList'),
+    roomSearch: document.getElementById('roomSearch'),
     lowView: document.getElementById('lowView'),
     typeNormal: document.getElementById('typeNormal'),
     typeGold: document.getElementById('typeGold'),
@@ -193,7 +237,11 @@
     var f = state.filters;
     var count = 0;
     if (f.minCoins > 0) count += 1;
+    if (f.maxCoins !== null) count += 1;
     if (f.minRatio !== null) count += 1;
+    if (f.maxRatio !== null) count += 1;
+    if (f.minViewers > 0) count += 1;
+    if (f.maxViewers !== null) count += 1;
     if (f.minSeconds > 0) count += 1;
     if (f.lowView) count += 1;
     if (f.chestTypes.length !== 2) count += 1;
@@ -314,11 +362,12 @@
     el.resultCount.textContent = list.length + ' kutu';
     el.filterCount.textContent = String(activeFilterCount());
 
-    var statusText = state.lastFetchOk ? 'yerel veri' : 'veri okunamadı';
-    el.dataStatus.textContent = statusText;
-    el.dataStatus.className = 'status-pill' + (state.lastFetchOk ? '' : ' bad');
+    updateSourceStatus();
     el.updatedAt.textContent = state.lastBoxAt ? 'kutu ' + timeText(state.lastBoxAt) : '—';
     maybeBeep(list, now);
+    syncQuiet(now);
+    maybeNotifyBoxes(result.all, now);
+    syncOutcomeOptions();
   }
 
   function tick() {
@@ -345,6 +394,7 @@
       card.classList.toggle('urgent', urgent);
     });
     maybeBeep(result.list, now);
+    syncQuiet(now);
   }
 
   function cssEscape(value) {
@@ -397,10 +447,402 @@
     if (state.sound) beep();
   }
 
+  function loadNotify() {
+    var defaults = { enabled: false, minScore: 0, quietStart: '', quietEnd: '' };
+    var raw = null;
+    try {
+      raw = JSON.parse(localStorage.getItem(NOTIFY_KEY) || 'null');
+    } catch (error) {
+      return defaults;
+    }
+    if (!raw || typeof raw !== 'object') return defaults;
+    var clock = function (value) {
+      return Policy ? Policy.formatClock(Policy.parseClock(value)) : '';
+    };
+    return {
+      enabled: raw.enabled === true,
+      minScore: Math.max(0, Math.min(100, Math.round(Number(raw.minScore) || 0))),
+      quietStart: clock(raw.quietStart),
+      quietEnd: clock(raw.quietEnd)
+    };
+  }
+
+  function saveNotify() {
+    try { localStorage.setItem(NOTIFY_KEY, JSON.stringify(state.notify)); } catch (error) { /* yoksay */ }
+  }
+
+  function notifyAvailable() {
+    return Boolean(Policy) && typeof window.Notification !== 'undefined';
+  }
+
+  // Sessiz saat kararı her zaman güncel saate göre verilir; önbellek yalnızca
+  // başlıktaki etiketi tazelemek için tutulur.
+  function quietNow(now) {
+    if (!Policy) return false;
+    return Policy.inQuietHours(new Date(now || Date.now()), state.notify.quietStart, state.notify.quietEnd);
+  }
+
+  function boxScore(reward, now) {
+    return Policy.opportunityScore({
+      ratio: Engine.ratio(reward),
+      totalCoins: reward.totalCoins,
+      winnerCount: reward.winnerCount,
+      viewerCount: reward.viewerCount,
+      opensAt: reward.opensAt,
+      now: now
+    });
+  }
+
+  function presetLabel() {
+    if (!el.presetMode || el.presetMode.selectedIndex < 0) return 'tümü';
+    if (el.presetMode.value === 'all') return 'tümü';
+    return el.presetMode.options[el.presetMode.selectedIndex].textContent;
+  }
+
+  function updateNotifyUi(note) {
+    var cfg = state.notify;
+    var available = notifyAvailable();
+    var permission = typeof window.Notification === 'undefined' ? 'unsupported' : window.Notification.permission;
+    el.notifyBtn.setAttribute('aria-pressed', String(cfg.enabled));
+    el.notifyBtn.textContent = cfg.enabled ? '🔔 Bildirim açık' : '🔕 Bildirim kapalı';
+    var stateText;
+    if (!available) stateText = 'desteklenmiyor';
+    else if (cfg.enabled) stateText = state.quietActive ? 'sessiz saat' : 'açık';
+    else if (permission === 'denied') stateText = 'izin engelli';
+    else stateText = 'kapalı';
+    el.notifyState.textContent = stateText;
+    var parts = [
+      'skor ≥ ' + cfg.minScore,
+      cfg.quietStart && cfg.quietEnd ? 'sessiz ' + cfg.quietStart + '–' + cfg.quietEnd : 'sessiz saat yok',
+      'hazır filtre: ' + presetLabel(),
+      'bu oturumda ' + state.notifiedCount + ' bildirim'
+    ];
+    if (!available) parts.push('tarayıcı bildirim API’si yok');
+    else if (permission === 'denied') parts.push('adres çubuğundan izin ver');
+    if (note) parts.push(note);
+    el.notifyHint.textContent = parts.join(' · ');
+  }
+
+  function syncQuiet(now) {
+    if (!Policy || !el.notifyHint) return;
+    var quiet = quietNow(now);
+    if (quiet === state.quietActive) return;
+    state.quietActive = quiet;
+    updateNotifyUi();
+  }
+
+  // Mevcut kutuları "görüldü" say ve hattı hazır işaretle. Seed, ready'den
+  // önce çalışır: yarıda hata olsa bile hat seed'siz açılmaz.
+  function seedNotifyBaseline() {
+    var now = Date.now();
+    rewards(now).forEach(function (reward) {
+      if (reward.id) state.notified.add(reward.id);
+    });
+    state.notifyReady = true;
+  }
+
+  /*
+   * Bildirim hattını ilk başarılı veri yolunda (boxes.json veya ntfy) açar.
+   * ntfy yolunda gelen yeni kutudan önce çağrılır; böylece yalnızca o kutu
+   * bildirim adayı olur ve açılışta bildirim yağmaz. Seed yalnızca bir kez
+   * yapılır; sonraki çağrılar hazır hattı olduğu gibi bırakır.
+   */
+  function activateNotifyPipeline() {
+    if (!state.notifyReady) seedNotifyBaseline();
+  }
+
+  function sendNotification(reward, score, now) {
+    var parts = [];
+    if (reward.totalCoins > 0) parts.push('🪙 ' + fmt(reward.totalCoins) + ' jeton');
+    var ratio = Engine.ratio(reward);
+    if (ratio !== null) parts.push('oran ' + ratio.toFixed(2));
+    if (reward.opensAt > now) parts.push(Engine.countdown(reward.opensAt - now) + ' kaldı');
+    parts.push('skor ' + score);
+    var title = (reward.eventKind === 'chest' ? 'Sandık' : 'Zarf') + ' · @' + reward.creator +
+      (reward.chestType === 'gold' ? ' · ALTIN' : '');
+    try {
+      var notification = new window.Notification(title, {
+        body: parts.join(' · '),
+        // Aynı kutu için işletim sistemi tarafında da tek bildirim kalsın.
+        tag: 'box-' + reward.id
+      });
+      notification.onclick = function () {
+        window.focus();
+        notification.close();
+      };
+    } catch (error) {
+      return;
+    }
+    state.notifiedCount += 1;
+    updateNotifyUi();
+  }
+
+  function maybeNotifyBoxes(list, now) {
+    var cfg = state.notify;
+    if (!cfg.enabled || !state.notifyReady || !notifyAvailable()) return;
+    if (window.Notification.permission !== 'granted') return;
+    var quiet = quietNow(now);
+    list.forEach(function (reward) {
+      if (!reward || !reward.id) return;
+      // Açılmış/bekleyen ve eski kutular bildirilmez.
+      if (reward.chestStatus === 'hung') return;
+      if (now - Number(reward.observedAt) > NOTIFY_FRESH_MS) return;
+      if (!Engine.eligible(reward, now) || !Engine.matchesPreset(reward, state.preset)) return;
+      var score = boxScore(reward, now);
+      if (!Policy.shouldNotify({
+        match: true,
+        score: score,
+        minScore: cfg.minScore,
+        quiet: quiet,
+        seen: state.notified.has(reward.id)
+      })) return;
+      // Aynı kutu ikinci kez bildirilmesin (iki kanal + dosya yenilemesi).
+      state.notified.add(reward.id);
+      sendNotification(reward, score, now);
+    });
+  }
+
+  function applyNotifyInputs() {
+    var cfg = state.notify;
+    cfg.minScore = Math.max(0, Math.min(100, Math.round(Number(el.notifyScore.value) || 0)));
+    if (Policy) {
+      cfg.quietStart = Policy.formatClock(Policy.parseClock(el.quietStart.value));
+      cfg.quietEnd = Policy.formatClock(Policy.parseClock(el.quietEnd.value));
+      state.quietActive = quietNow();
+    }
+    el.notifyScore.value = cfg.minScore > 0 ? String(cfg.minScore) : '';
+    el.quietStart.value = cfg.quietStart;
+    el.quietEnd.value = cfg.quietEnd;
+    saveNotify();
+    updateNotifyUi();
+  }
+
+  function toggleNotify() {
+    if (state.notify.enabled) {
+      state.notify.enabled = false;
+      saveNotify();
+      updateNotifyUi();
+      return;
+    }
+    if (!notifyAvailable()) {
+      updateNotifyUi(Policy ? 'bu tarayıcı bildirim desteklemiyor' : 'bildirim modülü yüklenmedi');
+      return;
+    }
+    if (window.Notification.permission === 'denied') {
+      updateNotifyUi('bildirim izni engellenmiş');
+      return;
+    }
+    var enable = function () {
+      if (window.Notification.permission !== 'granted') {
+        updateNotifyUi('izin verilmedi');
+        return;
+      }
+      state.notify.enabled = true;
+      // Açma anında listede duran kutular bildirilmesin; sonrakiler bildirilir.
+      seedNotifyBaseline();
+      saveNotify();
+      updateNotifyUi();
+      beep();
+    };
+    if (window.Notification.permission === 'default') {
+      window.Notification.requestPermission().then(enable, function () { updateNotifyUi('izin istenemedi'); });
+    } else {
+      enable();
+    }
+  }
+
+  function loadOutcomes() {
+    try {
+      var raw = JSON.parse(localStorage.getItem(OUTCOME_KEY) || '[]');
+      if (!Array.isArray(raw)) return [];
+      return raw.filter(function (item) {
+        return item && item.id && item.predicted && item.actual;
+      }).slice(0, 500);
+    } catch (error) {
+      return [];
+    }
+  }
+
+  function saveOutcomes() {
+    try {
+      localStorage.setItem(OUTCOME_KEY, JSON.stringify(state.outcomes.slice(0, 500)));
+    } catch (error) { /* yoksay */ }
+  }
+
+  // Tahmini olan kutular (oran veya olasılık üretilebilenler), en yeniden eskiye.
+  function analyzableBoxes() {
+    if (!BoxMath) return [];
+    var list = [];
+    state.raw.forEach(function (box) {
+      var analyzed = BoxMath.analyzeBox(box);
+      if (analyzed.expectedPerWinner === null && analyzed.winProbability === null) return;
+      list.push({
+        analyzed: analyzed,
+        creator: String(box.username || ''),
+        at: Number(box.t) || Number(analyzed.startAt) || 0
+      });
+    });
+    list.sort(function (a, b) {
+      return b.at - a.at || a.analyzed.id.localeCompare(b.analyzed.id);
+    });
+    return list.slice(0, 50);
+  }
+
+  function two(value) {
+    return Number(value).toFixed(2);
+  }
+
+  function signed(value) {
+    var number = Number(value) || 0;
+    if (!number) return '0.00';
+    return (number > 0 ? '+' : '−') + two(Math.abs(number));
+  }
+
+  function updateOutcomeHint() {
+    if (!el.outcomeHint) return;
+    if (el.outcomeCount) el.outcomeCount.textContent = state.outcomes.length + ' sonuç';
+    var id = el.outcomePick ? el.outcomePick.value : '';
+    var box = id ? state.raw.get(id) : null;
+    var analyzed = box && BoxMath ? BoxMath.analyzeBox(box) : null;
+    var parts = [];
+    if (analyzed) {
+      parts.push('tahmin: kazanan başına ' +
+        (analyzed.expectedPerWinner === null ? '—' : two(analyzed.expectedPerWinner)) +
+        (analyzed.winProbability === null ? '' : ' · olasılık %' + Math.round(analyzed.winProbability * 100)));
+      if (analyzed.expectedCoins !== null) parts.push('katılım başına ' + two(analyzed.expectedCoins));
+    } else {
+      parts.push('kayıt için tahmin üreten bir kutu seç');
+    }
+    el.outcomeHint.textContent = parts.join(' · ');
+  }
+
+  // Seçenek listesi yalnızca kutu kümesi/tahmin girdileri değişince yeniden kurulur.
+  function syncOutcomeOptions() {
+    if (!el.outcomePick || !BoxMath) return;
+    var boxes = analyzableBoxes();
+    var signature = boxes.map(function (item) {
+      return item.analyzed.id + ':' + item.analyzed.totalCoins + ':' +
+        item.analyzed.winnerCount + ':' + item.analyzed.winProbability;
+    }).join('|');
+    if (signature === state.outcomeSig) return;
+    state.outcomeSig = signature;
+    var previous = el.outcomePick.value;
+    el.outcomePick.innerHTML = boxes.length ? boxes.map(function (item) {
+      var analyzed = item.analyzed;
+      return '<option value="' + esc(analyzed.id) + '">@' + esc(item.creator) +
+        ' · ' + (analyzed.kind === 'bag' ? 'Zarf' : analyzed.kind === 'chest' ? 'Sandık' : 'Portal') +
+        ' · ' + (analyzed.totalCoins === null ? '?' : fmt(analyzed.totalCoins)) + '/' +
+        (analyzed.winnerCount === null ? '?' : fmt(analyzed.winnerCount)) +
+        ' · tahmin ' + (analyzed.expectedPerWinner === null ? '—' : two(analyzed.expectedPerWinner)) +
+        (analyzed.winProbability === null ? '' : ' · p %' + Math.round(analyzed.winProbability * 100)) +
+        '</option>';
+    }).join('') : '<option value="">Tahmin üreten kutu yok</option>';
+    if (previous) el.outcomePick.value = previous;
+    if (!el.outcomePick.value && el.outcomePick.options.length) el.outcomePick.selectedIndex = 0;
+    updateOutcomeHint();
+  }
+
+  function saveOutcome() {
+    if (!el.outcomeHint) return;
+    if (!BoxMath || !OutcomeReport) {
+      el.outcomeHint.textContent = 'kalibrasyon modülü yüklenmedi';
+      return;
+    }
+    var id = el.outcomePick ? el.outcomePick.value : '';
+    var box = id ? state.raw.get(id) : null;
+    if (!box) {
+      el.outcomeHint.textContent = 'önce listeden bir kutu seç';
+      return;
+    }
+    var actual = {
+      perWinner: el.outcomePerWinner.value === '' ? null : Number(el.outcomePerWinner.value),
+      won: el.outcomeWon.value === 'won' ? true : el.outcomeWon.value === 'lost' ? false : null
+    };
+    var record = OutcomeReport.buildRecord(BoxMath.analyzeBox(box), actual, {
+      creator: String(box.username || ''),
+      recordedAt: Date.now()
+    });
+    if (record.error) {
+      el.outcomeHint.textContent = record.error;
+      return;
+    }
+    // Aynı kutu için tek kayıt: yeniden girmek düzeltme sayılır.
+    state.outcomes = state.outcomes.filter(function (item) { return item.id !== record.id; });
+    state.outcomes.unshift(record);
+    if (state.outcomes.length > 500) state.outcomes.length = 500;
+    saveOutcomes();
+    el.outcomePerWinner.value = '';
+    el.outcomeWon.value = '';
+    renderOutcomeReport();
+    updateOutcomeHint();
+    el.outcomeHint.textContent = 'kaydedildi: @' + record.creator + ' · ' +
+      (record.kind === 'bag' ? 'zarf' : 'sandık') + ' · ' + state.outcomes.length + ' kayıt';
+  }
+
+  function clearOutcomes() {
+    if (!state.outcomes.length) {
+      if (el.outcomeHint) el.outcomeHint.textContent = 'silinecek kayıt yok';
+      return;
+    }
+    state.outcomes = [];
+    saveOutcomes();
+    renderOutcomeReport();
+    updateOutcomeHint();
+    if (el.outcomeHint) el.outcomeHint.textContent = 'kayıtlar temizlendi';
+  }
+
+  function renderOutcomeReport() {
+    if (!el.outcomeReport) return;
+    if (el.outcomeCount) el.outcomeCount.textContent = state.outcomes.length + ' sonuç';
+    if (!OutcomeReport) {
+      el.outcomeReport.innerHTML = '<p class="hint">Kalibrasyon modülü yüklenmedi.</p>';
+      return;
+    }
+    var summary = OutcomeReport.summarize(state.outcomes);
+    if (!summary.count) {
+      el.outcomeReport.innerHTML = '<p class="hint">Henüz sonuç kaydı yok. Kutuyu açtıktan sonra gerçek sonucu gir; tahminlerle karşılaştırılıp burada özetlenir.</p>';
+      return;
+    }
+    var rows = [];
+    if (summary.perWinner) {
+      rows.push('Kazanan başına jeton: n=' + summary.perWinner.n +
+        ' · tahmin ' + two(summary.perWinner.predictedMean) +
+        ' · gerçek ' + two(summary.perWinner.actualMean) +
+        ' · sapma ' + signed(summary.perWinner.bias) +
+        ' · MAE ' + two(summary.perWinner.mae) +
+        (summary.perWinner.mape === null ? '' : ' · MAPE %' + Math.round(summary.perWinner.mape * 100)));
+    }
+    if (summary.probability) {
+      rows.push('Zarf olasılığı: n=' + summary.probability.n +
+        ' · tahmin %' + Math.round(summary.probability.predictedMean * 100) +
+        ' · gözlenen %' + Math.round(summary.probability.observedRate * 100) +
+        ' · Brier ' + two(summary.probability.brier));
+    }
+    var html = '<ul class="report-list">' + rows.map(function (row) {
+      return '<li>' + esc(row) + '</li>';
+    }).join('') + '</ul>';
+    var buckets = summary.buckets.filter(function (bucket) { return bucket.n > 0; });
+    if (buckets.length) {
+      html += '<ul class="report-list report-buckets">' + buckets.map(function (bucket) {
+        return '<li>' + esc(bucket.label + ': n=' + bucket.n +
+          ' · tahmin %' + Math.round(bucket.predictedMean * 100) +
+          ' · gözlenen %' + Math.round(bucket.observedRate * 100)) + '</li>';
+      }).join('') + '</ul>';
+    }
+    if (summary.count < 5) {
+      html += '<p class="hint">n &lt; 5: sayılar yön göstergesi, istatistik değil.</p>';
+    }
+    el.outcomeReport.innerHTML = html;
+  }
+
   function syncFilterUi() {
     var f = state.filters;
     el.minCoins.value = f.minCoins || '';
+    el.maxCoins.value = f.maxCoins === null ? '' : f.maxCoins;
     el.minRatio.value = f.minRatio === null ? '' : f.minRatio;
+    el.maxRatio.value = f.maxRatio === null ? '' : f.maxRatio;
+    el.minViewers.value = f.minViewers || '';
+    el.maxViewers.value = f.maxViewers === null ? '' : f.maxViewers;
     el.minSeconds.value = f.minSeconds || '';
     el.bagLevel.value = Array.isArray(f.levels) && f.levels.length ? String(f.levels[0]) : '';
     el.lowView.checked = f.lowView;
@@ -421,7 +863,11 @@
     var level = el.bagLevel.value === '' ? null : [Number(el.bagLevel.value)];
     state.filters = Engine.normalizeFilters({
       minCoins: el.minCoins.value,
+      maxCoins: el.maxCoins.value,
       minRatio: el.minRatio.value,
+      maxRatio: el.maxRatio.value,
+      minViewers: el.minViewers.value,
+      maxViewers: el.maxViewers.value,
       minSeconds: el.minSeconds.value,
       lowView: el.lowView.checked,
       levels: level,
@@ -441,23 +887,125 @@
   async function refreshBoxes() {
     try {
       var data = await fetchJson(BOXES_URL);
+      state.boxesScannedAt = data && data.scannedAt ? new Date(data.scannedAt).getTime() : 0;
       (data && Array.isArray(data.boxes) ? data.boxes : []).forEach(ingestBox);
       state.lastFetchOk = true;
+      state.lastError = '';
       render();
+      renderLiveSource();
+      activateNotifyPipeline();
     } catch (error) {
       state.lastFetchOk = false;
       state.lastError = error.message;
-      el.dataStatus.textContent = 'veri okunamadı';
-      el.dataStatus.className = 'status-pill bad';
+      updateSourceStatus();
     }
+  }
+
+  function liveRooms() {
+    var streamers = state.live && Array.isArray(state.live.streamers) ? state.live.streamers : [];
+    return streamers.filter(function (streamer) {
+      return streamer && streamer.live === true && streamer.username;
+    }).sort(function (a, b) {
+      return (Number(b.viewers) || 0) - (Number(a.viewers) || 0) ||
+        String(a.username).localeCompare(String(b.username), 'tr');
+    });
+  }
+
+  function roomRowHtml(streamer) {
+    var username = String(streamer.username || '');
+    var title = String(streamer.title || 'Başlık yok');
+    var viewers = Number(streamer.viewers) || 0;
+    var boxes = Number(streamer.boxCount || streamer.boxes) || 0;
+    var seenRaw = Number(streamer.lastSeenLiveAt) || 0;
+    var seen = seenRaw > 0 && seenRaw < 1e12 ? seenRaw * 1000 : seenRaw;
+    return '<div class="room-row">' +
+      '<div class="room-main"><a href="' + esc(liveUrl(username)) + '" target="_blank" rel="noopener">@' + esc(username) + '</a>' +
+        '<span class="room-title" title="' + esc(title) + '">' + esc(title) + '</span></div>' +
+      '<div class="room-meta">' +
+        '<span>👥 ' + (viewers > 0 ? fmt(viewers) : '—') + '</span>' +
+        '<span>📦 ' + (boxes > 0 ? fmt(boxes) : '—') + '</span>' +
+        (streamer.roomId ? '<span class="room-id" title="TikTok oda kimliği">#' + esc(streamer.roomId) + '</span>' : '') +
+        (seen > 0 ? '<span>' + esc(timeText(seen)) + '</span>' : '') +
+      '</div>' +
+      '<a class="room-open" href="' + esc(liveUrl(username)) + '" target="_blank" rel="noopener">Aç</a>' +
+    '</div>';
+  }
+
+  function renderRoomList() {
+    if (!el.roomList) return;
+    var query = String(state.roomQuery || '').trim().toLowerCase();
+    var list = liveRooms();
+    if (query) {
+      list = list.filter(function (streamer) {
+        return String(streamer.username || '').toLowerCase().indexOf(query) !== -1 ||
+          String(streamer.title || '').toLowerCase().indexOf(query) !== -1;
+      });
+    }
+    if (el.roomCount) el.roomCount.textContent = String(list.length);
+    el.roomList.innerHTML = list.length
+      ? list.map(roomRowHtml).join('')
+      : '<p class="hint room-empty">Canlı oda bulunamadı. Scanner yeni bir tur tamamladığında liste tazelenir.</p>';
+  }
+
+  // Dosya ve ntfy akışı ayrı yollardır: biri kapalıyken diğeri veri
+  // getirebilir, bu yüzden durumları ayrı rozetlerde gösterilir.
+  function updateSourceStatus() {
+    var fileText, fileClass;
+    if (state.lastFetchOk) {
+      fileText = 'dosya ok';
+      fileClass = '';
+    } else if (state.lastError) {
+      fileText = 'dosya okunamadı';
+      fileClass = 'bad';
+    } else {
+      fileText = 'dosya bekleniyor';
+      fileClass = 'warn';
+    }
+    el.fileStatus.textContent = fileText;
+    el.fileStatus.className = 'status-pill' + (fileClass ? ' ' + fileClass : '');
+
+    var streamText, streamClass;
+    if (typeof EventSource !== 'function') {
+      streamText = 'akış yok';
+      streamClass = 'warn';
+    } else if (state.streamOpen) {
+      streamText = 'akış bağlı';
+      streamClass = '';
+    } else if (state.streamError) {
+      streamText = 'akış kopuk';
+      streamClass = 'warn';
+    } else {
+      streamText = 'akış bekleniyor';
+      streamClass = 'warn';
+    }
+    el.streamStatus.textContent = streamText;
+    el.streamStatus.className = 'status-pill' + (streamClass ? ' ' + streamClass : '');
+  }
+
+  function renderLiveSource() {
+    var rooms = liveRooms();
+    var withRoom = rooms.filter(function (streamer) { return Boolean(streamer.roomId); }).length;
+    var scannedAt = state.live && state.live.scannedAt ? new Date(state.live.scannedAt).getTime() : 0;
+    if (el.sourceLive) el.sourceLive.textContent = rooms.length ? fmt(rooms.length) : '—';
+    if (el.sourceRooms) el.sourceRooms.textContent = withRoom ? fmt(withRoom) : '—';
+    if (el.sourceBoxes) el.sourceBoxes.textContent = state.raw.size ? fmt(state.raw.size) : '—';
+    if (el.sourceNote) {
+      var parts = ['Kendi scanner verimiz · ücretli API kullanılmaz'];
+      if (scannedAt) parts.push('live.json ' + timeText(scannedAt));
+      if (state.boxesScannedAt) parts.push('kutular ' + timeText(state.boxesScannedAt));
+      el.sourceNote.textContent = parts.join(' · ');
+    }
+    renderRoomList();
   }
 
   async function refreshLive() {
     try {
       state.live = await fetchJson(LIVE_URL);
       render();
+      renderLiveSource();
     } catch (error) {
       // Kutu listesi çalışmaya devam eder.
+      renderLiveSource();
     }
   }
 
@@ -471,12 +1019,25 @@
           if (outer.event && outer.event !== 'message') return;
           var box = outer.message ? JSON.parse(outer.message) : outer;
           if (!box || box.key !== BOX_STREAM_KEY) return;
+          state.streamOpen = true;
+          state.streamError = false;
+          // Dosya yolu hiç çalışmadıysa hat burada açılır; önceden biriken
+          // kutular görüldü sayılır, yalnızca bu yeni kutu bildirim adayı olur.
+          activateNotifyPipeline();
           ingestBox(box);
           render();
         } catch (error) { /* bozuk mesaj */ }
       });
+      state.stream.onopen = function () {
+        state.streamOpen = true;
+        state.streamError = false;
+        updateSourceStatus();
+      };
       state.stream.onerror = function () {
         // Kalıcı hata değil: 10 sn'lik dosya yenilemesi devrede kalır.
+        state.streamOpen = false;
+        state.streamError = true;
+        updateSourceStatus();
       };
     } catch (error) {
       state.stream = null;
@@ -503,6 +1064,7 @@
         });
         try { localStorage.setItem(TAB_KEY, state.tab); } catch (error) { /* yoksay */ }
         render();
+        updateNotifyUi();
       });
     });
 
@@ -520,11 +1082,21 @@
         item.classList.toggle('active', item.getAttribute('data-tab') === state.tab);
       });
       render();
+      updateNotifyUi();
     });
 
     el.soundBtn.addEventListener('click', function () {
       setSound(!state.sound);
     });
+
+    el.notifyBtn.addEventListener('click', toggleNotify);
+    [el.notifyScore, el.quietStart, el.quietEnd].forEach(function (input) {
+      input.addEventListener('change', applyNotifyInputs);
+    });
+
+    if (el.outcomeSave) el.outcomeSave.addEventListener('click', saveOutcome);
+    if (el.outcomeClear) el.outcomeClear.addEventListener('click', clearOutcomes);
+    if (el.outcomePick) el.outcomePick.addEventListener('change', updateOutcomeHint);
 
     el.viewMode.addEventListener('click', function () {
       state.view = state.view === 'fixed' ? 'list' : 'fixed';
@@ -535,7 +1107,8 @@
       render();
     });
 
-    [el.minCoins, el.minRatio, el.minSeconds, el.bagLevel, el.lowView,
+    [el.minCoins, el.maxCoins, el.minRatio, el.maxRatio, el.minViewers, el.maxViewers,
+      el.minSeconds, el.bagLevel, el.lowView,
       el.typeNormal, el.typeGold, el.stateActive, el.stateHung].forEach(function (input) {
       input.addEventListener('input', readFilterUi);
       input.addEventListener('change', readFilterUi);
@@ -552,6 +1125,13 @@
       refreshBoxes();
       refreshLive();
     });
+
+    if (el.roomSearch) {
+      el.roomSearch.addEventListener('input', function () {
+        state.roomQuery = el.roomSearch.value;
+        renderRoomList();
+      });
+    }
 
     el.cards.addEventListener('click', async function (event) {
       var copy = event.target.closest('[data-copy-comment]');
@@ -590,11 +1170,22 @@
     state.sound = savedBoolean(SOUND_KEY);
     state.preset = el.presetMode ? (el.presetMode.value || 'all') : 'all';
     setSound(state.sound);
+    // İzin geri alınmışsa kaydedilmiş "açık" durumu sessizce çalışmasın.
+    if (state.notify.enabled && (!notifyAvailable() || window.Notification.permission !== 'granted')) {
+      state.notify.enabled = false;
+    }
+    el.notifyScore.value = state.notify.minScore > 0 ? String(state.notify.minScore) : '';
+    el.quietStart.value = state.notify.quietStart;
+    el.quietEnd.value = state.notify.quietEnd;
+    state.quietActive = quietNow();
+    updateNotifyUi();
+    renderOutcomeReport();
     syncFilterUi();
     bind();
     connectStream();
     refreshBoxes();
     refreshLive();
+    renderLiveSource();
     setInterval(function () {
       prune();
       tick();

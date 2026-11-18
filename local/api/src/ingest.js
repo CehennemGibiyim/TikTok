@@ -178,7 +178,7 @@ export function canonicalBoxKey(event) {
 
   // Kaynak kimliği iki taşıma yolunda da aynı kutuya işaret eder; collector
   // yalnızca `scanner:` öneki ekler. Önce onu normalize et.
-  const sourceId = String(event.source_event_id || event.id || '').trim().replace(/^scanner:/, '');
+  const sourceId = String(event.source_event_id || event.id || '').trim().replace(/^scanner:/i, '');
   if (sourceId) return 'id|' + sourceId;
 
   // Kimlik yoksa içerik alanlarına düş. Bu, elle üretilen/eski kayıtlar için

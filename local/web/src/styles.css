@@ -34,11 +34,27 @@ h2 small { color: var(--muted); font-weight: 500; margin-left: 6px; }
 .connection { display: inline-flex; align-items: center; gap: 8px; border: 1px solid var(--line); background: var(--panel); padding: 9px 12px; border-radius: 999px; font-size: 13px; white-space: nowrap; }
 .connection .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--danger); }
 .connection.ok .dot { background: var(--ok); box-shadow: 0 0 12px var(--ok); }
+.connection.wait .dot { background: var(--gold); box-shadow: 0 0 12px var(--gold); }
+.statuses { display: flex; flex-wrap: wrap; gap: 8px; justify-content: flex-end; }
+.sync { display: flex; flex-wrap: wrap; gap: 6px 16px; border: 1px solid var(--line); background: var(--panel-2); border-radius: 10px; padding: 8px 12px; margin-bottom: 12px; color: var(--muted); font-size: 12px; }
+.sync b { color: var(--text); font-weight: 700; }
 
 .stats { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 10px; margin-bottom: 16px; }
 .stats div { background: linear-gradient(180deg, var(--panel), var(--panel-2)); border: 1px solid var(--line); border-radius: 12px; padding: 12px 14px; }
 .stats span { display: block; color: var(--muted); font-size: 12px; margin-bottom: 6px; }
 .stats b { font-size: 23px; }
+
+.audit { border: 1px solid var(--line); background: var(--panel); border-radius: 12px; padding: 10px 14px; margin-bottom: 16px; font-size: 12px; }
+.audit.alert { border-color: #c0562b; }
+.audit-head { display: flex; flex-wrap: wrap; gap: 14px; align-items: baseline; }
+.audit-head b { color: var(--text); }
+.audit-head span { color: var(--muted); }
+.audit-head span b { color: var(--text); }
+.audit.alert .audit-head span b { color: #e08a5b; }
+.audit-samples { margin: 8px 0 0; padding-left: 18px; color: var(--muted); }
+.audit-samples li { margin-bottom: 3px; }
+.audit-samples b { color: var(--text); margin-right: 6px; }
+.audit-empty { margin: 6px 0 0; }
 
 .filters { display: flex; flex-wrap: wrap; align-items: end; gap: 10px; border: 1px solid var(--line); background: var(--panel); border-radius: 14px; padding: 12px; margin-bottom: 18px; }
 .filters label { min-width: 118px; color: var(--muted); font-size: 11px; font-weight: 700; }
@@ -87,6 +103,7 @@ h2 small { color: var(--muted); font-weight: 500; margin-left: 6px; }
 @media (max-width: 620px) {
   .app { padding: 18px 12px 40px; }
   .hero { flex-direction: column; }
+  .statuses { justify-content: flex-start; }
   .stats { grid-template-columns: repeat(2, 1fr); }
   .card { grid-template-columns: 64px minmax(0, 1fr); }
   .card-actions { grid-column: 1 / -1; }

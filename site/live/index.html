@@ -16,7 +16,8 @@
     </div>
   </div>
   <div class="top-status">
-    <span id="dataStatus" class="status-pill">veri bekleniyor</span>
+    <span id="fileStatus" class="status-pill warn">dosya bekleniyor</span>
+    <span id="streamStatus" class="status-pill warn">akış bekleniyor</span>
     <span id="updatedAt" class="muted">—</span>
     <a href="../" class="nav-link">Panele dön</a>
   </div>
@@ -29,6 +30,29 @@
     <div class="stat"><span class="stat-label">Aktif sandık</span><strong id="statActive" class="gold">—</strong><small>açılmayı bekleyen</small></div>
     <div class="stat"><span class="stat-label">Bekleyen</span><strong id="statHung" class="red">—</strong><small>açıldı, süre doldu</small></div>
     <div class="stat"><span class="stat-label">Zarf / çanta</span><strong id="statBag" class="blue">—</strong><small>listede</small></div>
+  </section>
+
+  <section class="source-card" aria-labelledby="sourceTitle">
+    <div class="source-head">
+      <div>
+        <span class="source-kicker">CANLI KAYNAK</span>
+        <h2 id="sourceTitle">Kendi tarayıcımızın canlı oda listesi</h2>
+        <p id="sourceNote" class="hint">live.json yükleniyor…</p>
+      </div>
+      <div class="source-stats">
+        <span><b id="sourceLive">—</b> canlı</span>
+        <span><b id="sourceRooms">—</b> oda kimliği</span>
+        <span><b id="sourceBoxes">—</b> kutu</span>
+      </div>
+    </div>
+    <details class="rooms">
+      <summary>Canlı odaları göster <span id="roomCount" class="filter-count">0</span></summary>
+      <div class="room-tools">
+        <label class="sr-only" for="roomSearch">Canlı oda ara</label>
+        <input id="roomSearch" type="search" placeholder="Yayıncı veya başlık ara…">
+      </div>
+      <div id="roomList" class="room-list"></div>
+    </details>
   </section>
 
   <section class="control-card">
@@ -63,6 +87,7 @@
           <option value="viewers">👥 İzleyici (az → çok)</option>
         </select>
         <button id="soundBtn" class="ghost" type="button" aria-pressed="false">🔔 Ses kapalı</button>
+        <button id="notifyBtn" class="ghost" type="button" aria-pressed="false">🔕 Bildirim kapalı</button>
         <button id="viewMode" class="ghost" type="button" aria-pressed="false" title="Kartların yeri sabit kalır">▦ Sabit</button>
       </div>
       <div class="toolbar-right">
@@ -77,8 +102,20 @@
         <label>Minimum jeton
           <input id="minCoins" type="number" min="0" step="1" inputmode="numeric" placeholder="0">
         </label>
-        <label>Minimum oran (jeton / kişi)
+        <label>Maximum jeton
+          <input id="maxCoins" type="number" min="0" step="1" inputmode="numeric" placeholder="sınırsız">
+        </label>
+        <label>Minimum oran (jeton / kontenjan)
           <input id="minRatio" type="number" min="0" step="0.1" inputmode="decimal" placeholder="örn. 1.5">
+        </label>
+        <label>Maximum oran
+          <input id="maxRatio" type="number" min="0" step="0.1" inputmode="decimal" placeholder="sınırsız">
+        </label>
+        <label>Minimum izleyici
+          <input id="minViewers" type="number" min="0" step="1" inputmode="numeric" placeholder="0">
+        </label>
+        <label>Maximum izleyici
+          <input id="maxViewers" type="number" min="0" step="1" inputmode="numeric" placeholder="sınırsız">
         </label>
         <label>Minimum kalan süre (sn)
           <input id="minSeconds" type="number" min="0" step="5" inputmode="numeric" placeholder="0">
@@ -103,6 +140,47 @@
       </div>
       <p class="hint">Süre ve kazanan alanları TikTok bildiriminden gelmiyorsa “bilinmiyor” kalır; değer uydurulmaz. Bekleyen sandık açılıştan sonra 15 dakika listede tutulur.</p>
     </details>
+
+    <details class="filters" id="notifyBox">
+      <summary>🔔 Bildirim eşiği <span id="notifyState" class="notify-state">kapalı</span></summary>
+      <div class="filter-grid">
+        <label>Minimum fırsat skoru (0–100)
+          <input id="notifyScore" type="number" min="0" max="100" step="5" inputmode="numeric" placeholder="0">
+        </label>
+        <label>Sessiz saat başlangıcı
+          <input id="quietStart" type="time">
+        </label>
+        <label>Sessiz saat bitişi
+          <input id="quietEnd" type="time">
+        </label>
+      </div>
+      <p class="hint" id="notifyHint">Seçili hazır filtreye uyan kutu skor eşiğini geçince tarayıcı bildirimi gönderilir; aynı kutu için tekrar bildirim atılmaz. Sessiz saatte (örn. 23:00–08:00) bildirim gönderilmez.</p>
+    </details>
+
+    <details class="filters" id="outcomeBox">
+      <summary>📊 Kalibrasyon <span id="outcomeCount" class="notify-state">0 sonuç</span></summary>
+      <div class="filter-grid">
+        <label>Kutu
+          <select id="outcomePick"></select>
+        </label>
+        <label>Gerçek kazanan başına jeton
+          <input id="outcomePerWinner" type="number" min="0" step="0.1" inputmode="decimal" placeholder="örn. 3.5">
+        </label>
+        <label>Kazanma sonucu
+          <select id="outcomeWon">
+            <option value="">Belirtme</option>
+            <option value="won">Kazandım</option>
+            <option value="lost">Kazanmadım</option>
+          </select>
+        </label>
+      </div>
+      <div class="checks">
+        <button id="outcomeSave" class="ghost" type="button">Sonucu kaydet</button>
+        <button id="outcomeClear" class="link-btn" type="button">Kayıtları temizle</button>
+      </div>
+      <p class="hint" id="outcomeHint">Açtığın kutunun gerçek sonucunu gir; box-math tahminiyle karşılaştırılıp özetlenir. Kayıtlar bu cihazda tutulur, TikTok'tan otomatik okunmaz.</p>
+      <div id="outcomeReport"></div>
+    </details>
   </section>
 
   <section id="cards" class="cards" aria-live="polite"></section>
@@ -124,12 +202,15 @@
   </details>
 
   <footer class="foot">
-    <span>Veri: <code>firsat/data/boxes.json</code> + canlı akış</span>
-    <span>Yalnızca kendi tarayıcımızın verisi · özel API kullanılmaz</span>
+    <span>Veri: <code>firsat/data/live.json</code> + <code>boxes.json</code> + canlı akış</span>
+    <span>Kendi scanner verimiz · ücretli/özel API kullanılmaz</span>
   </footer>
 </main>
 
 <script src="../shared/reward-engine.js"></script>
+<script src="../shared/notify-policy.js"></script>
+<script src="../shared/outcome-report.js"></script>
+<script src="../firsat/box-math.js"></script>
 <script src="app.js"></script>
 </body>
 </html>

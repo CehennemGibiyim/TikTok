@@ -6,8 +6,8 @@
   "scripts": {
     "start": "node src/index.js",
     "dev": "node --watch src/index.js",
-    "check": "node --check src/index.js",
-    "test": "node --test ../../tests/local-api-ingest.test.mjs ../../tests/local-api-ntfy.test.mjs"
+    "check": "node --check src/index.js && node --check src/api.js && node --check src/events.js && node --check src/store-pg.js && node --check src/identity-audit.js && node --check src/box-identity.js && node --check src/tiktool.js",
+    "test": "node --test ../../tests/local-api-ingest.test.mjs ../../tests/local-api-ntfy.test.mjs ../../tests/local-api-pipeline.test.mjs ../../tests/dedupe-regression.test.mjs ../../tests/identity-audit.test.mjs ../../tests/tiktool-source.test.mjs"
   },
   "engines": {
     "node": ">=22"
@@ -16,6 +16,7 @@
     "express": "^4.21.2",
     "pg": "^8.13.1",
     "redis": "^4.7.0",
+    "tiktok-live-api": "^1.6.0",
     "ws": "^8.18.0"
   }
 }

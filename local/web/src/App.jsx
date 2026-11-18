@@ -6,6 +6,7 @@ const WS_URL = (() => {
   const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
   return `${protocol}//${window.location.host}/ws`;
 })();
+const SSE_URL = `${API}/events/stream`;
 const HUNG_WINDOW_MS = 15 * 60 * 1000;
 const NUMBER_FORMAT = new Intl.NumberFormat('tr-TR');
 const TIME_FORMAT = new Intl.DateTimeFormat('tr-TR', {
@@ -29,6 +30,25 @@ function clock(ms) {
 function dateTime(ms) {
   if (!Number.isFinite(ms) || ms <= 0) return '—';
   return TIME_FORMAT.format(new Date(ms));
+}
+
+function auditSampleText(sample) {
+  if (sample.type === 'key_collision') {
+    return `değişen: ${sample.changed.join(', ')} · ` +
+      `${sample.before.source || '?'} → ${sample.after.source || '?'}`;
+  }
+  const sources = [...new Set((sample.sources || []).filter(Boolean))].join(' / ');
+  const delta = Number(sample.timeDeltaMs) || 0;
+  const shift = delta
+    ? ` · açılış farkı ${delta > 0 ? '+' : ''}${(delta / 1000).toFixed(1)} sn`
+    : '';
+  return `${sources}${shift}`;
+}
+
+function sseLabel(sse) {
+  if (sse.state === 'open') return 'SSE bağlı';
+  if (sse.state === 'reconnecting') return `SSE yeniden bağlanıyor${sse.attempt ? ` · ${sse.attempt}. deneme` : ''}`;
+  return 'SSE bağlanıyor…';
 }
 
 function exampleEvents() {
@@ -99,13 +119,19 @@ export default function App() {
   const [offset, setOffset] = useState(0);
   const [now, setNow] = useState(Date.now());
   const [stats, setStats] = useState(null);
+  const [identity, setIdentity] = useState(null);
+  const [tiktool, setTiktool] = useState(null);
   const [manual, setManual] = useState(() => JSON.stringify(exampleEvents(), null, 2));
   const [message, setMessage] = useState('');
   const [busy, setBusy] = useState(false);
-  const reconnectRef = useRef(null);
-  const socketRef = useRef(null);
+  const [sse, setSse] = useState({ state: 'connecting', attempt: 0 });
+  const [snapshot, setSnapshot] = useState(null);
+  const [deduped, setDeduped] = useState(0);
   const statsTimerRef = useRef(null);
-  const wsHasSnapshotRef = useRef(false);
+  // Sunucu saatine göre en yeni snapshot; geç gelen eski kopya yeniyi ezmesin.
+  const lastSnapshotRef = useRef(0);
+  // Aynı olayın iki kanaldan (WebSocket + SSE) kimliği ve içeriği.
+  const appliedRef = useRef(new Map());
 
   function upsert(next) {
     setEvents((prev) => {
@@ -117,7 +143,58 @@ export default function App() {
 
   function remove(ids) {
     const set = new Set(ids);
+    appliedRef.current.forEach((_signature, id) => {
+      if (set.has(id)) appliedRef.current.delete(id);
+    });
     setEvents((prev) => prev.filter((event) => !set.has(event.id)));
+  }
+
+  // Aynı olay WebSocket ve SSE'den birlikte gelirse ikinci kez uygulanmaz.
+  // İçerik değiştiyse (jeton güncellemesi) imza farklıdır ve olay işlenir.
+  function applyEvent(event) {
+    if (!event || event.id == null) return false;
+    const signature = JSON.stringify(event);
+    if (appliedRef.current.get(event.id) === signature) {
+      setDeduped((count) => count + 1);
+      return false;
+    }
+    appliedRef.current.set(event.id, signature);
+    upsert([event]);
+    return true;
+  }
+
+  function applySnapshot(list, serverMs, source) {
+    const ms = Number(serverMs);
+    if (Number.isFinite(ms) && ms > 0) {
+      if (ms < lastSnapshotRef.current) return false;
+      lastSnapshotRef.current = ms;
+    }
+    const next = Array.isArray(list) ? list : [];
+    appliedRef.current = new Map(next.filter((event) => event && event.id != null)
+      .map((event) => [event.id, JSON.stringify(event)]));
+    setEvents(next);
+    setSnapshot({ at: Date.now(), count: next.length, source });
+    return true;
+  }
+
+  // WebSocket ve SSE aynı yükü taşır; ikisi de buradan geçer.
+  // `false` dönüşü kanalın kapatılması gerektiğini söyler (WS snapshot hatası).
+  function handleMessage(data, source) {
+    const serverMs = Number(data.server_ms);
+    if (Number.isFinite(serverMs)) setOffset(serverMs - Date.now());
+    if (data.type === 'snapshot') {
+      applySnapshot(data.events, data.server_ms, source);
+      loadStats().catch(() => {});
+    } else if (data.type === 'event' && data.event) {
+      if (applyEvent(data.event)) scheduleStats();
+    } else if (data.type === 'removed') {
+      remove(Array.isArray(data.ids) ? data.ids : []);
+      scheduleStats();
+    } else if (data.type === 'error') {
+      setMessage(data.message || 'snapshot alınamadı');
+      return false;
+    }
+    return true;
   }
 
   async function loadEvents() {
@@ -126,8 +203,7 @@ export default function App() {
     const data = await response.json();
     const serverMs = Number(data.server_ms);
     if (Number.isFinite(serverMs)) setOffset(serverMs - Date.now());
-    // WebSocket snapshot'ı daha yeniyse geç gelen REST yanıtı onu ezmesin.
-    if (!wsHasSnapshotRef.current) setEvents(Array.isArray(data.events) ? data.events : []);
+    applySnapshot(data.events, data.server_ms, 'REST');
     return data;
   }
 
@@ -136,6 +212,8 @@ export default function App() {
     if (!response.ok) return;
     const data = await response.json();
     setStats(data.stats);
+    setIdentity(data.identity || null);
+    setTiktool(data.tiktool || null);
   }
 
   function scheduleStats() {
@@ -145,10 +223,13 @@ export default function App() {
     }, 300);
   }
 
-  // WebSocket bağlıyken tam liste yenilemeye gerek yok; snapshot ve deltalar
-  // yeterli. Kopunca hem ilk yükleme hem periyodik yedek devreye girer.
+  const live = connected || sse.state === 'open';
+  const auditAlert = Boolean(identity && (identity.keyCollisions || identity.splitRows));
+
+  // Canlı kanallardan biri (WebSocket veya SSE) bağlıyken tam liste yenilemeye
+  // gerek yok; snapshot ve deltalar yeterli. İkisi de kopunca REST yedeği girer.
   useEffect(() => {
-    if (connected) return undefined;
+    if (live) return undefined;
     let cancelled = false;
     function refresh() {
       if (cancelled) return;
@@ -163,7 +244,7 @@ export default function App() {
       cancelled = true;
       clearInterval(timer);
     };
-  }, [connected]);
+  }, [live]);
 
   useEffect(() => {
     const timer = setInterval(() => setNow(Date.now() + offset), 1000);
@@ -178,40 +259,25 @@ export default function App() {
 
   useEffect(() => {
     let closed = false;
+    let socket = null;
+    let timer = null;
 
     function connect() {
       if (closed) return;
-      const socket = new WebSocket(WS_URL);
-      socketRef.current = socket;
+      socket = new WebSocket(WS_URL);
       socket.onopen = () => setConnected(true);
       socket.onclose = () => {
         setConnected(false);
-        wsHasSnapshotRef.current = false;
-        if (!closed) reconnectRef.current = setTimeout(connect, 2000);
+        // Kanallar aynı olayı taşıdığı için hemen yeniden bağlanmak güvenli.
+        if (!closed) timer = setTimeout(connect, 2000);
       };
       socket.onerror = () => {
         setConnected(false);
-        wsHasSnapshotRef.current = false;
         socket.close();
       };
       socket.onmessage = (raw) => {
         try {
-          const data = JSON.parse(raw.data);
-          if (Number.isFinite(Number(data.server_ms))) setOffset(Number(data.server_ms) - Date.now());
-          if (data.type === 'snapshot') {
-            wsHasSnapshotRef.current = true;
-            setEvents(Array.isArray(data.events) ? data.events : []);
-            loadStats().catch(() => {});
-          } else if (data.type === 'event' && data.event) {
-            upsert([data.event]);
-            scheduleStats();
-          } else if (data.type === 'removed') {
-            remove(Array.isArray(data.ids) ? data.ids : []);
-            scheduleStats();
-          } else if (data.type === 'error') {
-            setMessage(data.message || 'WebSocket snapshot alınamadı');
-            socket.close();
-          }
+          if (!handleMessage(JSON.parse(raw.data), 'WebSocket')) socket.close();
         } catch (error) {
           setMessage(error.message);
         }
@@ -221,8 +287,70 @@ export default function App() {
     connect();
     return () => {
       closed = true;
-      clearTimeout(reconnectRef.current);
-      if (socketRef.current) socketRef.current.close();
+      clearTimeout(timer);
+      if (socket) socket.close();
+    };
+  }, []);
+
+  // SSE birincil canlı kanal: koptuğunda artan aralıkla (1→30 sn) kendimiz
+  // yeniden bağlanırız, tarayıcının görünmez otomatik denemesine bırakmayız.
+  useEffect(() => {
+    let closed = false;
+    let source = null;
+    let timer = null;
+    let attempt = 0;
+
+    function schedule() {
+      const delay = Math.min(30000, 1000 * 2 ** attempt) + Math.round(Math.random() * 400);
+      attempt += 1;
+      setSse({ state: 'reconnecting', attempt });
+      clearTimeout(timer);
+      timer = setTimeout(connect, delay);
+    }
+
+    function onFrame(raw) {
+      if (closed) return;
+      try {
+        handleMessage(JSON.parse(raw.data), 'SSE');
+      } catch (error) {
+        setMessage(error.message);
+      }
+    }
+
+    function connect() {
+      if (closed) return;
+      const es = new EventSource(SSE_URL);
+      source = es;
+      es.onopen = () => {
+        if (closed) return;
+        attempt = 0;
+        setSse({ state: 'open', attempt: 0 });
+      };
+      es.addEventListener('snapshot', onFrame);
+      es.addEventListener('event', onFrame);
+      es.addEventListener('removed', onFrame);
+      es.onerror = (event) => {
+        if (closed) return;
+        // Sunucunun `event: error` çerçevesi bağlantıyı kapatmaz; yalnızca mesaj göster.
+        if (event && typeof event.data === 'string' && event.data) {
+          try {
+            handleMessage(JSON.parse(event.data), 'SSE');
+          } catch {
+            setMessage('SSE snapshot alınamadı');
+          }
+          return;
+        }
+        es.close();
+        if (source === es) source = null;
+        schedule();
+      };
+    }
+
+    connect();
+    return () => {
+      closed = true;
+      clearTimeout(timer);
+      if (source) source.close();
     };
   }, []);
 
@@ -273,9 +401,15 @@ export default function App() {
           <h1>TikTok Radar</h1>
           <p className="muted">Sandık ve Goody Bag olaylarını kendi veritabanında tut, filtrele ve canlı izle.</p>
         </div>
-        <div className={`connection ${connected ? 'ok' : 'bad'}`}>
-          <span className="dot" />
-          {connected ? 'WebSocket bağlı' : 'WebSocket kapalı'}
+        <div className="statuses">
+          <div className={`connection ${connected ? 'ok' : 'bad'}`}>
+            <span className="dot" />
+            {connected ? 'WebSocket bağlı' : 'WebSocket kapalı'}
+          </div>
+          <div className={`connection ${sse.state === 'open' ? 'ok' : sse.state === 'reconnecting' ? 'wait' : 'bad'}`}>
+            <span className="dot" />
+            {sseLabel(sse)}
+          </div>
         </div>
       </header>
 
@@ -286,6 +420,37 @@ export default function App() {
         <div><span>Zarf</span><b>{fmt(stats?.bags ?? 0)}</b></div>
         <div><span>Yayıncı</span><b>{fmt(stats?.creators ?? 0)}</b></div>
       </section>
+
+      {identity && (
+        <section className={`audit ${auditAlert ? 'alert' : ''}`}>
+          <div className="audit-head">
+            <b>Kimlik denetimi</b>
+            <span>Anahtar çakışması <b>{fmt(identity.keyCollisions)}</b></span>
+            <span>Aynı kutu, iki kimlik <b>{fmt(identity.splitRows)}</b></span>
+            <span className="muted">{fmt(identity.rows)} yazma izlendi</span>
+            {tiktool && (
+              <span className="muted">
+                TikTool {tiktool.enabled
+                  ? `${tiktool.rooms} oda · ${fmt(tiktool.boxes)} kutu · ${fmt(tiktool.connected)} bağlı`
+                  : 'kapalı'}
+              </span>
+            )}
+          </div>
+          {identity.samples?.length ? (
+            <ul className="audit-samples">
+              {identity.samples.map((sample) => (
+                <li key={sample.id || sample.ids.join('|')}>
+                  <b>{sample.type === 'key_collision' ? 'Çakışma' : 'İki kimlik'}</b>
+                  <span>@{sample.creator}</span>
+                  <span>{auditSampleText(sample)}</span>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p className="muted audit-empty">Henüz çakışma veya bölünmüş satır görülmedi.</p>
+          )}
+        </section>
+      )}
 
       <section className="filters">
         <label>Olay
@@ -320,6 +485,15 @@ export default function App() {
           <div className="list-head">
             <h2>Olaylar <small>{filtered.length}</small></h2>
             <span className="muted">{offset === 0 ? 'saat eşit' : `saat farkı ${offset > 0 ? '+' : ''}${Math.round(offset / 1000)} sn`} · sunucu saati düzeltmeli</span>
+          </div>
+
+          <div className="sync">
+            <span>
+              {snapshot
+                ? <>Son snapshot <b>{dateTime(snapshot.at)}</b> · {snapshot.source} · <b>{fmt(snapshot.count)}</b> olay</>
+                : 'Henüz snapshot alınmadı'}
+            </span>
+            {deduped > 0 && <span>🔁 <b>{fmt(deduped)}</b> yinelenen olay atlandı</span>}
           </div>
 
           {filtered.length === 0 ? (
@@ -388,6 +562,7 @@ export default function App() {
             <code>GET /api/events</code>
             <code>POST /api/events</code>
             <code>GET /api/stats</code>
+            <code>SSE /api/events/stream</code>
             <code>WS /ws</code>
           </div>
         </aside>
