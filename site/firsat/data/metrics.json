@@ -1,33 +1,12 @@
 {
-  "generatedAt": "2026-11-21T11:33:40.319Z",
+  "generatedAt": "2026-11-21T19:38:17.198Z",
   "source": {
-    "commits": 1743,
-    "parsed": 1733,
+    "commits": 1790,
+    "parsed": 1780,
     "failed": 10,
-    "comparedRuns": 51
+    "comparedRuns": 52
   },
   "runs": [
-    {
-      "at": "2026-11-13T11:39:25.236Z",
-      "cfg": {
-        "rooms": 40,
-        "gap": 2000,
-        "starts": 12,
-        "probe": 0.3,
-        "watchSec": 300
-      },
-      "profile": "agresif",
-      "attempts": 318,
-      "ok": 59,
-      "watching": 13,
-      "boxes": 32,
-      "boxCoins": 1504,
-      "hours": 1.47,
-      "boxesPer100": 10.06,
-      "boxesPerHour": 21.7,
-      "boxesPerSession": 0.54,
-      "short": false
-    },
     {
       "at": "2026-11-13T13:13:35.398Z",
       "cfg": {
@@ -846,22 +825,43 @@
       "boxesPerHour": 36,
       "boxesPerSession": 1.97,
       "short": false
+    },
+    {
+      "at": "2026-11-21T15:41:31.337Z",
+      "cfg": {
+        "rooms": 12,
+        "gap": 2000,
+        "starts": 4,
+        "probe": 0.1,
+        "watchSec": 7200
+      },
+      "profile": "agresif",
+      "attempts": 96,
+      "ok": 81,
+      "watching": 9,
+      "boxes": 157,
+      "boxCoins": 21453,
+      "hours": 3.89,
+      "boxesPer100": 163.54,
+      "boxesPerHour": 40.4,
+      "boxesPerSession": 1.94,
+      "short": false
     }
   ],
   "groups": [
     {
       "name": "agresif | ara 2000ms, dk 4, oran 0.1, oda 12",
       "profile": "agresif",
-      "runs": 19,
-      "attempts": 1390,
-      "ok": 1147,
+      "runs": 20,
+      "attempts": 1486,
+      "ok": 1228,
       "okRate": 83,
-      "boxes": 871,
-      "boxCoins": 104189,
-      "boxesPer100": 62.66,
-      "boxesPerOk": 0.76,
-      "boxesPerHour": 12.7,
-      "avgWatching": 6.4
+      "boxes": 1028,
+      "boxCoins": 125642,
+      "boxesPer100": 69.18,
+      "boxesPerOk": 0.84,
+      "boxesPerHour": 14.2,
+      "avgWatching": 6.6
     },
     {
       "name": "agresif | ara 2000ms, dk 12, oran 0.3, oda 32",
@@ -936,42 +936,10 @@
   ],
   "hourly": {
     "commits": 400,
-    "boxes": 977,
-    "hours": 87,
-    "avgPerHour": 11.2,
+    "boxes": 1042,
+    "hours": 84,
+    "avgPerHour": 12.4,
     "buckets": [
-      {
-        "hour": "2026-11-13T05",
-        "count": 18
-      },
-      {
-        "hour": "2026-11-13T06",
-        "count": 5
-      },
-      {
-        "hour": "2026-11-13T07",
-        "count": 7
-      },
-      {
-        "hour": "2026-11-13T08",
-        "count": 6
-      },
-      {
-        "hour": "2026-11-13T11",
-        "count": 23
-      },
-      {
-        "hour": "2026-11-13T12",
-        "count": 7
-      },
-      {
-        "hour": "2026-11-13T13",
-        "count": 15
-      },
-      {
-        "hour": "2026-11-13T14",
-        "count": 11
-      },
       {
         "hour": "2026-11-13T15",
         "count": 2
@@ -1287,6 +1255,26 @@
       {
         "hour": "2026-11-21T08",
         "count": 5
+      },
+      {
+        "hour": "2026-11-21T15",
+        "count": 25
+      },
+      {
+        "hour": "2026-11-21T16",
+        "count": 35
+      },
+      {
+        "hour": "2026-11-21T17",
+        "count": 30
+      },
+      {
+        "hour": "2026-11-21T18",
+        "count": 54
+      },
+      {
+        "hour": "2026-11-21T19",
+        "count": 13
       }
     ]
   }
