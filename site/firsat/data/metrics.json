@@ -1,33 +1,12 @@
 {
-  "generatedAt": "2026-11-22T16:35:57.890Z",
+  "generatedAt": "2026-11-22T22:40:32.338Z",
   "source": {
-    "commits": 1929,
-    "parsed": 1919,
+    "commits": 1945,
+    "parsed": 1935,
     "failed": 10,
-    "comparedRuns": 55
+    "comparedRuns": 56
   },
   "runs": [
-    {
-      "at": "2026-11-13T15:00:53.459Z",
-      "cfg": {
-        "rooms": 40,
-        "gap": 2000,
-        "starts": 12,
-        "probe": 0.3,
-        "watchSec": 300
-      },
-      "profile": "agresif",
-      "attempts": 43,
-      "ok": 9,
-      "watching": 1,
-      "boxes": 2,
-      "boxCoins": 12,
-      "hours": 0.24,
-      "boxesPer100": 4.65,
-      "boxesPerHour": 8.3,
-      "boxesPerSession": 0.22,
-      "short": true
-    },
     {
       "at": "2026-11-13T15:19:38.361Z",
       "cfg": {
@@ -846,21 +825,42 @@
       "boxesPerHour": 4.7,
       "boxesPerSession": 1.13,
       "short": false
+    },
+    {
+      "at": "2026-11-22T21:21:24.381Z",
+      "cfg": {
+        "rooms": 12,
+        "gap": 2000,
+        "starts": 4,
+        "probe": 0.1,
+        "watchSec": 7200
+      },
+      "profile": "agresif",
+      "attempts": 32,
+      "ok": 24,
+      "watching": 8,
+      "boxes": 32,
+      "boxCoins": 5066,
+      "hours": 1.2,
+      "boxesPer100": 100,
+      "boxesPerHour": 26.6,
+      "boxesPerSession": 1.33,
+      "short": false
     }
   ],
   "groups": [
     {
       "name": "agresif | ara 2000ms, dk 4, oran 0.1, oda 12",
       "profile": "agresif",
-      "runs": 23,
-      "attempts": 1666,
-      "ok": 1378,
+      "runs": 24,
+      "attempts": 1698,
+      "ok": 1402,
       "okRate": 83,
-      "boxes": 1288,
-      "boxCoins": 147364,
-      "boxesPer100": 77.31,
-      "boxesPerOk": 0.93,
-      "boxesPerHour": 15.4,
+      "boxes": 1320,
+      "boxCoins": 152430,
+      "boxesPer100": 77.74,
+      "boxesPerOk": 0.94,
+      "boxesPerHour": 15.5,
       "avgWatching": 6.9
     },
     {
@@ -936,26 +936,10 @@
   ],
   "hourly": {
     "commits": 400,
-    "boxes": 1101,
-    "hours": 82,
-    "avgPerHour": 13.4,
+    "boxes": 1045,
+    "hours": 80,
+    "avgPerHour": 13.1,
     "buckets": [
-      {
-        "hour": "2026-11-15T18",
-        "count": 5
-      },
-      {
-        "hour": "2026-11-15T19",
-        "count": 39
-      },
-      {
-        "hour": "2026-11-15T20",
-        "count": 19
-      },
-      {
-        "hour": "2026-11-15T21",
-        "count": 28
-      },
       {
         "hour": "2026-11-15T23",
         "count": 4
@@ -1267,6 +1251,14 @@
       {
         "hour": "2026-11-22T15",
         "count": 1
+      },
+      {
+        "hour": "2026-11-22T21",
+        "count": 12
+      },
+      {
+        "hour": "2026-11-22T22",
+        "count": 23
       }
     ]
   }
