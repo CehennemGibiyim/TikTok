@@ -1,8 +1,8 @@
 {
-  "generatedAt": "2026-11-22T22:40:32.338Z",
+  "generatedAt": "2026-11-23T03:53:48.559Z",
   "source": {
-    "commits": 1945,
-    "parsed": 1935,
+    "commits": 1976,
+    "parsed": 1966,
     "failed": 10,
     "comparedRuns": 56
   },
@@ -836,15 +836,15 @@
         "watchSec": 7200
       },
       "profile": "agresif",
-      "attempts": 32,
-      "ok": 24,
+      "attempts": 70,
+      "ok": 59,
       "watching": 8,
-      "boxes": 32,
-      "boxCoins": 5066,
-      "hours": 1.2,
-      "boxesPer100": 100,
-      "boxesPerHour": 26.6,
-      "boxesPerSession": 1.33,
+      "boxes": 60,
+      "boxCoins": 10511,
+      "hours": 3.89,
+      "boxesPer100": 85.71,
+      "boxesPerHour": 15.4,
+      "boxesPerSession": 1.02,
       "short": false
     }
   ],
@@ -853,14 +853,14 @@
       "name": "agresif | ara 2000ms, dk 4, oran 0.1, oda 12",
       "profile": "agresif",
       "runs": 24,
-      "attempts": 1698,
-      "ok": 1402,
+      "attempts": 1736,
+      "ok": 1437,
       "okRate": 83,
-      "boxes": 1320,
-      "boxCoins": 152430,
-      "boxesPer100": 77.74,
+      "boxes": 1348,
+      "boxCoins": 157875,
+      "boxesPer100": 77.65,
       "boxesPerOk": 0.94,
-      "boxesPerHour": 15.5,
+      "boxesPerHour": 15.4,
       "avgWatching": 6.9
     },
     {
@@ -936,26 +936,10 @@
   ],
   "hourly": {
     "commits": 400,
-    "boxes": 1045,
-    "hours": 80,
-    "avgPerHour": 13.1,
+    "boxes": 1054,
+    "hours": 79,
+    "avgPerHour": 13.3,
     "buckets": [
-      {
-        "hour": "2026-11-15T23",
-        "count": 4
-      },
-      {
-        "hour": "2026-11-16T00",
-        "count": 7
-      },
-      {
-        "hour": "2026-11-16T01",
-        "count": 3
-      },
-      {
-        "hour": "2026-11-16T02",
-        "count": 2
-      },
       {
         "hour": "2026-11-16T03",
         "count": 4
@@ -1258,7 +1242,19 @@
       },
       {
         "hour": "2026-11-22T22",
-        "count": 23
+        "count": 37
+      },
+      {
+        "hour": "2026-11-22T23",
+        "count": 4
+      },
+      {
+        "hour": "2026-11-23T00",
+        "count": 6
+      },
+      {
+        "hour": "2026-11-23T01",
+        "count": 1
       }
     ]
   }
