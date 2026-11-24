@@ -1,33 +1,12 @@
 {
-  "generatedAt": "2026-11-24T14:06:06.948Z",
+  "generatedAt": "2026-11-24T23:36:31.439Z",
   "source": {
-    "commits": 2116,
-    "parsed": 2106,
+    "commits": 2162,
+    "parsed": 2152,
     "failed": 10,
-    "comparedRuns": 59
+    "comparedRuns": 60
   },
   "runs": [
-    {
-      "at": "2026-11-14T08:34:32.964Z",
-      "cfg": {
-        "rooms": 40,
-        "gap": 2000,
-        "starts": 12,
-        "probe": 0.3,
-        "watchSec": 300
-      },
-      "profile": "agresif",
-      "attempts": 18,
-      "ok": 2,
-      "watching": 1,
-      "boxes": 0,
-      "boxCoins": 0,
-      "hours": 0.61,
-      "boxesPer100": 0,
-      "boxesPerHour": 0,
-      "boxesPerSession": 0,
-      "short": false
-    },
     {
       "at": "2026-11-14T09:26:49.474Z",
       "cfg": {
@@ -846,22 +825,43 @@
       "boxesPerHour": 38.3,
       "boxesPerSession": 3.08,
       "short": false
+    },
+    {
+      "at": "2026-11-24T19:08:05.198Z",
+      "cfg": {
+        "rooms": 12,
+        "gap": 2000,
+        "starts": 4,
+        "probe": 0.1,
+        "watchSec": 7200
+      },
+      "profile": "agresif",
+      "attempts": 4,
+      "ok": 0,
+      "watching": 0,
+      "boxes": 0,
+      "boxCoins": 0,
+      "hours": 3.71,
+      "boxesPer100": 0,
+      "boxesPerHour": 0,
+      "boxesPerSession": null,
+      "short": false
     }
   ],
   "groups": [
     {
       "name": "agresif | ara 2000ms, dk 4, oran 0.1, oda 12",
       "profile": "agresif",
-      "runs": 27,
-      "attempts": 1919,
+      "runs": 28,
+      "attempts": 1923,
       "ok": 1581,
       "okRate": 82,
       "boxes": 1541,
       "boxCoins": 170996,
-      "boxesPer100": 80.3,
+      "boxesPer100": 80.14,
       "boxesPerOk": 0.97,
-      "boxesPerHour": 15.5,
-      "avgWatching": 7
+      "boxesPerHour": 15,
+      "avgWatching": 6.7
     },
     {
       "name": "agresif | ara 2000ms, dk 12, oran 0.3, oda 32",
