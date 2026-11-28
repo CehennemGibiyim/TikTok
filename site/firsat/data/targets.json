@@ -1,20 +1,11 @@
 {
  "note": "Taranacak adresler. Keşif kendi bulduklarını buraya ekler; elle eklenenler korunur.",
- "probeRatio": 0.3,
+ "probeRatio": 0.25,
  "probeStats": {
-  "sessions": 4,
+  "sessions": 8,
   "withBox": 0
  },
  "probeHistory": [
-  {
-   "at": 1795418399935,
-   "from": 30,
-   "to": 25,
-   "probeRate": 0,
-   "hotRate": null,
-   "sessions": 8,
-   "boxSessions": 0
-  },
   {
    "at": 1795468049002,
    "from": 25,
@@ -365,10 +356,18 @@
    "hotRate": null,
    "sessions": 8,
    "boxSessions": 1
+  },
+  {
+   "at": 1795824018154,
+   "from": 30,
+   "to": 25,
+   "probeRate": 0,
+   "hotRate": null,
+   "sessions": 8,
+   "boxSessions": 0
   }
  ],
  "boxHourly": {
-  "498791": 3,
   "498792": 4,
   "498793": 43,
   "498794": 57,
@@ -390,10 +389,11 @@
   "498830": 59,
   "498831": 37,
   "498832": 31,
-  "498833": 1
+  "498833": 1,
+  "498839": 3,
+  "498840": 2
  },
  "watchHourly": {
-  "498791": 8,
   "498792": 9,
   "498793": 9,
   "498794": 11,
@@ -417,27 +417,10 @@
   "498831": 10,
   "498832": 8,
   "498833": 3,
-  "498839": 7
+  "498839": 8,
+  "498840": 4
  },
  "boxMinuteDays": {
-  "2026-11-21": {
-   "boxMinutes": [
-    20,
-    20,
-    7,
-    6,
-    9,
-    313
-   ],
-   "watchMin": [
-    180.51876666666666,
-    178.48093333333333,
-    175.26735,
-    40.57435000000002,
-    40,
-    2626.2960000000003
-   ]
-  },
   "2026-11-22": {
    "boxMinutes": [
     28,
@@ -530,18 +513,18 @@
   },
   "2026-11-27": {
    "boxMinutes": [
-    22,
-    16,
-    10,
+    23,
+    17,
+    11,
     9,
     3,
-    174
+    176
    ],
    "watchMin": [
-    149.06115,
-    149,
-    148.73575,
-    35.85583333333336,
+    153.06115,
+    153,
+    152.73575,
+    35.855850000000025,
     33.000033333333334,
     2027.4451
    ]
@@ -553,7 +536,7 @@
   "regions": {},
   "failed": []
  },
- "updatedAt": "2026-11-27T23:56:16.247Z",
+ "updatedAt": "2026-11-28T00:02:46.859Z",
  "targets": [
   {
    "username": "haris",
@@ -761,9 +744,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794721879334,
    "lastSeenLiveAt": 1794765732815,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 10,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "yildraay",
@@ -950,9 +933,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794721508750,
    "lastSeenLiveAt": 1795671199722,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 2,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "danixa531",
@@ -1832,9 +1815,9 @@
    "lastWatchedAt": 1794805863739,
    "addedAt": 1794720337508,
    "lastSeenLiveAt": 1795823251426,
-   "lastPollAt": 1795823770260,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 0,
-   "nextPollAt": 1795823890260
+   "nextPollAt": 1795824148996
   },
   {
    "username": "valvibae",
@@ -2336,9 +2319,9 @@
    "lastWatchedAt": 1795586241535,
    "addedAt": 1794719872232,
    "lastSeenLiveAt": 1795671199722,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 0,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "bearhlm13",
@@ -2441,9 +2424,9 @@
    "lastWatchedAt": 1794893220201,
    "addedAt": 1794719746345,
    "lastSeenLiveAt": 1795671199722,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 1,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "soymedusa5",
@@ -2630,9 +2613,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794719625000,
    "lastSeenLiveAt": 1795051346404,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 8,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "sccc1100",
@@ -2672,9 +2655,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794719503362,
    "lastSeenLiveAt": 1795823251425,
-   "lastPollAt": 1795823770260,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 0,
-   "nextPollAt": 1795823890260
+   "nextPollAt": 1795824148996
   },
   {
    "username": "mahmoudsaadi40",
@@ -4562,9 +4545,9 @@
    "lastWatchedAt": 1794793318394,
    "addedAt": 1794716867587,
    "lastSeenLiveAt": 1795413900315,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 7,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "phuquy28.04",
@@ -4667,9 +4650,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794716744373,
    "lastSeenLiveAt": 1794976224098,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 9,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "dilnashii024",
@@ -4835,9 +4818,9 @@
    "lastWatchedAt": 1794803212471,
    "addedAt": 1794716306344,
    "lastSeenLiveAt": 1795586642177,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 3,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "br.hutabarat09",
@@ -4898,9 +4881,9 @@
    "lastWatchedAt": 1794742714506,
    "addedAt": 1794716241882,
    "lastSeenLiveAt": 1795586900792,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 3,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "johnny.bl3m",
@@ -5528,9 +5511,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794714869665,
    "lastSeenLiveAt": 1795332284747,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 8,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "agcebedi.04.agdam.02",
@@ -5864,9 +5847,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794713889801,
    "lastSeenLiveAt": 1795041841887,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 8,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "withexzera",
@@ -5990,9 +5973,9 @@
    "lastWatchedAt": 1794970471914,
    "addedAt": 1794713199088,
    "lastSeenLiveAt": 1794972030089,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 10,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "lhdailyy",
@@ -6557,9 +6540,9 @@
    "lastWatchedAt": 1794712235105,
    "addedAt": 1794710685764,
    "lastSeenLiveAt": 1795410663690,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 6,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "namsai799",
@@ -6578,9 +6561,9 @@
    "lastWatchedAt": 1795325669716,
    "addedAt": 1794710685764,
    "lastSeenLiveAt": 1795507409320,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 4,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "llluminous15",
@@ -6641,9 +6624,9 @@
    "lastWatchedAt": 1794713597322,
    "addedAt": 1794710624520,
    "lastSeenLiveAt": 1795393440308,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 7,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "alciaaaxo",
@@ -6704,9 +6687,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794710412175,
    "lastSeenLiveAt": 1795362572327,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 6,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "nicoled.rodriguez",
@@ -6725,9 +6708,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794710412175,
    "lastSeenLiveAt": 1795578872344,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 2,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "totlyra3",
@@ -6809,9 +6792,9 @@
    "lastWatchedAt": 1794710552165,
    "addedAt": 1794710381927,
    "lastSeenLiveAt": 1795823251425,
-   "lastPollAt": 1795823770260,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 0,
-   "nextPollAt": 1795823890260
+   "nextPollAt": 1795824148996
   },
   {
    "username": "muszino2",
@@ -6851,9 +6834,9 @@
    "lastWatchedAt": 1794712938420,
    "addedAt": 1794710212137,
    "lastSeenLiveAt": 1795650622880,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 0,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "lu_vile",
@@ -6914,9 +6897,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794710121386,
    "lastSeenLiveAt": 1795322338042,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 9,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "hinseene0",
@@ -6935,9 +6918,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794710059116,
    "lastSeenLiveAt": 1795671199722,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 0,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "lonely_playboybackup",
@@ -6956,9 +6939,9 @@
    "lastWatchedAt": 1794711147314,
    "addedAt": 1794709998698,
    "lastSeenLiveAt": 1795584789353,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 4,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "gehan.alfaily",
@@ -6977,9 +6960,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794709938083,
    "lastSeenLiveAt": 1795823251426,
-   "lastPollAt": 1795823770260,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 0,
-   "nextPollAt": 1795823890260
+   "nextPollAt": 1795824148996
   },
   {
    "username": "themrmpage",
@@ -6998,9 +6981,9 @@
    "lastWatchedAt": 1794710079426,
    "addedAt": 1794709907560,
    "lastSeenLiveAt": 1794943686272,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 9,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "chineryny6l",
@@ -7061,9 +7044,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794709574981,
    "lastSeenLiveAt": 1795382484292,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 7,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "teacher_aj",
@@ -7103,9 +7086,9 @@
    "lastWatchedAt": 1795494784029,
    "addedAt": 1794709514614,
    "lastSeenLiveAt": 1795676292797,
-   "lastPollAt": 1795823770260,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 0,
-   "nextPollAt": 1795823890260
+   "nextPollAt": 1795824148996
   },
   {
    "username": "karinaalfaro9",
@@ -7145,9 +7128,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794709433080,
    "lastSeenLiveAt": 1795650622881,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 0,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "zenobia.39",
@@ -7166,9 +7149,9 @@
    "lastWatchedAt": 1795654763040,
    "addedAt": 1794709433080,
    "lastSeenLiveAt": 1795496452743,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 7,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "jaque66777i1",
@@ -7187,9 +7170,9 @@
    "lastWatchedAt": 1794712655879,
    "addedAt": 1794709433080,
    "lastSeenLiveAt": 1795588471605,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 0,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "yanixmelapelan",
@@ -7208,9 +7191,9 @@
    "lastWatchedAt": 1794770100258,
    "addedAt": 1794709433080,
    "lastSeenLiveAt": 1795006760791,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 2,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "verosha.miu",
@@ -7250,9 +7233,9 @@
    "lastWatchedAt": 1794717197301,
    "addedAt": 1794709359490,
    "lastSeenLiveAt": 1795585322031,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 4,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "k_man_big_g",
@@ -7355,9 +7338,9 @@
    "lastWatchedAt": 1795624805335,
    "addedAt": 1794709225587,
    "lastSeenLiveAt": 1795622034579,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 0,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "rosesugar4",
@@ -7523,9 +7506,9 @@
    "lastWatchedAt": 1794711159058,
    "addedAt": 1794708829525,
    "lastSeenLiveAt": 1794709141819,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 8,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "ihuda125",
@@ -7607,9 +7590,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794708767010,
    "lastSeenLiveAt": 1795362572327,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 7,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "kimberline50",
@@ -7628,9 +7611,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794708706724,
    "lastSeenLiveAt": 1795579132625,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 2,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "geovanapassione",
@@ -7649,9 +7632,9 @@
    "lastWatchedAt": 1794793001336,
    "addedAt": 1794708706724,
    "lastSeenLiveAt": 1795393440308,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 7,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "samuelhernandez132",
@@ -7754,9 +7737,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794708372115,
    "lastSeenLiveAt": 1794709141819,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 0,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "vaal.99",
@@ -7775,9 +7758,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794708372115,
    "lastSeenLiveAt": 1795589761401,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 1,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "unfilterd.scorpio",
@@ -7817,9 +7800,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794708251045,
    "lastSeenLiveAt": 1795650622881,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 0,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "..keiko1",
@@ -7838,9 +7821,9 @@
    "lastWatchedAt": 1794713257682,
    "addedAt": 1794708251045,
    "lastSeenLiveAt": 1795578600924,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 6,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "andrew_parker_",
@@ -7901,9 +7884,9 @@
    "lastWatchedAt": 1794795346696,
    "addedAt": 1794708004084,
    "lastSeenLiveAt": 1795393440308,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 7,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "arta.nababan4",
@@ -7922,9 +7905,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794707943327,
    "lastSeenLiveAt": 1795580718960,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 6,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "kingmauritan",
@@ -7964,9 +7947,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794707819589,
    "lastSeenLiveAt": 1795614021626,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 1,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "kozak.megalluks69",
@@ -8006,9 +7989,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794707759336,
    "lastSeenLiveAt": 1794709141819,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 10,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "everythingaboutjord",
@@ -8048,9 +8031,9 @@
    "lastWatchedAt": 1794797098380,
    "addedAt": 1794707728951,
    "lastSeenLiveAt": 1795393440308,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 6,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "abdullatef_laifan",
@@ -8111,9 +8094,9 @@
    "lastWatchedAt": 1794747198094,
    "addedAt": 1794707607836,
    "lastSeenLiveAt": 1795465465236,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 5,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "narcisaenache11",
@@ -8174,9 +8157,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794707484512,
    "lastSeenLiveAt": 1795650622880,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 0,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "pysia_017",
@@ -8195,9 +8178,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794707302348,
    "lastSeenLiveAt": 1795650622880,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 0,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "berthamattos",
@@ -8216,9 +8199,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794707302348,
    "lastSeenLiveAt": 1795577515297,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 4,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "kc0201sd",
@@ -8237,9 +8220,9 @@
    "lastWatchedAt": 1794801313384,
    "addedAt": 1794707302348,
    "lastSeenLiveAt": 1795507667257,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 4,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "sexyy0032",
@@ -8258,9 +8241,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794707302348,
    "lastSeenLiveAt": 1795579132625,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 4,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "luis.hernandez9315",
@@ -8300,9 +8283,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794707118174,
    "lastSeenLiveAt": 1795393440309,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 6,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "soyjessy6f",
@@ -8321,9 +8304,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794706996435,
    "lastSeenLiveAt": 1795585592438,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 3,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "liban_rufyanka",
@@ -8405,9 +8388,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794706843417,
    "lastSeenLiveAt": 1795413375244,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 7,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "jviroo_",
@@ -8447,9 +8430,9 @@
    "lastWatchedAt": 1794721257770,
    "addedAt": 1794706750875,
    "lastSeenLiveAt": 1795585851429,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 3,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "rossy1995.7",
@@ -8510,9 +8493,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794706629112,
    "lastSeenLiveAt": 1795462375087,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 5,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "mayzhepsykholoh",
@@ -8594,9 +8577,9 @@
    "lastWatchedAt": 1794712720675,
    "addedAt": 1794706568893,
    "lastSeenLiveAt": 1795619949496,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 0,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "richard.mecionari",
@@ -8615,9 +8598,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794706568893,
    "lastSeenLiveAt": 1795614021627,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 1,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "keyjiron33",
@@ -8720,9 +8703,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794706259276,
    "lastSeenLiveAt": 1795362033504,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 7,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "helmercastilho",
@@ -8846,9 +8829,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794706013296,
    "lastSeenLiveAt": 1795547331417,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 4,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "vallerix",
@@ -8867,9 +8850,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794706013296,
    "lastSeenLiveAt": 1795393440309,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 6,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "prettyboyali24",
@@ -8888,9 +8871,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794706013296,
    "lastSeenLiveAt": 1795676292797,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 0,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "always_unlxcky",
@@ -9014,9 +8997,9 @@
    "lastWatchedAt": 1794720138246,
    "addedAt": 1794705708545,
    "lastSeenLiveAt": 1795823251426,
-   "lastPollAt": 1795823770260,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 0,
-   "nextPollAt": 1795823890260
+   "nextPollAt": 1795824148996
   },
   {
    "username": "samar_samora13",
@@ -9056,9 +9039,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794705648287,
    "lastSeenLiveAt": 1794706627984,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 10,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "fagiakwako03",
@@ -9119,9 +9102,9 @@
    "lastWatchedAt": 1795505645056,
    "addedAt": 1794705526725,
    "lastSeenLiveAt": 1795589504284,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 0,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "loyal_queen01",
@@ -9140,9 +9123,9 @@
    "lastWatchedAt": 1795180775201,
    "addedAt": 1794705434268,
    "lastSeenLiveAt": 1794706627984,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 10,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "nerykrc",
@@ -9182,9 +9165,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794705434268,
    "lastSeenLiveAt": 1795715737459,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 0,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "peralesovando",
@@ -9245,9 +9228,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794705221449,
    "lastSeenLiveAt": 1795382484291,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 6,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "999narmin",
@@ -9308,9 +9291,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794705161197,
    "lastSeenLiveAt": 1795382484291,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 4,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "jady___sh",
@@ -9392,9 +9375,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794705100750,
    "lastSeenLiveAt": 1795393440309,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 6,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "jj.llorente._",
@@ -9581,9 +9564,9 @@
    "lastWatchedAt": 1794753552554,
    "addedAt": 1794704826958,
    "lastSeenLiveAt": 1795547331418,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 4,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "ahmad.alnsar14",
@@ -9602,9 +9585,9 @@
    "lastWatchedAt": 1794873146855,
    "addedAt": 1794704766719,
    "lastSeenLiveAt": 1795823251426,
-   "lastPollAt": 1795823770260,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 0,
-   "nextPollAt": 1795823890260
+   "nextPollAt": 1795824148996
   },
   {
    "username": "born2risee",
@@ -9644,9 +9627,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794704766719,
    "lastSeenLiveAt": 1795671199722,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 0,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "setarabayat8",
@@ -9686,9 +9669,9 @@
    "lastWatchedAt": 1794789404685,
    "addedAt": 1794704706245,
    "lastSeenLiveAt": 1795650622880,
-   "lastPollAt": 1795823770260,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 0,
-   "nextPollAt": 1795823890260
+   "nextPollAt": 1795824148996
   },
   {
    "username": "www.tiktok.com.ch36",
@@ -9707,9 +9690,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794704645296,
    "lastSeenLiveAt": 1794706627984,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 9,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "official_queensari",
@@ -9749,9 +9732,9 @@
    "lastWatchedAt": 1794786034885,
    "addedAt": 1794704584236,
    "lastSeenLiveAt": 1795823251426,
-   "lastPollAt": 1795823770260,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 0,
-   "nextPollAt": 1795823890260
+   "nextPollAt": 1795824148996
   },
   {
    "username": "nyaa_naomi",
@@ -9770,9 +9753,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794704584236,
    "lastSeenLiveAt": 1795823251426,
-   "lastPollAt": 1795823770260,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 0,
-   "nextPollAt": 1795823890260
+   "nextPollAt": 1795824148996
   },
   {
    "username": "mistyqp",
@@ -9812,9 +9795,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794704584236,
    "lastSeenLiveAt": 1795715737460,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 0,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "boryniecpatryklive",
@@ -9896,9 +9879,9 @@
    "lastWatchedAt": 1794712240090,
    "addedAt": 1794704427859,
    "lastSeenLiveAt": 1795585592438,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 3,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "karaman405",
@@ -9917,9 +9900,9 @@
    "lastWatchedAt": 1794719995484,
    "addedAt": 1794704427859,
    "lastSeenLiveAt": 1795578872344,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 2,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "kovalivska0",
@@ -10127,9 +10110,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794704094101,
    "lastSeenLiveAt": 1795823251426,
-   "lastPollAt": 1795823770260,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 0,
-   "nextPollAt": 1795823890260
+   "nextPollAt": 1795824148996
   },
   {
    "username": "goncalo17santos",
@@ -10211,9 +10194,9 @@
    "lastWatchedAt": 1794716535724,
    "addedAt": 1794703971392,
    "lastSeenLiveAt": 1795823251426,
-   "lastPollAt": 1795823770260,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 0,
-   "nextPollAt": 1795823890260
+   "nextPollAt": 1795824148996
   },
   {
    "username": "zozylka__",
@@ -10295,9 +10278,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794703848085,
    "lastSeenLiveAt": 1795823251426,
-   "lastPollAt": 1795823770260,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 0,
-   "nextPollAt": 1795823890260
+   "nextPollAt": 1795824148996
   },
   {
    "username": "essalhamdulillah",
@@ -10316,9 +10299,9 @@
    "lastWatchedAt": 1795624796977,
    "addedAt": 1794703848085,
    "lastSeenLiveAt": 1795614021627,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 0,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "buthainarashwan",
@@ -10421,9 +10404,9 @@
    "lastWatchedAt": 1795393424769,
    "addedAt": 1794703665485,
    "lastSeenLiveAt": 1795823251426,
-   "lastPollAt": 1795823770260,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 0,
-   "nextPollAt": 1795823890260
+   "nextPollAt": 1795824148996
   },
   {
    "username": "baloghrolly",
@@ -10463,9 +10446,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794703665485,
    "lastSeenLiveAt": 1795359890917,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 6,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "nubakingdom260",
@@ -10505,9 +10488,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794703602267,
    "lastSeenLiveAt": 1795823251426,
-   "lastPollAt": 1795823770260,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 0,
-   "nextPollAt": 1795823890260
+   "nextPollAt": 1795824148996
   },
   {
    "username": "oonnnnnnn00",
@@ -10526,9 +10509,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794703540608,
    "lastSeenLiveAt": 1795393440309,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 7,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "casperchronicles",
@@ -10589,9 +10572,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794703357806,
    "lastSeenLiveAt": 1795589761401,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 2,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "juansebastian31920",
@@ -10610,9 +10593,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794703328663,
    "lastSeenLiveAt": 1795622034579,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 0,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "kpe.vl",
@@ -10673,9 +10656,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794703328663,
    "lastSeenLiveAt": 1795465465236,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 5,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "jrbuilders1",
@@ -10736,9 +10719,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794703235959,
    "lastSeenLiveAt": 1795362572327,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 6,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "kamilya_999",
@@ -10778,9 +10761,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794703235959,
    "lastSeenLiveAt": 1794973445400,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 7,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "slunispeeddating",
@@ -10820,9 +10803,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794703174408,
    "lastSeenLiveAt": 1795584518638,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 3,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "blondehihello_",
@@ -10841,9 +10824,9 @@
    "lastWatchedAt": 1795650828469,
    "addedAt": 1794703114151,
    "lastSeenLiveAt": 1795650622881,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 1,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "samie_love_noortje",
@@ -11072,9 +11055,9 @@
    "lastWatchedAt": 1794794080472,
    "addedAt": 1794702777214,
    "lastSeenLiveAt": 1795382484291,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 6,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "bairesbaires85",
@@ -11198,9 +11181,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794702653486,
    "lastSeenLiveAt": 1794709475199,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 1,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "itssssme.babes",
@@ -11219,9 +11202,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794702653486,
    "lastSeenLiveAt": 1795382484291,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 6,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "dfaguimba",
@@ -11282,9 +11265,9 @@
    "lastWatchedAt": 1794716263064,
    "addedAt": 1794702592784,
    "lastSeenLiveAt": 1795590018982,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 0,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "chantalgehl",
@@ -11345,9 +11328,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794702504811,
    "lastSeenLiveAt": 1795715737459,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 0,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "neaizskarama",
@@ -11387,9 +11370,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794702440897,
    "lastSeenLiveAt": 1795393440309,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 6,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "hamed.elahy",
@@ -11408,9 +11391,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794702378079,
    "lastSeenLiveAt": 0,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 4,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "llijnc",
@@ -11471,9 +11454,9 @@
    "lastWatchedAt": 1794749978585,
    "addedAt": 1794702257534,
    "lastSeenLiveAt": 1795360421930,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 6,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "ematv_12_",
@@ -11492,9 +11475,9 @@
    "lastWatchedAt": 1794723458448,
    "addedAt": 1794702257534,
    "lastSeenLiveAt": 1794969176403,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 9,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "ella878204",
@@ -11576,9 +11559,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794702196839,
    "lastSeenLiveAt": 1795823251425,
-   "lastPollAt": 1795823770260,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 0,
-   "nextPollAt": 1795823890260
+   "nextPollAt": 1795824148996
   },
   {
    "username": "youronlyprincess79",
@@ -11597,9 +11580,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794702196839,
    "lastSeenLiveAt": 1795622034579,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 0,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "morleygold",
@@ -11744,9 +11727,9 @@
    "lastWatchedAt": 1795580193349,
    "addedAt": 1794701969685,
    "lastSeenLiveAt": 1795585322031,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 2,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "jjloco8",
@@ -11849,9 +11832,9 @@
    "lastWatchedAt": 1795393648774,
    "addedAt": 1794701811324,
    "lastSeenLiveAt": 1795393440308,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 7,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "anamaria.nc",
@@ -12080,9 +12063,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794701384791,
    "lastSeenLiveAt": 1795362572327,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 6,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "eden__dessalegn",
@@ -12143,9 +12126,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794701384791,
    "lastSeenLiveAt": 1795462375087,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 5,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "hel_tingles_asmr",
@@ -12164,9 +12147,9 @@
    "lastWatchedAt": 1794876754888,
    "addedAt": 1794701354349,
    "lastSeenLiveAt": 1795462375087,
-   "lastPollAt": 1795823770260,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 7,
-   "nextPollAt": 1795823890260
+   "nextPollAt": 1795824148996
   },
   {
    "username": "kokoroji._",
@@ -12227,9 +12210,9 @@
    "lastWatchedAt": 1794713246922,
    "addedAt": 1794701354349,
    "lastSeenLiveAt": 1795044920909,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 9,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "ekucha1",
@@ -12248,9 +12231,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794701300230,
    "lastSeenLiveAt": 1795393440309,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 6,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "tanyastrahilova",
@@ -12332,9 +12315,9 @@
    "lastWatchedAt": 1794713655069,
    "addedAt": 1794700993629,
    "lastSeenLiveAt": 1795578322725,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 4,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "_mika_1607",
@@ -12395,9 +12378,9 @@
    "lastWatchedAt": 1795577739610,
    "addedAt": 1794700735055,
    "lastSeenLiveAt": 1795579656177,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 3,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "kietheg",
@@ -12416,9 +12399,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794700735055,
    "lastSeenLiveAt": 1794701337088,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 6,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "o.d.i07",
@@ -12563,9 +12546,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794700567495,
    "lastSeenLiveAt": 1795306772308,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 8,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "__..angel__",
@@ -12626,9 +12609,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794700466770,
    "lastSeenLiveAt": 1795362572327,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 7,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "mrmike2912",
@@ -12647,9 +12630,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794700404935,
    "lastSeenLiveAt": 1795041841888,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 8,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "hernandezk0002",
@@ -12668,9 +12651,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794700404935,
    "lastSeenLiveAt": 0,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 0,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "jessy_uk777",
@@ -12689,9 +12672,9 @@
    "lastWatchedAt": 1794714311572,
    "addedAt": 1794700404935,
    "lastSeenLiveAt": 1794701337088,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 0,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "imyoursonya",
@@ -12731,9 +12714,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794700237523,
    "lastSeenLiveAt": 1795462375088,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 5,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "zayan_fxpro",
@@ -12773,9 +12756,9 @@
    "lastWatchedAt": 1794939151821,
    "addedAt": 1794700237523,
    "lastSeenLiveAt": 1795823251425,
-   "lastPollAt": 1795823770260,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 0,
-   "nextPollAt": 1795823890260
+   "nextPollAt": 1795824148996
   },
   {
    "username": "niffyherself",
@@ -12857,9 +12840,9 @@
    "lastWatchedAt": 1795577126309,
    "addedAt": 1794700190201,
    "lastSeenLiveAt": 1795579395712,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 4,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "kendra.djem22",
@@ -13088,9 +13071,9 @@
    "lastWatchedAt": 1795823226095,
    "addedAt": 1794699906235,
    "lastSeenLiveAt": 0,
-   "lastPollAt": 1795823770260,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 10,
-   "nextPollAt": 1795823890260
+   "nextPollAt": 1795824148996
   },
   {
    "username": "k_c614",
@@ -13256,9 +13239,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794699575570,
    "lastSeenLiveAt": 1795650622880,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 0,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "nemesis.avozdochat",
@@ -13340,9 +13323,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794699438840,
    "lastSeenLiveAt": 1795547331418,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 3,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "anianiiiiiiiiiiiii1",
@@ -13403,9 +13386,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794699361049,
    "lastSeenLiveAt": 1795547331418,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 3,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "ilincam09",
@@ -13466,9 +13449,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794699264562,
    "lastSeenLiveAt": 1795621772650,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 0,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "xxmicha_",
@@ -13487,9 +13470,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794699264562,
    "lastSeenLiveAt": 1795589504284,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 0,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "orxannamazovv",
@@ -13508,9 +13491,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794699264562,
    "lastSeenLiveAt": 1795354540635,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 8,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "rikyrikura_",
@@ -13550,9 +13533,9 @@
    "lastWatchedAt": 1794722732753,
    "addedAt": 1794699204181,
    "lastSeenLiveAt": 1795650622881,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 0,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "meerkat_petra",
@@ -13571,9 +13554,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794699204181,
    "lastSeenLiveAt": 1795382484291,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 6,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "san_dro_hg",
@@ -13613,9 +13596,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794699204181,
    "lastSeenLiveAt": 1795547331418,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 4,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "nrayito",
@@ -13676,9 +13659,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794699140140,
    "lastSeenLiveAt": 1795622034579,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 0,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "sassygirliexx",
@@ -13697,9 +13680,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794699140140,
    "lastSeenLiveAt": 1795465465236,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 5,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "halooaziz",
@@ -13739,9 +13722,9 @@
    "lastWatchedAt": 1795410711577,
    "addedAt": 1794699079319,
    "lastSeenLiveAt": 1795620725000,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 0,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "ninixarata13",
@@ -13760,9 +13743,9 @@
    "lastWatchedAt": 1794720158598,
    "addedAt": 1794699079319,
    "lastSeenLiveAt": 1795465465236,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 5,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "kaycollins69",
@@ -13802,9 +13785,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794699079319,
    "lastSeenLiveAt": 1795622034579,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 0,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "sham_1004",
@@ -13844,9 +13827,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794698920257,
    "lastSeenLiveAt": 1795622034579,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 0,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "sabinhodu13",
@@ -13886,9 +13869,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794698920257,
    "lastSeenLiveAt": 1795547331418,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 4,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "riktigasamsam",
@@ -13928,9 +13911,9 @@
    "lastWatchedAt": 1794714307852,
    "addedAt": 1794698920257,
    "lastSeenLiveAt": 1795586642177,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 2,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "mimakter5",
@@ -13949,9 +13932,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794698805641,
    "lastSeenLiveAt": 1795823251425,
-   "lastPollAt": 1795823770260,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 0,
-   "nextPollAt": 1795823890260
+   "nextPollAt": 1795824148996
   },
   {
    "username": "scorpioneeee6",
@@ -13991,9 +13974,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794698805641,
    "lastSeenLiveAt": 1795465465236,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 5,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "stevenrhodes97",
@@ -14012,9 +13995,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794698805641,
    "lastSeenLiveAt": 1795715737460,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 0,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "lamees.alzupi",
@@ -14033,9 +14016,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794698805641,
    "lastSeenLiveAt": 1794698841279,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 0,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "quintonbee2",
@@ -14075,9 +14058,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794698805641,
    "lastSeenLiveAt": 1795382484291,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 6,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "worldguessr_",
@@ -14138,9 +14121,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794695119816,
    "lastSeenLiveAt": 1795354273010,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 8,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "elcortezlive",
@@ -15587,9 +15570,9 @@
    "lastWatchedAt": 1795797031103,
    "addedAt": 1794694110145,
    "lastSeenLiveAt": 1795795064713,
-   "lastPollAt": 1795823770260,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 0,
-   "nextPollAt": 1795823890260
+   "nextPollAt": 1795824148996
   },
   {
    "username": "marikaa634",
@@ -16448,9 +16431,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794693584451,
    "lastSeenLiveAt": 1795584789353,
-   "lastPollAt": 1795795064713,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 6,
-   "nextPollAt": 1795823864713
+   "nextPollAt": 1795824148996
   },
   {
    "username": "mr2l",
@@ -16511,9 +16494,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794693432138,
    "lastSeenLiveAt": 1794701337089,
-   "lastPollAt": 1795823770260,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 9,
-   "nextPollAt": 1795823890260
+   "nextPollAt": 1795824148996
   },
   {
    "username": "kikifeng02",
@@ -16658,9 +16641,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794693125393,
    "lastSeenLiveAt": 1795412030840,
-   "lastPollAt": 1795823770260,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 7,
-   "nextPollAt": 1795823890260
+   "nextPollAt": 1795824148996
   },
   {
    "username": "selena_777888",
@@ -16931,9 +16914,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794692359139,
    "lastSeenLiveAt": 1795823251426,
-   "lastPollAt": 1795823770260,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 0,
-   "nextPollAt": 1795823890260
+   "nextPollAt": 1795824148996
   },
   {
    "username": ".ogrod_rozany",
@@ -17015,9 +16998,9 @@
    "lastWatchedAt": 1794770073320,
    "addedAt": 1794692083783,
    "lastSeenLiveAt": 1795823251425,
-   "lastPollAt": 1795823770260,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 0,
-   "nextPollAt": 1795823890260
+   "nextPollAt": 1795824148996
   },
   {
    "username": "ay.hemrayeva",
@@ -17057,9 +17040,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794691865783,
    "lastSeenLiveAt": 1795823251425,
-   "lastPollAt": 1795823770260,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 0,
-   "nextPollAt": 1795823890260
+   "nextPollAt": 1795824148996
   },
   {
    "username": "plneescy93p",
@@ -17750,9 +17733,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794690520413,
    "lastSeenLiveAt": 1795823251425,
-   "lastPollAt": 1795823770260,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 0,
-   "nextPollAt": 1795823890260
+   "nextPollAt": 1795824148996
   },
   {
    "username": "ontoraislamofficial",
@@ -19619,9 +19602,9 @@
    "lastWatchedAt": 1794778959813,
    "addedAt": 1794686968450,
    "lastSeenLiveAt": 1795823251425,
-   "lastPollAt": 1795823770260,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 0,
-   "nextPollAt": 1795823890260
+   "nextPollAt": 1795824148996
   },
   {
    "username": "la_gochita22",
@@ -20543,9 +20526,9 @@
    "lastWatchedAt": 1795823450616,
    "addedAt": 1794684762553,
    "lastSeenLiveAt": 1795823251425,
-   "lastPollAt": 1795823770260,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 0,
-   "nextPollAt": 1795823890260
+   "nextPollAt": 1795824148996
   },
   {
    "username": "supremogangtv",
@@ -21026,9 +21009,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794683688490,
    "lastSeenLiveAt": 1794685774296,
-   "lastPollAt": 1795823770260,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 9,
-   "nextPollAt": 1795823890260
+   "nextPollAt": 1795824148996
   },
   {
    "username": "papitorastpapito",
@@ -22139,9 +22122,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794681778036,
    "lastSeenLiveAt": 1795823251425,
-   "lastPollAt": 1795823770260,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 0,
-   "nextPollAt": 1795823890260
+   "nextPollAt": 1795824148996
   },
   {
    "username": "canibeyourbabyjie",
@@ -22391,9 +22374,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794681470210,
    "lastSeenLiveAt": 1795823251425,
-   "lastPollAt": 1795823770260,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 0,
-   "nextPollAt": 1795823890260
+   "nextPollAt": 1795824148996
   },
   {
    "username": "unknown199035",
@@ -22727,9 +22710,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794676187148,
    "lastSeenLiveAt": 1795823251426,
-   "lastPollAt": 1795823770260,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 0,
-   "nextPollAt": 1795823890260
+   "nextPollAt": 1795824148996
   },
   {
    "username": "only.thuy.whiny",
@@ -23441,9 +23424,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794674966015,
    "lastSeenLiveAt": 1795823251426,
-   "lastPollAt": 1795823770260,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 0,
-   "nextPollAt": 1795823890260
+   "nextPollAt": 1795824148996
   },
   {
    "username": "rizkaanhh_",
@@ -23630,9 +23613,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794674568652,
    "lastSeenLiveAt": 1795823251425,
-   "lastPollAt": 1795823770260,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 0,
-   "nextPollAt": 1795823890260
+   "nextPollAt": 1795824148996
   },
   {
    "username": "soleelole",
@@ -23966,9 +23949,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794674200589,
    "lastSeenLiveAt": 1795823251426,
-   "lastPollAt": 1795823770260,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 0,
-   "nextPollAt": 1795823890260
+   "nextPollAt": 1795824148996
   },
   {
    "username": "madina._osh",
@@ -24344,9 +24327,9 @@
    "lastWatchedAt": 1794746207831,
    "addedAt": 1794673592999,
    "lastSeenLiveAt": 1795578872345,
-   "lastPollAt": 1795795064714,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 6,
-   "nextPollAt": 1795823864714
+   "nextPollAt": 1795824148996
   },
   {
    "username": "apshalungta",
@@ -25352,9 +25335,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794672379601,
    "lastSeenLiveAt": 1795496999930,
-   "lastPollAt": 1795795064714,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 6,
-   "nextPollAt": 1795823864714
+   "nextPollAt": 1795824148996
   },
   {
    "username": "yuna_no_1",
@@ -26234,9 +26217,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794671247111,
    "lastSeenLiveAt": 1795581262056,
-   "lastPollAt": 1795795064714,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 6,
-   "nextPollAt": 1795823864714
+   "nextPollAt": 1795824148996
   },
   {
    "username": "ivetirri",
@@ -26339,9 +26322,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794671156234,
    "lastSeenLiveAt": 1795823251425,
-   "lastPollAt": 1795823770260,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 0,
-   "nextPollAt": 1795823890260
+   "nextPollAt": 1795824148996
   },
   {
    "username": "im_kuba1",
@@ -28124,9 +28107,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794668139305,
    "lastSeenLiveAt": 1795823251426,
-   "lastPollAt": 1795823770260,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 0,
-   "nextPollAt": 1795823890260
+   "nextPollAt": 1795824148996
   },
   {
    "username": "ts.enigma",
@@ -28607,9 +28590,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794667548522,
    "lastSeenLiveAt": 1795823251425,
-   "lastPollAt": 1795823770260,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 0,
-   "nextPollAt": 1795823890260
+   "nextPollAt": 1795824148996
   },
   {
    "username": "hnsw8d7",
@@ -29174,9 +29157,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794652977978,
    "lastSeenLiveAt": 1795823251426,
-   "lastPollAt": 1795823770260,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 0,
-   "nextPollAt": 1795823890260
+   "nextPollAt": 1795824148996
   },
   {
    "username": "woneeyday",
@@ -29636,9 +29619,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794651521972,
    "lastSeenLiveAt": 1794653382938,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 10,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "trishae333",
@@ -30098,9 +30081,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794650112734,
    "lastSeenLiveAt": 1795823251425,
-   "lastPollAt": 1795823770260,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 0,
-   "nextPollAt": 1795823890260
+   "nextPollAt": 1795824148996
   },
   {
    "username": "armine.dawtyan",
@@ -30413,9 +30396,9 @@
    "lastWatchedAt": 1794900172092,
    "addedAt": 1794649012260,
    "lastSeenLiveAt": 1795823251426,
-   "lastPollAt": 1795823770260,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 0,
-   "nextPollAt": 1795823890260
+   "nextPollAt": 1795824148996
   },
   {
    "username": "owest2.o",
@@ -34487,9 +34470,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794626301705,
    "lastSeenLiveAt": 1795823251426,
-   "lastPollAt": 1795823770260,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 0,
-   "nextPollAt": 1795823890260
+   "nextPollAt": 1795824148996
   },
   {
    "username": "g.p.13..7",
@@ -34718,9 +34701,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794625877729,
    "lastSeenLiveAt": 1795823251425,
-   "lastPollAt": 1795823770260,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 0,
-   "nextPollAt": 1795823890260
+   "nextPollAt": 1795824148996
   },
   {
    "username": "lucascaze00",
@@ -35012,9 +34995,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794625177803,
    "lastSeenLiveAt": 1795823251425,
-   "lastPollAt": 1795823770260,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 0,
-   "nextPollAt": 1795823890260
+   "nextPollAt": 1795824148996
   },
   {
    "username": "meiirzh4n",
@@ -37154,9 +37137,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794620889770,
    "lastSeenLiveAt": 1795589504284,
-   "lastPollAt": 1795823770260,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 1,
-   "nextPollAt": 1795823890260
+   "nextPollAt": 1795824148996
   },
   {
    "username": "mr.niett",
@@ -39464,9 +39447,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794617118106,
    "lastSeenLiveAt": 1795051346404,
-   "lastPollAt": 1795823770260,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 9,
-   "nextPollAt": 1795823890260
+   "nextPollAt": 1795824148996
   },
   {
    "username": "ninogashi",
@@ -41375,9 +41358,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794610060181,
    "lastSeenLiveAt": 1795823251426,
-   "lastPollAt": 1795823770260,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 0,
-   "nextPollAt": 1795823890260
+   "nextPollAt": 1795824148996
   },
   {
    "username": "valeri.bliss",
@@ -41522,9 +41505,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794609935193,
    "lastSeenLiveAt": 1795823251425,
-   "lastPollAt": 1795823770260,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 0,
-   "nextPollAt": 1795823890260
+   "nextPollAt": 1795824148996
   },
   {
    "username": "so_in_luxembourg",
@@ -41711,9 +41694,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794609814361,
    "lastSeenLiveAt": 1795823251426,
-   "lastPollAt": 1795823770260,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 0,
-   "nextPollAt": 1795823890260
+   "nextPollAt": 1795824148996
   },
   {
    "username": "yoyo.yani37",
@@ -42047,9 +42030,9 @@
    "lastWatchedAt": 1795823460420,
    "addedAt": 1794609480005,
    "lastSeenLiveAt": 1795823251425,
-   "lastPollAt": 1795823770260,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 0,
-   "nextPollAt": 1795823890260
+   "nextPollAt": 1795824148996
   },
   {
    "username": "luckyspicy55",
@@ -42950,9 +42933,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794608716744,
    "lastSeenLiveAt": 1795823251425,
-   "lastPollAt": 1795823770260,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 0,
-   "nextPollAt": 1795823890260
+   "nextPollAt": 1795824148996
   },
   {
    "username": "venera__007",
@@ -43202,9 +43185,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794608504131,
    "lastSeenLiveAt": 1795823251426,
-   "lastPollAt": 1795823770260,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 0,
-   "nextPollAt": 1795823890260
+   "nextPollAt": 1795824148996
   },
   {
    "username": "_hjjrg",
@@ -44399,9 +44382,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794607493938,
    "lastSeenLiveAt": 1795823251426,
-   "lastPollAt": 1795823770260,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 0,
-   "nextPollAt": 1795823890260
+   "nextPollAt": 1795824148996
   },
   {
    "username": "user91266185100258",
@@ -44798,9 +44781,9 @@
    "lastWatchedAt": 1795393491068,
    "addedAt": 1794606855876,
    "lastSeenLiveAt": 1795823251426,
-   "lastPollAt": 1795823770260,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 0,
-   "nextPollAt": 1795823890260
+   "nextPollAt": 1795824148996
   },
   {
    "username": "unicoesoloperunapersona",
@@ -45176,9 +45159,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794605791239,
    "lastSeenLiveAt": 1795823251425,
-   "lastPollAt": 1795823770260,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 0,
-   "nextPollAt": 1795823890260
+   "nextPollAt": 1795824148996
   },
   {
    "username": "dav81777",
@@ -47528,9 +47511,9 @@
    "lastWatchedAt": 1795389903837,
    "addedAt": 1794600551627,
    "lastSeenLiveAt": 1795823251426,
-   "lastPollAt": 1795823770260,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 0,
-   "nextPollAt": 1795823890260
+   "nextPollAt": 1795824148996
   },
   {
    "username": "l.i.z.z.zy",
@@ -48000,7 +47983,7 @@
    "source": "discovery",
    "roomId": "7707738971958299414",
    "roomIdAt": 1794599658452,
-   "roomIdMiss": 0,
+   "roomIdMiss": 1,
    "boxEvents": 0,
    "boxCoinSum": 0,
    "boxCoinsSeen": 0,
@@ -48263,9 +48246,9 @@
    "lastWatchedAt": 1795107669740,
    "addedAt": 1794599355460,
    "lastSeenLiveAt": 1795823251426,
-   "lastPollAt": 1795823770260,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 0,
-   "nextPollAt": 1795823890260
+   "nextPollAt": 1795824148996
   },
   {
    "username": "macielkiss",
@@ -49628,9 +49611,9 @@
    "lastWatchedAt": 1794597617595,
    "addedAt": 1794597150959,
    "lastSeenLiveAt": 1795746527961,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 0,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "chorniylinkoln",
@@ -52379,9 +52362,9 @@
    "lastWatchedAt": 1794970475267,
    "addedAt": 1794591666909,
    "lastSeenLiveAt": 1795823251426,
-   "lastPollAt": 1795823770260,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 0,
-   "nextPollAt": 1795823890260
+   "nextPollAt": 1795824148996
   },
   {
    "username": "bebongne199x",
@@ -52463,9 +52446,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794591606604,
    "lastSeenLiveAt": 1795823251426,
-   "lastPollAt": 1795823770260,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 0,
-   "nextPollAt": 1795823890260
+   "nextPollAt": 1795824148996
   },
   {
    "username": "hot_aleksa_",
@@ -52694,9 +52677,9 @@
    "lastWatchedAt": 1794939146832,
    "addedAt": 1794591360811,
    "lastSeenLiveAt": 1795823251426,
-   "lastPollAt": 1795823770260,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 0,
-   "nextPollAt": 1795823890260
+   "nextPollAt": 1795824148996
   },
   {
    "username": "tony.mlat268",
@@ -53156,9 +53139,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794590687901,
    "lastSeenLiveAt": 1795823251426,
-   "lastPollAt": 1795823770260,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 0,
-   "nextPollAt": 1795823890260
+   "nextPollAt": 1795824148996
   },
   {
    "username": "thotaputri",
@@ -53723,9 +53706,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794589897740,
    "lastSeenLiveAt": 1795823251425,
-   "lastPollAt": 1795823770260,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 0,
-   "nextPollAt": 1795823890260
+   "nextPollAt": 1795824148996
   },
   {
    "username": "andrewenglandofficial",
@@ -56306,9 +56289,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794586140509,
    "lastSeenLiveAt": 1795823251426,
-   "lastPollAt": 1795823770260,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 0,
-   "nextPollAt": 1795823890260
+   "nextPollAt": 1795824148996
   },
   {
    "username": "jiujiu5299",
@@ -60506,9 +60489,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794577075400,
    "lastSeenLiveAt": 1794577628843,
-   "lastPollAt": 1795823770260,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 9,
-   "nextPollAt": 1795823890260
+   "nextPollAt": 1795824148996
   },
   {
    "username": "miavalerio11",
@@ -65378,9 +65361,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794559141068,
    "lastSeenLiveAt": 1795823251426,
-   "lastPollAt": 1795823770260,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 0,
-   "nextPollAt": 1795823890260
+   "nextPollAt": 1795824148996
   },
   {
    "username": "diztractionofficial",
@@ -66512,9 +66495,9 @@
    "lastWatchedAt": 1794558379697,
    "addedAt": 1794557514673,
    "lastSeenLiveAt": 1795614021626,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 3,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "kozwe4552",
@@ -67121,9 +67104,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794556178741,
    "lastSeenLiveAt": 1795823251425,
-   "lastPollAt": 1795823770260,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 0,
-   "nextPollAt": 1795823890260
+   "nextPollAt": 1795824148996
   },
   {
    "username": "one.for.all005",
@@ -67268,9 +67251,9 @@
    "lastWatchedAt": 1794811106587,
    "addedAt": 1794555877007,
    "lastSeenLiveAt": 1795588471605,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 3,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "ive_leoleo",
@@ -67709,9 +67692,9 @@
    "lastWatchedAt": 1794555467961,
    "addedAt": 1794555132438,
    "lastSeenLiveAt": 1795823251425,
-   "lastPollAt": 1795823770260,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 0,
-   "nextPollAt": 1795823890260
+   "nextPollAt": 1795824148996
   },
   {
    "username": "enas_zayed",
@@ -67982,9 +67965,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794554307408,
    "lastSeenLiveAt": 1795823251426,
-   "lastPollAt": 1795823770260,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 0,
-   "nextPollAt": 1795823890260
+   "nextPollAt": 1795824148996
   },
   {
    "username": "anna_besant",
@@ -68297,9 +68280,9 @@
    "lastWatchedAt": 1795328583420,
    "addedAt": 1794553846944,
    "lastSeenLiveAt": 1795586112608,
-   "lastPollAt": 1795823770260,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 0,
-   "nextPollAt": 1795823890260
+   "nextPollAt": 1795824148996
   },
   {
    "username": "lewisang_",
@@ -70922,9 +70905,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794549672097,
    "lastSeenLiveAt": 1795588988826,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 3,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "user210106.1",
@@ -71258,9 +71241,9 @@
    "lastWatchedAt": 1795587349863,
    "addedAt": 1794549307982,
    "lastSeenLiveAt": 1795585592438,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 3,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "claytonfromsc",
@@ -72140,9 +72123,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794548249546,
    "lastSeenLiveAt": 1795588471605,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 3,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "yogi_reina",
@@ -72287,9 +72270,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794548153698,
    "lastSeenLiveAt": 1795588471605,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 3,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "esuxxxip",
@@ -76634,9 +76617,9 @@
    "lastWatchedAt": 1794538861690,
    "addedAt": 1794538097601,
    "lastSeenLiveAt": 1795412574982,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 7,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "edonawit5",
@@ -76697,9 +76680,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794537934538,
    "lastSeenLiveAt": 1795324772748,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 8,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "vraxofficiel",
@@ -76718,9 +76701,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794537934538,
    "lastSeenLiveAt": 1795324772748,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 8,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "darlingtwinsx",
@@ -76739,9 +76722,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794537760915,
    "lastSeenLiveAt": 1795361489820,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 7,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "andrew_chef1",
@@ -76781,9 +76764,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794537760915,
    "lastSeenLiveAt": 1795588988826,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 0,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "aliciaadior",
@@ -76802,9 +76785,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794537760915,
    "lastSeenLiveAt": 1794625273527,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 9,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "zainnazry",
@@ -76823,9 +76806,9 @@
    "lastWatchedAt": 1794770596222,
    "addedAt": 1794537760915,
    "lastSeenLiveAt": 1795320426120,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 8,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "ramiresalbertino",
@@ -76844,9 +76827,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794537595302,
    "lastSeenLiveAt": 1795109169948,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 8,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "snuckums",
@@ -76991,9 +76974,9 @@
    "lastWatchedAt": 1795011460604,
    "addedAt": 1794537269493,
    "lastSeenLiveAt": 1795578872345,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 4,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "jasmin_queen77",
@@ -77033,9 +77016,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794537106628,
    "lastSeenLiveAt": 1795508181435,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 3,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "electroremedy",
@@ -77096,9 +77079,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794537106628,
    "lastSeenLiveAt": 1795620466892,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 1,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "mariakopss",
@@ -77138,9 +77121,9 @@
    "lastWatchedAt": 1794777443157,
    "addedAt": 1794536939297,
    "lastSeenLiveAt": 1795577515297,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 4,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "piscessboy9",
@@ -77159,9 +77142,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794536779096,
    "lastSeenLiveAt": 1795614021626,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 2,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "karentdhein",
@@ -77264,9 +77247,9 @@
    "lastWatchedAt": 1795417847560,
    "addedAt": 1794536614715,
    "lastSeenLiveAt": 1795588206265,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 3,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "jackthomas__",
@@ -77285,9 +77268,9 @@
    "lastWatchedAt": 1794770346445,
    "addedAt": 1794536614715,
    "lastSeenLiveAt": 1794569965208,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 9,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "duda_a380",
@@ -77306,9 +77289,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794536452520,
    "lastSeenLiveAt": 1795578872345,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 3,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "pantera_709",
@@ -77327,9 +77310,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794536452520,
    "lastSeenLiveAt": 1795578872345,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 3,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "laumg.16",
@@ -77348,9 +77331,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794536452520,
    "lastSeenLiveAt": 1795319321128,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 8,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "biaivyali",
@@ -77411,9 +77394,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794535961601,
    "lastSeenLiveAt": 1795823251426,
-   "lastPollAt": 1795823770260,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 0,
-   "nextPollAt": 1795823890260
+   "nextPollAt": 1795824148996
   },
   {
    "username": "aprilcallanan_",
@@ -77432,9 +77415,9 @@
    "lastWatchedAt": 1794773665040,
    "addedAt": 1794535961601,
    "lastSeenLiveAt": 1795823251425,
-   "lastPollAt": 1795823770260,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 0,
-   "nextPollAt": 1795823890260
+   "nextPollAt": 1795824148996
   },
   {
    "username": "kamille0422",
@@ -77453,9 +77436,9 @@
    "lastWatchedAt": 1795584363313,
    "addedAt": 1794535961601,
    "lastSeenLiveAt": 1795588471606,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 1,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "nicole_khug",
@@ -77474,9 +77457,9 @@
    "lastWatchedAt": 1794880408360,
    "addedAt": 1794535961601,
    "lastSeenLiveAt": 1795051346405,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 8,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "iamsaraderaiss",
@@ -77516,9 +77499,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794535795709,
    "lastSeenLiveAt": 1795590018982,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 0,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "namiilily",
@@ -77558,9 +77541,9 @@
    "lastWatchedAt": 1794769776175,
    "addedAt": 1794535795709,
    "lastSeenLiveAt": 1795823251426,
-   "lastPollAt": 1795823770260,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 0,
-   "nextPollAt": 1795823890260
+   "nextPollAt": 1795824148996
   },
   {
    "username": "ellykitty_1",
@@ -77579,9 +77562,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794535795709,
    "lastSeenLiveAt": 1795589246419,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 2,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "mefjuu03",
@@ -77705,9 +77688,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794535278926,
    "lastSeenLiveAt": 1794616813839,
-   "lastPollAt": 1795823770260,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 9,
-   "nextPollAt": 1795823890260
+   "nextPollAt": 1795824148996
   },
   {
    "username": "joistx",
@@ -77726,9 +77709,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794535110993,
    "lastSeenLiveAt": 1795497273637,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 5,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "maimiller.m",
@@ -77747,9 +77730,9 @@
    "lastWatchedAt": 1794535176243,
    "addedAt": 1794535110993,
    "lastSeenLiveAt": 1795138127765,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 8,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "babyvee367",
@@ -77768,9 +77751,9 @@
    "lastWatchedAt": 1794535182117,
    "addedAt": 1794535110993,
    "lastSeenLiveAt": 1795414693667,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 7,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "nwivz",
@@ -77789,9 +77772,9 @@
    "lastWatchedAt": 1794535187920,
    "addedAt": 1794535110993,
    "lastSeenLiveAt": 1795050050532,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 8,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "miiiiii06120",
@@ -77810,9 +77793,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794535110993,
    "lastSeenLiveAt": 1795382484291,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 6,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "jaii_mobb",
@@ -77831,9 +77814,9 @@
    "lastWatchedAt": 1794535258096,
    "addedAt": 1794535110993,
    "lastSeenLiveAt": 1794980600765,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 8,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "juaannguaqsteen90",
@@ -77873,9 +77856,9 @@
    "lastWatchedAt": 1794535005128,
    "addedAt": 1794534944038,
    "lastSeenLiveAt": 1795583427603,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 4,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "millemussen2004",
@@ -77894,9 +77877,9 @@
    "lastWatchedAt": 1794535009685,
    "addedAt": 1794534944038,
    "lastSeenLiveAt": 1794974005329,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 9,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "akula888_",
@@ -77936,9 +77919,9 @@
    "lastWatchedAt": 1795300535738,
    "addedAt": 1794534777365,
    "lastSeenLiveAt": 1795234839222,
-   "lastPollAt": 1795794795005,
+   "lastPollAt": 1795824028995,
    "offlineChecks": 9,
-   "nextPollAt": 1796025195005
+   "nextPollAt": 1795824148995
   },
   {
    "username": "yasaminazizi37",
@@ -77957,9 +77940,9 @@
    "lastWatchedAt": 1794535097992,
    "addedAt": 1794534777365,
    "lastSeenLiveAt": 1795650622880,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 1,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "ani.grigoryan.7701",
@@ -77978,9 +77961,9 @@
    "lastWatchedAt": 1794535101425,
    "addedAt": 1794534777365,
    "lastSeenLiveAt": 1795234839221,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 8,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "cocolinica",
@@ -78083,9 +78066,9 @@
    "lastWatchedAt": 1794535331483,
    "addedAt": 1794534589662,
    "lastSeenLiveAt": 1795588471605,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 1,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "bliznazaszyty",
@@ -78167,9 +78150,9 @@
    "lastWatchedAt": 1795322296598,
    "addedAt": 1794530412151,
    "lastSeenLiveAt": 1795362572328,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 6,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "cesteliz",
@@ -78209,9 +78192,9 @@
    "lastWatchedAt": 1795213666483,
    "addedAt": 1794530243529,
    "lastSeenLiveAt": 1795823251426,
-   "lastPollAt": 1795823770260,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 0,
-   "nextPollAt": 1795823890260
+   "nextPollAt": 1795824148996
   },
   {
    "username": "2b.gameroffical",
@@ -78230,9 +78213,9 @@
    "lastWatchedAt": 1794843701237,
    "addedAt": 1794530243529,
    "lastSeenLiveAt": 1794579539389,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 9,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "araus_30",
@@ -78272,9 +78255,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794530243529,
    "lastSeenLiveAt": 1795048256896,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 8,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "director_o1",
@@ -78335,9 +78318,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794529888424,
    "lastSeenLiveAt": 1795393440310,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 6,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "babbyy_leo_",
@@ -78377,9 +78360,9 @@
    "lastWatchedAt": 1795138328968,
    "addedAt": 1794529888424,
    "lastSeenLiveAt": 1795138127765,
-   "lastPollAt": 1795798679747,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 8,
-   "nextPollAt": 1795798799747
+   "nextPollAt": 1795824148996
   },
   {
    "username": "nicalto",
@@ -78398,9 +78381,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794529888424,
    "lastSeenLiveAt": 1795051346404,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 8,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "happy57349",
@@ -78419,9 +78402,9 @@
    "lastWatchedAt": 1795393790361,
    "addedAt": 1794529888424,
    "lastSeenLiveAt": 1795393440308,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 6,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "alybeiu",
@@ -78440,9 +78423,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794529718237,
    "lastSeenLiveAt": 1795189532625,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 8,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "iliepiellie_",
@@ -78482,9 +78465,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794529550181,
    "lastSeenLiveAt": 1795013783987,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 8,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "remmalyn",
@@ -78503,9 +78486,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794529550181,
    "lastSeenLiveAt": 1795382484292,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 6,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "axlarii",
@@ -78524,9 +78507,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794529550181,
    "lastSeenLiveAt": 1795823251425,
-   "lastPollAt": 1795823770260,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 0,
-   "nextPollAt": 1795823890260
+   "nextPollAt": 1795824148996
   },
   {
    "username": "1naacho",
@@ -78545,9 +78528,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794529550181,
    "lastSeenLiveAt": 1795049534643,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 8,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "yulia___yulyashka___",
@@ -78587,9 +78570,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794529382542,
    "lastSeenLiveAt": 1795320702017,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 8,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "f340169",
@@ -78692,9 +78675,9 @@
    "lastWatchedAt": 1794529176704,
    "addedAt": 1794529042495,
    "lastSeenLiveAt": 1795465465236,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 7,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "wiktoria_vikii",
@@ -78734,9 +78717,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794529042495,
    "lastSeenLiveAt": 1795715737460,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 0,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "123www540",
@@ -78755,9 +78738,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794529042495,
    "lastSeenLiveAt": 0,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 3,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "rahyan404",
@@ -78776,9 +78759,9 @@
    "lastWatchedAt": 1794529055373,
    "addedAt": 1794528873465,
    "lastSeenLiveAt": 1795296705903,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 8,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "viki_bor_",
@@ -78797,9 +78780,9 @@
    "lastWatchedAt": 1794529062809,
    "addedAt": 1794528873465,
    "lastSeenLiveAt": 1795362572328,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 7,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "apachino89",
@@ -78818,9 +78801,9 @@
    "lastWatchedAt": 1794529131893,
    "addedAt": 1794528873465,
    "lastSeenLiveAt": 1795362572328,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 6,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "namra_chaudhary00",
@@ -78860,9 +78843,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794528703746,
    "lastSeenLiveAt": 1795650622880,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 0,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "frangospafora",
@@ -78902,9 +78885,9 @@
    "lastWatchedAt": 1794528812129,
    "addedAt": 1794528534265,
    "lastSeenLiveAt": 1795585060579,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 4,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "chtmskf",
@@ -78923,9 +78906,9 @@
    "lastWatchedAt": 1794528818647,
    "addedAt": 1794528534265,
    "lastSeenLiveAt": 1794974843233,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 8,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "fa_zz20",
@@ -78944,9 +78927,9 @@
    "lastWatchedAt": 1794528824638,
    "addedAt": 1794528534265,
    "lastSeenLiveAt": 1795620991951,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 0,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "786_830",
@@ -78965,9 +78948,9 @@
    "lastWatchedAt": 1794528675340,
    "addedAt": 1794528360037,
    "lastSeenLiveAt": 1795823251426,
-   "lastPollAt": 1795823770260,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 0,
-   "nextPollAt": 1795823890260
+   "nextPollAt": 1795824148996
   },
   {
    "username": "asfgv013",
@@ -79007,9 +78990,9 @@
    "lastWatchedAt": 1794528750907,
    "addedAt": 1794528360037,
    "lastSeenLiveAt": 1795650622880,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 1,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "stackz954",
@@ -79028,9 +79011,9 @@
    "lastWatchedAt": 1794528757298,
    "addedAt": 1794528360037,
    "lastSeenLiveAt": 1795578872345,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 4,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "alexmubarok26",
@@ -79154,9 +79137,9 @@
    "lastWatchedAt": 1794528557911,
    "addedAt": 1794528024189,
    "lastSeenLiveAt": 1795046962376,
-   "lastPollAt": 1795823513139,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 8,
-   "nextPollAt": 1795823633139
+   "nextPollAt": 1795824148996
   },
   {
    "username": "prinssprinss0",
@@ -79175,9 +79158,9 @@
    "lastWatchedAt": 1794528564290,
    "addedAt": 1794528024189,
    "lastSeenLiveAt": 1795009875696,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 8,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "7mareschurelamarinillo",
@@ -79196,9 +79179,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794528024189,
    "lastSeenLiveAt": 1795462375087,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 6,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "marvin_himselff",
@@ -79259,9 +79242,9 @@
    "lastWatchedAt": 1794528508935,
    "addedAt": 1794527858469,
    "lastSeenLiveAt": 1795382484291,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 6,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "mardiinsson",
@@ -79301,9 +79284,9 @@
    "lastWatchedAt": 1794528552392,
    "addedAt": 1794527858469,
    "lastSeenLiveAt": 1795622034579,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 1,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "jamka.1111",
@@ -79322,9 +79305,9 @@
    "lastWatchedAt": 1794528429916,
    "addedAt": 1794527690144,
    "lastSeenLiveAt": 1795503745659,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 6,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "brondvn",
@@ -79343,9 +79326,9 @@
    "lastWatchedAt": 1794528436605,
    "addedAt": 1794527690144,
    "lastSeenLiveAt": 1795588471605,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 3,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "jptalisca",
@@ -79385,9 +79368,9 @@
    "lastWatchedAt": 1795584103879,
    "addedAt": 1794527690144,
    "lastSeenLiveAt": 1795583973107,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 3,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "seljankezza",
@@ -79448,9 +79431,9 @@
    "lastWatchedAt": 1795417943267,
    "addedAt": 1794527523182,
    "lastSeenLiveAt": 1795420470994,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 5,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "shahsiyati.bzrg_62mkr",
@@ -79490,9 +79473,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794527523182,
    "lastSeenLiveAt": 1794700226176,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 9,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "joudy17117",
@@ -79553,9 +79536,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794527188859,
    "lastSeenLiveAt": 1795005979153,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 8,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "fjaviermazariego",
@@ -79574,9 +79557,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794527188859,
    "lastSeenLiveAt": 1795622034579,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 0,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "mari12mari22",
@@ -79616,9 +79599,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794527021660,
    "lastSeenLiveAt": 1795823251425,
-   "lastPollAt": 1795823770260,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 0,
-   "nextPollAt": 1795823890260
+   "nextPollAt": 1795824148996
   },
   {
    "username": "baby.iuliaa",
@@ -79637,9 +79620,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794527021660,
    "lastSeenLiveAt": 1794534649892,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 9,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "thepunisheur1",
@@ -79742,9 +79725,9 @@
    "lastWatchedAt": 1795410654779,
    "addedAt": 1794526687350,
    "lastSeenLiveAt": 1795671199722,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 1,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "ranja.sm",
@@ -79763,9 +79746,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794526687350,
    "lastSeenLiveAt": 1795547331418,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 4,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "queen_qusu",
@@ -79784,9 +79767,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794526687350,
    "lastSeenLiveAt": 1795715737460,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 0,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "a.s.h.a.t_pushka",
@@ -79868,9 +79851,9 @@
    "lastWatchedAt": 1795746740783,
    "addedAt": 1794526525131,
    "lastSeenLiveAt": 1795746527961,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 0,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "ollystuart",
@@ -79889,9 +79872,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794526525131,
    "lastSeenLiveAt": 1795823251426,
-   "lastPollAt": 1795823770260,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 0,
-   "nextPollAt": 1795823890260
+   "nextPollAt": 1795824148996
   },
   {
    "username": "shanggozi_",
@@ -79973,9 +79956,9 @@
    "lastWatchedAt": 1795042045356,
    "addedAt": 1794526525131,
    "lastSeenLiveAt": 1795041841887,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 8,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "tubsietut",
@@ -79994,9 +79977,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794526360283,
    "lastSeenLiveAt": 1795213471183,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 8,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "yamammiiy",
@@ -80015,9 +79998,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794526360283,
    "lastSeenLiveAt": 1794617093537,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 10,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "melliii__25",
@@ -80036,9 +80019,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794526360283,
    "lastSeenLiveAt": 1795500811865,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 5,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "villager.man",
@@ -80078,9 +80061,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794526360283,
    "lastSeenLiveAt": 1795044920909,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 8,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "hamzasarhan87",
@@ -80120,9 +80103,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794526360283,
    "lastSeenLiveAt": 1795382484291,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 7,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "yana_rezerv1",
@@ -80141,9 +80124,9 @@
    "lastWatchedAt": 1795393592316,
    "addedAt": 1794526196965,
    "lastSeenLiveAt": 1795393440308,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 7,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "melynakis23",
@@ -80183,9 +80166,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794526196965,
    "lastSeenLiveAt": 1795138127765,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 8,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "x.paigex69",
@@ -80288,9 +80271,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794525869523,
    "lastSeenLiveAt": 1795047994888,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 8,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "vikulea_a",
@@ -80309,9 +80292,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794525869523,
    "lastSeenLiveAt": 1795465465236,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 5,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "nikasydolll",
@@ -80435,9 +80418,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794525869523,
    "lastSeenLiveAt": 1795498910334,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 5,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "brigenda",
@@ -80456,9 +80439,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794525705400,
    "lastSeenLiveAt": 1795213471183,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 8,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "geovia.shan",
@@ -80498,9 +80481,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794525705400,
    "lastSeenLiveAt": 1795393440308,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 6,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "glos.tiktoka",
@@ -80561,9 +80544,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794525539823,
    "lastSeenLiveAt": 1795044920909,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 8,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "klaabby",
@@ -80603,9 +80586,9 @@
    "lastWatchedAt": 1795390500631,
    "addedAt": 1794525539823,
    "lastSeenLiveAt": 1795044920909,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 8,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "sheizzaya",
@@ -80666,9 +80649,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794525539823,
    "lastSeenLiveAt": 1795362572328,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 6,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "fritzylive1",
@@ -80750,9 +80733,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794525371292,
    "lastSeenLiveAt": 1795619690487,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 0,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "destina138",
@@ -80771,9 +80754,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794525371292,
    "lastSeenLiveAt": 1795650622880,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 1,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "luigigiadafg",
@@ -80792,9 +80775,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794525371292,
    "lastSeenLiveAt": 1795382484291,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 6,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "bossgally2",
@@ -80813,9 +80796,9 @@
    "lastWatchedAt": 1794525313733,
    "addedAt": 1794525206544,
    "lastSeenLiveAt": 0,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 2,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "_msflora",
@@ -80939,9 +80922,9 @@
    "lastWatchedAt": 1795389804258,
    "addedAt": 1794525206544,
    "lastSeenLiveAt": 1795394205925,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 6,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "selamakidane1",
@@ -80960,9 +80943,9 @@
    "lastWatchedAt": 1795297251156,
    "addedAt": 1794525039548,
    "lastSeenLiveAt": 1795213471183,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 1,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "itsnorel",
@@ -81023,9 +81006,9 @@
    "lastWatchedAt": 1794525219694,
    "addedAt": 1794525039548,
    "lastSeenLiveAt": 1795622034579,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 0,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "saten.ghazaryan",
@@ -81065,9 +81048,9 @@
    "lastWatchedAt": 1794525254371,
    "addedAt": 1794524874447,
    "lastSeenLiveAt": 1795547331418,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 5,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "sicilia528",
@@ -81107,9 +81090,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794524874447,
    "lastSeenLiveAt": 1795009616894,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 8,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "firemoonenergy",
@@ -81149,9 +81132,9 @@
    "lastWatchedAt": 1794525096288,
    "addedAt": 1794524874447,
    "lastSeenLiveAt": 1795614021626,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 1,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "akeshn",
@@ -81233,9 +81216,9 @@
    "lastWatchedAt": 1794525024124,
    "addedAt": 1794524706465,
    "lastSeenLiveAt": 1795414961407,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 6,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "alesia_lakina",
@@ -81296,9 +81279,9 @@
    "lastWatchedAt": 1794524966612,
    "addedAt": 1794524374127,
    "lastSeenLiveAt": 1794972030090,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 9,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "tinklezasmr",
@@ -81317,9 +81300,9 @@
    "lastWatchedAt": 1794524892401,
    "addedAt": 1794524207692,
    "lastSeenLiveAt": 1794617093537,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 8,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "nastysha.space",
@@ -81359,9 +81342,9 @@
    "lastWatchedAt": 1794524960209,
    "addedAt": 1794524207692,
    "lastSeenLiveAt": 1795785261753,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 0,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "smbalaty",
@@ -81401,9 +81384,9 @@
    "lastWatchedAt": 1794769535987,
    "addedAt": 1794524039927,
    "lastSeenLiveAt": 1795671199723,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 0,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "qttr132",
@@ -81464,9 +81447,9 @@
    "lastWatchedAt": 1794524772679,
    "addedAt": 1794523879104,
    "lastSeenLiveAt": 1795502420680,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 5,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "crainer",
@@ -81506,9 +81489,9 @@
    "lastWatchedAt": 1795757397657,
    "addedAt": 1794523879104,
    "lastSeenLiveAt": 1795590018982,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 2,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "sowfootball0505",
@@ -81527,9 +81510,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794523879104,
    "lastSeenLiveAt": 1795013783987,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 8,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "adrian.corduneanu17",
@@ -81548,9 +81531,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794523879104,
    "lastSeenLiveAt": 1795614021627,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 0,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "alisiyass_",
@@ -81590,9 +81573,9 @@
    "lastWatchedAt": 1794796968621,
    "addedAt": 1794523879104,
    "lastSeenLiveAt": 1795579132625,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 4,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "userzhumkp1h89",
@@ -81695,9 +81678,9 @@
    "lastWatchedAt": 1795217034726,
    "addedAt": 1794523714730,
    "lastSeenLiveAt": 1795213471183,
-   "lastPollAt": 1795823770260,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 9,
-   "nextPollAt": 1795823890260
+   "nextPollAt": 1795824148996
   },
   {
    "username": "sajinatamang.1",
@@ -81737,9 +81720,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794523714730,
    "lastSeenLiveAt": 1795465465236,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 5,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "akistey11",
@@ -81758,9 +81741,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794523714730,
    "lastSeenLiveAt": 1794772903939,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 9,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "somoteamburro3",
@@ -81779,9 +81762,9 @@
    "lastWatchedAt": 1795046498956,
    "addedAt": 1794523550060,
    "lastSeenLiveAt": 1795583427603,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 3,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "peace.mind001",
@@ -81863,9 +81846,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794523550060,
    "lastSeenLiveAt": 1795547331418,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 4,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "spartamindest",
@@ -81905,9 +81888,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794523550060,
    "lastSeenLiveAt": 1795044920909,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 8,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "sejgi.m",
@@ -81926,9 +81909,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794523550060,
    "lastSeenLiveAt": 1794576540507,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 9,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "ageofhope2",
@@ -81947,9 +81930,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794523388220,
    "lastSeenLiveAt": 1795046962377,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 8,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "sperbichotagalact",
@@ -81968,9 +81951,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794523388220,
    "lastSeenLiveAt": 1795323958799,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 8,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "ivvona2",
@@ -82031,9 +82014,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794523388220,
    "lastSeenLiveAt": 1795382484291,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 6,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "dagiyeldetyelj",
@@ -82052,9 +82035,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794523388220,
    "lastSeenLiveAt": 1795823251426,
-   "lastPollAt": 1795823770260,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 0,
-   "nextPollAt": 1795823890260
+   "nextPollAt": 1795824148996
   },
   {
    "username": "rubina.dan",
@@ -82073,9 +82056,9 @@
    "lastWatchedAt": 1795506114522,
    "addedAt": 1794523388220,
    "lastSeenLiveAt": 1795508181435,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 4,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "thepainoriginal",
@@ -82094,9 +82077,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794523225763,
    "lastSeenLiveAt": 1794602579414,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 6,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "provenzano1314",
@@ -82115,9 +82098,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794523225763,
    "lastSeenLiveAt": 1795498093513,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 6,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "hanan37",
@@ -82136,9 +82119,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794523225763,
    "lastSeenLiveAt": 1795589504284,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 1,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "danicormusic",
@@ -82199,9 +82182,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794523054691,
    "lastSeenLiveAt": 1795823251425,
-   "lastPollAt": 1795823770260,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 0,
-   "nextPollAt": 1795823890260
+   "nextPollAt": 1795824148996
   },
   {
    "username": "anochabeautyspaamsterdam",
@@ -82241,9 +82224,9 @@
    "lastWatchedAt": 1795319028470,
    "addedAt": 1794523054691,
    "lastSeenLiveAt": 1795319596862,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 8,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "barberkaiva",
@@ -82262,9 +82245,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794523054691,
    "lastSeenLiveAt": 1795044920911,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 8,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "jubbydann",
@@ -82283,9 +82266,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794523054691,
    "lastSeenLiveAt": 1794534649892,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 0,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "abodyfunn",
@@ -82304,9 +82287,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794522711605,
    "lastSeenLiveAt": 1795049534643,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 8,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "dd.mln",
@@ -82367,9 +82350,9 @@
    "lastWatchedAt": 1794838223542,
    "addedAt": 1794522711605,
    "lastSeenLiveAt": 1795008842511,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 6,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "angiecamachofi",
@@ -82430,9 +82413,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794522711605,
    "lastSeenLiveAt": 1794684949626,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 9,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "gonchuk__",
@@ -82451,9 +82434,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794522711605,
    "lastSeenLiveAt": 1795044920909,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 8,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "dzelo88",
@@ -82514,9 +82497,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794522549455,
    "lastSeenLiveAt": 1795382484291,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 6,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "emil_samarkand",
@@ -82598,9 +82581,9 @@
    "lastWatchedAt": 1795217339746,
    "addedAt": 1794522386994,
    "lastSeenLiveAt": 1795213471182,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 8,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "lionking007716",
@@ -82640,9 +82623,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794522386994,
    "lastSeenLiveAt": 1795382484291,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 7,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "miss.sanjitaa",
@@ -82661,9 +82644,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794522386994,
    "lastSeenLiveAt": 1795109430618,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 8,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "natashe_natty",
@@ -82787,9 +82770,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794522228385,
    "lastSeenLiveAt": 1794545432853,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 0,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "janetski89",
@@ -82808,9 +82791,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794522228385,
    "lastSeenLiveAt": 1795047479638,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 8,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "aliyeva_z777",
@@ -82871,9 +82854,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794522065229,
    "lastSeenLiveAt": 1795823251426,
-   "lastPollAt": 1795823770260,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 0,
-   "nextPollAt": 1795823890260
+   "nextPollAt": 1795824148996
   },
   {
    "username": "krisztinalakatos638",
@@ -82892,9 +82875,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794522065229,
    "lastSeenLiveAt": 1795382484291,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 6,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "fuadik717",
@@ -82997,9 +82980,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794522065229,
    "lastSeenLiveAt": 1795547331418,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 4,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "pillango0711",
@@ -83060,9 +83043,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794521900711,
    "lastSeenLiveAt": 1795785261754,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 0,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "axmedoff_tashkentiskiy01",
@@ -83102,9 +83085,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794521900711,
    "lastSeenLiveAt": 1795213471183,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 8,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "chey.ds",
@@ -83123,9 +83106,9 @@
    "lastWatchedAt": 1794776668993,
    "addedAt": 1794521900711,
    "lastSeenLiveAt": 1794943686272,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 8,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "inguleisn",
@@ -83134,19 +83117,19 @@
    "roomId": "7712925658032769814",
    "roomIdAt": 1795823515806,
    "roomIdMiss": 0,
-   "boxEvents": 8,
-   "boxCoinSum": 269,
-   "boxCoinsSeen": 7,
-   "boxSharedSum": 188,
-   "boxSharedSeen": 7,
+   "boxEvents": 9,
+   "boxCoinSum": 302,
+   "boxCoinsSeen": 8,
+   "boxSharedSum": 212,
+   "boxSharedSeen": 8,
    "firstBoxAt": 1795217336597,
-   "lastBoxAt": 1795307220968,
+   "lastBoxAt": 1795824136910,
    "lastWatchedAt": 1795823515806,
    "addedAt": 1794521735246,
    "lastSeenLiveAt": 1794617093537,
-   "lastPollAt": 1795823770260,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 9,
-   "nextPollAt": 1795823890260
+   "nextPollAt": 1795824148996
   },
   {
    "username": "christianjuhani",
@@ -83207,9 +83190,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794521735246,
    "lastSeenLiveAt": 1795213471183,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 8,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "kvkkfkf6",
@@ -83291,9 +83274,9 @@
    "lastWatchedAt": 1794942448476,
    "addedAt": 1794521572106,
    "lastSeenLiveAt": 1795465465236,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 5,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "maryxoxo03",
@@ -83333,9 +83316,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794521572106,
    "lastSeenLiveAt": 1795614021626,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 0,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "balkanlive999",
@@ -83375,9 +83358,9 @@
    "lastWatchedAt": 1794521476755,
    "addedAt": 1794521408324,
    "lastSeenLiveAt": 1795348968016,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 6,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "diegocordon_",
@@ -83438,9 +83421,9 @@
    "lastWatchedAt": 1794521494409,
    "addedAt": 1794521408324,
    "lastSeenLiveAt": 1795382484291,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 7,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "nani_arm_",
@@ -83543,9 +83526,9 @@
    "lastWatchedAt": 1794521279696,
    "addedAt": 1794521246582,
    "lastSeenLiveAt": 1795785261754,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 0,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "ugcwithkui",
@@ -83564,9 +83547,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794521246582,
    "lastSeenLiveAt": 1794617093537,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 8,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "belloworld09",
@@ -83606,9 +83589,9 @@
    "lastWatchedAt": 1794521408787,
    "addedAt": 1794521246582,
    "lastSeenLiveAt": 1794687423669,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 8,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "gonnaaaam7",
@@ -83690,9 +83673,9 @@
    "lastWatchedAt": 1794521606237,
    "addedAt": 1794520906011,
    "lastSeenLiveAt": 1795010133630,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 8,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "jaktonsen",
@@ -83753,9 +83736,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794520906011,
    "lastSeenLiveAt": 0,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 8,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "__lilyy.__",
@@ -83816,9 +83799,9 @@
    "lastWatchedAt": 1794520728608,
    "addedAt": 1794520718662,
    "lastSeenLiveAt": 1795671199723,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 0,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "wesley_cabelinho00",
@@ -83837,9 +83820,9 @@
    "lastWatchedAt": 1794521565361,
    "addedAt": 1794520718662,
    "lastSeenLiveAt": 1795010653368,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 8,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "yaaaaaankaaa",
@@ -83900,9 +83883,9 @@
    "lastWatchedAt": 1794521014733,
    "addedAt": 1794520172922,
    "lastSeenLiveAt": 1795578872345,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 4,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "mandat.international.17",
@@ -83921,9 +83904,9 @@
    "lastWatchedAt": 1794519982909,
    "addedAt": 1794519975370,
    "lastSeenLiveAt": 1795465465236,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 5,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "roberto.zamora23",
@@ -84047,9 +84030,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794519657703,
    "lastSeenLiveAt": 1794519853129,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 9,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "alexaaabianca",
@@ -84089,9 +84072,9 @@
    "lastWatchedAt": 1794520043965,
    "addedAt": 1794519346892,
    "lastSeenLiveAt": 1795382484291,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 6,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "rimns29",
@@ -84110,9 +84093,9 @@
    "lastWatchedAt": 1794769309181,
    "addedAt": 1794519037661,
    "lastSeenLiveAt": 1795584518638,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 4,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "nesquik.krispy",
@@ -84152,9 +84135,9 @@
    "lastWatchedAt": 1794518971317,
    "addedAt": 1794518889220,
    "lastSeenLiveAt": 1794980600765,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 8,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "asmitajureli2201",
@@ -84278,9 +84261,9 @@
    "lastWatchedAt": 1794518729036,
    "addedAt": 1794518590655,
    "lastSeenLiveAt": 1795576955455,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 4,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "george_88__",
@@ -84299,9 +84282,9 @@
    "lastWatchedAt": 1794518733012,
    "addedAt": 1794518590655,
    "lastSeenLiveAt": 1794519853129,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 8,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "sardarafghanistan01",
@@ -84320,9 +84303,9 @@
    "lastWatchedAt": 1794518805959,
    "addedAt": 1794518590655,
    "lastSeenLiveAt": 1795047479638,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 8,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "the.cobras8",
@@ -84425,9 +84408,9 @@
    "lastWatchedAt": 1794518338166,
    "addedAt": 1794518289259,
    "lastSeenLiveAt": 1795323958799,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 8,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "music_niloy",
@@ -84530,9 +84513,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794517987317,
    "lastSeenLiveAt": 1795012737886,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 8,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "1979zoltan",
@@ -84614,9 +84597,9 @@
    "lastWatchedAt": 1794517646030,
    "addedAt": 1794517640338,
    "lastSeenLiveAt": 1794517695433,
-   "lastPollAt": 1795823770260,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 9,
-   "nextPollAt": 1795823890260
+   "nextPollAt": 1795824148996
   },
   {
    "username": "thekaszasimreicon",
@@ -84635,9 +84618,9 @@
    "lastWatchedAt": 1794517649739,
    "addedAt": 1794517640338,
    "lastSeenLiveAt": 1794943686272,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 10,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "danellys_zerpa",
@@ -84698,9 +84681,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794517493452,
    "lastSeenLiveAt": 1795109430618,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 8,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "olimpiya.kz",
@@ -84740,9 +84723,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794517338127,
    "lastSeenLiveAt": 1795382484291,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 8,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "diyalimbu30",
@@ -84887,9 +84870,9 @@
    "lastWatchedAt": 1795111490136,
    "addedAt": 1794516871997,
    "lastSeenLiveAt": 1795462375086,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 6,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "pema.yeshi80",
@@ -84908,9 +84891,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794516871997,
    "lastSeenLiveAt": 1795785261754,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 1,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "rizkingrami",
@@ -84929,9 +84912,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794516871998,
    "lastSeenLiveAt": 1795213471183,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 8,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "szajnoga_pro",
@@ -84950,9 +84933,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794516871998,
    "lastSeenLiveAt": 1795362572328,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 7,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "patrik171717",
@@ -85013,9 +84996,9 @@
    "lastWatchedAt": 1795465951284,
    "addedAt": 1794516715161,
    "lastSeenLiveAt": 1795465465236,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 6,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "rimi_off1cial",
@@ -85034,9 +85017,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794516559509,
    "lastSeenLiveAt": 0,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 9,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "k.d.b.21",
@@ -85202,9 +85185,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794516241912,
    "lastSeenLiveAt": 1795498366389,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 7,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "okozeleno17_01_ss",
@@ -85244,9 +85227,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794516086282,
    "lastSeenLiveAt": 1794517695433,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 8,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "snail.girl7",
@@ -85265,9 +85248,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794516086282,
    "lastSeenLiveAt": 1795044920910,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 8,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "samaal.122",
@@ -85370,9 +85353,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794515761078,
    "lastSeenLiveAt": 1794517695433,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 9,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "shingrwa69",
@@ -85412,9 +85395,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794515761078,
    "lastSeenLiveAt": 1795009616894,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 8,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "matijahodak",
@@ -85601,9 +85584,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794515439398,
    "lastSeenLiveAt": 1795009358483,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 8,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "bawsladylive",
@@ -85622,9 +85605,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794515439398,
    "lastSeenLiveAt": 1795362572328,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 7,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "maya02y0",
@@ -85853,9 +85836,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794514786569,
    "lastSeenLiveAt": 1795501346449,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 7,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "edithanyamene",
@@ -85874,9 +85857,9 @@
    "lastWatchedAt": 1794515640764,
    "addedAt": 1794514786569,
    "lastSeenLiveAt": 1795006760792,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 8,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "foreverrukishin",
@@ -85937,9 +85920,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794514627791,
    "lastSeenLiveAt": 1795502947667,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 7,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "nati_chava",
@@ -86000,9 +85983,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794514470332,
    "lastSeenLiveAt": 1795189269012,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 8,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "lft.faif1995",
@@ -86189,9 +86172,9 @@
    "lastWatchedAt": 1794769527799,
    "addedAt": 1794513996499,
    "lastSeenLiveAt": 1795362572328,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 6,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "unclesammy.0",
@@ -86252,9 +86235,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794513996499,
    "lastSeenLiveAt": 1795715737460,
-   "lastPollAt": 1795823770260,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 0,
-   "nextPollAt": 1795823890260
+   "nextPollAt": 1795824148996
   },
   {
    "username": "fwa.92",
@@ -86273,9 +86256,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794513502888,
    "lastSeenLiveAt": 1795013783987,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 8,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "babina_kiratee",
@@ -86336,9 +86319,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794513502888,
    "lastSeenLiveAt": 1795013783987,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 8,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "joshuaplourde",
@@ -86525,9 +86508,9 @@
    "lastWatchedAt": 1794513817756,
    "addedAt": 1794513031317,
    "lastSeenLiveAt": 1795622034579,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 0,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "mariajosemelo_1",
@@ -86735,9 +86718,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794512715718,
    "lastSeenLiveAt": 1795047737914,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 8,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "meduza.blondinuke",
@@ -86777,9 +86760,9 @@
    "lastWatchedAt": 1794513446148,
    "addedAt": 1794512561819,
    "lastSeenLiveAt": 0,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 9,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "maishiyang16",
@@ -87029,9 +87012,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794511911502,
    "lastSeenLiveAt": 0,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 9,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "_cidaguedes",
@@ -87134,9 +87117,9 @@
    "lastWatchedAt": 1795719300943,
    "addedAt": 1794511590787,
    "lastSeenLiveAt": 1795715737459,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 0,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "jeovanyestrada40",
@@ -87218,9 +87201,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794511433872,
    "lastSeenLiveAt": 1794617093537,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 8,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "teresita_castellon",
@@ -87260,9 +87243,9 @@
    "lastWatchedAt": 1795117915097,
    "addedAt": 1794511280681,
    "lastSeenLiveAt": 1795785261754,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 0,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "almortah711",
@@ -87302,9 +87285,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794511125666,
    "lastSeenLiveAt": 0,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 8,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "latoni01",
@@ -87491,9 +87474,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794510816533,
    "lastSeenLiveAt": 1794646395600,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 8,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "martusiuu",
@@ -87533,9 +87516,9 @@
    "lastWatchedAt": 1795052711822,
    "addedAt": 1794510663259,
    "lastSeenLiveAt": 1795650622880,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 0,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "iii3ppp",
@@ -87743,9 +87726,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794510042533,
    "lastSeenLiveAt": 1795462375087,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 7,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "1dweetrecords",
@@ -87890,9 +87873,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794509732907,
    "lastSeenLiveAt": 1795362307143,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 7,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "hellolovekayci",
@@ -88310,9 +88293,9 @@
    "lastWatchedAt": 1794883949060,
    "addedAt": 1794508653919,
    "lastSeenLiveAt": 1795585060579,
-   "lastPollAt": 1795823770260,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 3,
-   "nextPollAt": 1795823890260
+   "nextPollAt": 1795824148996
   },
   {
    "username": "kara_prank",
@@ -89024,9 +89007,9 @@
    "lastWatchedAt": 1795284215662,
    "addedAt": 1794507260542,
    "lastSeenLiveAt": 1795362572328,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 6,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "kksleepsong.com",
@@ -89570,9 +89553,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794506339536,
    "lastSeenLiveAt": 1795823251426,
-   "lastPollAt": 1795823770260,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 0,
-   "nextPollAt": 1795823890260
+   "nextPollAt": 1795824148996
   },
   {
    "username": "aley.nguyenx",
@@ -90179,9 +90162,9 @@
    "lastWatchedAt": 1794505449615,
    "addedAt": 1794505418828,
    "lastSeenLiveAt": 1794517695434,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 9,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "josteinsorum",
@@ -90368,9 +90351,9 @@
    "lastWatchedAt": 1794505317687,
    "addedAt": 1794505244866,
    "lastSeenLiveAt": 1794941634120,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 10,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "mala.online",
@@ -90599,9 +90582,9 @@
    "lastWatchedAt": 1794499953019,
    "addedAt": 1794499820154,
    "lastSeenLiveAt": 1795585851429,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 3,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "_itsme.solace",
@@ -90662,9 +90645,9 @@
    "lastWatchedAt": 1794499824472,
    "addedAt": 1794499661056,
    "lastSeenLiveAt": 1795795064713,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 0,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "7caaiolucas",
@@ -90746,9 +90729,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794499507786,
    "lastSeenLiveAt": 1795362572328,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 5,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "jaydennnn.85",
@@ -90767,9 +90750,9 @@
    "lastWatchedAt": 1794499706940,
    "addedAt": 1794499507786,
    "lastSeenLiveAt": 1794972030090,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 9,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "resilencia780",
@@ -90788,9 +90771,9 @@
    "lastWatchedAt": 1794500326658,
    "addedAt": 1794499507786,
    "lastSeenLiveAt": 1795355340311,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 7,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "sonamchoden3386",
@@ -90830,9 +90813,9 @@
    "lastWatchedAt": 1794500082339,
    "addedAt": 1794499335659,
    "lastSeenLiveAt": 1794499385758,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 0,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "fiziarshad_",
@@ -91019,9 +91002,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794498841237,
    "lastSeenLiveAt": 1795362572328,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 6,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "yesqueen.live1",
@@ -91166,9 +91149,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794498512576,
    "lastSeenLiveAt": 1795497273637,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 5,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "tammib07",
@@ -91250,9 +91233,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794498360217,
    "lastSeenLiveAt": 1795362572328,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 6,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "ranyuki11",
@@ -91439,9 +91422,9 @@
    "lastWatchedAt": 1795011698352,
    "addedAt": 1794498055156,
    "lastSeenLiveAt": 1795420470994,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 5,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "reegan645",
@@ -91502,9 +91485,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794497901296,
    "lastSeenLiveAt": 1795586376223,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 2,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "amal16600",
@@ -91544,9 +91527,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794497745431,
    "lastSeenLiveAt": 1795785261754,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 1,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "missy.lly",
@@ -91565,9 +91548,9 @@
    "lastWatchedAt": 1795118484897,
    "addedAt": 1794497745431,
    "lastSeenLiveAt": 1795420470994,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 5,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "jarrobht3",
@@ -91607,9 +91590,9 @@
    "lastWatchedAt": 1795622228187,
    "addedAt": 1794497592635,
    "lastSeenLiveAt": 1795676032332,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 0,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "marytahaddad1",
@@ -91691,9 +91674,9 @@
    "lastWatchedAt": 1795226880235,
    "addedAt": 1794497259410,
    "lastSeenLiveAt": 1795495354265,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 5,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "_____katcoula",
@@ -91817,9 +91800,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794496937580,
    "lastSeenLiveAt": 1795620991951,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 1,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "bekkks8",
@@ -91901,9 +91884,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794496781236,
    "lastSeenLiveAt": 1795588988826,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 0,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "dh_hyun",
@@ -91943,9 +91926,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794496781236,
    "lastSeenLiveAt": 1795581262056,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 3,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "_ebimayo_",
@@ -92027,9 +92010,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794496622235,
    "lastSeenLiveAt": 1795362307143,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 6,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "rezeenaghimire",
@@ -92069,9 +92052,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794496299543,
    "lastSeenLiveAt": 1795588471605,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 0,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "no1lowzinnn",
@@ -92300,9 +92283,9 @@
    "lastWatchedAt": 1794496099536,
    "addedAt": 1794495968741,
    "lastSeenLiveAt": 1795589504285,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 2,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "golpariiii0____",
@@ -92363,9 +92346,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794495808325,
    "lastSeenLiveAt": 1795362307143,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 6,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "gullllll06",
@@ -92468,9 +92451,9 @@
    "lastWatchedAt": 1794495736668,
    "addedAt": 1794495649620,
    "lastSeenLiveAt": 1795362307143,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 6,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "romanac03",
@@ -92489,9 +92472,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794495649620,
    "lastSeenLiveAt": 1795588471605,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 2,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "belousov_10",
@@ -92573,9 +92556,9 @@
    "lastWatchedAt": 1794495483392,
    "addedAt": 1794495332587,
    "lastSeenLiveAt": 1794495372201,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 9,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "kindi.lau98",
@@ -92615,9 +92598,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794495332587,
    "lastSeenLiveAt": 1795650622881,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 1,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "bnt_jumirah",
@@ -92657,9 +92640,9 @@
    "lastWatchedAt": 1794495662795,
    "addedAt": 1794495174312,
    "lastSeenLiveAt": 1795715737459,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 0,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "hind.x1992",
@@ -92678,9 +92661,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794495174312,
    "lastSeenLiveAt": 1795590018982,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 1,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "dilekkprive",
@@ -92699,9 +92682,9 @@
    "lastWatchedAt": 1795004227349,
    "addedAt": 1794495017170,
    "lastSeenLiveAt": 1795650622880,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 1,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "anggun_supriadi91",
@@ -92741,9 +92724,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794494852885,
    "lastSeenLiveAt": 1795412846612,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 6,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "team.kent1",
@@ -92762,9 +92745,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794494852885,
    "lastSeenLiveAt": 1794494894847,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 0,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "papa_ozali",
@@ -92804,9 +92787,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794494852885,
    "lastSeenLiveAt": 1795362307143,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 7,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "tamaramilojevic",
@@ -92825,9 +92808,9 @@
    "lastWatchedAt": 1795792782806,
    "addedAt": 1794494852885,
    "lastSeenLiveAt": 1795795064713,
-   "lastPollAt": 1795798938099,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 0,
-   "nextPollAt": 1795799058099
+   "nextPollAt": 1795824148996
   },
   {
    "username": "odiogobento",
@@ -92951,9 +92934,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794494525294,
    "lastSeenLiveAt": 1795676032332,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 0,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "kharites1",
@@ -92993,9 +92976,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794494363452,
    "lastSeenLiveAt": 1795362572328,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 6,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "dselinkose",
@@ -93140,9 +93123,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794494052786,
    "lastSeenLiveAt": 1795614021626,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 0,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "justin__915",
@@ -93161,9 +93144,9 @@
    "lastWatchedAt": 1795004179603,
    "addedAt": 1794494052786,
    "lastSeenLiveAt": 1795500269579,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 5,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "senan.996",
@@ -93224,9 +93207,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794493895387,
    "lastSeenLiveAt": 1795589504284,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 0,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "mightyfit1",
@@ -93350,9 +93333,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794493576427,
    "lastSeenLiveAt": 1795411210235,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 4,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "kamran_aqsa",
@@ -93371,9 +93354,9 @@
    "lastWatchedAt": 1795466189735,
    "addedAt": 1794493576427,
    "lastSeenLiveAt": 1795465465236,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 5,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "nona63650",
@@ -93392,9 +93375,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794493576427,
    "lastSeenLiveAt": 1795589504284,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 1,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "freid_tj",
@@ -93413,9 +93396,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794493425059,
    "lastSeenLiveAt": 1795505320717,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 4,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "jinkangkr",
@@ -93518,9 +93501,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794493267363,
    "lastSeenLiveAt": 1795585592439,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 1,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "regi0911",
@@ -93623,9 +93606,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794493110291,
    "lastSeenLiveAt": 1795715737459,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 1,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "rosy.balla",
@@ -93707,9 +93690,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794492778304,
    "lastSeenLiveAt": 1795614021626,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 1,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "lipe.gral",
@@ -93770,9 +93753,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794492778304,
    "lastSeenLiveAt": 1795362307143,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 6,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "losel52",
@@ -93833,9 +93816,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794492622051,
    "lastSeenLiveAt": 1795590018982,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 0,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "blackmagicsound",
@@ -93959,9 +93942,9 @@
    "lastWatchedAt": 1795004507247,
    "addedAt": 1794492473904,
    "lastSeenLiveAt": 1795578872345,
-   "lastPollAt": 1795823770260,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 6,
-   "nextPollAt": 1795823890260
+   "nextPollAt": 1795824148996
   },
   {
    "username": "zainabowda",
@@ -94106,9 +94089,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794492324256,
    "lastSeenLiveAt": 1795620208869,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 0,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "vitalinamilagres",
@@ -94211,9 +94194,9 @@
    "lastWatchedAt": 1794750698362,
    "addedAt": 1794492324256,
    "lastSeenLiveAt": 1795362572328,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 7,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "yige0111",
@@ -94253,9 +94236,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794492173877,
    "lastSeenLiveAt": 1795584789354,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 4,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "jannat909095",
@@ -94316,9 +94299,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794492173877,
    "lastSeenLiveAt": 1795675776107,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 0,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "rabi_diego7",
@@ -94358,9 +94341,9 @@
    "lastWatchedAt": 1794492025157,
    "addedAt": 1794491999142,
    "lastSeenLiveAt": 1795010133630,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 9,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "el_butterfly24",
@@ -94379,9 +94362,9 @@
    "lastWatchedAt": 1794492126408,
    "addedAt": 1794491999142,
    "lastSeenLiveAt": 1795622034580,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 2,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "mahi93632",
@@ -94526,9 +94509,9 @@
    "lastWatchedAt": 1794491894473,
    "addedAt": 1794491825215,
    "lastSeenLiveAt": 1795715737460,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 1,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "seydaaaa16",
@@ -94736,9 +94719,9 @@
    "lastWatchedAt": 1794491539548,
    "addedAt": 1794491486715,
    "lastSeenLiveAt": 1795362307143,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 7,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "rinzin308",
@@ -94883,9 +94866,9 @@
    "lastWatchedAt": 1794491600584,
    "addedAt": 1794491486715,
    "lastSeenLiveAt": 1795359890916,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 7,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "daivadaiva287",
@@ -94904,9 +94887,9 @@
    "lastWatchedAt": 1794491322300,
    "addedAt": 1794491317901,
    "lastSeenLiveAt": 1795620208869,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 2,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "www.tiktok.surviver1411",
@@ -95030,9 +95013,9 @@
    "lastWatchedAt": 1794491416438,
    "addedAt": 1794491317901,
    "lastSeenLiveAt": 1795785261753,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 1,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "gabriela_angeless",
@@ -95093,9 +95076,9 @@
    "lastWatchedAt": 1795498313127,
    "addedAt": 1794461764664,
    "lastSeenLiveAt": 1795671199722,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 1,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "aengdew",
@@ -95114,9 +95097,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794461764664,
    "lastSeenLiveAt": 1795671199722,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 0,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "roxy_jc0",
@@ -95198,9 +95181,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794461643364,
    "lastSeenLiveAt": 1795585851429,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 2,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "riareverie",
@@ -95261,9 +95244,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794461643364,
    "lastSeenLiveAt": 1795590018982,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 1,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "luzbel_666..0",
@@ -95324,9 +95307,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794461523467,
    "lastSeenLiveAt": 1795498093513,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 7,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "sulesila06",
@@ -95366,9 +95349,9 @@
    "lastWatchedAt": 1794469184495,
    "addedAt": 1794461523467,
    "lastSeenLiveAt": 1795671199722,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 0,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "correa_jc02",
@@ -95429,9 +95412,9 @@
    "lastWatchedAt": 1795580124063,
    "addedAt": 1794461149927,
    "lastSeenLiveAt": 1795582880166,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 3,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "keiserbigbang",
@@ -95450,9 +95433,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794461149927,
    "lastSeenLiveAt": 1795671199722,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 0,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "nxits_0",
@@ -95492,9 +95475,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794461149927,
    "lastSeenLiveAt": 1795671199722,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 0,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "mercegt2026",
@@ -95513,9 +95496,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794461149927,
    "lastSeenLiveAt": 1795506110991,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 4,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "nurmels",
@@ -95597,9 +95580,9 @@
    "lastWatchedAt": 1794896552746,
    "addedAt": 1794461029942,
    "lastSeenLiveAt": 1795671199722,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 0,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "yadirazambrano2020",
@@ -95618,9 +95601,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794461029942,
    "lastSeenLiveAt": 1795671199722,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 0,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "barbara__antonella",
@@ -95702,9 +95685,9 @@
    "lastWatchedAt": 1794467459868,
    "addedAt": 1794460911757,
    "lastSeenLiveAt": 1795671199722,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 1,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "dellanirismarte",
@@ -95723,9 +95706,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794460911757,
    "lastSeenLiveAt": 1795189532626,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 0,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "koreakkang1",
@@ -95786,9 +95769,9 @@
    "lastWatchedAt": 1794469980199,
    "addedAt": 1794460911757,
    "lastSeenLiveAt": 1795671199722,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 0,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "lechugalive",
@@ -95807,9 +95790,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794460911757,
    "lastSeenLiveAt": 1795671199722,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 1,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "reinchristian_",
@@ -95870,9 +95853,9 @@
    "lastWatchedAt": 1794467275709,
    "addedAt": 1794460792359,
    "lastSeenLiveAt": 1795415765975,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 7,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "chismosoxx2",
@@ -95891,9 +95874,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794460792359,
    "lastSeenLiveAt": 1794980600765,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 3,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "adam.ali.hh",
@@ -95933,9 +95916,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794460792359,
    "lastSeenLiveAt": 1795671199722,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 1,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "noxeli.814",
@@ -95975,9 +95958,9 @@
    "lastWatchedAt": 1794467052794,
    "addedAt": 1794460673204,
    "lastSeenLiveAt": 1795715737459,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 1,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "1menace7.62",
@@ -96017,9 +96000,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794460673204,
    "lastSeenLiveAt": 1795715737459,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 1,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "agri..acevedo",
@@ -96038,9 +96021,9 @@
    "lastWatchedAt": 1794467234493,
    "addedAt": 1794460673204,
    "lastSeenLiveAt": 1795676292797,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 1,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "elcanebrita05",
@@ -96059,9 +96042,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794460673204,
    "lastSeenLiveAt": 1795675776107,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 1,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "anaxisabellex",
@@ -96206,9 +96189,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794460311062,
    "lastSeenLiveAt": 1795671199722,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 1,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "rojinaprasai1234",
@@ -96374,9 +96357,9 @@
    "lastWatchedAt": 1794466440572,
    "addedAt": 1794460189624,
    "lastSeenLiveAt": 1795671199722,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 1,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "heydi.27",
@@ -96395,9 +96378,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794460189624,
    "lastSeenLiveAt": 1794623577860,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 0,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "ale_magar48",
@@ -96437,9 +96420,9 @@
    "lastWatchedAt": 1794466474564,
    "addedAt": 1794460189624,
    "lastSeenLiveAt": 1794603101265,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 8,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "queenhayatty",
@@ -96479,9 +96462,9 @@
    "lastWatchedAt": 1794466636181,
    "addedAt": 1794460189624,
    "lastSeenLiveAt": 1795715737459,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 1,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "mr.facts787",
@@ -96668,9 +96651,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794459951895,
    "lastSeenLiveAt": 1795671199722,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 1,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "temomarquez",
@@ -96710,9 +96693,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794459700258,
    "lastSeenLiveAt": 1795671199722,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 1,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "_jxdxn_28",
@@ -96773,9 +96756,9 @@
    "lastWatchedAt": 1794465883883,
    "addedAt": 1794459700258,
    "lastSeenLiveAt": 1795671199722,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 1,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "ax4patron",
@@ -96857,9 +96840,9 @@
    "lastWatchedAt": 1795584531106,
    "addedAt": 1794459700258,
    "lastSeenLiveAt": 1795823251426,
-   "lastPollAt": 1795823770260,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 0,
-   "nextPollAt": 1795823890260
+   "nextPollAt": 1795824148996
   },
   {
    "username": "lalali.25",
@@ -96941,9 +96924,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794459460391,
    "lastSeenLiveAt": 1795671199722,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 1,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "carlychatss",
@@ -97004,9 +96987,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794459329735,
    "lastSeenLiveAt": 1795823251426,
-   "lastPollAt": 1795823770260,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 0,
-   "nextPollAt": 1795823890260
+   "nextPollAt": 1795824148996
   },
   {
    "username": "paolamarku0",
@@ -97046,9 +97029,9 @@
    "lastWatchedAt": 1794977917382,
    "addedAt": 1794459329735,
    "lastSeenLiveAt": 1795671199722,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 1,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "barbie_oficcial1",
@@ -97697,9 +97680,9 @@
    "lastWatchedAt": 1795577122034,
    "addedAt": 1794458379327,
    "lastSeenLiveAt": 1795584247392,
-   "lastPollAt": 1795795064714,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 6,
-   "nextPollAt": 1795823864714
+   "nextPollAt": 1795824148996
   },
   {
    "username": "itsnic.__",
@@ -97760,9 +97743,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794458254989,
    "lastSeenLiveAt": 1795823251426,
-   "lastPollAt": 1795823770260,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 0,
-   "nextPollAt": 1795823890260
+   "nextPollAt": 1795824148996
   },
   {
    "username": "sydney_.0.9",
@@ -98495,9 +98478,9 @@
    "lastWatchedAt": 1795580575334,
    "addedAt": 1794453570815,
    "lastSeenLiveAt": 1795584247392,
-   "lastPollAt": 1795823770260,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 3,
-   "nextPollAt": 1795823890260
+   "nextPollAt": 1795824148996
   },
   {
    "username": "hanbaooo8",
@@ -98558,9 +98541,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794453570815,
    "lastSeenLiveAt": 1794582918907,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 9,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "vadim_po__",
@@ -98600,9 +98583,9 @@
    "lastWatchedAt": 1794458991998,
    "addedAt": 1794453416085,
    "lastSeenLiveAt": 1795785261753,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 1,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "jin102701",
@@ -98999,9 +98982,9 @@
    "lastWatchedAt": 1795388294176,
    "addedAt": 1794452592327,
    "lastSeenLiveAt": 1795746527961,
-   "lastPollAt": 1795823770260,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 0,
-   "nextPollAt": 1795823890260
+   "nextPollAt": 1795824148996
   },
   {
    "username": "dymeft",
@@ -99650,9 +99633,9 @@
    "lastWatchedAt": 1794974075239,
    "addedAt": 1794451331312,
    "lastSeenLiveAt": 1795671199723,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 0,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "fuad.775",
@@ -100196,9 +100179,9 @@
    "lastWatchedAt": 1794797021993,
    "addedAt": 1794449769379,
    "lastSeenLiveAt": 1795420470994,
-   "lastPollAt": 1795798679747,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 6,
-   "nextPollAt": 1795798799747
+   "nextPollAt": 1795824148996
   },
   {
    "username": "ceellyynnn",
@@ -100868,9 +100851,9 @@
    "lastWatchedAt": 1795576588882,
    "addedAt": 1794448393613,
    "lastSeenLiveAt": 1795823251426,
-   "lastPollAt": 1795823770260,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 0,
-   "nextPollAt": 1795823890260
+   "nextPollAt": 1795824148996
   },
   {
    "username": "_portugalac",
@@ -100994,9 +100977,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794448116695,
    "lastSeenLiveAt": 1794875113353,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 11,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "ernirj",
@@ -101120,9 +101103,9 @@
    "lastWatchedAt": 1795045533167,
    "addedAt": 1794447825372,
    "lastSeenLiveAt": 1795393440308,
-   "lastPollAt": 1795798938099,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 1,
-   "nextPollAt": 1795799058099
+   "nextPollAt": 1795824148996
   },
   {
    "username": "serhiidix",
@@ -101708,9 +101691,9 @@
    "lastWatchedAt": 1795007665351,
    "addedAt": 1794446727679,
    "lastSeenLiveAt": 1795244089554,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 9,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "jnisana",
@@ -101918,9 +101901,9 @@
    "lastWatchedAt": 1794977902582,
    "addedAt": 1794446077506,
    "lastSeenLiveAt": 1795823251426,
-   "lastPollAt": 1795823770260,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 0,
-   "nextPollAt": 1795823890260
+   "nextPollAt": 1795824148996
   },
   {
    "username": "oscar.ting1",
@@ -102107,9 +102090,9 @@
    "lastWatchedAt": 1794447916944,
    "addedAt": 1794445761960,
    "lastSeenLiveAt": 1795823251426,
-   "lastPollAt": 1795823770260,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 0,
-   "nextPollAt": 1795823890260
+   "nextPollAt": 1795824148996
   },
   {
    "username": "riv.dul",
@@ -102128,9 +102111,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794445618318,
    "lastSeenLiveAt": 1795785261753,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 1,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "ashabylafunky7",
@@ -102212,9 +102195,9 @@
    "lastWatchedAt": 1794448282535,
    "addedAt": 1794445618318,
    "lastSeenLiveAt": 1795794276010,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 1,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "janiylive",
@@ -102716,9 +102699,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794444649372,
    "lastSeenLiveAt": 1795785261753,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 1,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "mais_moo3",
@@ -103619,9 +103602,9 @@
    "lastWatchedAt": 1795658136173,
    "addedAt": 1794443383646,
    "lastSeenLiveAt": 1795586112608,
-   "lastPollAt": 1795798938099,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 3,
-   "nextPollAt": 1795799058099
+   "nextPollAt": 1795824148996
   },
   {
    "username": "itsheycancer",
@@ -103892,9 +103875,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794443105309,
    "lastSeenLiveAt": 1795823251426,
-   "lastPollAt": 1795823770260,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 0,
-   "nextPollAt": 1795823890260
+   "nextPollAt": 1795824148996
   },
   {
    "username": "roi.ydf",
@@ -104207,9 +104190,9 @@
    "lastWatchedAt": 1794458659241,
    "addedAt": 1794442713336,
    "lastSeenLiveAt": 1795823251426,
-   "lastPollAt": 1795823770260,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 0,
-   "nextPollAt": 1795823890260
+   "nextPollAt": 1795824148996
   },
   {
    "username": "johnnidiaconud",
@@ -104564,9 +104547,9 @@
    "lastWatchedAt": 1795587638314,
    "addedAt": 1794442278089,
    "lastSeenLiveAt": 1795729410122,
-   "lastPollAt": 1795823770260,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 0,
-   "nextPollAt": 1795823890260
+   "nextPollAt": 1795824148996
   },
   {
    "username": "waelyat",
@@ -104690,9 +104673,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794441994573,
    "lastSeenLiveAt": 1795785261753,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 1,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "prettajess",
@@ -105194,9 +105177,9 @@
    "lastWatchedAt": 1794448500659,
    "addedAt": 1794441430810,
    "lastSeenLiveAt": 1795823251425,
-   "lastPollAt": 1795823770260,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 0,
-   "nextPollAt": 1795823890260
+   "nextPollAt": 1795824148996
   },
   {
    "username": "habibi.1dubai",
@@ -105299,9 +105282,9 @@
    "lastWatchedAt": 1794462107294,
    "addedAt": 1794441285091,
    "lastSeenLiveAt": 1795823251426,
-   "lastPollAt": 1795823770260,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 0,
-   "nextPollAt": 1795823890260
+   "nextPollAt": 1795824148996
   },
   {
    "username": "_babe.lil.dove_",
@@ -105866,9 +105849,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794440691577,
    "lastSeenLiveAt": 1795650622881,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 1,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "zewa__",
@@ -105908,9 +105891,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794440691577,
    "lastSeenLiveAt": 1794440745230,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 9,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "thepositivefamily2",
@@ -105929,9 +105912,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794440691577,
    "lastSeenLiveAt": 1795823251426,
-   "lastPollAt": 1795823770260,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 0,
-   "nextPollAt": 1795823890260
+   "nextPollAt": 1795824148996
   },
   {
    "username": "mohamedsomali1",
@@ -106181,9 +106164,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794440395025,
    "lastSeenLiveAt": 1794969176403,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 9,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "supremolives",
@@ -106349,9 +106332,9 @@
    "lastWatchedAt": 1795407130813,
    "addedAt": 1794440253467,
    "lastSeenLiveAt": 1795587424213,
-   "lastPollAt": 1795823770260,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 3,
-   "nextPollAt": 1795823890260
+   "nextPollAt": 1795824148996
   },
   {
    "username": "dobleff_f",
@@ -106391,9 +106374,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794440253467,
    "lastSeenLiveAt": 1794440304777,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 9,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "ar1sssssssss",
@@ -106706,9 +106689,9 @@
    "lastWatchedAt": 1794440060410,
    "addedAt": 1794439964176,
    "lastSeenLiveAt": 1794440017184,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 9,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "emma_finity",
@@ -107126,9 +107109,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794435109805,
    "lastSeenLiveAt": 1794519853130,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 9,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "princesstellaaa",
@@ -107273,9 +107256,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794434997442,
    "lastSeenLiveAt": 1795823251425,
-   "lastPollAt": 1795823770260,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 0,
-   "nextPollAt": 1795823890260
+   "nextPollAt": 1795824148996
   },
   {
    "username": "stasiek_filochowski",
@@ -107378,9 +107361,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794434873962,
    "lastSeenLiveAt": 1794685499625,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 9,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "sandhyashrestha232",
@@ -107483,9 +107466,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794434763469,
    "lastSeenLiveAt": 1794973726328,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 9,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "anamaria.4u",
@@ -107533,22 +107516,22 @@
    "username": "mirnel.live.new",
    "country": "MK",
    "source": "discovery",
-   "roomId": "7710752413201648391",
-   "roomIdAt": 1795307838929,
+   "roomId": "7712990145632291591",
+   "roomIdAt": 1795823845996,
    "roomIdMiss": 0,
-   "boxEvents": 14,
-   "boxCoinSum": 1100,
-   "boxCoinsSeen": 6,
-   "boxSharedSum": 1100,
-   "boxSharedSeen": 6,
+   "boxEvents": 18,
+   "boxCoinSum": 1200,
+   "boxCoinsSeen": 7,
+   "boxSharedSum": 1200,
+   "boxSharedSeen": 7,
    "firstBoxAt": 1794876870728,
-   "lastBoxAt": 1795309725576,
-   "lastWatchedAt": 1795307838930,
+   "lastBoxAt": 1795824160727,
+   "lastWatchedAt": 1795823845996,
    "addedAt": 1794434763469,
    "lastSeenLiveAt": 1795393440310,
-   "lastPollAt": 1795823770260,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 7,
-   "nextPollAt": 1795823890260
+   "nextPollAt": 1795824148996
   },
   {
    "username": "mauryyofficial",
@@ -107672,9 +107655,9 @@
    "lastWatchedAt": 1795319032106,
    "addedAt": 1794434524808,
    "lastSeenLiveAt": 1795746527961,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 0,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "shorts011",
@@ -108260,9 +108243,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794433403750,
    "lastSeenLiveAt": 1795823251425,
-   "lastPollAt": 1795823770260,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 0,
-   "nextPollAt": 1795823890260
+   "nextPollAt": 1795824148996
   },
   {
    "username": "roxy_smenn",
@@ -108386,9 +108369,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794433182021,
    "lastSeenLiveAt": 0,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 9,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "rashidraja215",
@@ -109205,9 +109188,9 @@
    "lastWatchedAt": 1795118345397,
    "addedAt": 1794432077586,
    "lastSeenLiveAt": 1795794016998,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 0,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "rasimbaba001",
@@ -109310,9 +109293,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794431966659,
    "lastSeenLiveAt": 1794519853130,
-   "lastPollAt": 1795823770260,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 10,
-   "nextPollAt": 1795823890260
+   "nextPollAt": 1795824148996
   },
   {
    "username": "king.alasow",
@@ -109373,9 +109356,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794431750133,
    "lastSeenLiveAt": 1794646937977,
-   "lastPollAt": 1795798163927,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 9,
-   "nextPollAt": 1795798283927
+   "nextPollAt": 1795824148996
   },
   {
    "username": "mix_151",
@@ -109814,9 +109797,9 @@
    "lastWatchedAt": 1794970701481,
    "addedAt": 1794431206604,
    "lastSeenLiveAt": 1795746527961,
-   "lastPollAt": 1795823770260,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 0,
-   "nextPollAt": 1795823890260
+   "nextPollAt": 1795824148996
   },
   {
    "username": "isabel.vela.72",
@@ -110906,9 +110889,9 @@
    "lastWatchedAt": 1795323288722,
    "addedAt": 1794429452180,
    "lastSeenLiveAt": 1795823251426,
-   "lastPollAt": 1795823770260,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 0,
-   "nextPollAt": 1795823890260
+   "nextPollAt": 1795824148996
   },
   {
    "username": "kyngtavii",
@@ -113300,9 +113283,9 @@
    "lastWatchedAt": 1795823520147,
    "addedAt": 1794425788616,
    "lastSeenLiveAt": 1795823251425,
-   "lastPollAt": 1795823770260,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 0,
-   "nextPollAt": 1795823890260
+   "nextPollAt": 1795824148996
   },
   {
    "username": "younesssss03",
@@ -115883,9 +115866,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794422576498,
    "lastSeenLiveAt": 1795823251425,
-   "lastPollAt": 1795823770260,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 0,
-   "nextPollAt": 1795823890260
+   "nextPollAt": 1795824148996
   },
   {
    "username": "sharon_meh",
@@ -116219,9 +116202,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794422259351,
    "lastSeenLiveAt": 1795508181435,
-   "lastPollAt": 1795795064715,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 6,
-   "nextPollAt": 1795823864715
+   "nextPollAt": 1795824148996
   },
   {
    "username": "danielaceballoss8",
@@ -116240,9 +116223,9 @@
    "lastWatchedAt": 1794970739743,
    "addedAt": 1794422259351,
    "lastSeenLiveAt": 1795823251426,
-   "lastPollAt": 1795823770260,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 0,
-   "nextPollAt": 1795823890260
+   "nextPollAt": 1795824148996
   },
   {
    "username": "scorpiowolf11_11",
@@ -116282,9 +116265,9 @@
    "lastWatchedAt": 1794433786092,
    "addedAt": 1794422259351,
    "lastSeenLiveAt": 1795823251426,
-   "lastPollAt": 1795823770260,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 0,
-   "nextPollAt": 1795823890260
+   "nextPollAt": 1795824148996
   },
   {
    "username": "niknando",
@@ -116954,9 +116937,9 @@
    "lastWatchedAt": 1794421107428,
    "addedAt": 1794421082698,
    "lastSeenLiveAt": 1795505320716,
-   "lastPollAt": 1795823770260,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 6,
-   "nextPollAt": 1795823890260
+   "nextPollAt": 1795824148996
   },
   {
    "username": "diilloo_94",
@@ -117080,9 +117063,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794420853957,
    "lastSeenLiveAt": 1795508181435,
-   "lastPollAt": 1795795064715,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 6,
-   "nextPollAt": 1795823864715
+   "nextPollAt": 1795824148996
   },
   {
    "username": "soyinsano_h1",
@@ -118004,9 +117987,9 @@
    "lastWatchedAt": 1794807154458,
    "addedAt": 1794416519484,
    "lastSeenLiveAt": 1795497550068,
-   "lastPollAt": 1795795064715,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 6,
-   "nextPollAt": 1795823864715
+   "nextPollAt": 1795824148996
   },
   {
    "username": "mentalhelselars",
@@ -119201,9 +119184,9 @@
    "lastWatchedAt": 1795117910743,
    "addedAt": 1794414287151,
    "lastSeenLiveAt": 1795795064715,
-   "lastPollAt": 1795823770260,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 0,
-   "nextPollAt": 1795823890260
+   "nextPollAt": 1795824148996
   },
   {
    "username": "rsq867",
@@ -119768,9 +119751,9 @@
    "lastWatchedAt": 1794421223879,
    "addedAt": 1794413293942,
    "lastSeenLiveAt": 1795547331418,
-   "lastPollAt": 1795795064715,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 6,
-   "nextPollAt": 1795823864715
+   "nextPollAt": 1795824148996
   },
   {
    "username": "deotroplaneta",
@@ -119789,9 +119772,9 @@
    "lastWatchedAt": 1795279502784,
    "addedAt": 1794413090226,
    "lastSeenLiveAt": 1795795064715,
-   "lastPollAt": 1795798938099,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 0,
-   "nextPollAt": 1795799058099
+   "nextPollAt": 1795824148996
   },
   {
    "username": "ghazinadan1",
@@ -120629,9 +120612,9 @@
    "lastWatchedAt": 1794508959567,
    "addedAt": 1794411724633,
    "lastSeenLiveAt": 1795795064715,
-   "lastPollAt": 1795823770260,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 0,
-   "nextPollAt": 1795823890260
+   "nextPollAt": 1795824148996
   },
   {
    "username": "sztiflerr18",
@@ -120755,9 +120738,9 @@
    "lastWatchedAt": 1794520131451,
    "addedAt": 1794411528751,
    "lastSeenLiveAt": 1795795064713,
-   "lastPollAt": 1795823770260,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 0,
-   "nextPollAt": 1795823890260
+   "nextPollAt": 1795824148996
   },
   {
    "username": "zaika_zn",
@@ -122435,9 +122418,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794408026488,
    "lastSeenLiveAt": 1795577515297,
-   "lastPollAt": 1795795064715,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 6,
-   "nextPollAt": 1795823864715
+   "nextPollAt": 1795824148996
   },
   {
    "username": "choko_pie_new",
@@ -122855,9 +122838,9 @@
    "lastWatchedAt": 1794457526602,
    "addedAt": 1794407000265,
    "lastSeenLiveAt": 1795823251426,
-   "lastPollAt": 1795823770260,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 0,
-   "nextPollAt": 1795823890260
+   "nextPollAt": 1795824148996
   },
   {
    "username": "pareeshyy1",
@@ -122897,9 +122880,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794407000265,
    "lastSeenLiveAt": 1795823251426,
-   "lastPollAt": 1795823770260,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 0,
-   "nextPollAt": 1795823890260
+   "nextPollAt": 1795824148996
   },
   {
    "username": "mehdia66",
@@ -123296,9 +123279,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794406397486,
    "lastSeenLiveAt": 1795462375087,
-   "lastPollAt": 1795795064715,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 6,
-   "nextPollAt": 1795823864715
+   "nextPollAt": 1795824148996
   },
   {
    "username": "baby_010608",
@@ -124934,9 +124917,9 @@
    "lastWatchedAt": 1794838400321,
    "addedAt": 1794403775224,
    "lastSeenLiveAt": 1795620208869,
-   "lastPollAt": 1795823770260,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 1,
-   "nextPollAt": 1795823890260
+   "nextPollAt": 1795824148996
   },
   {
    "username": "yur.1112_",
@@ -125501,9 +125484,9 @@
    "lastWatchedAt": 1795410854377,
    "addedAt": 1794328182171,
    "lastSeenLiveAt": 1795823251426,
-   "lastPollAt": 1795823770260,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 0,
-   "nextPollAt": 1795823890260
+   "nextPollAt": 1795824148996
   },
   {
    "username": "bossup_babe",
@@ -125564,9 +125547,9 @@
    "lastWatchedAt": 1794582619473,
    "addedAt": 1794327890362,
    "lastSeenLiveAt": 1795823251425,
-   "lastPollAt": 1795823770260,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 0,
-   "nextPollAt": 1795823890260
+   "nextPollAt": 1795824148996
   },
   {
    "username": "numbe_nine",
@@ -125606,9 +125589,9 @@
    "lastWatchedAt": 1794580406046,
    "addedAt": 1794327890362,
    "lastSeenLiveAt": 1794403779071,
-   "lastPollAt": 1795797906894,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 2,
-   "nextPollAt": 1795798026894
+   "nextPollAt": 1795824148996
   },
   {
    "username": "nickytanixviva",
@@ -125627,9 +125610,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794327890362,
    "lastSeenLiveAt": 1795589246419,
-   "lastPollAt": 1795797906894,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 1,
-   "nextPollAt": 1795798026894
+   "nextPollAt": 1795824148996
   },
   {
    "username": "ee_110124",
@@ -125774,9 +125757,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794327827506,
    "lastSeenLiveAt": 0,
-   "lastPollAt": 1795797906894,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 9,
-   "nextPollAt": 1795798026894
+   "nextPollAt": 1795824148996
   },
   {
    "username": "theroyalqueens13",
@@ -125795,9 +125778,9 @@
    "lastWatchedAt": 1794834512106,
    "addedAt": 1794327827506,
    "lastSeenLiveAt": 1795622034579,
-   "lastPollAt": 1795797906894,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 0,
-   "nextPollAt": 1795798026894
+   "nextPollAt": 1795824148996
   },
   {
    "username": "_kgz_a1maz__",
@@ -126005,9 +125988,9 @@
    "lastWatchedAt": 1795110711288,
    "addedAt": 1794327770843,
    "lastSeenLiveAt": 1795362307143,
-   "lastPollAt": 1795797906894,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 6,
-   "nextPollAt": 1795798026894
+   "nextPollAt": 1795824148996
   },
   {
    "username": "douhalaribiii",
@@ -126068,9 +126051,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794327770843,
    "lastSeenLiveAt": 1795504799019,
-   "lastPollAt": 1795797906894,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 4,
-   "nextPollAt": 1795798026894
+   "nextPollAt": 1795824148996
   },
   {
    "username": "___88358",
@@ -126131,9 +126114,9 @@
    "lastWatchedAt": 1795414022052,
    "addedAt": 1794327577410,
    "lastSeenLiveAt": 1795589246419,
-   "lastPollAt": 1795797906894,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 1,
-   "nextPollAt": 1795798026894
+   "nextPollAt": 1795824148996
   },
   {
    "username": "rosalia.camacho82",
@@ -126152,9 +126135,9 @@
    "lastWatchedAt": 1794539110122,
    "addedAt": 1794327577410,
    "lastSeenLiveAt": 1795620991951,
-   "lastPollAt": 1795797906894,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 0,
-   "nextPollAt": 1795798026894
+   "nextPollAt": 1795824148996
   },
   {
    "username": "rodifyy",
@@ -126215,9 +126198,9 @@
    "lastWatchedAt": 0,
    "addedAt": 1794327577410,
    "lastSeenLiveAt": 1795715737460,
-   "lastPollAt": 1795797906894,
+   "lastPollAt": 1795824028996,
    "offlineChecks": 0,
-   "nextPollAt": 1795798026894
+   "nextPollAt": 1795824148996
   },
   {
    "username": "sayatissembayev",
